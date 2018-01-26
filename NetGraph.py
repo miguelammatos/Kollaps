@@ -1,11 +1,13 @@
+from utils import fail
+
 
 class NetGraph:
     def __init__(self):
-        self.services = {} #  TODO: Need to support replication
+        self.services = {}
         self.bridges = {}
         self.links = []
 
-    def get_node(self, name):
+    def get_nodes(self, name):
         if name in self.services:
             return self.services[name]
         elif name in self.bridges:
@@ -15,17 +17,24 @@ class NetGraph:
 
     def new_service(self, name, image):
         service = NetGraph.Service(name, image)
-        self.services[name] = service
+        if self.get_nodes(name) is None:
+            self.services[name] = [service]
+        else:
+            self.get_nodes(name).append(service)
 
     def new_bridge(self, name):
         bridge = NetGraph.Bridge(name)
-        self.bridges[name] = bridge
+        if self.get_nodes(name) is None:
+            self.bridges[name] = [bridge]
+        else:
+            fail("Cant add bridge with name: " + name + ". Another node with the same name already exists")
 
     def new_link(self, source, destination, latency, drop, bandwidth, network):
-        link = NetGraph.Link(source, destination, latency, drop, bandwidth, network)
-        self.links.append(link);
-        sourceNode = self.get_node(source)
-        sourceNode.attach_link(link)
+        source_nodes = self.get_nodes(source)
+        for node in source_nodes:
+            link = NetGraph.Link(source, destination, latency, drop, bandwidth, network)
+            self.links.append(link)
+            node.attach_link(link)
 
 
     class Node:
