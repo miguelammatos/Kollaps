@@ -6,9 +6,14 @@ from utils import fail
 from socket import gethostname
 import netifaces
 import os
+import sys
 
 def main():
-    topology_file = "/topology.xml"
+    if(len(sys.argv) != 2):
+        topology_file = "/topology.xml"
+    else:
+        topology_file = sys.argv[1]
+
     graph = NetGraph()
 
     XMLGraphParser(topology_file, graph).fill_graph()
@@ -29,7 +34,23 @@ def main():
     if graph.root is None:
         fail("Failed to identify current service instance in topology!")
 
-    # TODO Calculate shortest paths
+    graph.calculate_shortest_paths()
+
+'''
+#TEMP REMOVE ME
+graph.root = graph.services["leaf"][0]
+#_____________
+
+graph.calculate_shortest_paths()
+for node in graph.paths:
+    path = graph.paths[node]
+    if len(path) < 1:
+        continue
+    print(graph.root.name + " -> " + node.name)
+    for link in path:
+        print("   " + link.source + " hop " + link.destination)
+'''
+
     # TODO Call TC init and init all destinations
     # TODO Go beyoind static emulation
 

@@ -2,6 +2,7 @@ from utils import fail
 from socket import gethostbyname_ex
 from time import sleep
 import re
+import heapq
 
 class NetGraph:
     def __init__(self):
@@ -54,11 +55,11 @@ class NetGraph:
         base = results[0][0]
         multiplier = results[0][1]
         if multiplier == 'K':
-            return base
+            return int(base)
         if multiplier == 'M':
-            return base * 1000
+            return int(base) * 1000
         if multiplier == 'G':
-            return base * 1000 * 1000
+            return int(base) * 1000 * 1000
 
     def resolve_hostnames(self):
         for service in self.services:
@@ -70,6 +71,43 @@ class NetGraph:
             for i in range(len(hosts)):
                 hosts[i].ip = info[2][i]
 
+    def calculate_shortest_paths(self):
+        # Dijkstra's shortest path implementation
+        if self.root is None:
+            fail("Root of the tree has not been defined.")
+
+        dist = {}
+        Q = []
+        for service in self.services:
+            hosts = self.services[service]
+            for host in hosts:
+                distance = 0
+                if host != self.root:
+                    distance = self.reference_bandwidth
+                entry = [distance, host]
+                Q.append(entry)
+                dist[host] = distance
+        for bridge in self.bridges:
+            b = self.bridges[bridge][0]
+            Q.append([self.reference_bandwidth, b])
+            dist[b] = self.reference_bandwidth
+
+        self.paths[self.root] = []
+        while len(Q) > 0:
+            Q.sort(key=lambda ls: ls[0])
+            u = Q.pop(0)[1]  # type: NetGraph.Node
+            for link in u.links:
+                alt = dist[u] + (self.reference_bandwidth/link.bandwidth_Kbps)
+                if alt < dist[self.get_nodes(link.destination)[0]]:  # We can just grab the first one as its the same for all
+                    for node in self.get_nodes(link.destination):
+                        dist[node] = alt
+                        node.parent = u
+                        path = self.paths[u][:]
+                        path.append(link)
+                        self.paths[node] = path
+                        for e in Q:  # find the node in Q and change its priority
+                            if e[1] == node:
+                                e[0] = alt
 
 
     class Node:
@@ -77,6 +115,7 @@ class NetGraph:
             self.name = name
             self.network = ""  # maybe in the future support multiple networks? (TCAL doesnt allow that for now)
             self.links = []
+            self.parent = None  # to be filled by shortest paths
 
         def attach_link(self, link):
             self.links.append(link)
