@@ -1,4 +1,4 @@
-import TCAL.pyTCAL as TCAL
+from TCAL import pyTCAL as TCAL  # TODO this breaks compatibility with py2 for some reason...
 from NetGraph import NetGraph
 
 import sys

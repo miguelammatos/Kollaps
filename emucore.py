@@ -22,7 +22,8 @@ def main():
 
     XMLGraphParser(topology_file, graph).fill_graph()
 
-    # __debug_print_paths(graph)
+    __debug_print_paths(graph)
+    return
 
     graph.resolve_hostnames()
 

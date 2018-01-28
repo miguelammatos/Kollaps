@@ -165,21 +165,17 @@ class NetGraph:
         :param path: List[Link]
         :return: float
         """
-        total_drop = 0.0
+        # Product of reverse probabilities reversed
+        # basically calculate the probability of not dropping across the entire path
+        # and then invert it
+        # Problem is similar to probability of getting at least one 6 in multiple dice rolls
+        total_not_drop_probability = 1.0
         for link in path:
             try:
-                # P(drop in current link | not dropped in previous)
-                # P(B | A) = ( P(A and B) ) / P(A)
-                # P(A and B) = P(A)*P(B|A) if dependant
-                # P(A and B) = P(A)*P(B) if independant
-                # if independant:
-                #   P(B | A) = P(B)
-                # TODO double check the math behind this!
-                drop_this_link = float(link.drop)
-                total_drop += drop_this_link
+                total_not_drop_probability *= (1.0-float(link.drop))
             except:
                 fail("Provided packet loss probability is not a float: " + link.latency)
-        return total_drop
+        return (1.0-total_not_drop_probability)
 
     @staticmethod
     def calculate_path_max_initial_bandwidth(path):
