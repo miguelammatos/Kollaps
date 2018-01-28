@@ -145,7 +145,8 @@ class NetGraph:
                         if e[1] == node:
                             e[0] = alt
 
-    def calculate_path_latency(self, path):
+    @staticmethod
+    def calculate_path_latency(path):
         """
         :param path: List[Link]
         :return: int
@@ -158,7 +159,8 @@ class NetGraph:
                 fail("Provided latency is not an integer: " + link.latency)
         return total_latency
 
-    def calculate_path_drop(self, path):
+    @staticmethod
+    def calculate_path_drop(path):
         """
         :param path: List[Link]
         :return: float
@@ -179,13 +181,16 @@ class NetGraph:
                 fail("Provided packet loss probability is not a float: " + link.latency)
         return total_drop
 
-    def calculate_path_max_initial_bandwidth(self, path):
+    @staticmethod
+    def calculate_path_max_initial_bandwidth(path):
         """
         :param path: List[Link]
         :return: int
         """
-        max_bandwidth = self.reference_bandwidth
+        max_bandwidth = None
         for link in path:
+            if max_bandwidth is None:
+                max_bandwidth = link.bandwidth_Kbps
             if link.bandwidth_Kbps < max_bandwidth:
                 max_bandwidth = link.bandwidth_Kbps
 

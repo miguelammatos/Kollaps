@@ -2,14 +2,18 @@
 from NetGraph import NetGraph
 from XMLGraphParser import XMLGraphParser
 from utils import fail
+import PathEmulation
 
+
+import subprocess
 from socket import gethostname
 import netifaces
 import os
 import sys
 
+
 def main():
-    if(len(sys.argv) != 2):
+    if len(sys.argv) != 2:
         topology_file = "/topology.xml"
     else:
         topology_file = sys.argv[1]
@@ -18,12 +22,11 @@ def main():
 
     XMLGraphParser(topology_file, graph).fill_graph()
 
-    __debug_print_paths(graph)
+    # __debug_print_paths(graph)
 
-    '''
     graph.resolve_hostnames()
 
-    #Get our own ip address and set the root of the "tree"
+    # Get our own ip address and set the root of the "tree"
     interface = os.environ.get['NETWORK_INTERFACE']
     if interface is None:
         fail("NETWORK_INTERFACE environment variable is not set!")
@@ -32,17 +35,23 @@ def main():
     ownIP = netifaces.ifaddresses(interface)[netifaces.AF_INET]['addr']
     currentServiceName = gethostname()
     for host in graph.services[currentServiceName]:
-        if(host.ip == ownIP):
+        if host.ip == ownIP:
             graph.root = host
     if graph.root is None:
         fail("Failed to identify current service instance in topology!")
 
     graph.calculate_shortest_paths()
 
-    '''
+    PathEmulation.init()
+    for service in graph.paths:
+        path = graph.paths[service]
+        PathEmulation.initialize_path(path)
 
-    # TODO Call TC init and init all destinations
-    # TODO Go beyoind static emulation
+    # Temporary hack to start the experiment
+    subprocess.run('echo "done\n" > /tmp/readypipe', shell=True)
+
+    # TODO Go beyond static emulation
+
 
 def __debug_print_paths(graph):
     graph.root = graph.services["leaf"][0]
@@ -51,13 +60,14 @@ def __debug_print_paths(graph):
     for node in graph.paths:
         path = graph.paths[node]
         print("##############################")
-        print(graph.root.name + " -> " + node.name + ":" +  str(node.__hash__()))
+        print(graph.root.name + " -> " + node.name + ":" + str(node.__hash__()))
         print("latency: " + str(graph.calculate_path_latency(path)))
         print("drop: " + str(graph.calculate_path_drop(path)))
         print("bandwidth: " + str(graph.calculate_path_max_initial_bandwidth(path)))
         print("------------------------------")
         for link in path:
             print("   " + link.source.name + " hop " + link.destination.name)
+
 
 if __name__ == '__main__':
     main()
