@@ -18,6 +18,18 @@ def main():
 
     XMLGraphParser(topology_file, graph).fill_graph()
 
+    #TEMP REMOVE ME
+    graph.root = graph.services["leaf"][0]
+    #_____________
+
+    graph.calculate_shortest_paths()
+    for node in graph.paths:
+        path = graph.paths[node]
+        print(graph.root.name + " -> " + node.name + ":" +  str(node.__hash__()))
+        for link in path:
+            print("   " + link.source.name + " hop " + link.destination.name)
+
+    '''
     graph.resolve_hostnames()
 
     #Get our own ip address and set the root of the "tree"
@@ -36,20 +48,7 @@ def main():
 
     graph.calculate_shortest_paths()
 
-'''
-#TEMP REMOVE ME
-graph.root = graph.services["leaf"][0]
-#_____________
-
-graph.calculate_shortest_paths()
-for node in graph.paths:
-    path = graph.paths[node]
-    if len(path) < 1:
-        continue
-    print(graph.root.name + " -> " + node.name)
-    for link in path:
-        print("   " + link.source + " hop " + link.destination)
-'''
+    '''
 
     # TODO Call TC init and init all destinations
     # TODO Go beyoind static emulation

@@ -2,16 +2,20 @@ from utils import fail
 from socket import gethostbyname_ex
 from time import sleep
 import re
-import heapq
+
+import sys
+if sys.version_info >= (3, 0):
+    from typing import Dict, List
+
 
 class NetGraph:
     def __init__(self):
-        self.services = {}
-        self.bridges = {}
-        self.links = []
+        self.services = {}  # type: Dict[str,List[NetGraph.Service]]
+        self.bridges = {}  # type: Dict[str,List[NetGraph.Service]]
+        self.links = []  # type: List[NetGraph.Link]
 
         self.root = None  # type: NetGraph.Service
-        self.paths = {}  # Shortest path to each possible destination
+        self.paths = {}  # type: Dict[NetGraph.Node,List[NetGraph.Link]
 
         self.reference_bandwidth = 0  # Maximum bandwidth on the topology, used for calculating link cost
         self.bandwidth_re = re.compile("([0-9]+)([KMG])bps")
@@ -22,31 +26,33 @@ class NetGraph:
         elif name in self.bridges:
             return self.bridges[name]
         else:
-            return None
+            return []
 
     def new_service(self, name, image):
         service = NetGraph.Service(name, image)
-        if self.get_nodes(name) is None:
+        if len(self.get_nodes(name)) == 0:
             self.services[name] = [service]
         else:
             self.get_nodes(name).append(service)
 
     def new_bridge(self, name):
         bridge = NetGraph.Bridge(name)
-        if self.get_nodes(name) is None:
+        if len(self.get_nodes(name)) == 0:
             self.bridges[name] = [bridge]
         else:
             fail("Cant add bridge with name: " + name + ". Another node with the same name already exists")
 
     def new_link(self, source, destination, latency, drop, bandwidth, network):
         source_nodes = self.get_nodes(source)
+        destination_nodes = self.get_nodes(destination)
         for node in source_nodes:
-            bandwidth_kbps = self.bandwidth_in_kbps(bandwidth)
-            if self.reference_bandwidth < bandwidth_kbps:
-                self.reference_bandwidth = bandwidth_kbps
-            link = NetGraph.Link(source, destination, latency, drop, bandwidth, bandwidth_kbps, network)
-            self.links.append(link)
-            node.attach_link(link)
+            for dest in destination_nodes:
+                bandwidth_kbps = self.bandwidth_in_kbps(bandwidth)
+                if self.reference_bandwidth < bandwidth_kbps:
+                    self.reference_bandwidth = bandwidth_kbps
+                link = NetGraph.Link(node, dest, latency, drop, bandwidth, bandwidth_kbps, network)
+                self.links.append(link)
+                node.attach_link(link)
 
     def bandwidth_in_kbps(self, bandwidth_string):
         if re.match(self.bandwidth_re, bandwidth_string) is None:
@@ -98,29 +104,25 @@ class NetGraph:
             u = Q.pop(0)[1]  # type: NetGraph.Node
             for link in u.links:
                 alt = dist[u] + (self.reference_bandwidth/link.bandwidth_Kbps)
-                if alt < dist[self.get_nodes(link.destination)[0]]:  # We can just grab the first one as its the same for all
-                    for node in self.get_nodes(link.destination):
-                        dist[node] = alt
-                        node.parent = u
-                        path = self.paths[u][:]
-                        path.append(link)
-                        self.paths[node] = path
-                        for e in Q:  # find the node in Q and change its priority
-                            if e[1] == node:
-                                e[0] = alt
+                if alt < dist[link.destination]:
+                    node = link.destination
+                    dist[node] = alt
+                    path = self.paths[u][:]
+                    path.append(link)
+                    self.paths[node] = path
+                    for e in Q:  # find the node in Q and change its priority
+                        if e[1] == node:
+                            e[0] = alt
 
-
-    class Node:
+    class Node(object):
         def __init__(self, name):
             self.name = name
             self.network = ""  # maybe in the future support multiple networks? (TCAL doesnt allow that for now)
             self.links = []
-            self.parent = None  # to be filled by shortest paths
 
         def attach_link(self, link):
             self.links.append(link)
             self.network = link.network
-
 
     class Service(Node):
         def __init__(self, name, image):
@@ -133,12 +135,12 @@ class NetGraph:
             super(NetGraph.Bridge, self).__init__(name)
 
     class Link:
-        #Links are unidirectional
+        # Links are unidirectional
         def __init__(self, source, destination, latency, drop, bandwidth, Kbps, network):
-            self.source = source
-            self.destination = destination
+            self.source = source  # type: NetGraph.Node
+            self.destination = destination  # type: NetGraph.Node
             self.latency = latency
             self.drop = drop
-            self.bandwidth = bandwidth
-            self.bandwidth_Kbps = Kbps
+            self.bandwidth = bandwidth  # type: str
+            self.bandwidth_Kbps = Kbps  # type: int
             self.network = network
