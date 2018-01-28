@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<experiment>
+	<services>
+		<service name="leaf" image="warpenguin.no-ip.org/leaf:2.73" replicas="2" share="false"/>
+		<service name="leaf2" image="warpenguin.no-ip.org/leaf:2.73" replicas="2" share="false"/>
+	</services>
+	<bridges>
+                <bridge name="s1"/>
+                <bridge name="s2"/>
+	</bridges>
+        <links>
+                <link origin="leaf" dest="s1" latency="5"  drop="0.3" upload="100Mbps" download="100Mbps" network="test1"/>
+                <link origin="leaf2" dest="s2" latency="1"  drop="0.2" upload="100Mbps" download="100Mbps" network="test1"/>
+                <link origin="s1" dest="s2" latency="10"  drop="0.1" upload="10Mbps" download="10Mbps" network="test1"/>
+        </links>
+</experiment>

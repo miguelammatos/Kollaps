@@ -18,16 +18,7 @@ def main():
 
     XMLGraphParser(topology_file, graph).fill_graph()
 
-    #TEMP REMOVE ME
-    graph.root = graph.services["leaf"][0]
-    #_____________
-
-    graph.calculate_shortest_paths()
-    for node in graph.paths:
-        path = graph.paths[node]
-        print(graph.root.name + " -> " + node.name + ":" +  str(node.__hash__()))
-        for link in path:
-            print("   " + link.source.name + " hop " + link.destination.name)
+    __debug_print_paths(graph)
 
     '''
     graph.resolve_hostnames()
@@ -53,6 +44,20 @@ def main():
     # TODO Call TC init and init all destinations
     # TODO Go beyoind static emulation
 
+def __debug_print_paths(graph):
+    graph.root = graph.services["leaf"][0]
+
+    graph.calculate_shortest_paths()
+    for node in graph.paths:
+        path = graph.paths[node]
+        print("##############################")
+        print(graph.root.name + " -> " + node.name + ":" +  str(node.__hash__()))
+        print("latency: " + str(graph.calculate_path_latency(path)))
+        print("drop: " + str(graph.calculate_path_drop(path)))
+        print("bandwidth: " + str(graph.calculate_path_max_initial_bandwidth(path)))
+        print("------------------------------")
+        for link in path:
+            print("   " + link.source.name + " hop " + link.destination.name)
 
 if __name__ == '__main__':
     main()

@@ -20,6 +20,37 @@ class NetGraph:
         self.reference_bandwidth = 0  # Maximum bandwidth on the topology, used for calculating link cost
         self.bandwidth_re = re.compile("([0-9]+)([KMG])bps")
 
+    class Node(object):
+        def __init__(self, name):
+            self.name = name
+            self.network = ""  # maybe in the future support multiple networks? (TCAL doesnt allow that for now)
+            self.links = []
+
+        def attach_link(self, link):
+            self.links.append(link)
+            self.network = link.network
+
+    class Service(Node):
+        def __init__(self, name, image):
+            super(NetGraph.Service, self).__init__(name)
+            self.image = image
+            self.ip = ""  # to be filled in later
+
+    class Bridge(Node):
+        def __init__(self, name):
+            super(NetGraph.Bridge, self).__init__(name)
+
+    class Link:
+        # Links are unidirectional
+        def __init__(self, source, destination, latency, drop, bandwidth, Kbps, network):
+            self.source = source  # type: NetGraph.Node
+            self.destination = destination  # type: NetGraph.Node
+            self.latency = latency
+            self.drop = drop
+            self.bandwidth = bandwidth  # type: str
+            self.bandwidth_Kbps = Kbps  # type: int
+            self.network = network
+
     def get_nodes(self, name):
         if name in self.services:
             return self.services[name]
@@ -114,33 +145,48 @@ class NetGraph:
                         if e[1] == node:
                             e[0] = alt
 
-    class Node(object):
-        def __init__(self, name):
-            self.name = name
-            self.network = ""  # maybe in the future support multiple networks? (TCAL doesnt allow that for now)
-            self.links = []
+    def calculate_path_latency(self, path):
+        """
+        :param path: List[Link]
+        :return: int
+        """
+        total_latency = 0
+        for link in path:
+            try:
+                total_latency += int(link.latency)
+            except:
+                fail("Provided latency is not an integer: " + link.latency)
+        return total_latency
 
-        def attach_link(self, link):
-            self.links.append(link)
-            self.network = link.network
+    def calculate_path_drop(self, path):
+        """
+        :param path: List[Link]
+        :return: float
+        """
+        total_drop = 0.0
+        for link in path:
+            try:
+                # P(drop in current link | not dropped in previous)
+                # P(B | A) = ( P(A and B) ) / P(A)
+                # P(A and B) = P(A)*P(B|A) if dependant
+                # P(A and B) = P(A)*P(B) if independant
+                # if independant:
+                #   P(B | A) = P(B)
+                # TODO double check the math behind this!
+                drop_this_link = float(link.drop)
+                total_drop += drop_this_link
+            except:
+                fail("Provided packet loss probability is not a float: " + link.latency)
+        return total_drop
 
-    class Service(Node):
-        def __init__(self, name, image):
-            super(NetGraph.Service, self).__init__(name)
-            self.image = image
-            self.ip = ""  # to be filled in later
+    def calculate_path_max_initial_bandwidth(self, path):
+        """
+        :param path: List[Link]
+        :return: int
+        """
+        max_bandwidth = self.reference_bandwidth
+        for link in path:
+            if link.bandwidth_Kbps < max_bandwidth:
+                max_bandwidth = link.bandwidth_Kbps
 
-    class Bridge(Node):
-        def __init__(self, name):
-            super(NetGraph.Bridge, self).__init__(name)
-
-    class Link:
-        # Links are unidirectional
-        def __init__(self, source, destination, latency, drop, bandwidth, Kbps, network):
-            self.source = source  # type: NetGraph.Node
-            self.destination = destination  # type: NetGraph.Node
-            self.latency = latency
-            self.drop = drop
-            self.bandwidth = bandwidth  # type: str
-            self.bandwidth_Kbps = Kbps  # type: int
-            self.network = network
+        return max_bandwidth
