@@ -32,7 +32,7 @@ def main():
     graph.resolve_hostnames()
 
     # Get our own ip address and set the root of the "tree"
-    interface = os.environ.get['NETWORK_INTERFACE']
+    interface = os.environ.get('NETWORK_INTERFACE', 'eth0')
     if interface is None:
         fail("NETWORK_INTERFACE environment variable is not set!")
     if interface not in netifaces.interfaces():
