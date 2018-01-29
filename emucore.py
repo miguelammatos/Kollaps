@@ -37,7 +37,8 @@ def main():
         fail("NETWORK_INTERFACE environment variable is not set!")
     if interface not in netifaces.interfaces():
         fail("$NETWORK_INTERFACE: " + interface + " does not exist!")
-    ownIP = netifaces.ifaddresses(interface)[netifaces.AF_INET]['addr']
+    ownIP = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
+
     currentServiceName = gethostname()
     for host in graph.services[currentServiceName]:
         if host.ip == ownIP:
