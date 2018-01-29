@@ -18,6 +18,10 @@ def main():
     else:
         topology_file = sys.argv[1]
 
+    # Because of the bootstrapper hack we cant get output from the emucore through standard docker logs...
+    sys.stdout = open("/var/log/need.log", "w")
+    sys.stderr = open("/var/log/need_error.log", "w")
+
     graph = NetGraph()
 
     XMLGraphParser(topology_file, graph).fill_graph()
