@@ -101,10 +101,14 @@ class NetGraph:
     def resolve_hostnames(self):
         for service in self.services:
             hosts = self.services[service]
-            info = gethostbyname_ex(service)
+            info = [[], [], []]
             while len(info[2]) != len(hosts):
-                sleep(3)
-                info = gethostbyname_ex(service)
+                try:
+                    info = gethostbyname_ex(service)
+                    if len(info[2]) != len(hosts):
+                        sleep(3)
+                except:
+                    sleep(3)
             for i in range(len(hosts)):
                 hosts[i].ip = info[2][i]
 
