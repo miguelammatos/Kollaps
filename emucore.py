@@ -25,12 +25,16 @@ def main():
     graph = NetGraph()
 
     XMLGraphParser(topology_file, graph).fill_graph()
+    print("Done parsing topology")
 
     #__debug_print_paths(graph)
     #return
 
+    print("Resolving hostnames...")
     graph.resolve_hostnames()
+    print("All hosts found!")
 
+    print("Determining the root of the tree...")
     # Get our own ip address and set the root of the "tree"
     interface = os.environ.get('NETWORK_INTERFACE', 'eth0')
     if interface is None:
@@ -45,18 +49,24 @@ def main():
             graph.root = host
     if graph.root is None:
         fail("Failed to identify current service instance in topology!")
+    print("We are " + currentServiceName + "@" + ownIP)
 
+    print("Calculating shortest paths...")
     graph.calculate_shortest_paths()
 
+    print("Initializing network emulation conditions...")
     PathEmulation.init()
     for service in graph.paths:
         if isinstance(service, NetGraph.Service):
             path = graph.paths[service]
             PathEmulation.initialize_path(path)
 
+    print("Starting experiment!")
     # Temporary hack to start the experiment
     subprocess.run('echo "done\n" > /tmp/readypipe', shell=True)
 
+    print("All done!")
+    return
     # TODO Go beyond static emulation
 
 
