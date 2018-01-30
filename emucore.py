@@ -71,7 +71,7 @@ def main():
 
 
 def __debug_print_paths(graph):
-    graph.root = graph.services["leaf"][0]
+    graph.root = graph.services["server2"][0]
 
     graph.calculate_shortest_paths()
     for node in graph.paths:

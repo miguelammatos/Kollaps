@@ -3,6 +3,8 @@ from socket import gethostbyname_ex
 from time import sleep
 import re
 
+import dns.resolver
+
 import sys
 if sys.version_info >= (3, 0):
     from typing import Dict, List
@@ -99,18 +101,23 @@ class NetGraph:
             return int(base) * 1000 * 1000
 
     def resolve_hostnames(self):
+        # python's built in address resolver looks in /etc/hosts first
+        # this is a problem since services with multiple replicas (same hostname)
+        # will only have ONE entry in /etc/hosts, so the other hosts will never be found...
+        # Solution: forcefully use dns queries that skip /etc/hosts (this pulls the dnspython dependency...)
         for service in self.services:
             hosts = self.services[service]
-            info = [[], [], []]
-            while len(info[2]) != len(hosts):
+            ips = []
+            while len(ips) != len(hosts):
                 try:
-                    info = gethostbyname_ex(service)
-                    if len(info[2]) != len(hosts):
+                    answers = dns.resolver.query(service, 'A')
+                    ips = [str(ip) for ip in answers]
+                    if len(ips) != len(hosts):
                         sleep(3)
                 except:
                     sleep(3)
             for i in range(len(hosts)):
-                hosts[i].ip = info[2][i]
+                hosts[i].ip = ips[i]
 
     def calculate_shortest_paths(self):
         # Dijkstra's shortest path implementation
