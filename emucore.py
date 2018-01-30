@@ -50,8 +50,9 @@ def main():
 
     PathEmulation.init()
     for service in graph.paths:
-        path = graph.paths[service]
-        PathEmulation.initialize_path(path)
+        if isinstance(service, NetGraph.Service):
+            path = graph.paths[service]
+            PathEmulation.initialize_path(path)
 
     # Temporary hack to start the experiment
     subprocess.run('echo "done\n" > /tmp/readypipe', shell=True)
