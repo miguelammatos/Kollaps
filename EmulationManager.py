@@ -30,7 +30,8 @@ class EmulationManager:
                         bytes_delta = bytes #in case of overflow ignore the bytes before the overflow
                     else:
                         bytes_delta = bytes - host.last_bytes
-                    throughput = bytes_delta / time_delta
+                    kbits = (bytes_delta/1000)*8
+                    throughput = kbits / time_delta
                     host.last_bytes = bytes
 
                     #Get the network path
