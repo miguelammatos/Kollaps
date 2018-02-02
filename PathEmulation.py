@@ -12,14 +12,32 @@ def init():
 
 def initialize_path(path):
     """
-    :param path: List[NetGraph.Link]
+    :param path: NetGraph.Path
     :return:
     """
-    if len(path) < 1:
+    if len(path.links) < 1:
         return
-    destination = path[-1].destination  # type: NetGraph.Service
-    bandwidth = NetGraph.calculate_path_max_initial_bandwidth(path)
-    latency = NetGraph.calculate_path_latency(path)
-    drop = NetGraph.calculate_path_drop(path)
+    destination = path.links[-1].destination  # type: NetGraph.Service
+    bandwidth = path.max_bandwidth
+    latency = path.latency
+    drop = path.drop
 
     TCAL.initDestination(destination.ip, bandwidth, latency, drop)
+
+def update_usage():
+    TCAL.updateUsage()
+
+def query_usage(service):
+    """
+    :param service: NetGraph.Service
+    :return: int  # in bytes
+    """
+    TCAL.queryUsage(service.ip)
+
+def change_bandwidth(service, new_bandwidth):
+    """
+    :param service: NetGraph.Service
+    :param new_bandwidth: int  # in Kbps
+    :return:
+    """
+    TCAL.changeBandwidth(service.ip, new_bandwidth)

@@ -17,7 +17,7 @@ class NetGraph:
         self.links = []  # type: List[NetGraph.Link]
 
         self.root = None  # type: NetGraph.Service
-        self.paths = {}  # type: Dict[NetGraph.Node,List[NetGraph.Link]
+        self.paths = {}  # type: Dict[NetGraph.Node,NetGraph.Path]
 
         self.reference_bandwidth = 0  # Maximum bandwidth on the topology, used for calculating link cost
         self.bandwidth_re = re.compile("([0-9]+)([KMG])bps")
@@ -37,10 +37,12 @@ class NetGraph:
             super(NetGraph.Service, self).__init__(name)
             self.image = image
             self.ip = ""  # to be filled in later
+            self.last_bytes = 0  # number of bytes sent to this service
 
     class Bridge(Node):
         def __init__(self, name):
             super(NetGraph.Bridge, self).__init__(name)
+
 
     class Link:
         # Links are unidirectional
@@ -52,6 +54,33 @@ class NetGraph:
             self.bandwidth = bandwidth  # type: str
             self.bandwidth_Kbps = Kbps  # type: int
             self.network = network
+
+    class Path(object):
+        def __init__(self, links):
+            self.links = links
+            total_latency = 0
+            total_not_drop_probability = 1.0
+            max_bandwidth = None
+            for link in self.links:
+                try:
+                    if max_bandwidth is None:
+                        max_bandwidth = link.bandwidth_Kbps
+                    if link.bandwidth_Kbps < max_bandwidth:
+                        max_bandwidth = link.bandwidth_Kbps
+                    total_latency += int(link.latency)
+                    total_not_drop_probability *= (1.0-float(link.drop))
+                except:
+                    fail("Provided link data is not valid: "
+                         + link.latency + "ms "
+                         + link.drop + "drop rate "
+                         + link.bandwidth)
+            self.max_bandwidth = max_bandwidth
+            self.latency = total_latency
+            # Product of reverse probabilities reversed
+            # basically calculate the probability of not dropping across the entire path
+            # and then invert it
+            # Problem is similar to probability of getting at least one 6 in multiple dice rolls
+            self.drop = (1.0-total_not_drop_probability)
 
     def get_nodes(self, name):
         if name in self.services:
@@ -140,7 +169,7 @@ class NetGraph:
             Q.append([self.reference_bandwidth, b])
             dist[b] = self.reference_bandwidth
 
-        self.paths[self.root] = []
+        self.paths[self.root] = NetGraph.Path([])
         while len(Q) > 0:
             Q.sort(key=lambda ls: ls[0])
             u = Q.pop(0)[1]  # type: NetGraph.Node
@@ -149,56 +178,11 @@ class NetGraph:
                 if alt < dist[link.destination]:
                     node = link.destination
                     dist[node] = alt
-                    path = self.paths[u][:]
+                    # append to the previous path
+                    path = self.paths[u].links[:]
                     path.append(link)
-                    self.paths[node] = path
+                    self.paths[node] = NetGraph.Path(path)
                     for e in Q:  # find the node in Q and change its priority
                         if e[1] == node:
                             e[0] = alt
 
-    @staticmethod
-    def calculate_path_latency(path):
-        """
-        :param path: List[Link]
-        :return: int
-        """
-        total_latency = 0
-        for link in path:
-            try:
-                total_latency += int(link.latency)
-            except:
-                fail("Provided latency is not an integer: " + link.latency)
-        return total_latency
-
-    @staticmethod
-    def calculate_path_drop(path):
-        """
-        :param path: List[Link]
-        :return: float
-        """
-        # Product of reverse probabilities reversed
-        # basically calculate the probability of not dropping across the entire path
-        # and then invert it
-        # Problem is similar to probability of getting at least one 6 in multiple dice rolls
-        total_not_drop_probability = 1.0
-        for link in path:
-            try:
-                total_not_drop_probability *= (1.0-float(link.drop))
-            except:
-                fail("Provided packet loss probability is not a float: " + link.latency)
-        return (1.0-total_not_drop_probability)
-
-    @staticmethod
-    def calculate_path_max_initial_bandwidth(path):
-        """
-        :param path: List[Link]
-        :return: int
-        """
-        max_bandwidth = None
-        for link in path:
-            if max_bandwidth is None:
-                max_bandwidth = link.bandwidth_Kbps
-            if link.bandwidth_Kbps < max_bandwidth:
-                max_bandwidth = link.bandwidth_Kbps
-
-        return max_bandwidth

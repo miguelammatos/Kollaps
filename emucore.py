@@ -1,6 +1,7 @@
 #! /usr/bin/python
 from NetGraph import NetGraph
 from XMLGraphParser import XMLGraphParser
+from EmulationManager import EmulationManager
 from utils import fail
 import PathEmulation
 
@@ -65,9 +66,9 @@ def main():
     # Temporary hack to start the experiment
     subprocess.run('echo "done\n" > /tmp/readypipe', shell=True)
 
-    print("All done!")
-    return
-    # TODO Go beyond static emulation
+    # Enter the emulation loop
+    manager = EmulationManager(graph)
+    manager.emulation_loop()
 
 
 def __debug_print_paths(graph):
@@ -78,11 +79,11 @@ def __debug_print_paths(graph):
         path = graph.paths[node]
         print("##############################")
         print(graph.root.name + " -> " + node.name + ":" + str(node.__hash__()))
-        print("latency: " + str(graph.calculate_path_latency(path)))
-        print("drop: " + str(graph.calculate_path_drop(path)))
-        print("bandwidth: " + str(graph.calculate_path_max_initial_bandwidth(path)))
+        print("latency: " + str(path.latency))
+        print("drop: " + str(path.drop))
+        print("bandwidth: " + str(path.max_bandwidth))
         print("------------------------------")
-        for link in path:
+        for link in path.links:
             print("   " + link.source.name + " hop " + link.destination.name)
 
 
