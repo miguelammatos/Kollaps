@@ -15,6 +15,7 @@ class NetGraph:
         self.services = {}  # type: Dict[str,List[NetGraph.Service]]
         self.bridges = {}  # type: Dict[str,List[NetGraph.Service]]
         self.links = []  # type: List[NetGraph.Link]
+        self.link_counter = 0  # increment counter that will give each link an index
 
         self.root = None  # type: NetGraph.Service
         self.paths = {}  # type: Dict[NetGraph.Node,NetGraph.Path]
@@ -47,12 +48,15 @@ class NetGraph:
     class Link:
         # Links are unidirectional
         def __init__(self, source, destination, latency, drop, bandwidth, Kbps, network):
+            self.index = 0
             self.source = source  # type: NetGraph.Node
             self.destination = destination  # type: NetGraph.Node
             self.latency = latency
             self.drop = drop
             self.bandwidth = bandwidth  # type: str
             self.bandwidth_Kbps = Kbps  # type: int
+            self.used_bandwidth_Kbps = 0
+            self.flows = []  # type: List[NetGraph.Path]
             self.network = network
 
     class Path(object):
@@ -76,6 +80,7 @@ class NetGraph:
                          + link.bandwidth)
             self.max_bandwidth = max_bandwidth
             self.latency = total_latency
+            self.RTT = self.latency*2
             # Product of reverse probabilities reversed
             # basically calculate the probability of not dropping across the entire path
             # and then invert it
@@ -113,7 +118,10 @@ class NetGraph:
                 if self.reference_bandwidth < bandwidth_kbps:
                     self.reference_bandwidth = bandwidth_kbps
                 link = NetGraph.Link(node, dest, latency, drop, bandwidth, bandwidth_kbps, network)
+                link.index = self.link_counter
+                self.link_counter += 1
                 self.links.append(link)
+
                 node.attach_link(link)
 
     def bandwidth_in_kbps(self, bandwidth_string):
