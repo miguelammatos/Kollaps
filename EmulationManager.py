@@ -1,6 +1,7 @@
 from time import time, sleep
 from NetGraph import NetGraph
 import PathEmulation
+from FlowDisseminator import FlowDisseminator
 
 import sys
 if sys.version_info >= (3, 0):
@@ -13,8 +14,9 @@ class EmulationManager:
 
     def __init__(self, graph):
         self.graph = graph  # type: NetGraph
-        self.active_flows = {} # type: Dict[NetGraph.Service, NetGraph.Path]
-        # self.active_links
+        self.active_links = []
+        self.active_paths = []
+        self.disseminator = FlowDisseminator(self.collect_flow)
 
     def emulation_loop(self):
         last_time = time()
@@ -26,13 +28,12 @@ class EmulationManager:
             self.recalculate_path_bandwidths()
 
     def reset_flow_state(self):
-        for host in self.active_flows:
-            flow = self.active_flows[host]
-            for link in flow.links:
+        for link in self.active_links:
                 link.used_bandwidth_Kbps = 0
-                link.flows = 0
+                del link.flows[:]
 
-        self.active_flows.clear()
+        del self.active_links[:]
+        del self.active_paths[:]
 
     def check_active_flows(self, last_time):
         PathEmulation.update_usage()
@@ -41,6 +42,8 @@ class EmulationManager:
         for service in self.graph.services:
             hosts = self.graph.services[service]
             for host in hosts:
+                if host == self.graph.root:
+                    continue
                 # Calculate current throughput
                 bytes = PathEmulation.query_usage(host)
                 if bytes < host.last_bytes:
@@ -48,6 +51,7 @@ class EmulationManager:
                 else:
                     bytes_delta = bytes - host.last_bytes
                 kbits = (bytes_delta / 1000) * 8
+                print(kbits)
                 throughput = kbits / time_delta
                 host.last_bytes = bytes
 
@@ -56,21 +60,20 @@ class EmulationManager:
 
                 # Check if this is an active flow
                 if throughput <= (path.max_bandwidth * EmulationManager.ERROR_MARGIN):
-                    if host in self.active_flows:
-                        del self.active_flows[host]
+                    path.used_bandwidth = 0
                     continue
 
                 # This is an active flow
-                if host not in self.active_flows:
-                    self.active_flows[host] = path
-
+                path.used_bandwidth = throughput
+                self.active_paths.append(path)
                 for link in path.links:
+                    self.active_links.append(link)
                     link.used_bandwidth_Kbps += throughput
                     link.flows.append(path)
         return current_time
 
     def disseminate_active_flows(self):
-        pass
+        self.disseminator.broadcast_flows(self.active_paths)
 
     def recalculate_path_bandwidths(self):
         pass

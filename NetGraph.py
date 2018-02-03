@@ -86,6 +86,7 @@ class NetGraph:
             # and then invert it
             # Problem is similar to probability of getting at least one 6 in multiple dice rolls
             self.drop = (1.0-total_not_drop_probability)
+            self.used_bandwidth = 0
 
     def get_nodes(self, name):
         if name in self.services:

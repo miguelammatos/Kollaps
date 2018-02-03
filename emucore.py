@@ -28,9 +28,6 @@ def main():
     XMLGraphParser(topology_file, graph).fill_graph()
     print("Done parsing topology")
 
-    #__debug_print_paths(graph)
-    #return
-
     print("Resolving hostnames...")
     graph.resolve_hostnames()
     print("All hosts found!")
@@ -69,22 +66,6 @@ def main():
     # Enter the emulation loop
     manager = EmulationManager(graph)
     manager.emulation_loop()
-
-
-def __debug_print_paths(graph):
-    graph.root = graph.services["server2"][0]
-
-    graph.calculate_shortest_paths()
-    for node in graph.paths:
-        path = graph.paths[node]
-        print("##############################")
-        print(graph.root.name + " -> " + node.name + ":" + str(node.__hash__()))
-        print("latency: " + str(path.latency))
-        print("drop: " + str(path.drop))
-        print("bandwidth: " + str(path.max_bandwidth))
-        print("------------------------------")
-        for link in path.links:
-            print("   " + link.source.name + " hop " + link.destination.name)
 
 
 if __name__ == '__main__':

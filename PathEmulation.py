@@ -32,7 +32,7 @@ def query_usage(service):
     :param service: NetGraph.Service
     :return: int  # in bytes
     """
-    TCAL.queryUsage(service.ip)
+    return TCAL.queryUsage(service.ip)
 
 def change_bandwidth(service, new_bandwidth):
     """
