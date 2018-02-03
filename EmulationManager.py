@@ -51,7 +51,6 @@ class EmulationManager:
                 else:
                     bytes_delta = bytes - host.last_bytes
                 kbits = (bytes_delta / 1000) * 8
-                print(kbits)
                 throughput = kbits / time_delta
                 host.last_bytes = bytes
 

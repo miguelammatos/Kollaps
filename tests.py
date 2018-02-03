@@ -38,16 +38,20 @@ def mock_update_usage():
     mock_update_usage.last_time = current_time
     print("Updating data usage")
 
-
+mock_sent_bytes = {}
 def mock_query_usage(service):
     """
     :param service: NetGraph.Service
     :return: int  # in bytes
     """
-    sent_delta = 10000000*8*mock_update_usage.time_delta
-    mock_query_usage.sent_bytes += sent_delta
+    Mbits = 10
+    sent_delta = ((Mbits*1000*1000)/8)*mock_update_usage.time_delta
+    if service in mock_sent_bytes:
+        mock_sent_bytes[service] += sent_delta
+    else:
+        mock_sent_bytes[service] = sent_delta
 
-    return mock_query_usage.sent_bytes
+    return mock_sent_bytes[service]
 
 
 def mock_change_bandwidth(service, new_bandwidth):
