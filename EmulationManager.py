@@ -1,4 +1,6 @@
 from time import time, sleep
+from threading import Lock
+
 from NetGraph import NetGraph
 import PathEmulation
 from FlowDisseminator import FlowDisseminator
@@ -14,25 +16,29 @@ class EmulationManager:
 
     def __init__(self, graph):
         self.graph = graph  # type: NetGraph
-        self.active_links = []
+        self.active_links = {}  # type: Dict[int, NetGraph.Link]
         self.active_paths = []
-        self.disseminator = FlowDisseminator(self.collect_flow)
+        self.disseminator = FlowDisseminator(self, self.collect_flow)
+        self.state_lock = Lock()
 
     def emulation_loop(self):
         last_time = time()
         while True:
-            self.reset_flow_state()
-            last_time = self.check_active_flows(last_time)
+            with self.state_lock:
+                self.reset_flow_state()
+                last_time = self.check_active_flows(last_time)
             self.disseminate_active_flows()
             sleep(EmulationManager.POOL_PERIOD)
-            self.recalculate_path_bandwidths()
+            with self.state_lock:
+                self.recalculate_path_bandwidths()
 
     def reset_flow_state(self):
-        for link in self.active_links:
-                link.used_bandwidth_Kbps = 0
-                del link.flows[:]
+        for link_index in self.active_links:
+            link = self.active_links[link_index]
+            link.used_bandwidth_Kbps = 0
+            del link.flows[:]
 
-        del self.active_links[:]
+        self.active_links.clear()
         del self.active_paths[:]
 
     def check_active_flows(self, last_time):
@@ -66,7 +72,7 @@ class EmulationManager:
                 path.used_bandwidth = throughput
                 self.active_paths.append(path)
                 for link in path.links:
-                    self.active_links.append(link)
+                    self.active_links[link.index] = link
                     link.used_bandwidth_Kbps += throughput
                     link.flows.append(path)
         return current_time
@@ -75,7 +81,17 @@ class EmulationManager:
         self.disseminator.broadcast_flows(self.active_paths)
 
     def recalculate_path_bandwidths(self):
-        pass
+        for path in self.active_paths:
+            for link in path.links:
+                if link.used_bandwidth_Kbps > link.bandwidth_Kbps:
+                    print("CONGESTION!!")
 
     def collect_flow(self, bandwidth, link_indices):
-        pass
+        with self.state_lock:
+            rtt = 0
+            for index in link_indices:
+                if index in self.active_links:
+                    link = self.active_links[index]
+                    link.used_bandwidth_Kbps += bandwidth
+                    link.flows += 1
+                    rtt += link.latency*2

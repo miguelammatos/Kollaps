@@ -7,8 +7,11 @@ from utils import fail
 import PathEmulation
 from FlowDisseminator import FlowDisseminator
 
+from threading import Thread
+from sched import scheduler
+
 import sys
-from time import time
+from time import time, sleep
 
 
 def mock_init():
@@ -44,7 +47,7 @@ def mock_query_usage(service):
     :param service: NetGraph.Service
     :return: int  # in bytes
     """
-    Mbits = 10
+    Mbits = 50
     sent_delta = ((Mbits*1000*1000)/8)*mock_update_usage.time_delta
     if service in mock_sent_bytes:
         mock_sent_bytes[service] += sent_delta
@@ -64,8 +67,12 @@ def mock_change_bandwidth(service, new_bandwidth):
 
 
 class MockFlowDisseminator:
-    def __init__(self, flow_collector):
+    def __init__(self, manager, flow_collector):
+        self.emulation_manager = manager
         self.flow_collector = flow_collector
+        self.s = scheduler(time, sleep)
+        self.thread = Thread(target=self.receive_flows, args=([],))
+        self.thread.start()
 
     def broadcast_flows(self, active_flows):
         """
@@ -80,7 +87,9 @@ class MockFlowDisseminator:
                 print("        " + str(link.index))
 
     def receive_flows(self, data):
-        pass
+        self.flow_collector(51*1000, [0, 4, 6])
+        self.s.enter(0.05, 1, self.receive_flows,argument=([],))
+        self.s.run()
 
 def setup_mocking():
     PathEmulation.init = mock_init

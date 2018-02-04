@@ -1,5 +1,4 @@
 from utils import fail
-from socket import gethostbyname_ex
 from time import sleep
 import re
 

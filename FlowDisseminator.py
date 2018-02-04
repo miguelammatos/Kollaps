@@ -12,7 +12,8 @@ if sys.version_info >= (3, 0):
 
 
 class FlowDisseminator:
-    def __init__(self, flow_collector):
+    def __init__(self, manager, flow_collector):
+        self.emuliation_manager = manager
         self.flow_collector = flow_collector
 
     def broadcast_flows(self, active_flows):
