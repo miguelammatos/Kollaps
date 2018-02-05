@@ -50,16 +50,22 @@ class NetGraph:
             self.index = 0
             self.source = source  # type: NetGraph.Node
             self.destination = destination  # type: NetGraph.Node
-            self.latency = latency
-            self.drop = drop
+            try:
+                self.latency = int(latency)
+                self.drop = float(drop)
+            except:
+                fail("Provided link data is not valid: "
+                     + latency + "ms "
+                     + drop + "drop rate "
+                     + bandwidth)
             self.bandwidth = bandwidth  # type: str
             self.bandwidth_Kbps = Kbps  # type: int
             self.used_bandwidth_Kbps = 0
-            self.flows = []  # type: List[NetGraph.Path]
+            self.flows_RTTs = []  # type: List[int]
             self.network = network
 
     class Path(object):
-        def __init__(self, links):
+        def __init__(self, links, used_bandwidth=0):
             self.links = links
             total_latency = 0
             total_not_drop_probability = 1.0
@@ -78,6 +84,7 @@ class NetGraph:
                          + link.drop + "drop rate "
                          + link.bandwidth)
             self.max_bandwidth = max_bandwidth
+            self.current_bandwidth = max_bandwidth
             self.latency = total_latency
             self.RTT = self.latency*2
             # Product of reverse probabilities reversed
@@ -85,7 +92,7 @@ class NetGraph:
             # and then invert it
             # Problem is similar to probability of getting at least one 6 in multiple dice rolls
             self.drop = (1.0-total_not_drop_probability)
-            self.used_bandwidth = 0
+            self.used_bandwidth = used_bandwidth
 
     def get_nodes(self, name):
         if name in self.services:

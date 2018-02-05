@@ -18,8 +18,8 @@ class EmulationManager:
         self.graph = graph  # type: NetGraph
         self.active_links = {}  # type: Dict[int, NetGraph.Link]
         self.active_paths = []
-        self.disseminator = FlowDisseminator(self, self.collect_flow)
         self.state_lock = Lock()
+        self.disseminator = FlowDisseminator(self, self.collect_flow)
 
     def emulation_loop(self):
         last_time = time()
@@ -36,7 +36,7 @@ class EmulationManager:
         for link_index in self.active_links:
             link = self.active_links[link_index]
             link.used_bandwidth_Kbps = 0
-            del link.flows[:]
+            del link.flows_RTTs[:]
 
         self.active_links.clear()
         del self.active_paths[:]
@@ -74,7 +74,7 @@ class EmulationManager:
                 for link in path.links:
                     self.active_links[link.index] = link
                     link.used_bandwidth_Kbps += throughput
-                    link.flows.append(path)
+                    link.flows_RTTs.append(path.RTT)
         return current_time
 
     def disseminate_active_flows(self):
@@ -82,16 +82,33 @@ class EmulationManager:
 
     def recalculate_path_bandwidths(self):
         for path in self.active_paths:
+            max_bandwidth = path.max_bandwidth
             for link in path.links:
-                if link.used_bandwidth_Kbps > link.bandwidth_Kbps:
-                    print("CONGESTION!!")
+                if link.used_bandwidth_Kbps > link.bandwidth_Kbps:  # We have congestion apply RTT-aware Min-Max model
+                    rtt_reverse_sum = 0
+                    for flow_RTT in link.flows_RTTs:
+                        rtt_reverse_sum += (1.0/flow_RTT)
+                    max_bandwidth_on_link = ((1.0/path.RTT)/rtt_reverse_sum)*link.bandwidth_Kbps
+                    if max_bandwidth_on_link < max_bandwidth:
+                        max_bandwidth = max_bandwidth_on_link
+            if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
+                PathEmulation.change_bandwidth(path.links[-1].destination, max_bandwidth)
+                path.current_bandwidth = max_bandwidth
 
     def collect_flow(self, bandwidth, link_indices):
         with self.state_lock:
+            concurrent_links = []
+            # Calculate RTT of this flow and check if we are sharing any link with it
             rtt = 0
             for index in link_indices:
+                link = self.graph.links[index]
+                rtt += (link.latency*2)
                 if index in self.active_links:
-                    link = self.active_links[index]
+                    concurrent_links.append(link)
+
+            # If we are sharing links, then update them with this flows bandwidth usage and RTT
+            if len(concurrent_links) > 0:
+                for link in concurrent_links:
                     link.used_bandwidth_Kbps += bandwidth
-                    link.flows += 1
-                    rtt += link.latency*2
+                    link.flows_RTTs.append(rtt)
+

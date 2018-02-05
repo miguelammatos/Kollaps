@@ -47,6 +47,8 @@ def mock_query_usage(service):
     :param service: NetGraph.Service
     :return: int  # in bytes
     """
+    if service.name != "server1":
+        return 0
     Mbits = 50
     sent_delta = ((Mbits*1000*1000)/8)*mock_update_usage.time_delta
     if service in mock_sent_bytes:
@@ -63,13 +65,14 @@ def mock_change_bandwidth(service, new_bandwidth):
     :param new_bandwidth: int  # in Kbps
     :return:
     """
-    print("Changing " + service.name + ":" + service.__hash__() + " to " + str(new_bandwidth) + "Kbps")
+    print("Changing " + service.name + ":" + str(service.__hash__()) + " to " + str(new_bandwidth) + "Kbps")
 
 
 class MockFlowDisseminator:
     def __init__(self, manager, flow_collector):
         self.emulation_manager = manager
         self.flow_collector = flow_collector
+        self.concurrency_timer = 5
         self.s = scheduler(time, sleep)
         self.thread = Thread(target=self.receive_flows, args=([],))
         self.thread.start()
@@ -87,9 +90,20 @@ class MockFlowDisseminator:
                 print("        " + str(link.index))
 
     def receive_flows(self, data):
-        self.flow_collector(51*1000, [0, 4, 6])
-        self.s.enter(0.05, 1, self.receive_flows,argument=([],))
-        self.s.run()
+        bandwidthMbps = 51
+        path = [2, 4, 7]
+        self.flow_collector(bandwidthMbps*1000, path)
+        bandwidthMbps = 51
+        path = [2, 4, 6]
+        self.flow_collector(bandwidthMbps*1000, path)
+        print("Active Concurrent Flow")
+        print("    " + str(bandwidthMbps*1000))
+        for i in path:
+            print("    " + str(i))
+        self.concurrency_timer -= 1
+        if self.concurrency_timer > 0:
+            self.s.enter(0.05, 1, self.receive_flows,argument=([],))
+            self.s.run()
 
 def setup_mocking():
     PathEmulation.init = mock_init
@@ -122,7 +136,7 @@ def main():
     #print("All hosts found!")
 
     print("Determining the root of the tree...")
-    graph.root = graph.services["client"][0]
+    graph.root = graph.services["client1"][0]
 
 
     if graph.root is None:
@@ -140,7 +154,7 @@ def main():
         print("bandwidth: " + str(path.max_bandwidth))
         print("------------------------------")
         for link in path.links:
-            print("   " + link.source.name + " hop " + link.destination.name)
+            print("   " + link.source.name + " hop " + link.destination.name + " i:" + str(link.index))
 
     print("Initializing network emulation conditions...")
     PathEmulation.init()
