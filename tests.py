@@ -39,7 +39,7 @@ def mock_update_usage():
     current_time = time()
     mock_update_usage.time_delta = current_time - mock_update_usage.last_time
     mock_update_usage.last_time = current_time
-    print("Updating data usage")
+    print("Updating data usage ###############################")
 
 mock_sent_bytes = {}
 def mock_query_usage(service):
@@ -82,6 +82,7 @@ class MockFlowDisseminator:
         :param active_flows: List[NetGraph.Path]
         :return:
         """
+        return
         print("Active Flows: " + str(len(active_flows)))
         for path in active_flows:
             print("    " + str(path.used_bandwidth))
@@ -90,16 +91,16 @@ class MockFlowDisseminator:
                 print("        " + str(link.index))
 
     def receive_flows(self, data):
-        bandwidthMbps = 51
+        bandwidthMbps = 10
         path = [2, 4, 7]
         self.flow_collector(bandwidthMbps*1000, path)
-        bandwidthMbps = 51
-        path = [2, 4, 6]
-        self.flow_collector(bandwidthMbps*1000, path)
-        print("Active Concurrent Flow")
-        print("    " + str(bandwidthMbps*1000))
-        for i in path:
-            print("    " + str(i))
+        #bandwidthMbps = 51
+        #path = [2, 4, 6]
+        #self.flow_collector(bandwidthMbps*1000, path)
+        #print("Active Concurrent Flow")
+        #print("    " + str(bandwidthMbps*1000))
+        #for i in path:
+        #    print("    " + str(i))
         self.concurrency_timer -= 1
         if self.concurrency_timer > 0:
             self.s.enter(0.05, 1, self.receive_flows,argument=([],))

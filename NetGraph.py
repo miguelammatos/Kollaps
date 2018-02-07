@@ -6,7 +6,7 @@ import dns.resolver
 
 import sys
 if sys.version_info >= (3, 0):
-    from typing import Dict, List
+    from typing import Dict, List, Tuple
 
 
 class NetGraph:
@@ -60,8 +60,7 @@ class NetGraph:
                      + bandwidth)
             self.bandwidth = bandwidth  # type: str
             self.bandwidth_Kbps = Kbps  # type: int
-            self.used_bandwidth_Kbps = 0
-            self.flows_RTTs = []  # type: List[int]
+            self.flows = []  # type: List[Tuple[int, int]]  # (RTT, Bandwidth)
             self.network = network
 
     class Path(object):

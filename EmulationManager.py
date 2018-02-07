@@ -35,8 +35,7 @@ class EmulationManager:
     def reset_flow_state(self):
         for link_index in self.active_links:
             link = self.active_links[link_index]
-            link.used_bandwidth_Kbps = 0
-            del link.flows_RTTs[:]
+            del link.flows[:]
 
         self.active_links.clear()
         del self.active_paths[:]
@@ -73,24 +72,59 @@ class EmulationManager:
                 self.active_paths.append(path)
                 for link in path.links:
                     self.active_links[link.index] = link
-                    link.used_bandwidth_Kbps += throughput
-                    link.flows_RTTs.append(path.RTT)
+                    link.flows.append((path.RTT, throughput))
         return current_time
 
     def disseminate_active_flows(self):
         self.disseminator.broadcast_flows(self.active_paths)
 
     def recalculate_path_bandwidths(self):
+        RTT = 0
+        BW = 1
         for path in self.active_paths:
             max_bandwidth = path.max_bandwidth
             for link in path.links:
-                if link.used_bandwidth_Kbps > link.bandwidth_Kbps:  # We have congestion apply RTT-aware Min-Max model
+                used_bandwidth = 0
+                for flow in link.flows:
+                    used_bandwidth += flow[BW]
+                if used_bandwidth > link.bandwidth_Kbps:  # We have congestion apply RTT-aware Min-Max model
                     rtt_reverse_sum = 0
-                    for flow_RTT in link.flows_RTTs:
-                        rtt_reverse_sum += (1.0/flow_RTT)
-                    max_bandwidth_on_link = ((1.0/path.RTT)/rtt_reverse_sum)*link.bandwidth_Kbps
-                    if max_bandwidth_on_link < max_bandwidth:
-                        max_bandwidth = max_bandwidth_on_link
+                    for flow in link.flows:
+                        rtt_reverse_sum += (1.0/flow[RTT])
+                    max_bandwidth_on_link = []
+                    our_share = (1.0/path.RTT)/rtt_reverse_sum
+                    # calculate the bandwidth for the everyone
+                    for flow in link.flows:
+                        max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_Kbps)
+
+
+                    # Maximize link utilization to 100%
+                    # TODO Experimentally verify this is correct (impossible to verify with offline mocks)
+                    # This is not complete on a single cycle, there can still be wastage (but never exceed 100%)
+                    # but it should converge to 100% usage over 2 distributed cycles
+                    # as the other nodes calculate their share and apply it
+                    spare_bw = 1.0
+                    max_usage_sum = 0  # this is used later for normalization
+                    using_less_than_allocated = True if max_bandwidth_on_link[0] > link.flows[0][BW] else False
+                    for i, flow in enumerate(link.flows):
+                        if(max_bandwidth_on_link[i] > flow[BW]):
+                            max_bandwidth_on_link[i] = flow[BW]
+                        else:
+                            # add together all shares that are competing for more than their fair share
+                            max_usage_sum += max_bandwidth_on_link[i]/link.bandwidth_Kbps
+                        spare_bw -= max_bandwidth_on_link[i]/link.bandwidth_Kbps
+
+                    #If we are competing for more than our share try to get some spare bw
+                    if not using_less_than_allocated:
+                        # normalize our usage
+                        normalized = our_share/max_usage_sum
+                        our_share += normalized*spare_bw
+                        max_bandwidth_on_link[0] = our_share*link.bandwidth_Kbps
+
+                    if max_bandwidth_on_link[0] < max_bandwidth:
+                        max_bandwidth = max_bandwidth_on_link[0]
+
+            # Apply the new bandwidth on this path
             if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
                 PathEmulation.change_bandwidth(path.links[-1].destination, max_bandwidth)
                 path.current_bandwidth = max_bandwidth
@@ -109,6 +143,5 @@ class EmulationManager:
             # If we are sharing links, then update them with this flows bandwidth usage and RTT
             if len(concurrent_links) > 0:
                 for link in concurrent_links:
-                    link.used_bandwidth_Kbps += bandwidth
-                    link.flows_RTTs.append(rtt)
+                    link.flows.append((rtt, bandwidth))
 
