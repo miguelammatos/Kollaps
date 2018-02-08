@@ -47,7 +47,7 @@ class FlowDisseminator:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.graph.root.ip, FlowDisseminator.UDP_PORT))
 
-        self.thread = Thread(target=self.receive_flows, args=())
+        self.thread = Thread(target=self.receive_flows)
         self.thread.start()
 
 
