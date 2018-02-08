@@ -24,8 +24,12 @@ class XMLGraphParser:
                 except:
                     fail('replicas attribute must be a valid integer.')
 
+            command = "[]"
+            if 'command' in service.attrib:
+                command = service.attrib['command']
+
             for i in range(replicas):
-                    self.graph.new_service(service.attrib['name'], service.attrib['image'])
+                    self.graph.new_service(service.attrib['name'], service.attrib['image'], command)
 
     def parse_bridges(self, root):
         for bridge in root:

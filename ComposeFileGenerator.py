@@ -28,6 +28,7 @@ class ComposeFileGenerator:
     def print_service(self, service_list):
         print("  " + service_list[0].name + ":")
         print("    image: " + service_list[0].image)
+        print("    command: " + service_list[0].command)
         print("    hostname: " + service_list[0].name)
         print("    labels:")
         print("      netsim: \"true\"")

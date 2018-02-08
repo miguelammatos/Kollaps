@@ -69,9 +69,22 @@ def mock_change_bandwidth(service, new_bandwidth):
 
 
 class MockFlowDisseminator:
-    def __init__(self, manager, flow_collector):
+    def __init__(self, manager, flow_collector, graph):
+        self.graph = graph  # type: NetGraph
         self.emulation_manager = manager
         self.flow_collector = flow_collector
+
+        link_count = len(self.graph.links)
+        BYTE_LIMIT = 255
+        SHORT_LIMIT = 65535
+        INT_LIMIT = 4294967296
+        if link_count <= BYTE_LIMIT:
+            self.link_unit = "B"
+        elif link_count <= SHORT_LIMIT:
+            self.link_unit = "H"
+        elif link_count <= INT_LIMIT:
+            self.link_unit = "I"
+
         self.concurrency_timer = 5
         self.s = scheduler(time, sleep)
         self.thread = Thread(target=self.receive_flows, args=([],))
@@ -116,7 +129,7 @@ def setup_mocking():
     PathEmulation.change_bandwidth = mock_change_bandwidth
 
     FlowDisseminator.__init__ = MockFlowDisseminator.__init__
-    FlowDisseminator.broadcast_flows = MockFlowDisseminator.broadcast_flows
+    #FlowDisseminator.broadcast_flows = MockFlowDisseminator.broadcast_flows
     FlowDisseminator.receive_flows = MockFlowDisseminator.receive_flows
 
 def main():

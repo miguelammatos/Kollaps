@@ -19,7 +19,7 @@ class EmulationManager:
         self.active_links = {}  # type: Dict[int, NetGraph.Link]
         self.active_paths = []
         self.state_lock = Lock()
-        self.disseminator = FlowDisseminator(self, self.collect_flow)
+        self.disseminator = FlowDisseminator(self, self.collect_flow, self.graph)
 
     def emulation_loop(self):
         last_time = time()

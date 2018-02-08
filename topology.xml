@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <experiment>
 	<services>
-		<service name="client1" image="warpenguin.no-ip.org/client:1.8" replicas="1" share="false"/>
-		<service name="client2" image="warpenguin.no-ip.org/client:1.8" replicas="1" share="false"/>
+		<service name="client1" image="warpenguin.no-ip.org/client:1.8" command="['server1']" replicas="1" share="false"/>
+		<service name="client2" image="warpenguin.no-ip.org/client:1.8" command="['server2']" replicas="1" share="false"/>
 		<service name="server1" image="warpenguin.no-ip.org/server:1.8" replicas="1" share="false"/>
 		<service name="server2" image="warpenguin.no-ip.org/server:1.8" replicas="1" share="false"/>
 	</services>

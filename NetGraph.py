@@ -33,9 +33,10 @@ class NetGraph:
             self.network = link.network
 
     class Service(Node):
-        def __init__(self, name, image):
+        def __init__(self, name, image, command):
             super(NetGraph.Service, self).__init__(name)
             self.image = image
+            self.command = command
             self.ip = ""  # to be filled in later
             self.last_bytes = 0  # number of bytes sent to this service
 
@@ -101,8 +102,8 @@ class NetGraph:
         else:
             return []
 
-    def new_service(self, name, image):
-        service = NetGraph.Service(name, image)
+    def new_service(self, name, image, command):
+        service = NetGraph.Service(name, image, command)
         if len(self.get_nodes(name)) == 0:
             self.services[name] = [service]
         else:

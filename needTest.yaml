@@ -1,0 +1,91 @@
+version: "3.3"
+services:
+  bootstrapper:
+    image: warpenguin.no-ip.org/privilegedbootstrapper:1.3
+    command: ["netsim", "/opt/NEED/emucore.py"]
+    deploy:
+      mode: global
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    networks:
+      - NEEDnet
+
+  client1:
+    image: warpenguin.no-ip.org/client:1.8
+    command: ['server1']
+    hostname: client1
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 1
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  client2:
+    image: warpenguin.no-ip.org/client:1.8
+    command: ['server2']
+    hostname: client2
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 1
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  server1:
+    image: warpenguin.no-ip.org/server:1.8
+    command: []
+    hostname: server1
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 1
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  server2:
+    image: warpenguin.no-ip.org/server:1.8
+    command: []
+    hostname: server2
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 1
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+configs:
+  topology:
+    file: topology.xml
+
+networks:
+  NEEDnet:
+    external:
+      name: test1
+
