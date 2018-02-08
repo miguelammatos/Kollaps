@@ -95,20 +95,22 @@ class FlowDisseminator:
         for service in self.graph.services:
             hosts = self.graph.services[service]
             for host in hosts:
-                addr = (host.ip, FlowDisseminator.UDP_PORT)
-                print("broadcasting to " + addr[0])
-                s.sendto(data, addr)
+                if host != self.graph.root:
+                    addr = (host.ip, FlowDisseminator.UDP_PORT)
+                    print("broadcasting to " + addr[0])
+                    s.sendto(data, addr)
 
     def receive_flows(self):
+        print("Ready to receive flows")
         # TODO check for split packets
         while True:
             data, addr = self.sock.recvfrom(FlowDisseminator.BUFFER_LEN)
-            print("Got data from " + addr)
+            print("Got data from " + addr[0])
             with self.lock:
-                if addr in self.repeat_detection:
+                if addr[0] in self.repeat_detection:
                     continue
                 else:
-                    self.repeat_detection[addr] = True
+                    self.repeat_detection[addr[0]] = True
             offset = 0
             num_of_flows = struct.unpack_from("<1i", data, offset)[0]
             offset += struct.calcsize("<1i")
