@@ -96,12 +96,14 @@ class FlowDisseminator:
             hosts = self.graph.services[service]
             for host in hosts:
                 addr = (host.ip, FlowDisseminator.UDP_PORT)
+                print("broadcasting to " + addr[0])
                 s.sendto(data, addr)
 
     def receive_flows(self):
         # TODO check for split packets
         while True:
             data, addr = self.sock.recvfrom(FlowDisseminator.BUFFER_LEN)
+            print("Got data from " + addr)
             with self.lock:
                 if addr in self.repeat_detection:
                     continue
@@ -120,5 +122,6 @@ class FlowDisseminator:
                     index = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
                     offset += struct.calcsize("<1"+self.link_unit)
                     links.append(index)
+                print("calling the flow collector")
                 self.flow_collector(bandwidth, links)
 

@@ -14,7 +14,7 @@ class ComposeFileGenerator:
     def print_bootstrapper(self):
         print("  bootstrapper:")
         print("    image: warpenguin.no-ip.org/privilegedbootstrapper:1.3")
-        print("    command: [\"netsim\", \"/opt/NEED/emucore.py\"]")
+        print("    command: [\"netsim\", \"python3 /opt/NEED/emucore.py\"]")
         print("    deploy:")
         print("      mode: global")
         print("    volumes:")

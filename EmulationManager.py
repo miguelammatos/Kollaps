@@ -139,6 +139,7 @@ class EmulationManager:
 
     def collect_flow(self, bandwidth, link_indices):
         with self.state_lock:
+            print("Got a flow")
             concurrent_links = []
             # Calculate RTT of this flow and check if we are sharing any link with it
             rtt = 0
