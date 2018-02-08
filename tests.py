@@ -129,7 +129,7 @@ def setup_mocking():
     PathEmulation.change_bandwidth = mock_change_bandwidth
 
     FlowDisseminator.__init__ = MockFlowDisseminator.__init__
-    #FlowDisseminator.broadcast_flows = MockFlowDisseminator.broadcast_flows
+    FlowDisseminator.broadcast_flows = MockFlowDisseminator.broadcast_flows
     FlowDisseminator.receive_flows = MockFlowDisseminator.receive_flows
 
 def main():
