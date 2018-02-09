@@ -88,6 +88,7 @@ class EmulationManager:
                 for flow in link.flows:
                     used_bandwidth += flow[BW]
                 if used_bandwidth > link.bandwidth_Kbps:  # We have congestion: apply RTT-aware Min-Max model
+                    print("CONGESTION")
                     rtt_reverse_sum = 0
                     for flow in link.flows:
                         rtt_reverse_sum += (1.0/flow[RTT])
@@ -135,6 +136,7 @@ class EmulationManager:
             # Apply the new bandwidth on this path
             if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
                 PathEmulation.change_bandwidth(path.links[-1].destination, max_bandwidth)
+                print("Changed " + path.links[-1].destination.ip + " to " + str(max_bandwidth))
                 path.current_bandwidth = max_bandwidth
 
     def collect_flow(self, bandwidth, link_indices):
