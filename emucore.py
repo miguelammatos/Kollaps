@@ -53,18 +53,14 @@ def main():
     graph.calculate_shortest_paths()
 
     print("Initializing network emulation conditions...")
-    PathEmulation.init()
-    for service in graph.paths:
-        if isinstance(service, NetGraph.Service):
-            path = graph.paths[service]
-            PathEmulation.initialize_path(path)
+    manager = EmulationManager(graph)
+    manager.initialize()
 
     print("Starting experiment!")
     # Temporary hack to start the experiment
     subprocess.run('echo "done\n" > /tmp/readypipe', shell=True)
 
     # Enter the emulation loop
-    manager = EmulationManager(graph)
     manager.emulation_loop()
 
 

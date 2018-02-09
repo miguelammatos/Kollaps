@@ -14,8 +14,9 @@ import sys
 from time import time, sleep
 
 
-def mock_init():
+def mock_init(controll_port):
     print("TC init called")
+    print("Controll port is " + str(controll_port))
 
 
 def mock_initialize_path(path):
@@ -171,16 +172,11 @@ def main():
             print("   " + link.source.name + " hop " + link.destination.name + " i:" + str(link.index))
 
     print("Initializing network emulation conditions...")
-    PathEmulation.init()
-    for service in graph.paths:
-        if isinstance(service, NetGraph.Service):
-            path = graph.paths[service]
-            PathEmulation.initialize_path(path)
-
+    manager = EmulationManager(graph)
+    manager.initialize()
 
     print("Starting experiment!")
     # Enter the emulation loop
-    manager = EmulationManager(graph)
     manager.emulation_loop()
 
 

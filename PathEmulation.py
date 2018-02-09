@@ -6,8 +6,8 @@ if sys.version_info >= (3, 0):
     from typing import Dict, List
 
 
-def init():
-    TCAL.init()
+def init(controll_port):
+    TCAL.init(controll_port)
 
 
 def initialize_path(path):

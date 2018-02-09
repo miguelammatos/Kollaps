@@ -21,18 +21,24 @@ class EmulationManager:
         self.state_lock = Lock()
         self.disseminator = FlowDisseminator(self, self.collect_flow, self.graph)
 
+    def initialize(self):
+        PathEmulation.init(FlowDisseminator.UDP_PORT)
+        for service in self.graph.paths:
+            if isinstance(service, NetGraph.Service):
+                path = self.graph.paths[service]
+                PathEmulation.initialize_path(path)
+
+
     def emulation_loop(self):
         last_time = time()
         while True:
             with self.state_lock:
-                print("Start##############")
                 self.reset_flow_state()
                 last_time = self.check_active_flows(last_time)
             self.disseminate_active_flows()
             sleep(EmulationManager.POOL_PERIOD)
             with self.state_lock:
                 self.recalculate_path_bandwidths()
-                print("End################")
 
     def reset_flow_state(self):
         for link_index in self.active_links:
@@ -90,7 +96,6 @@ class EmulationManager:
                 for flow in link.flows:
                     used_bandwidth += flow[BW]
                 if used_bandwidth > link.bandwidth_Kbps:  # We have congestion: apply RTT-aware Min-Max model
-                    print("CONGESTION")
                     rtt_reverse_sum = 0
                     for flow in link.flows:
                         rtt_reverse_sum += (1.0/flow[RTT])
@@ -138,12 +143,10 @@ class EmulationManager:
             # Apply the new bandwidth on this path
             if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
                 PathEmulation.change_bandwidth(path.links[-1].destination, max_bandwidth)
-                print("Changed " + path.links[-1].destination.ip + " to " + str(max_bandwidth))
                 path.current_bandwidth = max_bandwidth
 
     def collect_flow(self, bandwidth, link_indices):
         with self.state_lock:
-            print("Got a flow of " + str(bandwidth))
             concurrent_links = []
             # Calculate RTT of this flow and check if we are sharing any link with it
             rtt = 0
