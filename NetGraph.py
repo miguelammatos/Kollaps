@@ -160,6 +160,7 @@ class NetGraph:
                         sleep(3)
                 except:
                     sleep(3)
+            ips.sort()  # needed for deterministic behaviour
             for i in range(len(hosts)):
                 hosts[i].ip = ips[i]
 

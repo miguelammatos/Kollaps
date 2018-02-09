@@ -101,11 +101,9 @@ class FlowDisseminator:
                     s.sendto(data, addr)
 
     def receive_flows(self):
-        print("Ready to receive flows")
         # TODO check for split packets
         while True:
             data, addr = self.sock.recvfrom(FlowDisseminator.BUFFER_LEN)
-            print("Got data from " + addr[0])
             with self.lock:
                 if addr[0] in self.repeat_detection:
                     continue
@@ -124,6 +122,5 @@ class FlowDisseminator:
                     index = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
                     offset += struct.calcsize("<1"+self.link_unit)
                     links.append(index)
-                print("calling the flow collector")
                 self.flow_collector(bandwidth, links)
 
