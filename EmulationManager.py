@@ -25,12 +25,14 @@ class EmulationManager:
         last_time = time()
         while True:
             with self.state_lock:
+                print("Start##############")
                 self.reset_flow_state()
                 last_time = self.check_active_flows(last_time)
             self.disseminate_active_flows()
             sleep(EmulationManager.POOL_PERIOD)
             with self.state_lock:
                 self.recalculate_path_bandwidths()
+                print("End################")
 
     def reset_flow_state(self):
         for link_index in self.active_links:
@@ -141,6 +143,7 @@ class EmulationManager:
 
     def collect_flow(self, bandwidth, link_indices):
         with self.state_lock:
+            print("Got a flow of " + str(bandwidth))
             concurrent_links = []
             # Calculate RTT of this flow and check if we are sharing any link with it
             rtt = 0
