@@ -45,9 +45,10 @@ class FlowDisseminator:
             fail("Topology has too many links: " + str(link_count))
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind((self.graph.root.ip, FlowDisseminator.UDP_PORT))
+        self.sock.bind(('0.0.0.0', FlowDisseminator.UDP_PORT))
 
         self.thread = Thread(target=self.receive_flows)
+        self.thread.daemon = True
         self.thread.start()
 
 
