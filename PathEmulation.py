@@ -24,8 +24,10 @@ def initialize_path(path):
 
     TCAL.initDestination(destination.ip, bandwidth, latency, drop)
 
+
 def update_usage():
     TCAL.updateUsage()
+
 
 def query_usage(service):
     """
@@ -34,10 +36,11 @@ def query_usage(service):
     """
     return TCAL.queryUsage(service.ip)
 
+
 def change_bandwidth(service, new_bandwidth):
     """
     :param service: NetGraph.Service
     :param new_bandwidth: int  # in Kbps
     :return:
     """
-    TCAL.changeBandwidth(service.ip, new_bandwidth)
+    TCAL.changeBandwidth(service.ip, int(new_bandwidth))
