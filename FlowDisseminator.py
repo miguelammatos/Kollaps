@@ -97,7 +97,6 @@ class FlowDisseminator:
             for host in hosts:
                 if host != self.graph.root:
                     addr = (host.ip, FlowDisseminator.UDP_PORT)
-                    print("broadcasting to " + addr[0])
                     s.sendto(data, addr)
 
     def receive_flows(self):
