@@ -35,7 +35,7 @@ class EmulationManager:
             with self.state_lock:
                 self.reset_flow_state()
                 last_time = self.check_active_flows(last_time)
-            self.disseminate_active_flows()
+                self.disseminator.broadcast_flows(self.active_paths)
             sleep(EmulationManager.POOL_PERIOD)
             with self.state_lock:
                 self.recalculate_path_bandwidths()
@@ -83,8 +83,6 @@ class EmulationManager:
                     link.flows.append((path.RTT, throughput))
         return current_time
 
-    def disseminate_active_flows(self):
-        self.disseminator.broadcast_flows(self.active_paths)
 
     def recalculate_path_bandwidths(self):
         RTT = 0

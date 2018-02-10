@@ -60,9 +60,11 @@ def main():
     # Temporary hack to start the experiment
     subprocess.run('echo "done\n" > /tmp/readypipe', shell=True)
 
+    sys.stdout.flush()
+    sys.stderr.flush()
+
     # Enter the emulation loop
     manager.emulation_loop()
-
 
 if __name__ == '__main__':
     main()

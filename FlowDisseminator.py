@@ -3,6 +3,7 @@ from utils import fail, BYTE_LIMIT, INT_LIMIT, SHORT_LIMIT
 
 
 from threading import Thread, Lock
+from concurrent.futures import ThreadPoolExecutor
 import socket
 import struct
 import ctypes
@@ -51,22 +52,40 @@ class FlowDisseminator:
         self.thread.daemon = True
         self.thread.start()
 
-    def broadcast_thread(self, active_flows):
+        self.pool = ThreadPoolExecutor(max_workers=16)
+
+
+    def broadcast_thread(self, service, data):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        hosts = self.graph.services[service]
+        for host in hosts:
+            if host != self.graph.root:
+                addr = (host.ip, FlowDisseminator.UDP_PORT)
+                s.sendto(data, addr)
+
+    def broadcast_flows(self, active_flows):
         """
         :param active_flows: List[NetGraph.Path]
         :return:
         """
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.settimeout(1)
+        # TODO List
+        # Check if we need to split packets
+        with self.lock:
+            print(len(self.repeat_detection))
+            self.repeat_detection.clear()  # This is the start of a new cycle
 
+        if len(active_flows) < 1:
+            return
+
+        # calculate size of packet
         fmt = "<1i"
         for flow in active_flows:
             fmt += "1i1"+self.link_unit
             for link in flow.links:
                 fmt += "1"+self.link_unit
-
         size = struct.calcsize(fmt)
 
+        # Build the packet
         data = ctypes.create_string_buffer(size)
         accumulated_size = 0
         struct.pack_into("<1i", data, accumulated_size, len(active_flows))
@@ -80,33 +99,9 @@ class FlowDisseminator:
                 struct.pack_into("<1"+self.link_unit, data, accumulated_size, link.index)
                 accumulated_size += struct.calcsize("<1"+self.link_unit)
 
-
+        # Submit sending to thread pool
         for service in self.graph.services:
-            hosts = self.graph.services[service]
-            for host in hosts:
-                if host != self.graph.root:
-                    addr = (host.ip, FlowDisseminator.UDP_PORT)
-                    s.sendto(data, addr)
-
-
-    def broadcast_flows(self, active_flows):
-        """
-        :param active_flows: List[NetGraph.Path]
-        :return:
-        """
-        # TODO List
-        # Check if we need to split packets
-        # Spread the sending through POOL_PERIOD/2
-
-        with self.lock:
-            self.repeat_detection.clear()  # This is the start of a new cycle
-
-        if len(active_flows) < 1:
-            return
-        t = Thread(target=self.broadcast_thread, args=(active_flows,))
-        t.daemon = True
-        t.start()
-
+            self.pool.submit(self.broadcast_thread, (service,data,))
 
     def receive_flows(self):
         # TODO check for split packets
