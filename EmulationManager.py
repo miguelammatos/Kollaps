@@ -31,6 +31,8 @@ class EmulationManager:
 
     def emulation_loop(self):
         last_time = time()
+        self.check_active_flows(last_time)  # to prevent bug where data has already passed through the filters before
+        i = 0
         while True:
             with self.state_lock:
                 self.reset_flow_state()
@@ -39,6 +41,10 @@ class EmulationManager:
             sleep(EmulationManager.POOL_PERIOD)
             with self.state_lock:
                 self.recalculate_path_bandwidths()
+            i += 1
+            if i == 20:
+                sys.stdout.flush()
+                i = 0
 
     def reset_flow_state(self):
         for link_index in self.active_links:

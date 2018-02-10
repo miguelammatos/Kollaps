@@ -4,6 +4,7 @@ from utils import fail, BYTE_LIMIT, INT_LIMIT, SHORT_LIMIT
 
 from threading import Thread, Lock
 from concurrent.futures import ThreadPoolExecutor
+from time import time
 import socket
 import struct
 import ctypes
@@ -83,11 +84,15 @@ class FlowDisseminator:
             fmt += "1i1"+self.link_unit
             for link in flow.links:
                 fmt += "1"+self.link_unit
+        fmt += "<1L"
+
         size = struct.calcsize(fmt)
 
         # Build the packet
         data = ctypes.create_string_buffer(size)
         accumulated_size = 0
+        struct.pack_into("<1L", data, accumulated_size, int(time()*1000))
+        accumulated_size += struct.calcsize("<1L")
         struct.pack_into("<1i", data, accumulated_size, len(active_flows))
         accumulated_size += struct.calcsize("<1i")
         for flow in active_flows:
@@ -113,6 +118,9 @@ class FlowDisseminator:
                 else:
                     self.repeat_detection[addr[0]] = True
             offset = 0
+            timestamp = struct.unpack_from("<1L", data, offset)[0]
+            latency = time() - timestamp
+            print(str(latency) + "ms")
             num_of_flows = struct.unpack_from("<1i", data, offset)[0]
             offset += struct.calcsize("<1i")
             for i in range(num_of_flows):
