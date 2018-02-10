@@ -119,7 +119,7 @@ class FlowDisseminator:
                     self.repeat_detection[addr[0]] = True
             offset = 0
             timestamp = struct.unpack_from("<1Q", data, offset)[0]
-            latency = time() - timestamp
+            latency = int(time()*1000) - timestamp
             print(str(latency) + "ms")
             offset += struct.calcsize("<1Q")
             num_of_flows = struct.unpack_from("<1i", data, offset)[0]
