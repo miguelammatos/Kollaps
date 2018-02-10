@@ -20,6 +20,7 @@ class EmulationManager:
         self.active_paths = []
         self.state_lock = Lock()
         self.disseminator = FlowDisseminator(self, self.collect_flow, self.graph)
+        self.repeat_detection = {}
 
     def initialize(self):
         PathEmulation.init(FlowDisseminator.UDP_PORT)
@@ -34,17 +35,17 @@ class EmulationManager:
         self.check_active_flows(last_time)  # to prevent bug where data has already passed through the filters before
         i = 0
         while True:
-            with self.state_lock:
-                self.reset_flow_state()
-                last_time = self.check_active_flows(last_time)
-                self.disseminator.broadcast_flows(self.active_paths)
             sleep(EmulationManager.POOL_PERIOD)
             with self.state_lock:
+                last_time = self.check_active_flows(last_time)
+                self.disseminator.broadcast_flows(self.active_paths)
                 self.recalculate_path_bandwidths()
-            i += 1
-            if i == 20:
-                sys.stdout.flush()
-                i = 0
+                self.reset_flow_state()
+
+                i += 1
+                if i == 20:
+                    sys.stdout.flush()
+                    i = 0
 
     def reset_flow_state(self):
         for link_index in self.active_links:
@@ -53,6 +54,8 @@ class EmulationManager:
 
         self.active_links.clear()
         del self.active_paths[:]
+        print(len(self.repeat_detection))
+        self.repeat_detection.clear()
 
     def check_active_flows(self, last_time):
         PathEmulation.update_usage()
@@ -151,6 +154,10 @@ class EmulationManager:
 
     def collect_flow(self, bandwidth, link_indices):
         with self.state_lock:
+            if link_indices[0] in self.repeat_detection:
+                return
+            else:
+                self.repeat_detection[link_indices[0]] = True
             concurrent_links = []
             # Calculate RTT of this flow and check if we are sharing any link with it
             rtt = 0

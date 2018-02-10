@@ -33,9 +33,6 @@ class FlowDisseminator:
         self.emuliation_manager = manager
         self.flow_collector = flow_collector
 
-        self.lock = Lock()
-        self.repeat_detection = {}
-
         link_count = len(self.graph.links)
         if link_count <= BYTE_LIMIT:
             self.link_unit = "B"
@@ -56,14 +53,6 @@ class FlowDisseminator:
         self.pool = ThreadPoolExecutor(max_workers=16)
 
 
-    def broadcast_thread(self, service, data):
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        hosts = self.graph.services[service]
-        for host in hosts:
-            if host != self.graph.root:
-                addr = (host.ip, FlowDisseminator.UDP_PORT)
-                s.sendto(data, addr)
-
     def broadcast_flows(self, active_flows):
         """
         :param active_flows: List[NetGraph.Path]
@@ -71,10 +60,6 @@ class FlowDisseminator:
         """
         # TODO List
         # Check if we need to split packets
-        with self.lock:
-            print(len(self.repeat_detection))
-            self.repeat_detection.clear()  # This is the start of a new cycle
-
         if len(active_flows) < 1:
             return
 
@@ -100,35 +85,36 @@ class FlowDisseminator:
                 struct.pack_into("<1"+self.link_unit, data, accumulated_size, link.index)
                 accumulated_size += struct.calcsize("<1"+self.link_unit)
 
-        # Submit sending to thread pool
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        ips = []
         for service in self.graph.services:
-            self.pool.submit(self.broadcast_thread, service, data)
+            hosts = self.graph.services[service]
+            for host in hosts:
+                if host != self.graph.root:
+                    ips.append(host.ip)
+
+        for ip in ips:
+            addr = (ip, FlowDisseminator.UDP_PORT)
+            s.sendto(data, addr)
+        s.close()
 
     def receive_flows(self):
         # TODO check for split packets
         while True:
             data, addr = self.sock.recvfrom(FlowDisseminator.BUFFER_LEN)
-            self.pool.submit(self.parse_packet, data, addr)
-
-    def parse_packet(self, data, addr):
-        with self.lock:
-            if addr[0] in self.repeat_detection:
-                return
-            else:
-                self.repeat_detection[addr[0]] = True
-        offset = 0
-        num_of_flows = struct.unpack_from("<1i", data, offset)[0]
-        offset += struct.calcsize("<1i")
-        for i in range(num_of_flows):
-            bandwidth = struct.unpack_from("<1i", data, offset)[0]
+            offset = 0
+            num_of_flows = struct.unpack_from("<1i", data, offset)[0]
             offset += struct.calcsize("<1i")
-            num_of_links = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
-            offset += struct.calcsize("<1"+self.link_unit)
-            links = []
-            for j in range(num_of_links):
-                index = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
+            for i in range(num_of_flows):
+                bandwidth = struct.unpack_from("<1i", data, offset)[0]
+                offset += struct.calcsize("<1i")
+                num_of_links = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
                 offset += struct.calcsize("<1"+self.link_unit)
-                links.append(index)
-            self.flow_collector(bandwidth, links)
+                links = []
+                for j in range(num_of_links):
+                    index = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
+                    offset += struct.calcsize("<1"+self.link_unit)
+                    links.append(index)
+                self.flow_collector(bandwidth, links)
 
 
