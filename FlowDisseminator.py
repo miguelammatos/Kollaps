@@ -84,7 +84,7 @@ class FlowDisseminator:
             fmt += "1i1"+self.link_unit
             for link in flow.links:
                 fmt += "1"+self.link_unit
-        fmt += "<1L"
+        fmt += "1L"
 
         size = struct.calcsize(fmt)
 

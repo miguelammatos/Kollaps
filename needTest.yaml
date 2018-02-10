@@ -13,7 +13,7 @@ services:
       - NEEDnet
 
   client1:
-    image: warpenguin.no-ip.org/client:2.98
+    image: warpenguin.no-ip.org/client:2.99
     command: ['server1']
     hostname: client1
     labels:
@@ -34,7 +34,7 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client:2.98
+    image: warpenguin.no-ip.org/client:2.99
     command: ['server2']
     hostname: client2
     labels:
@@ -54,7 +54,7 @@ services:
       - NEEDnet
 
   server1:
-    image: warpenguin.no-ip.org/server:2.98
+    image: warpenguin.no-ip.org/server:2.99
     command: []
     hostname: server1
     labels:
@@ -74,7 +74,7 @@ services:
       - NEEDnet
 
   server2:
-    image: warpenguin.no-ip.org/server:2.98
+    image: warpenguin.no-ip.org/server:2.99
     command: []
     hostname: server2
     labels:
