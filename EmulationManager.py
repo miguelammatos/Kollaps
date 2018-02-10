@@ -21,6 +21,7 @@ class EmulationManager:
         self.state_lock = Lock()
         self.disseminator = FlowDisseminator(self, self.collect_flow, self.graph)
         self.repeat_detection = {}
+        self.dropped = 0.0
 
     def initialize(self):
         PathEmulation.init(FlowDisseminator.UDP_PORT)
@@ -37,13 +38,14 @@ class EmulationManager:
         while True:
             sleep(EmulationManager.POOL_PERIOD)
             with self.state_lock:
-                last_time = self.check_active_flows(last_time)
-                self.disseminator.broadcast_flows(self.active_paths)
                 self.recalculate_path_bandwidths()
                 self.reset_flow_state()
+                last_time = self.check_active_flows(last_time)
+                self.disseminator.broadcast_flows(self.active_paths)
 
                 i += 1
                 if i == 20:
+                    print(self.drop)
                     sys.stdout.flush()
                     i = 0
 
@@ -54,7 +56,8 @@ class EmulationManager:
 
         self.active_links.clear()
         del self.active_paths[:]
-        print(len(self.repeat_detection))
+        received = len(self.repeat_detection)
+        self.drop += (1-(received/3.0))/10 - self.drop/10
         self.repeat_detection.clear()
 
     def check_active_flows(self, last_time):
