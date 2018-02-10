@@ -51,23 +51,11 @@ class FlowDisseminator:
         self.thread.daemon = True
         self.thread.start()
 
-
-    def broadcast_flows(self, active_flows):
+    def broadcast_thread(self, active_flows):
         """
         :param active_flows: List[NetGraph.Path]
         :return:
         """
-
-        # TODO List
-        # Check if we need to split packets
-        # Spawn a thread for this and spread the sending through POOL_PERIOD/2
-
-        with self.lock:
-            self.repeat_detection.clear()  # This is the start of a new cycle
-
-        if len(active_flows) < 1:
-            return
-
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(1)
 
@@ -99,6 +87,26 @@ class FlowDisseminator:
                 if host != self.graph.root:
                     addr = (host.ip, FlowDisseminator.UDP_PORT)
                     s.sendto(data, addr)
+
+
+    def broadcast_flows(self, active_flows):
+        """
+        :param active_flows: List[NetGraph.Path]
+        :return:
+        """
+        # TODO List
+        # Check if we need to split packets
+        # Spread the sending through POOL_PERIOD/2
+
+        with self.lock:
+            self.repeat_detection.clear()  # This is the start of a new cycle
+
+        if len(active_flows) < 1:
+            return
+        t = Thread(target=self.broadcast_thread, args=(active_flows,))
+        t.daemon = True
+        t.start()
+
 
     def receive_flows(self):
         # TODO check for split packets
