@@ -84,15 +84,11 @@ class FlowDisseminator:
             fmt += "1i1"+self.link_unit
             for link in flow.links:
                 fmt += "1"+self.link_unit
-        fmt += "1Q"
-
         size = struct.calcsize(fmt)
 
         # Build the packet
         data = ctypes.create_string_buffer(size)
         accumulated_size = 0
-        struct.pack_into("<1Q", data, accumulated_size, int(time()*1000))
-        accumulated_size += struct.calcsize("<1Q")
         struct.pack_into("<1i", data, accumulated_size, len(active_flows))
         accumulated_size += struct.calcsize("<1i")
         for flow in active_flows:
@@ -112,27 +108,27 @@ class FlowDisseminator:
         # TODO check for split packets
         while True:
             data, addr = self.sock.recvfrom(FlowDisseminator.BUFFER_LEN)
-            with self.lock:
-                if addr[0] in self.repeat_detection:
-                    continue
-                else:
-                    self.repeat_detection[addr[0]] = True
-            offset = 0
-            timestamp = struct.unpack_from("<1Q", data, offset)[0]
-            latency = int(time()*1000) - timestamp
-            print(str(latency) + "ms")
-            offset += struct.calcsize("<1Q")
-            num_of_flows = struct.unpack_from("<1i", data, offset)[0]
+            self.pool.submit(self.parse_packet, data, addr)
+
+    def parse_packet(self, data, addr):
+        with self.lock:
+            if addr[0] in self.repeat_detection:
+                return
+            else:
+                self.repeat_detection[addr[0]] = True
+        offset = 0
+        num_of_flows = struct.unpack_from("<1i", data, offset)[0]
+        offset += struct.calcsize("<1i")
+        for i in range(num_of_flows):
+            bandwidth = struct.unpack_from("<1i", data, offset)[0]
             offset += struct.calcsize("<1i")
-            for i in range(num_of_flows):
-                bandwidth = struct.unpack_from("<1i", data, offset)[0]
-                offset += struct.calcsize("<1i")
-                num_of_links = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
+            num_of_links = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
+            offset += struct.calcsize("<1"+self.link_unit)
+            links = []
+            for j in range(num_of_links):
+                index = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
                 offset += struct.calcsize("<1"+self.link_unit)
-                links = []
-                for j in range(num_of_links):
-                    index = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
-                    offset += struct.calcsize("<1"+self.link_unit)
-                    links.append(index)
-                self.flow_collector(bandwidth, links)
+                links.append(index)
+            self.flow_collector(bandwidth, links)
+
 
