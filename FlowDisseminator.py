@@ -106,7 +106,7 @@ class FlowDisseminator:
 
         # Submit sending to thread pool
         for service in self.graph.services:
-            self.pool.submit(self.broadcast_thread, (service,data,))
+            self.pool.submit(self.broadcast_thread, service, data)
 
     def receive_flows(self):
         # TODO check for split packets
