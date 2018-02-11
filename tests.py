@@ -7,7 +7,7 @@ from utils import fail
 import PathEmulation
 from FlowDisseminator import FlowDisseminator
 
-from threading import Thread
+from threading import Thread, Timer
 from sched import scheduler
 
 import sys
@@ -110,6 +110,7 @@ class MockFlowDisseminator:
         bandwidthMbps = 50
         path = [2, 4, 7]
         self.flow_collector(bandwidthMbps*1000, path)
+        #sleep(0.01)
         bandwidthMbps = 50
         path = [3, 5, 8]
         self.flow_collector(bandwidthMbps*1000, path)
@@ -125,8 +126,7 @@ class MockFlowDisseminator:
         #    print("    " + str(i))
         #self.concurrency_timer -= 1
         #if self.concurrency_timer > 0:
-        self.s.enter(0.05, 1, self.receive_flows,argument=([],))
-        self.s.run()
+        Timer(0.025, self.receive_flows, args=([],)).start()
 
 def setup_mocking():
     PathEmulation.init = mock_init

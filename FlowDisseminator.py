@@ -32,6 +32,8 @@ class FlowDisseminator:
         self.graph = graph  # type: NetGraph
         self.emuliation_manager = manager
         self.flow_collector = flow_collector
+        self.sent = 0
+        self.received = 0
 
         link_count = len(self.graph.links)
         if link_count <= BYTE_LIMIT:
@@ -62,6 +64,8 @@ class FlowDisseminator:
         # Check if we need to split packets
         if len(active_flows) < 1:
             return
+
+        self.sent += 1
 
         # calculate size of packet
         fmt = "<1i"
@@ -97,6 +101,7 @@ class FlowDisseminator:
         # TODO check for split packets
         while True:
             data, addr = self.sock.recvfrom(FlowDisseminator.BUFFER_LEN)
+            self.received += 1
             offset = 0
             num_of_flows = struct.unpack_from("<1i", data, offset)[0]
             offset += struct.calcsize("<1i")

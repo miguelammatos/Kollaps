@@ -18,7 +18,7 @@ class EmulationManager:
         self.graph = graph  # type: NetGraph
         self.active_links = {}  # type: Dict[int, NetGraph.Link]
         self.active_paths = []
-        self.packet_buffer = {}
+        self.repeat_detection = {}
         self.state_lock = Lock()
         self.disseminator = FlowDisseminator(self, self.collect_flow, self.graph)
         self.last_time = 0
@@ -36,17 +36,17 @@ class EmulationManager:
         self.check_active_flows()  # to prevent bug where data has already passed through the filters before
         def cycle():
             Timer(EmulationManager.POOL_PERIOD, cycle).start()
-            self.disseminator.broadcast_flows(self.active_paths)
             with self.state_lock:
-                for origin in self.packet_buffer:
-                    if len(self.packet_buffer[origin]) > 0:
-                        packet = self.packet_buffer[origin].pop(0)
-                        self.process_flow(packet[0], packet[1])
                 self.recalculate_path_bandwidths()
                 self.reset_flow_state()
                 self.check_active_flows()
+        def broadcast():
+            Timer(EmulationManager.POOL_PERIOD/2.0, broadcast).start()
+            with self.state_lock:
+                self.disseminator.broadcast_flows(self.active_paths)
 
         cycle()
+        broadcast()
 
     def reset_flow_state(self):
         for link_index in self.active_links:
@@ -55,6 +55,7 @@ class EmulationManager:
 
         self.active_links.clear()
         del self.active_paths[:]
+        self.repeat_detection.clear()
 
     def check_active_flows(self):
         PathEmulation.update_usage()
@@ -154,22 +155,20 @@ class EmulationManager:
     def collect_flow(self, bandwidth, link_indices):
         key = str(link_indices[0]) + str(link_indices[-1])
         with self.state_lock:
-            if key in self.packet_buffer:
-                self.packet_buffer[key].append((bandwidth, link_indices))
+            if key in self.repeat_detection:
+                return
             else:
-                self.packet_buffer[key] = [(bandwidth, link_indices)]
+                self.repeat_detection[key] = True
+            concurrent_links = []
+            # Calculate RTT of this flow and check if we are sharing any link with it
+            rtt = 0
+            for index in link_indices:
+                link = self.graph.links[index]
+                rtt += (link.latency*2)
+                if index in self.active_links:
+                    concurrent_links.append(link)
 
-    def process_flow(self, bandwidth, link_indices):
-        concurrent_links = []
-        # Calculate RTT of this flow and check if we are sharing any link with it
-        rtt = 0
-        for index in link_indices:
-            link = self.graph.links[index]
-            rtt += (link.latency*2)
-            if index in self.active_links:
-                concurrent_links.append(link)
-
-        # If we are sharing links, then update them with this flows bandwidth usage and RTT
-        if len(concurrent_links) > 0:
-            for link in concurrent_links:
-                link.flows.append((rtt, bandwidth))
+            # If we are sharing links, then update them with this flows bandwidth usage and RTT
+            if len(concurrent_links) > 0:
+                for link in concurrent_links:
+                    link.flows.append((rtt, bandwidth))
