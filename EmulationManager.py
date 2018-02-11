@@ -107,18 +107,21 @@ class EmulationManager:
                 # calculate the bandwidth for everyone
                 for flow in link.flows:
                     max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_Kbps)
-
+                print("I get " + str(max_bandwidth_on_link[0]))
                 # Maximize link utilization to 100%
                 # TODO Experimentally verify this is correct (impossible to verify with offline mocks)
 
                 spare_bw = link.bandwidth_Kbps - max_bandwidth_on_link[0]
+                hungry_flows = 1
                 for i, flow in enumerate(link.flows[1:]):
-                     if(max_bandwidth_on_link[i] > flow[BW]):  # this flow got allocated more than what is using
-                        max_bandwidth_on_link[i] = flow[BW]
-                     spare_bw -= max_bandwidth_on_link[i]  # decrement by this flows share
+                    if flow[BW] > max_bandwidth_on_link[i]:
+                        spare_bw -= max_bandwidth_on_link[i]
+                        hungry_flows += 1
+                    else:
+                        spare_bw -= flow[BW]
 
-                max_bandwidth_on_link[0] += spare_bw
-
+                max_bandwidth_on_link[0] += (spare_bw/hungry_flows) #if spare_bw > 0 else 0
+                print("Plus spare = " + str(max_bandwidth_on_link[0]))
                 # If this link restricts us more than previously assume this bandwidth as the max
                 if max_bandwidth_on_link[0] < max_bandwidth:
                     max_bandwidth = max_bandwidth_on_link[0]

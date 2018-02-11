@@ -13,6 +13,8 @@ from sched import scheduler
 import sys
 from time import time, sleep
 
+class CT:
+    current_throughput = 50*1000*1000
 
 def mock_init(controll_port):
     print("TC init called")
@@ -51,7 +53,7 @@ def mock_query_usage(service):
     if service.name != "server1":
         return 0
     Mbits = 50
-    sent_delta = ((Mbits*1000*1000)/8)*mock_update_usage.time_delta
+    sent_delta = (CT.current_throughput/8)*mock_update_usage.time_delta
     if service in mock_sent_bytes:
         mock_sent_bytes[service] += sent_delta
     else:
@@ -67,6 +69,7 @@ def mock_change_bandwidth(service, new_bandwidth):
     :return:
     """
     print("Changing " + service.name + ":" + str(service.__hash__()) + " to " + str(new_bandwidth) + "Kbps")
+    CT.current_throughput = new_bandwidth*1000 - 0.01*new_bandwidth*1000
 
 
 class MockFlowDisseminator:
@@ -107,13 +110,13 @@ class MockFlowDisseminator:
     def receive_flows(self, data):
         if len(data) > 0:
             sleep(0.5)
-        bandwidthMbps = 50
+        bandwidthMbps = CT.current_throughput/(1000*1000)
         path = [2, 4, 7]
         self.flow_collector(bandwidthMbps*1000, path)
         #sleep(0.01)
-        #bandwidthMbps = 50
-        #path = [3, 5, 8]
-        #self.flow_collector(bandwidthMbps*1000, path)
+        bandwidthMbps = 10
+        path = [2, 4, 8]
+        self.flow_collector(bandwidthMbps*1000, path)
         #bandwidthMbps = 50
         #path = [0, 5, 8]
         #self.flow_collector(bandwidthMbps*1000, path)
