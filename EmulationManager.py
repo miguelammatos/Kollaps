@@ -111,7 +111,7 @@ class EmulationManager:
                 # Maximize link utilization to 100%
                 # TODO Experimentally verify this is correct (impossible to verify with offline mocks)
 
-                spare_bw = link.bandwidth_Kbps
+                spare_bw = link.bandwidth_Kbps - max_bandwidth_on_link[0]
                 for i, flow in enumerate(link.flows[1:]):
                      if(max_bandwidth_on_link[i] > flow[BW]):  # this flow got allocated more than what is using
                         max_bandwidth_on_link[i] = flow[BW]
