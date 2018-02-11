@@ -99,9 +99,16 @@ class FlowDisseminator:
 
     def receive_flows(self):
         # TODO check for split packets
+        last_time = time()
         while True:
             data, addr = self.sock.recvfrom(FlowDisseminator.BUFFER_LEN)
             self.received += 1
+            current_time = time()
+            if current_time - last_time > 10:
+                last_time = current_time
+                print("sent: " + self.sent)
+                print("received" + self.received)
+                sys.stdout.flush()
             offset = 0
             num_of_flows = struct.unpack_from("<1i", data, offset)[0]
             offset += struct.calcsize("<1i")
