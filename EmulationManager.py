@@ -85,7 +85,6 @@ class EmulationManager:
                 self.active_paths.append(path)
                 for link in path.links:
                     self.active_links[link.index] = link
-                    print(link.index)
                     link.flows.append((path.RTT, throughput))
         self.last_time = current_time
 
@@ -93,59 +92,40 @@ class EmulationManager:
     def recalculate_path_bandwidths(self):
         RTT = 0
         BW = 1
+        print("#############################")
         for path in self.active_paths:
             max_bandwidth = path.max_bandwidth
             for link in path.links:
                 used_bandwidth = 0
+                print(link.flows)
                 for flow in link.flows:
                     used_bandwidth += flow[BW]
-                if used_bandwidth > link.bandwidth_Kbps:  # We have congestion: apply RTT-aware Min-Max model
-                    rtt_reverse_sum = 0
-                    for flow in link.flows:
-                        rtt_reverse_sum += (1.0/flow[RTT])
-                    max_bandwidth_on_link = []
-                    our_share = (1.0/path.RTT)/rtt_reverse_sum
-                    # calculate the bandwidth for everyone
-                    for flow in link.flows:
-                        max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_Kbps)
+                rtt_reverse_sum = 0
+                for flow in link.flows:
+                    rtt_reverse_sum += (1.0/flow[RTT])
+                max_bandwidth_on_link = []
+                # calculate the bandwidth for everyone
+                for flow in link.flows:
+                    max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_Kbps)
 
-                    # Maximize link utilization to 100%
-                    # TODO Experimentally verify this is correct (impossible to verify with offline mocks)
-                    # This is not complete on a single cycle, there can still be wastage (but never exceed 100%)
-                    # but it should converge to 100% usage over 2 distributed cycles
-                    # as the other nodes calculate their share and apply it.
-                    # Example:
-                    # Node1 receives extra spare bw on Link1
-                    # Node1 is however further restricted by Link2 and doesnt use the extra spare bw
-                    # Node2 takes into consideration Node1's extra spare bw on Link1
-                    # Utilization should converge on the next cycle when Node1 broadcasts its bw restricted by Link2
-                    # Note: this is a greedy approach, the non-greedy approach would require full knowledge of the
-                    #       entire network state since right now Node2 might not have Link2 in its active paths,
-                    #       and therefore cant consider it
-                    spare_bw = 1.0
-                    max_usage_sum = 0  # this is used later for normalization
-                    using_less_than_allocated = True if max_bandwidth_on_link[0] > link.flows[0][BW] else False
-                    for i, flow in enumerate(link.flows):
-                        if(max_bandwidth_on_link[i] > flow[BW]):  # this flow got allocated more than what is using
-                            max_bandwidth_on_link[i] = flow[BW]
-                        else:
-                            # add together all shares that are competing for more than their fair share
-                            max_usage_sum += max_bandwidth_on_link[i]/link.bandwidth_Kbps
-                        spare_bw -= max_bandwidth_on_link[i]/link.bandwidth_Kbps  # decrement by this flows share
+                # Maximize link utilization to 100%
+                # TODO Experimentally verify this is correct (impossible to verify with offline mocks)
 
-                    # If we are competing for more than our share try to get some spare bw
-                    if not using_less_than_allocated:
-                        # normalize our usage
-                        normalized = our_share/max_usage_sum
-                        our_share += normalized*spare_bw  # allocate extra bw according to our weight
-                        max_bandwidth_on_link[0] = our_share*link.bandwidth_Kbps
+                spare_bw = link.bandwidth_Kbps
+                for i, flow in enumerate(link.flows[1:]):
+                     if(max_bandwidth_on_link[i] > flow[BW]):  # this flow got allocated more than what is using
+                        max_bandwidth_on_link[i] = flow[BW]
+                     spare_bw -= max_bandwidth_on_link[i]  # decrement by this flows share
 
-                    # If this link restricts us more than previously assume this bandwidth as the max
-                    if max_bandwidth_on_link[0] < max_bandwidth:
-                        max_bandwidth = max_bandwidth_on_link[0]
+                max_bandwidth_on_link[0] += spare_bw
+
+                # If this link restricts us more than previously assume this bandwidth as the max
+                if max_bandwidth_on_link[0] < max_bandwidth:
+                    max_bandwidth = max_bandwidth_on_link[0]
 
             # Apply the new bandwidth on this path
             if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
+                print("Changing to :" + str(max_bandwidth))
                 PathEmulation.change_bandwidth(path.links[-1].destination, max_bandwidth)
                 path.current_bandwidth = max_bandwidth
 

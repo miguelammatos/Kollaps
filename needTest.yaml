@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.5"
 services:
   bootstrapper:
     image: warpenguin.no-ip.org/privilegedbootstrapper:1.3
@@ -13,7 +13,7 @@ services:
       - NEEDnet
 
   client1:
-    image: warpenguin.no-ip.org/client:3.4
+    image: warpenguin.no-ip.org/client:3.5
     command: ['server1']
     hostname: client1
     labels:
@@ -34,7 +34,7 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client:3.4
+    image: warpenguin.no-ip.org/client:3.5
     command: ['server2']
     hostname: client2
     labels:
@@ -54,7 +54,7 @@ services:
       - NEEDnet
 
   server1:
-    image: warpenguin.no-ip.org/server:3.4
+    image: warpenguin.no-ip.org/server:3.5
     command: []
     hostname: server1
     labels:
@@ -74,7 +74,7 @@ services:
       - NEEDnet
 
   server2:
-    image: warpenguin.no-ip.org/server:3.4
+    image: warpenguin.no-ip.org/server:3.5
     command: []
     hostname: server2
     labels:
