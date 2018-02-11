@@ -1,5 +1,5 @@
 from time import time, sleep
-from threading import Lock
+from threading import Lock, Timer, active_count
 
 from NetGraph import NetGraph
 import PathEmulation
@@ -18,10 +18,10 @@ class EmulationManager:
         self.graph = graph  # type: NetGraph
         self.active_links = {}  # type: Dict[int, NetGraph.Link]
         self.active_paths = []
+        self.repeat_detection = {}
         self.state_lock = Lock()
         self.disseminator = FlowDisseminator(self, self.collect_flow, self.graph)
-        self.repeat_detection = {}
-        self.dropped = 0.0
+        self.last_time = 0
 
     def initialize(self):
         PathEmulation.init(FlowDisseminator.UDP_PORT)
@@ -32,22 +32,17 @@ class EmulationManager:
 
 
     def emulation_loop(self):
-        last_time = time()
-        self.check_active_flows(last_time)  # to prevent bug where data has already passed through the filters before
-        i = 0
-        while True:
-            sleep(EmulationManager.POOL_PERIOD)
+        self.last_time = time()
+        self.check_active_flows()  # to prevent bug where data has already passed through the filters before
+        def cycle():
+            Timer(EmulationManager.POOL_PERIOD, cycle).start()
             with self.state_lock:
                 self.recalculate_path_bandwidths()
                 self.reset_flow_state()
-                last_time = self.check_active_flows(last_time)
-                self.disseminator.broadcast_flows(self.active_paths)
+                self.check_active_flows()
+            self.disseminator.broadcast_flows(self.active_paths)
 
-                i += 1
-                if i == 20:
-                    print(self.drop)
-                    sys.stdout.flush()
-                    i = 0
+        cycle()
 
     def reset_flow_state(self):
         for link_index in self.active_links:
@@ -56,14 +51,14 @@ class EmulationManager:
 
         self.active_links.clear()
         del self.active_paths[:]
-        received = len(self.repeat_detection)
-        self.drop += (1-(received/3.0))/10 - self.drop/10
+        print(len(self.repeat_detection))
+        print(active_count())
         self.repeat_detection.clear()
 
-    def check_active_flows(self, last_time):
+    def check_active_flows(self):
         PathEmulation.update_usage()
         current_time = time()
-        time_delta = current_time - last_time
+        time_delta = current_time - self.last_time
         for service in self.graph.services:
             hosts = self.graph.services[service]
             for host in hosts:
@@ -93,7 +88,7 @@ class EmulationManager:
                 for link in path.links:
                     self.active_links[link.index] = link
                     link.flows.append((path.RTT, throughput))
-        return current_time
+        self.last_time = current_time
 
 
     def recalculate_path_bandwidths(self):

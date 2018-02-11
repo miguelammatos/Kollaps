@@ -40,7 +40,7 @@ def mock_update_usage():
     current_time = time()
     mock_update_usage.time_delta = current_time - mock_update_usage.last_time
     mock_update_usage.last_time = current_time
-    print("Updating data usage ###############################")
+    #print("Updating data usage ###############################")
 
 mock_sent_bytes = {}
 def mock_query_usage(service):
@@ -88,7 +88,7 @@ class MockFlowDisseminator:
 
         self.concurrency_timer = 5
         self.s = scheduler(time, sleep)
-        self.thread = Thread(target=self.receive_flows, args=([],))
+        self.thread = Thread(target=self.receive_flows, args=([1],))
         self.thread.start()
 
     def broadcast_flows(self, active_flows):
@@ -105,8 +105,16 @@ class MockFlowDisseminator:
                 print("        " + str(link.index))
 
     def receive_flows(self, data):
-        bandwidthMbps = 10
+        if len(data) > 0:
+            sleep(0.5)
+        bandwidthMbps = 50
         path = [2, 4, 7]
+        self.flow_collector(bandwidthMbps*1000, path)
+        bandwidthMbps = 50
+        path = [3, 5, 8]
+        self.flow_collector(bandwidthMbps*1000, path)
+        bandwidthMbps = 50
+        path = [0, 5, 8]
         self.flow_collector(bandwidthMbps*1000, path)
         #bandwidthMbps = 51
         #path = [2, 4, 6]
@@ -115,10 +123,10 @@ class MockFlowDisseminator:
         #print("    " + str(bandwidthMbps*1000))
         #for i in path:
         #    print("    " + str(i))
-        self.concurrency_timer -= 1
-        if self.concurrency_timer > 0:
-            self.s.enter(0.05, 1, self.receive_flows,argument=([],))
-            self.s.run()
+        #self.concurrency_timer -= 1
+        #if self.concurrency_timer > 0:
+        self.s.enter(0.05, 1, self.receive_flows,argument=([],))
+        self.s.run()
 
 def setup_mocking():
     PathEmulation.init = mock_init
