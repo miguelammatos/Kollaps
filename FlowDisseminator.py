@@ -86,16 +86,11 @@ class FlowDisseminator:
                 accumulated_size += struct.calcsize("<1"+self.link_unit)
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        ips = []
         for service in self.graph.services:
             hosts = self.graph.services[service]
             for host in hosts:
                 if host != self.graph.root:
-                    ips.append(host.ip)
-
-        for ip in ips:
-            addr = (ip, FlowDisseminator.UDP_PORT)
-            s.sendto(data, addr)
+                    s.sendto(data, (host.ip, FlowDisseminator.UDP_PORT))
         s.close()
 
     def receive_flows(self):

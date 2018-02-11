@@ -12,13 +12,13 @@ if sys.version_info >= (3, 0):
 class EmulationManager:
 
     ERROR_MARGIN = 0.01  # in percent
-    POOL_PERIOD = 0.1 # in seconds
+    POOL_PERIOD = 0.05 # in seconds
 
     def __init__(self, graph):
         self.graph = graph  # type: NetGraph
         self.active_links = {}  # type: Dict[int, NetGraph.Link]
         self.active_paths = []
-        self.repeat_detection = {}
+        self.packet_buffer = {}
         self.state_lock = Lock()
         self.disseminator = FlowDisseminator(self, self.collect_flow, self.graph)
         self.last_time = 0
@@ -38,6 +38,10 @@ class EmulationManager:
             Timer(EmulationManager.POOL_PERIOD, cycle).start()
             self.disseminator.broadcast_flows(self.active_paths)
             with self.state_lock:
+                for origin in self.packet_buffer:
+                    if len(self.packet_buffer[origin]) > 0:
+                        packet = self.packet_buffer[origin].pop(0)
+                        self.process_flow(packet[0], packet[1])
                 self.recalculate_path_bandwidths()
                 self.reset_flow_state()
                 self.check_active_flows()
@@ -51,7 +55,6 @@ class EmulationManager:
 
         self.active_links.clear()
         del self.active_paths[:]
-        self.repeat_detection.clear()
 
     def check_active_flows(self):
         PathEmulation.update_usage()
@@ -149,22 +152,24 @@ class EmulationManager:
                 path.current_bandwidth = max_bandwidth
 
     def collect_flow(self, bandwidth, link_indices):
+        key = str(link_indices[0]) + str(link_indices[-1])
         with self.state_lock:
-            if link_indices[0] in self.repeat_detection:
-                return
+            if key in self.packet_buffer:
+                self.packet_buffer[key].append((bandwidth, link_indices))
             else:
-                self.repeat_detection[link_indices[0]] = True
-            concurrent_links = []
-            # Calculate RTT of this flow and check if we are sharing any link with it
-            rtt = 0
-            for index in link_indices:
-                link = self.graph.links[index]
-                rtt += (link.latency*2)
-                if index in self.active_links:
-                    concurrent_links.append(link)
+                self.packet_buffer[key] = [(bandwidth, link_indices)]
 
-            # If we are sharing links, then update them with this flows bandwidth usage and RTT
-            if len(concurrent_links) > 0:
-                for link in concurrent_links:
-                    link.flows.append((rtt, bandwidth))
+    def process_flow(self, bandwidth, link_indices):
+        concurrent_links = []
+        # Calculate RTT of this flow and check if we are sharing any link with it
+        rtt = 0
+        for index in link_indices:
+            link = self.graph.links[index]
+            rtt += (link.latency*2)
+            if index in self.active_links:
+                concurrent_links.append(link)
 
+        # If we are sharing links, then update them with this flows bandwidth usage and RTT
+        if len(concurrent_links) > 0:
+            for link in concurrent_links:
+                link.flows.append((rtt, bandwidth))
