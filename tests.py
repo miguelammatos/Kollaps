@@ -111,12 +111,12 @@ class MockFlowDisseminator:
         path = [2, 4, 7]
         self.flow_collector(bandwidthMbps*1000, path)
         #sleep(0.01)
-        bandwidthMbps = 50
-        path = [3, 5, 8]
-        self.flow_collector(bandwidthMbps*1000, path)
-        bandwidthMbps = 50
-        path = [0, 5, 8]
-        self.flow_collector(bandwidthMbps*1000, path)
+        #bandwidthMbps = 50
+        #path = [3, 5, 8]
+        #self.flow_collector(bandwidthMbps*1000, path)
+        #bandwidthMbps = 50
+        #path = [0, 5, 8]
+        #self.flow_collector(bandwidthMbps*1000, path)
         #bandwidthMbps = 51
         #path = [2, 4, 6]
         #self.flow_collector(bandwidthMbps*1000, path)

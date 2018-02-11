@@ -36,11 +36,11 @@ class EmulationManager:
         self.check_active_flows()  # to prevent bug where data has already passed through the filters before
         def cycle():
             Timer(EmulationManager.POOL_PERIOD, cycle).start()
-            self.disseminator.broadcast_flows(self.active_paths)
             with self.state_lock:
                 self.recalculate_path_bandwidths()
                 self.reset_flow_state()
                 self.check_active_flows()
+            self.disseminator.broadcast_flows(self.active_paths)
 
         cycle()
 
@@ -85,6 +85,7 @@ class EmulationManager:
                 self.active_paths.append(path)
                 for link in path.links:
                     self.active_links[link.index] = link
+                    print(link.index)
                     link.flows.append((path.RTT, throughput))
         self.last_time = current_time
 

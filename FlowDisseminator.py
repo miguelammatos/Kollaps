@@ -106,8 +106,8 @@ class FlowDisseminator:
             current_time = time()
             if current_time - last_time > 10:
                 last_time = current_time
-                print("sent: " + self.sent)
-                print("received" + self.received)
+                print("sent: " + str(self.sent))
+                print("received" + str(self.received))
                 sys.stdout.flush()
             offset = 0
             num_of_flows = struct.unpack_from("<1i", data, offset)[0]
