@@ -12,7 +12,7 @@ if sys.version_info >= (3, 0):
 class EmulationManager:
 
     ERROR_MARGIN = 0.01  # in percent
-    POOL_PERIOD = 0.05 # in seconds
+    POOL_PERIOD = 0.1 # in seconds
 
     def __init__(self, graph):
         self.graph = graph  # type: NetGraph
@@ -51,9 +51,6 @@ class EmulationManager:
 
         self.active_links.clear()
         del self.active_paths[:]
-        print(len(self.repeat_detection))
-        print(active_count())
-        sys.stdout.flush()
         self.repeat_detection.clear()
 
     def check_active_flows(self):
