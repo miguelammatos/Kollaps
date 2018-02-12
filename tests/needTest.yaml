@@ -13,8 +13,8 @@ services:
       - NEEDnet
 
   client1:
-    image: warpenguin.no-ip.org/client:3.7
-    command: ['server1']
+    image: warpenguin.no-ip.org/client:3.8
+    command: ['server']
     hostname: client1
     labels:
       netsim: "true"
@@ -33,8 +33,8 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client:3.7
-    command: ['server2']
+    image: warpenguin.no-ip.org/client:3.8
+    command: ['server']
     hostname: client2
     labels:
       netsim: "true"
@@ -53,8 +53,8 @@ services:
       - NEEDnet
 
   client3:
-    image: warpenguin.no-ip.org/client:3.7
-    command: ['server3']
+    image: warpenguin.no-ip.org/client:3.8
+    command: ['server']
     hostname: client3
     labels:
       netsim: "true"
@@ -72,54 +72,14 @@ services:
     networks:
       - NEEDnet
 
-  server1:
-    image: warpenguin.no-ip.org/server:3.7
+  server:
+    image: warpenguin.no-ip.org/server:3.8
     command: []
-    hostname: server1
+    hostname: server
     labels:
       netsim: "true"
     deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.desktop == true
-    configs:
-      - source: topology
-        target: /topology.xml
-        uid: '0'
-        gid: '0'
-        mode: 0555
-    networks:
-      - NEEDnet
-
-  server2:
-    image: warpenguin.no-ip.org/server:3.7
-    command: []
-    hostname: server2
-    labels:
-      netsim: "true"
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.desktop == true
-    configs:
-      - source: topology
-        target: /topology.xml
-        uid: '0'
-        gid: '0'
-        mode: 0555
-    networks:
-      - NEEDnet
-
-  server3:
-    image: warpenguin.no-ip.org/server:3.7
-    command: []
-    hostname: server3
-    labels:
-      netsim: "true"
-    deploy:
-      replicas: 1
+      replicas: 3
       placement:
         constraints:
           - node.labels.desktop == true
@@ -134,7 +94,7 @@ services:
 
 configs:
   topology:
-    file: topology.xml
+    file: ./topology5.xml
 
 networks:
   NEEDnet:
