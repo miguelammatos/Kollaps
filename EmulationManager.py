@@ -92,7 +92,6 @@ class EmulationManager:
     def recalculate_path_bandwidths(self):
         RTT = 0
         BW = 1
-        print("#############################")
         for path in self.active_paths:
             max_bandwidth = path.max_bandwidth
             for link in path.links:
@@ -107,30 +106,28 @@ class EmulationManager:
                 # calculate the bandwidth for everyone
                 for flow in link.flows:
                     max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_Kbps)
-                print("I get " + str(max_bandwidth_on_link[0]))
-                # Maximize link utilization to 100%
-                # TODO Experimentally verify this is correct (impossible to verify with offline mocks)
 
+                # Maximize link utilization to 100%
                 spare_bw = link.bandwidth_Kbps - max_bandwidth_on_link[0]
                 our_share = max_bandwidth_on_link[0]/link.bandwidth_Kbps
                 hungry_usage_sum = our_share
                 for i, flow in enumerate(link.flows[1:]):
+                    # Check if a flow is "hungry" (wants more than its allocated share)
                     if flow[BW] > max_bandwidth_on_link[i]:
                         spare_bw -= max_bandwidth_on_link[i]
                         hungry_usage_sum += max_bandwidth_on_link[i]/link.bandwidth_Kbps
                     else:
                         spare_bw -= flow[BW]
 
-                normalized_share = our_share/hungry_usage_sum
-                max_bandwidth_on_link[0] += (normalized_share*spare_bw) #if spare_bw > 0 else 0
-                print("Plus spare = " + str(max_bandwidth_on_link[0]))
+                normalized_share = our_share/hungry_usage_sum  # we get a share of the spare proportional to our RTT
+                max_bandwidth_on_link[0] += (normalized_share*spare_bw)
+
                 # If this link restricts us more than previously assume this bandwidth as the max
                 if max_bandwidth_on_link[0] < max_bandwidth:
                     max_bandwidth = max_bandwidth_on_link[0]
 
             # Apply the new bandwidth on this path
             if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
-                print("Changing to :" + str(max_bandwidth))
                 PathEmulation.change_bandwidth(path.links[-1].destination, max_bandwidth)
                 path.current_bandwidth = max_bandwidth
 

@@ -65,7 +65,6 @@ class FlowDisseminator:
         if len(active_flows) < 1:
             return
 
-        self.sent += 1
 
         # calculate size of packet
         fmt = "<1i"
@@ -95,6 +94,7 @@ class FlowDisseminator:
             for host in hosts:
                 if host != self.graph.root:
                     s.sendto(data, (host.ip, FlowDisseminator.UDP_PORT))
+                    self.sent += 1
         s.close()
 
     def receive_flows(self):
@@ -106,9 +106,6 @@ class FlowDisseminator:
             current_time = time()
             if current_time - last_time > 10:
                 last_time = current_time
-                print("sent: " + str(self.sent))
-                print("received" + str(self.received))
-                sys.stdout.flush()
             offset = 0
             num_of_flows = struct.unpack_from("<1i", data, offset)[0]
             offset += struct.calcsize("<1i")
