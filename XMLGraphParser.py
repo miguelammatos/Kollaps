@@ -27,7 +27,7 @@ class XMLGraphParser:
                 except:
                     fail('replicas attribute must be a valid integer.')
 
-            command = "[]"
+            command = None
             if 'command' in service.attrib:
                 command = service.attrib['command']
 
