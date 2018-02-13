@@ -162,7 +162,9 @@ def main():
     #print("All hosts found!")
 
     print("Determining the root of the tree...")
-    graph.root = graph.services["client1"][0]
+    for service in graph.services:
+        graph.root = graph.services[service][0]
+        break
 
 
     if graph.root is None:

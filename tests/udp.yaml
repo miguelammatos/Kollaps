@@ -1,0 +1,103 @@
+version: "3.3"
+services:
+  bootstrapper:
+    image: warpenguin.no-ip.org/privilegedbootstrapper:1.3
+    command: ["netsim", "python3 /opt/NEED/emucore.py"]
+    deploy:
+      mode: global
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    networks:
+      - NEEDnet
+
+  client1:
+    image: warpenguin.no-ip.org/udpclient:4.0
+    command: ['server']
+    hostname: client1
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.desktop == true
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  client2:
+    image: warpenguin.no-ip.org/udpclient:4.0
+    command: ['server']
+    hostname: client2
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.desktop == true
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  client3:
+    image: warpenguin.no-ip.org/udpclient:4.0
+    command: ['server']
+    hostname: client3
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.desktop == true
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  server:
+    image: warpenguin.no-ip.org/server:4.0
+    command: []
+    hostname: server
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 3
+      placement:
+        constraints:
+          - node.labels.desktop == true
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+configs:
+  topology:
+    file: topology5_udp.xml
+
+networks:
+  NEEDnet:
+    external:
+      name: test1
+

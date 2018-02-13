@@ -23,18 +23,19 @@ class NetGraph:
         self.bandwidth_re = re.compile("([0-9]+)([KMG])bps")
 
     class Node(object):
-        def __init__(self, name):
+        def __init__(self, name, shared):
             self.name = name
             self.network = ""  # maybe in the future support multiple networks? (TCAL doesnt allow that for now)
             self.links = []
+            self.shared_link = shared
 
         def attach_link(self, link):
             self.links.append(link)
             self.network = link.network
 
     class Service(Node):
-        def __init__(self, name, image, command):
-            super(NetGraph.Service, self).__init__(name)
+        def __init__(self, name, image, command, shared):
+            super(NetGraph.Service, self).__init__(name, shared)
             self.image = image
             self.command = command
             self.ip = ""  # to be filled in later
@@ -42,7 +43,7 @@ class NetGraph:
 
     class Bridge(Node):
         def __init__(self, name):
-            super(NetGraph.Bridge, self).__init__(name)
+            super(NetGraph.Bridge, self).__init__(name, False)
 
 
     class Link:
@@ -102,8 +103,8 @@ class NetGraph:
         else:
             return []
 
-    def new_service(self, name, image, command):
-        service = NetGraph.Service(name, image, command)
+    def new_service(self, name, image, command, shared):
+        service = NetGraph.Service(name, image, command, shared)
         if len(self.get_nodes(name)) == 0:
             self.services[name] = [service]
         else:
@@ -128,7 +129,6 @@ class NetGraph:
                 link.index = self.link_counter
                 self.link_counter += 1
                 self.links.append(link)
-
                 node.attach_link(link)
 
     def bandwidth_in_kbps(self, bandwidth_string):
