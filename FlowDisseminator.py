@@ -1,9 +1,8 @@
 from NetGraph import NetGraph
-from utils import fail, BYTE_LIMIT, INT_LIMIT, SHORT_LIMIT
+from utils import fail, BYTE_LIMIT, SHORT_LIMIT
 
 
 from threading import Thread, Lock
-from concurrent.futures import ThreadPoolExecutor
 from time import time
 import socket
 import struct
@@ -40,8 +39,8 @@ class FlowDisseminator:
             self.link_unit = "B"
         elif link_count <= SHORT_LIMIT:
             self.link_unit = "H"
-        elif link_count <= INT_LIMIT:
-            self.link_unit = "I"
+        #elif link_count <= INT_LIMIT:
+        #    self.link_unit = "I"
         else:
             fail("Topology has too many links: " + str(link_count))
 
@@ -51,9 +50,6 @@ class FlowDisseminator:
         self.thread = Thread(target=self.receive_flows)
         self.thread.daemon = True
         self.thread.start()
-
-        self.pool = ThreadPoolExecutor(max_workers=16)
-
 
     def broadcast_flows(self, active_flows):
         """

@@ -66,7 +66,7 @@ class NetGraph:
 
     class Path(object):
         def __init__(self, links, used_bandwidth=0):
-            self.links = links
+            self.links = links  # type: List[NetGraph.Link]
             total_latency = 0
             total_not_drop_probability = 1.0
             max_bandwidth = None
