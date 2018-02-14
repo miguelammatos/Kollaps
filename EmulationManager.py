@@ -35,8 +35,7 @@ class EmulationManager:
         self.last_time = time()
         self.check_active_flows()  # to prevent bug where data has already passed through the filters before
         def cycle():
-            sleep(EmulationManager.POOL_PERIOD)
-            # Timer(EmulationManager.POOL_PERIOD, cycle).start()
+            Timer(EmulationManager.POOL_PERIOD, cycle).start()
             with self.state_lock:
                 self.recalculate_path_bandwidths()
                 self.reset_flow_state()
