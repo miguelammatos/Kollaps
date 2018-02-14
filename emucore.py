@@ -56,7 +56,6 @@ def main():
 
     print("Initializing network emulation conditions...")
     signal.signal(signal.SIGTERM, signal_handler)
-    signal.signal(signal.SIGKILL, signal_handler)
     manager = EmulationManager(graph)
     manager.initialize()
 
