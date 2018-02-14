@@ -44,3 +44,6 @@ def change_bandwidth(service, new_bandwidth):
     :return:
     """
     TCAL.changeBandwidth(service.ip, int(new_bandwidth))
+
+def tearDown():
+    TCAL.tearDown()

@@ -14,12 +14,31 @@ services:
 
   client1:
     image: warpenguin.no-ip.org/client:4.1
-    command: ['server']
+    command: ['server1']
     hostname: client1
     labels:
       netsim: "true"
     deploy:
-      replicas: 1
+      replicas: 20
+      placement:
+        constraints:
+          - node.labels.gigabit == true
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  server1:
+    image: warpenguin.no-ip.org/server:4.1
+    hostname: server1
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 20
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -34,12 +53,31 @@ services:
 
   client2:
     image: warpenguin.no-ip.org/client:4.1
-    command: ['server']
+    command: ['server2']
     hostname: client2
     labels:
       netsim: "true"
     deploy:
-      replicas: 1
+      replicas: 20
+      placement:
+        constraints:
+          - node.labels.gigabit == true
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  server2:
+    image: warpenguin.no-ip.org/server:4.1
+    hostname: server2
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 20
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -54,12 +92,12 @@ services:
 
   client3:
     image: warpenguin.no-ip.org/client:4.1
-    command: ['server']
+    command: ['server3']
     hostname: client3
     labels:
       netsim: "true"
     deploy:
-      replicas: 1
+      replicas: 20
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -72,13 +110,13 @@ services:
     networks:
       - NEEDnet
 
-  server:
+  server3:
     image: warpenguin.no-ip.org/server:4.1
-    hostname: server
+    hostname: server3
     labels:
       netsim: "true"
     deploy:
-      replicas: 3
+      replicas: 20
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -93,7 +131,7 @@ services:
 
 configs:
   topology:
-    file: topology5.xml
+    file: topology_many_links.xml
 
 networks:
   NEEDnet:

@@ -35,7 +35,8 @@ class EmulationManager:
         self.last_time = time()
         self.check_active_flows()  # to prevent bug where data has already passed through the filters before
         def cycle():
-            Timer(EmulationManager.POOL_PERIOD, cycle).start()
+            sleep(EmulationManager.POOL_PERIOD)
+            # Timer(EmulationManager.POOL_PERIOD, cycle).start()
             with self.state_lock:
                 self.recalculate_path_bandwidths()
                 self.reset_flow_state()
@@ -96,11 +97,9 @@ class EmulationManager:
             max_bandwidth = path.max_bandwidth
             for link in path.links:
                 used_bandwidth = 0
-                print(link.flows)
-                for flow in link.flows:
-                    used_bandwidth += flow[BW]
                 rtt_reverse_sum = 0
                 for flow in link.flows:
+                    used_bandwidth += flow[BW]
                     rtt_reverse_sum += (1.0/flow[RTT])
                 max_bandwidth_on_link = []
                 # calculate the bandwidth for everyone

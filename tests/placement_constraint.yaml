@@ -2,4 +2,4 @@
       replicas: 1
       placement:
         constraints:
-          - node.labels.desktop == true
+          - node.labels.gigabit == true

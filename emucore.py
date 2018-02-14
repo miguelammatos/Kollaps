@@ -9,9 +9,11 @@ import PathEmulation
 import subprocess
 from socket import gethostname
 import netifaces
-import os
-import sys
+import os, signal, sys
 
+def signal_handler(signum, frame):
+    PathEmulation.tearDown()
+    sys.exit(0)
 
 def main():
     if len(sys.argv) != 2:
@@ -53,6 +55,8 @@ def main():
     graph.calculate_shortest_paths()
 
     print("Initializing network emulation conditions...")
+    signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGKILL, signal_handler)
     manager = EmulationManager(graph)
     manager.initialize()
 

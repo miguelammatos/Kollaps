@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<experiment>
+	<services>
+		<service name="client1" image="warpenguin.no-ip.org/client:4.1" command="['server1']" replicas="20" share="true"/>
+		<service name="server1" image="warpenguin.no-ip.org/server:4.1" replicas="20" share="true"/>
+		<service name="client2" image="warpenguin.no-ip.org/client:4.1" command="['server2']" replicas="20" share="true"/>
+		<service name="server2" image="warpenguin.no-ip.org/server:4.1" replicas="20" share="true"/>
+		<service name="client3" image="warpenguin.no-ip.org/client:4.1" command="['server3']" replicas="20" share="true"/>
+		<service name="server3" image="warpenguin.no-ip.org/server:4.1" replicas="20" share="true"/>
+	</services>
+	<bridges>
+                <bridge name="s1"/>
+                <bridge name="s2"/>
+                <bridge name="s3"/>
+                <bridge name="s4"/>
+                <bridge name="s5"/>
+                <bridge name="s6"/>
+	</bridges>
+        <links>
+                <link origin="client1" dest="s1" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+                <link origin="s1" dest="s2" latency="10"  drop="0" upload="50Mbps" download="50Mbps" network="test1"/>
+                <link origin="s2" dest="server1" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+		
+		<link origin="client2" dest="s3" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+                <link origin="s3" dest="s4" latency="10"  drop="0" upload="50Mbps" download="50Mbps" network="test1"/>
+                <link origin="s4" dest="server2" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+		
+		<link origin="client3" dest="s5" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+                <link origin="s5" dest="s6" latency="10"  drop="0" upload="50Mbps" download="50Mbps" network="test1"/>
+                <link origin="s6" dest="server3" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+        </links>
+</experiment>
