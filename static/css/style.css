@@ -1,0 +1,200 @@
+:root{
+	--color: #254356;
+	--back: #445d77;
+	--back2: #254366;
+}
+
+img.logo{
+	height: 128px;
+	width: 384px;
+	display: inline-block;
+}
+
+.title{
+	text-align: left;
+	margin-left: 10%;
+	display: content;
+}
+body{
+	background: var(--back2);
+	font-family:calibri; 
+	text-align: center;
+	color: white;
+}
+
+div{    /*Defaults for all divs*/
+	background: var(--back);
+	padding: 15px;
+	border: 3px solid var(--color);
+	background-clip: padding-box;
+	border-radius: 0px;/*25px;*/
+	margin: 10px;
+	text-align: left;
+}
+
+.container{
+	background: rgba(000, 000, 000, 0);
+	padding: 15px;
+	border: 5px solid rgba(000, 000, 000, 0);
+	background-clip: padding-box;
+	border-radius: 0px;/*25px;*/
+	margin: 10px;
+	text-align: left;
+}
+
+.half{
+	width: 50%;
+	margin: auto;	
+}
+
+.header{
+	padding: 5px;
+}
+
+nav ul{
+	padding: 0px;
+	margin: 0px;
+	text-align: center;
+	display: inline-block;
+	vertical-align: top;
+	width: 100%;
+}
+
+li{
+	font-size: large;
+	margin: 5px;
+	display: inline;
+	padding: 4px;
+}
+
+.pull-right{
+    float: right;
+    text-align: right;
+}
+.pull-left{
+    float: left;
+    text-align:left;
+}
+
+
+table, th, td{
+	/*border: 1px solid white;*/
+	table-layout:fixed;
+	width: 100%
+}
+
+tbody{
+	overflow: auto;
+}
+
+th{
+	border: 1px solid var(--color);
+	font-style: oblique;
+	font-size: large;	
+}
+
+tr{
+	width: 100%;
+	text-align: left;
+	height: 10px;
+}
+
+td.time{
+	text-align: right;
+	font-family: arial;
+}
+
+tr:nth-child(even) {background-color: var(--color)}
+
+#active{
+	font-size: larger;
+	font-style: oblique;
+	border: 1px solid var(--color);
+}
+
+a:link {
+	color: white;
+}
+a:visited{
+	color: white;
+}
+a:hover{
+	color: var(--color);
+}
+a:active{
+	color: hotpink;
+}
+
+.filter-label{
+	font-style: oblique;
+	font-size: large;
+}
+
+select, option{
+	background-color: var(--back);
+	color: #F0F0F0;
+	border: 1px solid var(--color);
+	padding: 4px;
+	margin: 0px 10px;
+}
+
+input[type=button], input[type=submit], input[type=reset] {
+	background-color: var(--back);
+	border: 1px solid var(--color);
+	color: white;
+	padding: 10px 32px;
+	text-decoration: crimson;
+	margin: 4px 2px;
+	cursor: pointer;
+}
+
+input[type=name], input[type=password], input[type=text] {
+	background-color: var(--back);
+	border: 1px solid var(--color);
+	color: white;
+	padding: 10px 0px;
+	width: 99%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 1%;
+}
+
+input[type=number], input[type=milliseconds]{
+	background-color: var(--back);
+	border: 1px solid var(--color);
+	color: white;
+	padding: 5px 0px;
+	width: 45px;
+	margin: 1px;
+}
+
+button{
+	width: 100%;
+	background-color: var(--back);
+	border: 1px solid var(--color);
+	color: white;
+	padding: 10px 32px;
+	text-decoration: crimson;
+	margin: 10px;
+	cursor: pointer;
+	width: 99%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 1%;
+}
+
+button.alias{
+	width: auto;
+}
+
+button:hover, input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
+	background-color: var(--color);
+}
+
+img.delete{
+	width: 25px;
+	height: 25px;
+	margin-top: 3px;
+}

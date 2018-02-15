@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+ 
+<head>
+    <title>NEED Dashboard</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <meta http-equiv="refresh" content="2"/>
+</head>
+ 
+<body>
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul>
+                    <li class="pull-left" role="presentation" id="active"><a href="/">Home</a></li>
+                    <li class="pull-right" role="presentation"><a href="/stop">STOP</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        {% if stopping %}
+        <div class="header half">
+            {% if lost >= 0 %}
+                <p>Experiment stopped. Lost metadata:{{lost}}</p>
+            {% else %}
+            <p>Stopping experiment...</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="main">
+            <div class="container">
+                <table>
+                    <tr>
+                        <th>Hostname</th>
+                        <th>Up</th>
+                        <th>Network Usage</th>
+                    </tr>
+                    {% for key, host in hosts.items() %}
+                    <tr>
+                        <td>{{host.name}}</td>
+                        <td>{{host.ip}}</td>
+                        <td>Not implemented</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+ 
+        <footer class="footer">
+            <p>NEED 2018</p>
+        </footer>
+ 
+    </div>
+</body>
+ 
+</html>

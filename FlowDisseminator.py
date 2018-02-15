@@ -1,6 +1,6 @@
 from NetGraph import NetGraph
 from utils import fail, BYTE_LIMIT, SHORT_LIMIT
-
+import PathEmulation
 
 from threading import Thread, Lock
 from time import time
@@ -22,10 +22,13 @@ if sys.version_info >= (3, 0):
 
 class FlowDisseminator:
     UDP_PORT = 7073
+    TCP_PORT = 7073
     MIN_MTU = 576
     MAX_IP_HDR = 60
     UDP_HDR = 8
     BUFFER_LEN = MIN_MTU - MAX_IP_HDR - UDP_HDR
+
+    SHUTDOWN_COMMAND = 1
 
     def __init__(self, manager, flow_collector, graph):
         self.graph = graph  # type: NetGraph
@@ -47,9 +50,16 @@ class FlowDisseminator:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('0.0.0.0', FlowDisseminator.UDP_PORT))
 
+        self.dashboard_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.bind(('0.0.0.0', FlowDisseminator.TCP_PORT))
+
         self.thread = Thread(target=self.receive_flows)
         self.thread.daemon = True
         self.thread.start()
+
+        self.dashboard_thread = Thread(target=self.receive_dashboard_commands)
+        self.dashboard_thread.daemon = True
+        self.dashboard_thread.start()
 
     def broadcast_flows(self, active_flows):
         """
@@ -117,4 +127,16 @@ class FlowDisseminator:
                     links.append(index)
                 self.flow_collector(bandwidth, links)
 
-
+    def receive_dashboard_commands(self):
+        self.dashboard_socket.listen(1)
+        while True:
+            connection, addr = self.dashboard_socket.accept()
+            data = connection.recv(1)
+            if data:
+                command = struct.unpack("<1B", data)
+                if command == FlowDisseminator.SHUTDOWN_COMMAND:
+                    PathEmulation.tearDown()
+                    connection.send(struct.pack("<2I", self.sent, self.received))
+                    self.dashboard_socket.close()
+                    self.sock.close()
+                    exit(0)
