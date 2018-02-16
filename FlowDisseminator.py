@@ -51,7 +51,7 @@ class FlowDisseminator:
         self.sock.bind(('0.0.0.0', FlowDisseminator.UDP_PORT))
 
         self.dashboard_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind(('0.0.0.0', FlowDisseminator.TCP_PORT))
+        self.dashboard_socket.bind(('0.0.0.0', FlowDisseminator.TCP_PORT))
 
         self.thread = Thread(target=self.receive_flows)
         self.thread.daemon = True
