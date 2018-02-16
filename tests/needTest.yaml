@@ -13,7 +13,7 @@ services:
       - NEEDnet
 
   dashboard:
-    image: warpenguin.no-ip.org/dashboard:1.4
+    image: warpenguin.no-ip.org/dashboard:1.5
     ports:
       - "8088:8088"
     hostname: dashboard

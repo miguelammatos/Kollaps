@@ -26,7 +26,7 @@ proper_number = re.compile('^[0-9]+$')
 class DashboardState:
     graph = None
     lock = Lock()
-    hosts = {}  # type: Dict[NetGraph.Node, Host]
+    hosts = {}  # type: Dict[NetGraph.Service, Host]
     stopping = False
     lost_metadata = -1
 
@@ -77,12 +77,14 @@ def stopExperiment():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     for node in DashboardState.hosts:
         host = DashboardState.hosts[node]
-        print("connectiong to :" + host.ip + "@" + str(FlowDisseminator.TCP_PORT))
+        if node.supervisor:
+            continue
         s.connect((host.ip, FlowDisseminator.TCP_PORT))
         s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
         data = s.recv(64)
         sent += struct.unpack_from("<1I", data, 0)[0]
         received += struct.unpack_from("<1I", data, 4)[0]
+
 
     with DashboardState.lock:
         DashboardState.lost_metadata = 1-(received/sent)
