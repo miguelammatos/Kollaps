@@ -2,7 +2,8 @@ from NetGraph import NetGraph
 from utils import fail, BYTE_LIMIT, SHORT_LIMIT
 import PathEmulation
 
-from threading import Thread, Lock
+from threading import Thread
+from _thread import interrupt_main
 from time import time
 import socket
 import struct
@@ -27,7 +28,6 @@ class FlowDisseminator:
     MAX_IP_HDR = 60
     UDP_HDR = 8
     BUFFER_LEN = MIN_MTU - MAX_IP_HDR - UDP_HDR
-
     SHUTDOWN_COMMAND = 1
 
     def __init__(self, manager, flow_collector, graph):
@@ -142,4 +142,5 @@ class FlowDisseminator:
                     connection.close()
                     self.dashboard_socket.close()
                     self.sock.close()
-                    exit(0)
+                    interrupt_main()
+

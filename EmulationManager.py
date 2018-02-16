@@ -1,5 +1,5 @@
 from time import time, sleep
-from threading import Lock, Timer, active_count
+from threading import Lock
 
 from NetGraph import NetGraph
 import PathEmulation
