@@ -74,16 +74,17 @@ def stopExperiment():
     sent = 0
     received = 0
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     for node in DashboardState.hosts:
         host = DashboardState.hosts[node]
         if node.supervisor:
             continue
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((host.ip, FlowDisseminator.TCP_PORT))
         s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
         data = s.recv(64)
         sent += struct.unpack_from("<1I", data, 0)[0]
         received += struct.unpack_from("<1I", data, 4)[0]
+        s.close()
 
 
     with DashboardState.lock:
