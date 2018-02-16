@@ -130,13 +130,16 @@ class FlowDisseminator:
     def receive_dashboard_commands(self):
         self.dashboard_socket.listen(1)
         while True:
+            print("listening for supervisor commands")
+            sys.stdout.flush()
             connection, addr = self.dashboard_socket.accept()
             data = connection.recv(1)
             if data:
-                command = struct.unpack("<1B", data)
+                command = struct.unpack("<1B", data)[0]
                 if command == FlowDisseminator.SHUTDOWN_COMMAND:
                     PathEmulation.tearDown()
                     connection.send(struct.pack("<2I", self.sent, self.received))
+                    connection.close()
                     self.dashboard_socket.close()
                     self.sock.close()
                     exit(0)

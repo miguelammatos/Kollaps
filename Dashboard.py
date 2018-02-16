@@ -62,8 +62,7 @@ def main():
 @app.route('/stop')
 def stop():
     Thread(target=stopExperiment, daemon=False).start()
-    with DashboardState.lock:
-        return render_template('index.html', hosts=DashboardState.hosts, stopping=DashboardState.stopping, lost=DashboardState.lost_metadata)
+    return redirect(url_for('main'))
 
 def stopExperiment():
     with DashboardState.lock:
@@ -81,8 +80,8 @@ def stopExperiment():
         s.connect((host.ip, FlowDisseminator.TCP_PORT))
         s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
         data = s.recv(64)
-        sent += struct.unpack_from("<1I", data, 0)
-        received += struct.unpack_from("<1I", data, 4)
+        sent += struct.unpack_from("<1I", data, 0)[0]
+        received += struct.unpack_from("<1I", data, 4)[0]
 
     with DashboardState.lock:
         DashboardState.lost_metadata = 1-(received/sent)
