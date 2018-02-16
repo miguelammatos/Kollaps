@@ -13,7 +13,7 @@ services:
       - NEEDnet
 
   dashboard:
-    image: warpenguin.no-ip.org/dashboard:1.0
+    image: warpenguin.no-ip.org/dashboard:1.2
     ports:
       - "8088:8088"
     hostname: dashboard
@@ -21,6 +21,9 @@ services:
       netsim: "true"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -32,13 +35,16 @@ services:
       - outside
 
   client1:
-    image: warpenguin.no-ip.org/client:5.0
+    image: warpenguin.no-ip.org/client:5.1
     command: ['server']
     hostname: client1
     labels:
       netsim: "true"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -49,13 +55,16 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client:5.0
+    image: warpenguin.no-ip.org/client:5.1
     command: ['server']
     hostname: client2
     labels:
       netsim: "true"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -66,13 +75,16 @@ services:
       - NEEDnet
 
   client3:
-    image: warpenguin.no-ip.org/client:5.0
+    image: warpenguin.no-ip.org/client:5.1
     command: ['server']
     hostname: client3
     labels:
       netsim: "true"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -83,12 +95,15 @@ services:
       - NEEDnet
 
   server:
-    image: warpenguin.no-ip.org/server:5.0
+    image: warpenguin.no-ip.org/server:5.1
     hostname: server
     labels:
       netsim: "true"
     deploy:
       replicas: 3
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml

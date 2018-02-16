@@ -164,6 +164,8 @@ def main():
     print("Determining the root of the tree...")
     for service in graph.services:
         graph.root = graph.services[service][0]
+        if graph.root.supervisor:
+            continue
         break
 
 

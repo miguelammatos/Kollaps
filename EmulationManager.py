@@ -62,6 +62,8 @@ class EmulationManager:
             for host in hosts:
                 if host == self.graph.root:
                     continue
+                if host not in self.graph.paths:  # unreachable
+                    continue
                 # Calculate current throughput
                 bytes = PathEmulation.query_usage(host)
                 if bytes < host.last_bytes:
