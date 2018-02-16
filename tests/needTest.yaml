@@ -12,17 +12,33 @@ services:
     networks:
       - NEEDnet
 
+  dashboard:
+    image: warpenguin.no-ip.org/dashboard:1.0
+    ports:
+      - "8088:8088"
+    hostname: dashboard
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 1
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+      - outside
+
   client1:
-    image: warpenguin.no-ip.org/client:4.5
+    image: warpenguin.no-ip.org/client:5.0
     command: ['server']
     hostname: client1
     labels:
       netsim: "true"
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -33,16 +49,13 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client:4.5
+    image: warpenguin.no-ip.org/client:5.0
     command: ['server']
     hostname: client2
     labels:
       netsim: "true"
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -53,16 +66,13 @@ services:
       - NEEDnet
 
   client3:
-    image: warpenguin.no-ip.org/client:4.5
+    image: warpenguin.no-ip.org/client:5.0
     command: ['server']
     hostname: client3
     labels:
       netsim: "true"
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -73,15 +83,12 @@ services:
       - NEEDnet
 
   server:
-    image: warpenguin.no-ip.org/server:4.5
+    image: warpenguin.no-ip.org/server:5.0
     hostname: server
     labels:
       netsim: "true"
     deploy:
       replicas: 3
-      placement:
-        constraints:
-          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -99,4 +106,6 @@ networks:
   NEEDnet:
     external:
       name: test1
+  outside:
+    driver: overlay
 

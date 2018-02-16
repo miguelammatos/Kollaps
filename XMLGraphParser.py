@@ -44,9 +44,9 @@ class XMLGraphParser:
                 supervisor = True
 
             for i in range(replicas):
-                    service = self.graph.new_service(service.attrib['name'], service.attrib['image'], command, shared)
+                    srv = self.graph.new_service(service.attrib['name'], service.attrib['image'], command, shared)
                     if supervisor:
-                        self.supervisors.append(service)
+                        self.supervisors.append(srv)
 
     def parse_bridges(self, root):
         for bridge in root:
