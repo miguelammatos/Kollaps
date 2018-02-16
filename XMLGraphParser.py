@@ -5,11 +5,15 @@ from string import ascii_letters
 from utils import fail
 from NetGraph import NetGraph
 
+import sys
+if sys.version_info >= (3, 0):
+    from typing import Dict, List
 
 class XMLGraphParser:
     def __init__(self, file, graph):
         self.file = file
         self.graph = graph  # type: NetGraph
+        self.supervisors = []  # type: List[NetGraph.Service]
 
     def parse_services(self, root):
         for service in root:
@@ -35,8 +39,14 @@ class XMLGraphParser:
             if 'share' in service.attrib:
                 shared = (service.attrib['share'] == "true")
 
+            supervisor = False
+            if 'supervisor' in service.attrib:
+                supervisor = True
+
             for i in range(replicas):
-                    self.graph.new_service(service.attrib['name'], service.attrib['image'], command, shared)
+                    service = self.graph.new_service(service.attrib['name'], service.attrib['image'], command, shared)
+                    if supervisor:
+                        self.supervisors.append(service)
 
     def parse_bridges(self, root):
         for bridge in root:
@@ -71,6 +81,7 @@ class XMLGraphParser:
             both_shared = (source_nodes[0].shared_link and destination_nodes[0].shared_link)
             if both_shared:
                 src_meta_bridge = self.create_meta_bridge()
+
                 dst_meta_bridge = self.create_meta_bridge()
                 # create a link between both meta bridges
                 self.graph.new_link(src_meta_bridge, dst_meta_bridge, link.attrib['latency'],
@@ -152,3 +163,6 @@ class XMLGraphParser:
         if links is None:
             fail("No links declared in topology descritpion")
         self.parse_links(links)
+
+        for service in self.supervisors:
+            self.graph.set_supervisor(service)

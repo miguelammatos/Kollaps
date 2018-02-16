@@ -21,7 +21,7 @@
         {% if stopping %}
         <div class="header half">
             {% if lost >= 0 %}
-                <p>Experiment stopped. Lost metadata:{{lost}}</p>
+                <p>Experiment stopped. Lost metadata:{{lost*100}}%</p>
             {% else %}
             <p>Stopping experiment...</p>
             {% endif %}

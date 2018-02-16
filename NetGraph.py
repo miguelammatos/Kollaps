@@ -16,6 +16,10 @@ class NetGraph:
         self.links = []  # type: List[NetGraph.Link]
         self.link_counter = 0  # increment counter that will give each link an index
 
+        self.networks = []  # type: List[str]
+        self.supervisors = []  # type: List[NetGraph.Service]
+
+
         self.root = None  # type: NetGraph.Service
         self.paths = {}  # type: Dict[NetGraph.Node,NetGraph.Path]
 
@@ -40,6 +44,7 @@ class NetGraph:
             self.command = command
             self.ip = ""  # to be filled in later
             self.last_bytes = 0  # number of bytes sent to this service
+            self.supervisor = False
 
     class Bridge(Node):
         def __init__(self, name):
@@ -109,6 +114,11 @@ class NetGraph:
             self.services[name] = [service]
         else:
             self.get_nodes(name).append(service)
+        return service
+
+    def set_supervisor(self, service):
+        service.supervisor = True
+        service.network = self.networks[0]
 
     def new_bridge(self, name):
         bridge = NetGraph.Bridge(name)
@@ -116,8 +126,11 @@ class NetGraph:
             self.bridges[name] = [bridge]
         else:
             fail("Cant add bridge with name: " + name + ". Another node with the same name already exists")
+        return bridge
 
     def new_link(self, source, destination, latency, drop, bandwidth, network):
+        if network not in self.networks:
+            self.networks.append(network)
         source_nodes = self.get_nodes(source)
         destination_nodes = self.get_nodes(destination)
         for node in source_nodes:

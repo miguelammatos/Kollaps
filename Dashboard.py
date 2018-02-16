@@ -1,14 +1,21 @@
 import re
+import struct
 import sys
 
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, json
 from threading import Lock, Thread
 from time import sleep
+import socket
 
+from FlowDisseminator import FlowDisseminator
 from NetGraph import NetGraph
 from XMLGraphParser import XMLGraphParser
 
 import dns.resolver
+
+import sys
+if sys.version_info >= (3, 0):
+    from typing import Dict, List, Tuple
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'sdjh234hj23409ea9[u-ad=12-eqhkdjaadj23jaksldj23objadskjalskdj-1=1dadsd;akdaldm11pnf'
@@ -19,7 +26,7 @@ proper_number = re.compile('^[0-9]+$')
 class DashboardState:
     graph = None
     lock = Lock()
-    hosts = {}
+    hosts = {}  # type: Dict[NetGraph.Node, Host]
     stopping = False
     lost_metadata = -1
 
@@ -65,6 +72,21 @@ def stopExperiment():
         else:
             DashboardState.stopping = True
     # Do the actual shutdown (without lock)
+    sent = 0
+    received = 0
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    for node in DashboardState.hosts:
+        host = DashboardState.hosts[node]
+        s.connect((host.ip, FlowDisseminator.TCP_PORT))
+        s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
+        data = s.recv(64)
+        sent += struct.unpack_from("<1I", data, 0)
+        received += struct.unpack_from("<1I", data, 4)
+
+    with DashboardState.lock:
+        DashboardState.lost_metadata = 1-(received/sent)
+
 
 def resolve_hostnames():
     for service in graph.services:

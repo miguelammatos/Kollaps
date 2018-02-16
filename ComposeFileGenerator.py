@@ -30,6 +30,9 @@ class ComposeFileGenerator:
         print("    image: " + service_list[0].image)
         if service_list[0].command is not None:
             print("    command: " + service_list[0].command)
+        if service_list[0].supervisor:
+            print("    ports:")
+            print('      - "8088:8088"')
         print("    hostname: " + service_list[0].name)
         print("    labels:")
         print("      netsim: \"true\"")
@@ -43,6 +46,9 @@ class ComposeFileGenerator:
         print("        mode: 0555")
         print("    networks:")
         print("      - NEEDnet")
+        if service_list[0].supervisor:
+            print("      - outside")
+
         print("")
 
     def print_configs(self):
@@ -61,6 +67,8 @@ class ComposeFileGenerator:
         print("  NEEDnet:")
         print("    external:")
         print("      name: " + network)
+        print("  outside:")
+        print("    driver: overlay")
         print("")
 
     def generate(self):
