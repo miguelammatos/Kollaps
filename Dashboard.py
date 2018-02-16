@@ -101,7 +101,7 @@ def resolve_hostnames():
             except:
                 sleep(3)
         ips.sort()  # needed for deterministic behaviour
-        for i in range(len(DashboardState.hosts)):
+        for i in range(len(service_instances)):
                 service_instances[i].ip = ips[i]
         for i, host in enumerate(service_instances):
             with DashboardState.lock:
