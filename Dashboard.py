@@ -61,6 +61,8 @@ def stopExperiment():
     sent = 0
     received = 0
 
+    #TODO make this code more robust
+
     # Stop all services
     for node in DashboardState.hosts:
         host = DashboardState.hosts[node]

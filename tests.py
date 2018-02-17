@@ -4,6 +4,7 @@ from XMLGraphParser import XMLGraphParser
 from EmulationManager import EmulationManager
 from utils import fail
 
+from random import randrange, seed
 import PathEmulation
 from FlowDisseminator import FlowDisseminator
 
@@ -73,9 +74,8 @@ def mock_change_bandwidth(service, new_bandwidth):
 
 
 class MockFlowDisseminator:
-    def __init__(self, manager, flow_collector, graph):
+    def __init__(self, flow_collector, graph):
         self.graph = graph  # type: NetGraph
-        self.emulation_manager = manager
         self.flow_collector = flow_collector
 
         link_count = len(self.graph.links)
@@ -111,7 +111,8 @@ class MockFlowDisseminator:
         if len(data) > 0:
             sleep(0.5)
         bandwidthMbps = CT.current_throughput/(1000*1000)
-        path = [2, 4, 7]
+        #path = [2, 4, 7]
+        path = [0, 42, 44, 65]
         self.flow_collector(bandwidthMbps*1000, path)
         #sleep(0.01)
         #bandwidthMbps = 10
@@ -161,13 +162,26 @@ def main():
     #graph.resolve_hostnames()
     #print("All hosts found!")
 
-    print("Determining the root of the tree...")
+
+    seed(None)
+    print("Randomly Determining the root of the tree...")
+    sv = randrange(0, len(graph.services))
+    while True:
+        hosts = list(graph.services.values())[sv]
+        h = randrange(0, len(hosts))
+        root = list(graph.services.values())[sv][h]
+        if root.supervisor:
+            continue
+        else:
+            graph.root = root
+            break
+    '''
     for service in graph.services:
         graph.root = graph.services[service][0]
         if graph.root.supervisor:
             continue
         break
-
+    '''
 
     if graph.root is None:
         fail("Failed to identify current service instance in topology!")
