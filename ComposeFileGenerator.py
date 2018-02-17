@@ -34,8 +34,9 @@ class ComposeFileGenerator:
             print("    ports:")
             print('      - "8088:8088"')
         print("    hostname: " + service_list[0].name)
-        print("    labels:")
-        print("      netsim: \"true\"")
+        if not service_list[0].supervisor:
+            print("    labels:")
+            print("      netsim: \"true\"")
         print("    deploy:")
         print("      replicas: " + str(len(service_list)))
         print("    configs:")

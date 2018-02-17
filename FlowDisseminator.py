@@ -103,7 +103,7 @@ class FlowDisseminator:
         for service in self.graph.services:
             hosts = self.graph.services[service]
             for host in hosts:
-                if host != self.graph.root:
+                if host != self.graph.root and not host.supervisor:
                     s.sendto(data, (host.ip, FlowDisseminator.UDP_PORT))
                     self.sent += 1
         s.close()
