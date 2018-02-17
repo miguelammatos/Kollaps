@@ -61,6 +61,33 @@ def stopExperiment():
     sent = 0
     received = 0
 
+    # Stop all services
+    for node in DashboardState.hosts:
+        host = DashboardState.hosts[node]
+        if node.supervisor:
+            continue
+        for attempt in range(10):
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((host.ip, FlowDisseminator.TCP_PORT))
+                s.send(struct.pack("<1B", FlowDisseminator.STOP_COMMAND))
+                data = s.recv(64)
+                s.close()
+                ack = struct.unpack("<1B", data)
+                if ack == FlowDisseminator.ACK:
+                    break
+            except:
+                if attempt < 9:
+                    sleep(0.5)
+                    continue
+                else:
+                    with DashboardState.lock:
+                        DashboardState.stopping = False
+                        DashboardState.failed_to_shutdown = True
+                        return
+            break
+
+    # Collect sent/received statistics and shutdown
     for node in DashboardState.hosts:
         host = DashboardState.hosts[node]
         if node.supervisor:
@@ -88,7 +115,6 @@ def stopExperiment():
                         return
             break
 
-
     with DashboardState.lock:
         DashboardState.lost_metadata = 1-(received/sent)
 
@@ -109,6 +135,8 @@ def resolve_hostnames():
         for i in range(len(service_instances)):
                 service_instances[i].ip = ips[i]
         for i, host in enumerate(service_instances):
+            if host.supervisor:
+                continue
             with DashboardState.lock:
                 DashboardState.hosts[host].ip = ips[i]
 
@@ -124,6 +152,8 @@ if __name__ == "__main__":
     with DashboardState.lock:
         for service in graph.services:
             for i,host in enumerate(graph.services[service]):
+                if host.supervisor:
+                    continue
                 DashboardState.hosts[host] = Host(host.name, host.name + "." + str(i))
 
     dnsThread = Thread(target=resolve_hostnames)

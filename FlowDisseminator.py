@@ -2,7 +2,7 @@ from NetGraph import NetGraph
 from utils import fail, BYTE_LIMIT, SHORT_LIMIT
 import PathEmulation
 
-from threading import Thread
+from threading import Thread, Lock
 from _thread import interrupt_main
 from time import time
 import socket
@@ -28,13 +28,17 @@ class FlowDisseminator:
     MAX_IP_HDR = 60
     UDP_HDR = 8
     BUFFER_LEN = MIN_MTU - MAX_IP_HDR - UDP_HDR
-    SHUTDOWN_COMMAND = 1
+    STOP_COMMAND = 1
+    SHUTDOWN_COMMAND = 2
+    ACK = 255
 
     def __init__(self, flow_collector, graph):
         self.graph = graph  # type: NetGraph
         self.flow_collector = flow_collector
         self.sent = 0
         self.received = 0
+        self.stop_lock = Lock()
+        self.stop = False
 
         link_count = len(self.graph.links)
         if link_count <= BYTE_LIMIT:
@@ -69,7 +73,9 @@ class FlowDisseminator:
         # Check if we need to split packets
         if len(active_flows) < 1:
             return
-
+        with self.stop_lock:
+            if self.stop:
+                return
 
         # calculate size of packet
         fmt = "<1i"
@@ -129,14 +135,17 @@ class FlowDisseminator:
     def receive_dashboard_commands(self):
         self.dashboard_socket.listen(1)
         while True:
-            print("listening for supervisor commands")
-            sys.stdout.flush()
             connection, addr = self.dashboard_socket.accept()
             data = connection.recv(1)
             if data:
                 command = struct.unpack("<1B", data)[0]
-                if command == FlowDisseminator.SHUTDOWN_COMMAND:
+                if command == FlowDisseminator.STOP_COMMAND:
                     PathEmulation.tearDown()
+                    with self.stop_lock:
+                        self.stop = True
+                    connection.send(struct.pack("<1B", FlowDisseminator.ACK))
+                    connection.close()
+                elif command == FlowDisseminator.SHUTDOWN_COMMAND:
                     connection.send(struct.pack("<2I", self.sent, self.received))
                     connection.close()
                     self.dashboard_socket.close()
