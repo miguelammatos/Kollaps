@@ -1,5 +1,5 @@
 from NetGraph import NetGraph
-from utils import fail, BYTE_LIMIT, SHORT_LIMIT
+from utils import fail, stop_experiment, BYTE_LIMIT, SHORT_LIMIT
 import PathEmulation
 
 from threading import Thread, Lock
@@ -140,11 +140,13 @@ class FlowDisseminator:
             if data:
                 command = struct.unpack("<1B", data)[0]
                 if command == FlowDisseminator.STOP_COMMAND:
+                    stop_experiment()
                     PathEmulation.tearDown()
                     with self.stop_lock:
                         self.stop = True
                     connection.send(struct.pack("<1B", FlowDisseminator.ACK))
                     connection.close()
+
                 elif command == FlowDisseminator.SHUTDOWN_COMMAND:
                     connection.send(struct.pack("<2I", self.sent, self.received))
                     connection.close()

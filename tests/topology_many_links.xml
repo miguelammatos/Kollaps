@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <experiment>
 	<services>
-		<service name="client1" image="warpenguin.no-ip.org/client:4.3" command="['server1']" replicas="20" share="true"/>
-		<service name="server1" image="warpenguin.no-ip.org/server:4.3" replicas="20" share="true"/>
-		<service name="client2" image="warpenguin.no-ip.org/client:4.3" command="['server2']" replicas="20" share="true"/>
-		<service name="server2" image="warpenguin.no-ip.org/server:4.3" replicas="20" share="true"/>
-		<service name="client3" image="warpenguin.no-ip.org/client:4.3" command="['server3']" replicas="20" share="true"/>
-		<service name="server3" image="warpenguin.no-ip.org/server:4.3" replicas="20" share="true"/>
+		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:2.0" supervisor="true" />
+		<service name="client1" image="warpenguin.no-ip.org/client:5.8" command="['server1']" replicas="20" share="true"/>
+		<service name="server1" image="warpenguin.no-ip.org/server:5.8" replicas="20" share="true"/>
+		<service name="client2" image="warpenguin.no-ip.org/client:5.8" command="['server2']" replicas="20" share="true"/>
+		<service name="server2" image="warpenguin.no-ip.org/server:5.8" replicas="20" share="true"/>
+		<service name="client3" image="warpenguin.no-ip.org/client:5.8" command="['server3']" replicas="20" share="true"/>
+		<service name="server3" image="warpenguin.no-ip.org/server:5.8" replicas="20" share="true"/>
 	</services>
 	<bridges>
                 <bridge name="s1"/>

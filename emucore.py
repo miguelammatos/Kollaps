@@ -2,11 +2,10 @@
 from NetGraph import NetGraph
 from XMLGraphParser import XMLGraphParser
 from EmulationManager import EmulationManager
-from utils import fail
+from utils import fail, start_experiment
 import PathEmulation
 
 
-import subprocess
 from socket import gethostname
 import netifaces
 import os, signal, sys
@@ -60,8 +59,8 @@ def main():
     manager.initialize()
 
     print("Starting experiment!")
+    start_experiment()
     # Temporary hack to start the experiment
-    subprocess.run('echo "done\n" > /tmp/readypipe', shell=True)
 
     sys.stdout.flush()
     sys.stderr.flush()

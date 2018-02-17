@@ -19,9 +19,6 @@ services:
     hostname: dashboard
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -39,29 +36,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
-    configs:
-      - source: topology
-        target: /topology.xml
-        uid: '0'
-        gid: '0'
-        mode: 0555
-    networks:
-      - NEEDnet
-
-  server1:
-    image: warpenguin.no-ip.org/server:5.8
-    hostname: server1
-    labels:
-      netsim: "true"
-    deploy:
-      replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
+      replicas: 3
     configs:
       - source: topology
         target: /topology.xml
@@ -78,29 +53,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
-    configs:
-      - source: topology
-        target: /topology.xml
-        uid: '0'
-        gid: '0'
-        mode: 0555
-    networks:
-      - NEEDnet
-
-  server2:
-    image: warpenguin.no-ip.org/server:5.8
-    hostname: server2
-    labels:
-      netsim: "true"
-    deploy:
-      replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
+      replicas: 3
     configs:
       - source: topology
         target: /topology.xml
@@ -117,10 +70,39 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
+      replicas: 3
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  server1:
+    image: warpenguin.no-ip.org/server:5.8
+    hostname: server1
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 3
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  server2:
+    image: warpenguin.no-ip.org/server:5.8
+    hostname: server2
+    labels:
+      netsim: "true"
+    deploy:
+      replicas: 3
     configs:
       - source: topology
         target: /topology.xml
@@ -136,10 +118,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
+      replicas: 3
     configs:
       - source: topology
         target: /topology.xml
@@ -151,7 +130,7 @@ services:
 
 configs:
   topology:
-    file: topology_many_links.xml
+    file: topology6.xml
 
 networks:
   NEEDnet:
