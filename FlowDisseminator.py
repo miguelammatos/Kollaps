@@ -30,9 +30,8 @@ class FlowDisseminator:
     BUFFER_LEN = MIN_MTU - MAX_IP_HDR - UDP_HDR
     SHUTDOWN_COMMAND = 1
 
-    def __init__(self, manager, flow_collector, graph):
+    def __init__(self, flow_collector, graph):
         self.graph = graph  # type: NetGraph
-        self.emuliation_manager = manager
         self.flow_collector = flow_collector
         self.sent = 0
         self.received = 0

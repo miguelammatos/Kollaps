@@ -20,49 +20,36 @@ if sys.version_info >= (3, 0):
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'sdjh234hj23409ea9[u-ad=12-eqhkdjaadj23jaksldj23objadskjalskdj-1=1dadsd;akdaldm11pnf'
 
-proper_name = re.compile('^[a-zA-Z0-9 \-_]+$')
-proper_number = re.compile('^[0-9]+$')
-
 class DashboardState:
     graph = None
     lock = Lock()
     hosts = {}  # type: Dict[NetGraph.Service, Host]
     stopping = False
+    failed_to_shutdown = False
     lost_metadata = -1
 
 class Host:
     def __init__(self, hostname, name):
         self.name = name
         self.hostname = hostname
-        self.ip = 'Unknown'
-        self.bandwidth = 0
+        self.ip = 'Down'
 
-
-def check_name(name):
-    return re.match(proper_name, name)
-
-
-def check_number(number):
-    if re.match(proper_number, number):
-        try:
-            int(number)
-            return True
-        except:
-            return False
-    else:
-        return False
 
 
 @app.route('/')
 def main():
     with DashboardState.lock:
         if graph is not None:
-            return render_template('index.html', hosts=DashboardState.hosts, stopping=DashboardState.stopping, lost=DashboardState.lost_metadata)
+            answer = render_template('index.html', hosts=DashboardState.hosts, stopping=DashboardState.stopping,
+                                     lost=DashboardState.lost_metadata, failed=DashboardState.failed_to_shutdown)
+            return answer
+
 
 @app.route('/stop')
 def stop():
     Thread(target=stopExperiment, daemon=False).start()
     return redirect(url_for('main'))
+
 
 def stopExperiment():
     with DashboardState.lock:
@@ -70,7 +57,7 @@ def stopExperiment():
             return
         else:
             DashboardState.stopping = True
-    # Do the actual shutdown (without lock)
+            DashboardState.failed_to_shutdown = False
     sent = 0
     received = 0
 
@@ -78,13 +65,28 @@ def stopExperiment():
         host = DashboardState.hosts[node]
         if node.supervisor:
             continue
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((host.ip, FlowDisseminator.TCP_PORT))
-        s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
-        data = s.recv(64)
-        sent += struct.unpack_from("<1I", data, 0)[0]
-        received += struct.unpack_from("<1I", data, 4)[0]
-        s.close()
+        for attempt in range(10):
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((host.ip, FlowDisseminator.TCP_PORT))
+                s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
+                data = s.recv(64)
+                s.close()
+                data_tuple = struct.unpack("<2I", data)
+                sent += data_tuple[0]
+                received += data_tuple[1]
+                with DashboardState.lock:
+                    host.ip = "Down"
+            except:
+                if attempt < 9:
+                    sleep(0.5)
+                    continue
+                else:
+                    with DashboardState.lock:
+                        DashboardState.stopping = False
+                        DashboardState.failed_to_shutdown = True
+                        return
+            break
 
 
     with DashboardState.lock:
@@ -109,7 +111,6 @@ def resolve_hostnames():
         for i, host in enumerate(service_instances):
             with DashboardState.lock:
                 DashboardState.hosts[host].ip = ips[i]
-
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

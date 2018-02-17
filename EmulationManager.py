@@ -20,7 +20,7 @@ class EmulationManager:
         self.active_paths = []
         self.repeat_detection = {}
         self.state_lock = Lock()
-        self.disseminator = FlowDisseminator(self, self.collect_flow, self.graph)
+        self.disseminator = FlowDisseminator(self.collect_flow, self.graph)
         self.last_time = 0
 
     def initialize(self):
