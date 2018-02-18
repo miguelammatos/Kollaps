@@ -77,7 +77,7 @@ li{
 }
 
 table{
-    counter-reset: rowNumber;
+    counter-reset: rowNumber -1;
 }
 
 table tr{
