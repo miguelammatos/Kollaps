@@ -51,6 +51,10 @@ div{    /*Defaults for all divs*/
 	padding: 5px;
 }
 
+#graph{
+    height: 1000px;
+}
+
 nav ul{
 	padding: 0px;
 	margin: 0px;
@@ -210,4 +214,8 @@ img.delete{
 	width: 25px;
 	height: 25px;
 	margin-top: 3px;
+}
+
+footer{
+    bottom:0;
 }

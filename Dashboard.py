@@ -60,6 +60,10 @@ def flows():
         DashboardState.flows.clear()
         return answer
 
+@app.route('/graph')
+def graph():
+    return render_template('graph.html', graph=DashboardState.graph)
+
 def stopExperiment():
     with DashboardState.lock:
         if DashboardState.stopping:
