@@ -28,7 +28,7 @@ class DashboardState:
     stopping = False
     failed_to_shutdown = False
     lost_metadata = -1
-
+    fd = None  # type: FlowDisseminator
 class Host:
     def __init__(self, hostname, name):
         self.name = name
@@ -112,6 +112,7 @@ def stopExperiment():
             sleep(0.5)
 
     with DashboardState.lock:
+        received += DashboardState.fd.received
         DashboardState.lost_metadata = 1-(received/sent)
 
 
@@ -160,7 +161,9 @@ if __name__ == "__main__":
                     continue
                 DashboardState.hosts[host] = Host(host.name, host.name + "." + str(i))
 
-    fd = FlowDisseminator(collect_flow, graph)
+    DashboardState.fd = FlowDisseminator(collect_flow, graph)
+
+    DashboardState.graph = graph
 
     dnsThread = Thread(target=resolve_hostnames)
     dnsThread.daemon = True
