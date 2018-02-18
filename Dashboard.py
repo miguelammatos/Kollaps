@@ -78,6 +78,7 @@ def stopExperiment():
             try:
                 host = to_kill[i]
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(2)
                 s.connect((host.ip, FlowDisseminator.TCP_PORT))
                 s.send(struct.pack("<1B", FlowDisseminator.STOP_COMMAND))
                 data = s.recv(64)
@@ -86,8 +87,9 @@ def stopExperiment():
                 if ack == FlowDisseminator.ACK:
                     to_stop.pop()
                     continue
-            except:
-                    continue
+            except OSError as e:
+                print(e)
+                continue
 
         if attempts <= 0:
             with DashboardState.lock:
@@ -105,6 +107,7 @@ def stopExperiment():
             try:
                 host = to_kill[i]
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(2)
                 s.connect((host.ip, FlowDisseminator.TCP_PORT))
                 s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
                 data = s.recv(64)
@@ -116,7 +119,8 @@ def stopExperiment():
                     to_kill.pop()
                     host.down = True
                     continue
-            except:
+            except OSError as e:
+                print(e)
                 continue
         if attempts <= 0:
             with DashboardState.lock:

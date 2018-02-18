@@ -14,8 +14,8 @@ def fail(message):
 
 def start_experiment():
     # Temporary hack to start the experiment
-    subprocess.run('echo "done\n" > /tmp/readypipe', shell=True)
+    subprocess.run('echo "done" > /tmp/readypipe', shell=True)
 
 def stop_experiment():
     # Temporary hack to stop the experiment
-    subprocess.run('echo "done\n" > /tmp/readypipe', shell=True)
+    subprocess.run('echo "done" > /tmp/readypipe', shell=True)
