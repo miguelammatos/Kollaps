@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <experiment>
 	<services>
-		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:2.2" supervisor="true" />
-		<service name="client1" image="warpenguin.no-ip.org/client:6.3" command="['server']"/>
-		<service name="client2" image="warpenguin.no-ip.org/client:6.3" command="['server']"/>
-		<service name="client3" image="warpenguin.no-ip.org/client:6.3" command="['server']"/>
-		<service name="server" image="warpenguin.no-ip.org/server:6.3" replicas="3" share="false"/>
+		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:2.3" supervisor="true" />
+		<service name="client1" image="warpenguin.no-ip.org/client:6.4" command="['server']"/>
+		<service name="client2" image="warpenguin.no-ip.org/client:6.4" command="['server']"/>
+		<service name="client3" image="warpenguin.no-ip.org/client:6.4" command="['server']"/>
+		<service name="server" image="warpenguin.no-ip.org/server:6.4" replicas="3" share="false"/>
 	</services>
 	<bridges>
                 <bridge name="s1"/>

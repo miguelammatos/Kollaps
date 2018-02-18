@@ -76,7 +76,8 @@ def stopExperiment():
         attempts -= 1
         for i in reversed(range(len(to_stop))):
             try:
-                host = to_kill[i]
+                print(to_stop)
+                host = to_stop[i]
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(2)
                 s.connect((host.ip, FlowDisseminator.TCP_PORT))
@@ -105,6 +106,7 @@ def stopExperiment():
         attempts -= 1
         for i in reversed(range(len(to_kill))):
             try:
+                print(to_kill)
                 host = to_kill[i]
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(2)
