@@ -74,18 +74,10 @@ def stopExperiment():
     while to_stop:
         host = to_stop.pop()
         try:
-            print(to_stop)
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(2)
             s.connect((host.ip, FlowDisseminator.TCP_PORT))
             s.send(struct.pack("<1B", FlowDisseminator.STOP_COMMAND))
-            data = s.recv(64)
-            s.close()
-            ack = struct.unpack("<1B", data)
-            if ack == FlowDisseminator.ACK:
-                continue
-            else:
-                to_stop.insert(0, host)
         except OSError as e:
             print(e)
             to_stop.insert(0, host)

@@ -144,7 +144,6 @@ class FlowDisseminator:
                     PathEmulation.tearDown()
                     with self.stop_lock:
                         self.stop = True
-                    connection.send(struct.pack("<1B", FlowDisseminator.ACK))
                     connection.close()
 
                 elif command == FlowDisseminator.SHUTDOWN_COMMAND:
