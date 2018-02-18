@@ -21,9 +21,10 @@ app = Flask(__name__, static_folder='static')
 app.secret_key = 'sdjh234hj23409ea9[u-ad=12-eqhkdjaadj23jaksldj23objadskjalskdj-1=1dadsd;akdaldm11pnf'
 
 class DashboardState:
-    graph = None
+    graph = None  # type: NetGraph
     lock = Lock()
     hosts = {}  # type: Dict[NetGraph.Service, Host]
+    flows = {} # type: Dict[str, Tuple[int, int, int]]
     stopping = False
     failed_to_shutdown = False
     lost_metadata = -1
@@ -51,6 +52,12 @@ def stop():
     Thread(target=stopExperiment, daemon=False).start()
     return redirect(url_for('main'))
 
+@app.route('/flows')
+def flows():
+    with DashboardState.lock:
+        answer = render_template('flows.html', flows=DashboardState.flows, graph=DashboardState.graph)
+        DashboardState.flows.clear()
+        return answer
 
 def stopExperiment():
     with DashboardState.lock:
@@ -130,6 +137,13 @@ def resolve_hostnames():
                 DashboardState.hosts[host].ip = ips[i]
                 DashboardState.hosts[host].down = False
 
+
+def collect_flow(bandwidth, links):
+    key = str(links[0]+links[-1])
+    with DashboardState.lock:
+        DashboardState.flows[key] = (links[0], links[-1], bandwidth)
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         topology_file = "/topology.xml"
@@ -145,6 +159,8 @@ if __name__ == "__main__":
                 if host.supervisor:
                     continue
                 DashboardState.hosts[host] = Host(host.name, host.name + "." + str(i))
+
+    fd = FlowDisseminator(collect_flow, graph)
 
     dnsThread = Thread(target=resolve_hostnames)
     dnsThread.daemon = True

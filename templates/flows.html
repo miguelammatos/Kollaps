@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+ 
+<head>
+    <title>NEED Dashboard</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <meta http-equiv="refresh" content="2"/>
+</head>
+ 
+<body>
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul>
+                    <li class="pull-left" role="presentation"><a href="/">Home</a></li>
+                    <li class="pull-left" role="presentation" id="active"><a href="/flows">Active flows</a></li>
+                    <li class="pull-right" role="presentation"><a href="/stop">STOP</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main">
+            <div class="container">
+                <table>
+                    <tr>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Throughput</th>
+                    </tr>
+                    {% for key, flow in flows.items() %}
+                    <tr>
+                        <td>{{graph.links[flow[0]].source.name}}</td>
+                        <td>{{graph.links[flow[1]].source.name}}</td>
+                        <td>{{flow[2]}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+ 
+        <footer class="footer">
+            <p>NEED 2018</p>
+        </footer>
+ 
+    </div>
+</body>
+ 
+</html>
