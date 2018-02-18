@@ -131,7 +131,7 @@ class EmulationManager:
                 path.current_bandwidth = max_bandwidth
 
     def collect_flow(self, bandwidth, link_indices):
-        key = str(link_indices[0]) + str(link_indices[-1])
+        key = str(link_indices[0]) + ":" + str(link_indices[-1])
         with self.state_lock:
             if key in self.repeat_detection:
                 return

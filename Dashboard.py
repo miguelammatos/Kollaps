@@ -141,7 +141,7 @@ def resolve_hostnames():
 
 
 def collect_flow(bandwidth, links):
-    key = str(links[0]+links[-1])
+    key = str(links[0]+":"+links[-1])
     with DashboardState.lock:
         DashboardState.flows[key] = (links[0], links[-1], bandwidth)
 
