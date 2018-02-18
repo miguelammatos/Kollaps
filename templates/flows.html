@@ -30,8 +30,8 @@
                     {% for key, flow in flows.items() %}
                     <tr>
                         <td>{{graph.links[flow[0]].source.name}}</td>
-                        <td>{{graph.links[flow[1]].source.name}}</td>
-                        <td>{{flow[2]}}</td>
+                        <td>{{graph.links[flow[1]].destination.name}}</td>
+                        <td>{{flow[2]}}Kbps</td>
                     </tr>
                     {% endfor %}
                 </table>

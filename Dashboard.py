@@ -1,6 +1,7 @@
 import re
 import struct
 import sys
+from collections import OrderedDict
 
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, json
 from threading import Lock, Thread
@@ -24,7 +25,7 @@ class DashboardState:
     graph = None  # type: NetGraph
     lock = Lock()
     hosts = {}  # type: Dict[NetGraph.Service, Host]
-    flows = {} # type: Dict[str, Tuple[int, int, int]]
+    flows = OrderedDict() # type: Dict[str, Tuple[int, int, int]]
     stopping = False
     failed_to_shutdown = False
     lost_metadata = -1
