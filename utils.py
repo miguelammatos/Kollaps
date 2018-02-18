@@ -18,4 +18,4 @@ def start_experiment():
 
 def stop_experiment():
     # Temporary hack to stop the experiment
-    subprocess.run('echo "done" > /tmp/readypipe', shell=True)
+    subprocess.run('echo "done" > /tmp/donepipe', shell=True)

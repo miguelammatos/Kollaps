@@ -10,10 +10,6 @@ from socket import gethostname
 import netifaces
 import os, signal, sys
 
-def signal_handler(signum, frame):
-    PathEmulation.tearDown()
-    sys.exit(0)
-
 def main():
     if len(sys.argv) != 2:
         topology_file = "/topology.xml"
@@ -54,7 +50,6 @@ def main():
     graph.calculate_shortest_paths()
 
     print("Initializing network emulation conditions...")
-    signal.signal(signal.SIGTERM, signal_handler)
     manager = EmulationManager(graph)
     manager.initialize()
 
