@@ -71,65 +71,44 @@ def stopExperiment():
     to_stop = to_kill[:]
 
     # Stop all services
-    attempts = 10
-    while len(to_stop) > 0:
-        attempts -= 1
-        for i in reversed(range(len(to_stop))):
-            try:
-                print(to_stop)
-                host = to_stop[i]
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(2)
-                s.connect((host.ip, FlowDisseminator.TCP_PORT))
-                s.send(struct.pack("<1B", FlowDisseminator.STOP_COMMAND))
-                data = s.recv(64)
-                s.close()
-                ack = struct.unpack("<1B", data)
-                if ack == FlowDisseminator.ACK:
-                    to_stop.pop()
-                    continue
-            except OSError as e:
-                print(e)
+    while to_stop:
+        host = to_stop.pop()
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(2)
+            s.connect((host.ip, FlowDisseminator.TCP_PORT))
+            s.send(struct.pack("<1B", FlowDisseminator.STOP_COMMAND))
+            data = s.recv(64)
+            s.close()
+            ack = struct.unpack("<1B", data)
+            if ack == FlowDisseminator.ACK:
                 continue
-
-        if attempts <= 0:
-            with DashboardState.lock:
-                DashboardState.stopping = False
-                DashboardState.failed_to_shutdown = True
-            return
-        else:
+            else:
+                to_stop.insert(0, host)
+        except OSError as e:
+            print(e)
+            to_stop.insert(0, host)
             sleep(0.5)
 
     # Collect sent/received statistics and shutdown
-    attempts = 10
-    while len(to_kill) > 0:
-        attempts -= 1
-        for i in reversed(range(len(to_kill))):
-            try:
-                print(to_kill)
-                host = to_kill[i]
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(2)
-                s.connect((host.ip, FlowDisseminator.TCP_PORT))
-                s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
-                data = s.recv(64)
-                s.close()
-                data_tuple = struct.unpack("<2I", data)
-                sent += data_tuple[0]
-                received += data_tuple[1]
-                with DashboardState.lock:
-                    to_kill.pop()
-                    host.down = True
-                    continue
-            except OSError as e:
-                print(e)
-                continue
-        if attempts <= 0:
+    while to_kill:
+        host = to_kill.pop()
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(2)
+            s.connect((host.ip, FlowDisseminator.TCP_PORT))
+            s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
+            data = s.recv(64)
+            s.close()
+            data_tuple = struct.unpack("<2I", data)
+            sent += data_tuple[0]
+            received += data_tuple[1]
             with DashboardState.lock:
-                DashboardState.stopping = False
-                DashboardState.failed_to_shutdown = True
-            return
-        else:
+                host.down = True
+                continue
+        except OSError as e:
+            print(e)
+            to_kill.insert(0, host)
             sleep(0.5)
 
     with DashboardState.lock:
