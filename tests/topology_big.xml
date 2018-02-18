@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <experiment>
 	<services>
-		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:3.3" supervisor="true" />
+		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:3.4" supervisor="true" />
 		<service name="client1" image="warpenguin.no-ip.org/client:7.1" command="['server1']" replicas="5" share="true"/>
 		<service name="server1" image="warpenguin.no-ip.org/server:7.1" replicas="5" share="true"/>
 		<service name="client2" image="warpenguin.no-ip.org/client:7.1" command="['server2']" replicas="5" share="true"/>
