@@ -32,7 +32,8 @@ class Host:
     def __init__(self, hostname, name):
         self.name = name
         self.hostname = hostname
-        self.ip = 'Down'
+        self.ip = 'Unknown'
+        self.down = True
 
 
 
@@ -61,15 +62,21 @@ def stopExperiment():
     sent = 0
     received = 0
 
-    #TODO make this code more robust
-
-    # Stop all services
+    to_kill = []
     for node in DashboardState.hosts:
         host = DashboardState.hosts[node]
         if node.supervisor:
             continue
-        for attempt in range(10):
+        to_kill.append(host)
+    to_stop = to_kill[:]
+
+    # Stop all services
+    attempts = 10
+    while len(to_stop) > 0:
+        attempts -= 1
+        for i in reversed(range(len(to_stop))):
             try:
+                host = to_kill[i]
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((host.ip, FlowDisseminator.TCP_PORT))
                 s.send(struct.pack("<1B", FlowDisseminator.STOP_COMMAND))
@@ -77,25 +84,26 @@ def stopExperiment():
                 s.close()
                 ack = struct.unpack("<1B", data)
                 if ack == FlowDisseminator.ACK:
-                    break
-            except:
-                if attempt < 9:
-                    sleep(0.5)
+                    to_stop.pop()
                     continue
-                else:
-                    with DashboardState.lock:
-                        DashboardState.stopping = False
-                        DashboardState.failed_to_shutdown = True
-                        return
-            break
+            except:
+                    continue
+
+        if attempts <= 0:
+            with DashboardState.lock:
+                DashboardState.stopping = False
+                DashboardState.failed_to_shutdown = True
+            return
+        else:
+            sleep(0.5)
 
     # Collect sent/received statistics and shutdown
-    for node in DashboardState.hosts:
-        host = DashboardState.hosts[node]
-        if node.supervisor:
-            continue
-        for attempt in range(10):
+    attempts = 10
+    while len(to_kill) > 0:
+        attempts -= 1
+        for i in reversed(range(len(to_kill))):
             try:
+                host = to_kill[i]
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((host.ip, FlowDisseminator.TCP_PORT))
                 s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
@@ -105,17 +113,18 @@ def stopExperiment():
                 sent += data_tuple[0]
                 received += data_tuple[1]
                 with DashboardState.lock:
-                    host.ip = "Down"
-            except:
-                if attempt < 9:
-                    sleep(0.5)
+                    to_kill.pop()
+                    host.down = True
                     continue
-                else:
-                    with DashboardState.lock:
-                        DashboardState.stopping = False
-                        DashboardState.failed_to_shutdown = True
-                        return
-            break
+            except:
+                continue
+        if attempts <= 0:
+            with DashboardState.lock:
+                DashboardState.stopping = False
+                DashboardState.failed_to_shutdown = True
+            return
+        else:
+            sleep(0.5)
 
     with DashboardState.lock:
         DashboardState.lost_metadata = 1-(received/sent)
@@ -141,6 +150,7 @@ def resolve_hostnames():
                 continue
             with DashboardState.lock:
                 DashboardState.hosts[host].ip = ips[i]
+                DashboardState.hosts[host].down = False
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
