@@ -8,7 +8,7 @@ from threading import Lock, Thread
 from time import sleep
 import socket
 
-from FlowDisseminator import FlowDisseminator
+from CommunicationsManager import CommunicationsManager
 from NetGraph import NetGraph
 from XMLGraphParser import XMLGraphParser
 
@@ -26,16 +26,18 @@ class DashboardState:
     lock = Lock()
     hosts = {}  # type: Dict[NetGraph.Service, Host]
     flows = OrderedDict() # type: Dict[str, Tuple[int, int, int]]
-    stopping = False
-    failed_to_shutdown = False
     lost_metadata = -1
-    fd = None  # type: FlowDisseminator
+    comms = None  # type: CommunicationsManager
+    stopping = False
+    ready = False
+    running = False
+
 class Host:
     def __init__(self, hostname, name):
         self.name = name
         self.hostname = hostname
         self.ip = 'Unknown'
-        self.down = True
+        self.status = 'Down'
 
 
 
@@ -44,13 +46,18 @@ def main():
     with DashboardState.lock:
         if graph is not None:
             answer = render_template('index.html', hosts=DashboardState.hosts, stopping=DashboardState.stopping,
-                                     lost=DashboardState.lost_metadata, failed=DashboardState.failed_to_shutdown)
+                                     lost=DashboardState.lost_metadata)
             return answer
 
 
 @app.route('/stop')
 def stop():
     Thread(target=stopExperiment, daemon=False).start()
+    return redirect(url_for('main'))
+
+@app.route('/start')
+def start():
+    Thread(target=startExperiment, daemon=False).start()
     return redirect(url_for('main'))
 
 @app.route('/flows')
@@ -66,11 +73,10 @@ def graph():
 
 def stopExperiment():
     with DashboardState.lock:
-        if DashboardState.stopping:
+        if DashboardState.stopping or not DashboardState.ready:
             return
         else:
             DashboardState.stopping = True
-            DashboardState.failed_to_shutdown = False
     sent = 0
     received = 0
 
@@ -88,8 +94,9 @@ def stopExperiment():
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(2)
-            s.connect((host.ip, FlowDisseminator.TCP_PORT))
-            s.send(struct.pack("<1B", FlowDisseminator.STOP_COMMAND))
+            s.connect((host.ip, CommunicationsManager.TCP_PORT))
+            s.send(struct.pack("<1B", CommunicationsManager.STOP_COMMAND))
+            s.close()
         except OSError as e:
             print(e)
             to_stop.insert(0, host)
@@ -101,15 +108,15 @@ def stopExperiment():
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(2)
-            s.connect((host.ip, FlowDisseminator.TCP_PORT))
-            s.send(struct.pack("<1B", FlowDisseminator.SHUTDOWN_COMMAND))
+            s.connect((host.ip, CommunicationsManager.TCP_PORT))
+            s.send(struct.pack("<1B", CommunicationsManager.SHUTDOWN_COMMAND))
             data = s.recv(64)
             s.close()
             data_tuple = struct.unpack("<2I", data)
             sent += data_tuple[0]
             received += data_tuple[1]
             with DashboardState.lock:
-                host.down = True
+                host.status = 'Down'
                 continue
         except OSError as e:
             print(e)
@@ -117,8 +124,40 @@ def stopExperiment():
             sleep(0.5)
 
     with DashboardState.lock:
-        received += DashboardState.fd.received
+        received += DashboardState.comms.received
         DashboardState.lost_metadata = 1-(received/sent)
+        DashboardState.stopping = False
+
+def startExperiment():
+    with DashboardState.lock:
+        if DashboardState.stopping or not DashboardState.ready:
+            return
+
+    pending_nodes = []
+    for node in DashboardState.hosts:
+        host = DashboardState.hosts[node]
+        if node.supervisor:
+            continue
+        pending_nodes.append(host)
+
+    while pending_nodes:
+        host = pending_nodes.pop()
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(2)
+            s.connect((host.ip, CommunicationsManager.TCP_PORT))
+            s.send(struct.pack("<1B", CommunicationsManager.START_COMMAND))
+            s.close()
+            with DashboardState.lock:
+                host.status = 'Running'
+                continue
+        except OSError as e:
+            print(e)
+            pending_nodes.insert(0, host)
+            sleep(0.5)
+
+    with DashboardState.lock:
+        DashboardState.running = True
 
 
 def resolve_hostnames():
@@ -141,8 +180,37 @@ def resolve_hostnames():
                 continue
             with DashboardState.lock:
                 DashboardState.hosts[host].ip = ips[i]
-                DashboardState.hosts[host].down = False
+                DashboardState.hosts[host].status = 'Pending'
 
+def query_until_ready():
+    resolve_hostnames()
+    pending_nodes = []
+    for node in DashboardState.hosts:
+        host = DashboardState.hosts[node]
+        if node.supervisor:
+            continue
+        pending_nodes.append(host)
+    while pending_nodes:
+        host = pending_nodes.pop()
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(2)
+            s.connect((host.ip, CommunicationsManager.TCP_PORT))
+            s.send(struct.pack("<1B", CommunicationsManager.READY_COMMAND))
+            data = s.recv(64)
+            s.close()
+            if data != struct.pack("<1B", CommunicationsManager.ACK):
+                pending_nodes.insert(0, host)
+            with DashboardState.lock:
+                host.status = 'Ready'
+                continue
+        except OSError as e:
+            print(e)
+            pending_nodes.insert(0, host)
+            sleep(0.5)
+
+    with DashboardState.lock:
+        DashboardState.ready = True
 
 def collect_flow(bandwidth, links):
     key = str(links[0]) + ":" + str(links[-1])
@@ -166,12 +234,13 @@ if __name__ == "__main__":
                     continue
                 DashboardState.hosts[host] = Host(host.name, host.name + "." + str(i))
 
-    DashboardState.fd = FlowDisseminator(collect_flow, graph)
+    DashboardState.comms = CommunicationsManager(collect_flow, graph)
 
     DashboardState.graph = graph
 
-    dnsThread = Thread(target=resolve_hostnames)
-    dnsThread.daemon = True
-    dnsThread.start()
+    startupThread = Thread(target=query_until_ready)
+    startupThread.daemon = True
+    startupThread.start()
     app.run(host='0.0.0.0', port=8088)
+
 

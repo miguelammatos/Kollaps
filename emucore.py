@@ -49,14 +49,10 @@ def main():
     print("Calculating shortest paths...")
     graph.calculate_shortest_paths()
 
-    print("Initializing network emulation conditions...")
+    print("Initializing network emulation...")
     manager = EmulationManager(graph)
     manager.initialize()
-
-    print("Starting experiment!")
-    start_experiment()
-    # Temporary hack to start the experiment
-
+    print("Waiting for command to start experiment")
     sys.stdout.flush()
     sys.stderr.flush()
 

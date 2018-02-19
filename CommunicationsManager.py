@@ -1,5 +1,5 @@
 from NetGraph import NetGraph
-from utils import fail, stop_experiment, BYTE_LIMIT, SHORT_LIMIT
+from utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT
 import PathEmulation
 
 from threading import Thread, Lock
@@ -21,7 +21,7 @@ if sys.version_info >= (3, 0):
 # id's of links
 
 
-class FlowDisseminator:
+class CommunicationsManager:
     UDP_PORT = 7073
     TCP_PORT = 7073
     MIN_MTU = 576
@@ -30,7 +30,9 @@ class FlowDisseminator:
     BUFFER_LEN = MIN_MTU - MAX_IP_HDR - UDP_HDR
     STOP_COMMAND = 1
     SHUTDOWN_COMMAND = 2
-    ACK = 255
+    READY_COMMAND = 3
+    START_COMMAND = 4
+    ACK = 250
 
     def __init__(self, flow_collector, graph):
         self.graph = graph  # type: NetGraph
@@ -51,10 +53,10 @@ class FlowDisseminator:
             fail("Topology has too many links: " + str(link_count))
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(('0.0.0.0', FlowDisseminator.UDP_PORT))
+        self.sock.bind(('0.0.0.0', CommunicationsManager.UDP_PORT))
 
         self.dashboard_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.dashboard_socket.bind(('0.0.0.0', FlowDisseminator.TCP_PORT))
+        self.dashboard_socket.bind(('0.0.0.0', CommunicationsManager.TCP_PORT))
 
         self.thread = Thread(target=self.receive_flows)
         self.thread.daemon = True
@@ -104,7 +106,7 @@ class FlowDisseminator:
             hosts = self.graph.services[service]
             for host in hosts:
                 if host != self.graph.root:
-                    s.sendto(data, (host.ip, FlowDisseminator.UDP_PORT))
+                    s.sendto(data, (host.ip, CommunicationsManager.UDP_PORT))
                     self.sent += 1
         s.close()
 
@@ -112,7 +114,7 @@ class FlowDisseminator:
         # TODO check for split packets
         last_time = time()
         while True:
-            data, addr = self.sock.recvfrom(FlowDisseminator.BUFFER_LEN)
+            data, addr = self.sock.recvfrom(CommunicationsManager.BUFFER_LEN)
             self.received += 1
             current_time = time()
             if current_time - last_time > 10:
@@ -139,17 +141,26 @@ class FlowDisseminator:
             data = connection.recv(1)
             if data:
                 command = struct.unpack("<1B", data)[0]
-                if command == FlowDisseminator.STOP_COMMAND:
+                if command == CommunicationsManager.STOP_COMMAND:
                     stop_experiment()
                     PathEmulation.tearDown()
                     with self.stop_lock:
                         self.stop = True
                     connection.close()
 
-                elif command == FlowDisseminator.SHUTDOWN_COMMAND:
+                elif command == CommunicationsManager.SHUTDOWN_COMMAND:
                     connection.send(struct.pack("<2I", self.sent, self.received))
                     connection.close()
                     self.dashboard_socket.close()
                     self.sock.close()
                     interrupt_main()
+
+                elif command == CommunicationsManager.READY_COMMAND:
+                    connection.send(struct.pack("<1B", CommunicationsManager.ACK))
+                    connection.close()
+
+                elif command == CommunicationsManager.START_COMMAND:
+                    connection.close()
+                    print("Starting Experiment!")
+                    start_experiment()
 

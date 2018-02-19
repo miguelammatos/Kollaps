@@ -6,7 +6,7 @@ from utils import fail
 
 from random import randrange, seed
 import PathEmulation
-from FlowDisseminator import FlowDisseminator
+from CommunicationsManager import CommunicationsManager
 
 from threading import Thread, Timer
 from sched import scheduler
@@ -141,9 +141,9 @@ def setup_mocking():
     mock_query_usage.sent_bytes = 0
     PathEmulation.change_bandwidth = mock_change_bandwidth
 
-    FlowDisseminator.__init__ = MockFlowDisseminator.__init__
-    FlowDisseminator.broadcast_flows = MockFlowDisseminator.broadcast_flows
-    FlowDisseminator.receive_flows = MockFlowDisseminator.receive_flows
+    CommunicationsManager.__init__ = MockFlowDisseminator.__init__
+    CommunicationsManager.broadcast_flows = MockFlowDisseminator.broadcast_flows
+    CommunicationsManager.receive_flows = MockFlowDisseminator.receive_flows
 
 def main():
     setup_mocking()

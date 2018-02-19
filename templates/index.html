@@ -16,15 +16,10 @@
                     <li class="pull-left" role="presentation"><a href="/flows">Active flows</a></li>
                     <li class="pull-left" role="presentation"><a href="/graph">Graph</a></li>
                     <li class="pull-right" role="presentation"><a href="/stop">STOP</a></li>
+                    <li class="pull-right" role="presentation"><a href="/start">START</a></li>
                 </ul>
             </nav>
         </div>
-
-        {% if failed %}
-        <div class="header half">
-            <p>An error occurred while stopping the experiment, please try again</p>
-        </div>
-        {% endif %}
 
         {% if stopping %}
         <div class="header half">
@@ -42,16 +37,14 @@
                 <table>
                     <tr>
                         <th>Hostname</th>
-                        <th>Up</th>
+                        <th>Address</th>
+                        <th>Status</th>
                     </tr>
                     {% for key, host in hosts.items() %}
                     <tr>
                         <td>{{host.name}}</td>
-                        {% if host.down %}
-                        <td>Down</td>
-                        {% else %}
                         <td>{{host.ip}}</td>
-                        {% endif %}
+                        <td>{{host.status}}</td>
                     </tr>
                     {% endfor %}
                 </table>

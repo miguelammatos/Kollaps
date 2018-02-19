@@ -3,7 +3,7 @@ from threading import Lock
 
 from NetGraph import NetGraph
 import PathEmulation
-from FlowDisseminator import FlowDisseminator
+from CommunicationsManager import CommunicationsManager
 
 import sys
 if sys.version_info >= (3, 0):
@@ -20,11 +20,11 @@ class EmulationManager:
         self.active_paths = []
         self.repeat_detection = {}
         self.state_lock = Lock()
-        self.disseminator = FlowDisseminator(self.collect_flow, self.graph)
+        self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
 
     def initialize(self):
-        PathEmulation.init(FlowDisseminator.UDP_PORT)
+        PathEmulation.init(CommunicationsManager.UDP_PORT)
         for service in self.graph.paths:
             if isinstance(service, NetGraph.Service):
                 path = self.graph.paths[service]
@@ -39,7 +39,7 @@ class EmulationManager:
                 self.recalculate_path_bandwidths()
                 self.reset_flow_state()
                 self.check_active_flows()
-            self.disseminator.broadcast_flows(self.active_paths)
+            self.comms.broadcast_flows(self.active_paths)
             sleep(EmulationManager.POOL_PERIOD)
 
 
