@@ -154,7 +154,7 @@ services:
 
 configs:
   topology:
-    file: topology_big.xml
+    file: topology_60.xml
 
 networks:
   NEEDnet:

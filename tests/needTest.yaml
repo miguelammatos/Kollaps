@@ -16,7 +16,7 @@ services:
       - NEEDnet
 
   dashboard:
-    image: warpenguin.no-ip.org/dashboard:4.1
+    image: warpenguin.no-ip.org/dashboard:4.2
     ports:
       - "8088:8088"
     hostname: dashboard
@@ -42,7 +42,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 5
+      replicas: 10
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -61,7 +61,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 5
+      replicas: 10
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -81,7 +81,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 5
+      replicas: 10
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -100,7 +100,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 5
+      replicas: 10
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -120,7 +120,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 5
+      replicas: 10
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -139,7 +139,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 5
+      replicas: 10
       placement:
         constraints:
           - node.labels.gigabit == true

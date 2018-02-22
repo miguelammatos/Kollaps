@@ -42,7 +42,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 10
+      replicas: 5
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -61,7 +61,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 10
+      replicas: 5
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -81,7 +81,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 10
+      replicas: 5
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -100,7 +100,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 10
+      replicas: 5
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -120,7 +120,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 10
+      replicas: 5
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -139,7 +139,7 @@ services:
     labels:
       netsim: "true"
     deploy:
-      replicas: 10
+      replicas: 5
       placement:
         constraints:
           - node.labels.gigabit == true
@@ -154,7 +154,7 @@ services:
 
 configs:
   topology:
-    file: topology_big.xml
+    file: topology_30.xml
 
 networks:
   NEEDnet:
