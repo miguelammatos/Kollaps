@@ -67,7 +67,7 @@ class CommunicationsManager:
         self.dashboard_thread.daemon = True
         self.dashboard_thread.start()
 
-    def broadcast_flows(self, active_flows):
+    def broadcast_flows(self, active_paths):
         """
         :param active_flows: List[NetGraph.Path]
         :return:
@@ -75,6 +75,8 @@ class CommunicationsManager:
         with self.stop_lock:
             if self.stop:
                 return
+
+        active_flows = active_paths[:]
 
         while active_flows:
             packet_flows = []
