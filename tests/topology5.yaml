@@ -5,6 +5,9 @@ services:
     command: ["netsim", "python3 /opt/NEED/emucore.py"]
     deploy:
       mode: global
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     volumes:
       - type: bind
         source: /var/run/docker.sock
@@ -13,12 +16,15 @@ services:
       - NEEDnet
 
   dashboard:
-    image: warpenguin.no-ip.org/dashboard:2.0
+    image: warpenguin.no-ip.org/dashboard:4.4
     ports:
       - "8088:8088"
     hostname: dashboard
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -30,13 +36,16 @@ services:
       - outside
 
   client1:
-    image: warpenguin.no-ip.org/client:5.8
+    image: warpenguin.no-ip.org/client:8.0
     command: ['server']
     hostname: client1
     labels:
       netsim: "true"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -47,13 +56,16 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client:5.8
+    image: warpenguin.no-ip.org/client:8.0
     command: ['server']
     hostname: client2
     labels:
       netsim: "true"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -64,13 +76,16 @@ services:
       - NEEDnet
 
   client3:
-    image: warpenguin.no-ip.org/client:5.8
+    image: warpenguin.no-ip.org/client:8.0
     command: ['server']
     hostname: client3
     labels:
       netsim: "true"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -81,12 +96,15 @@ services:
       - NEEDnet
 
   server:
-    image: warpenguin.no-ip.org/server:5.8
+    image: warpenguin.no-ip.org/server:8.0
     hostname: server
     labels:
       netsim: "true"
     deploy:
       replicas: 3
+      placement:
+        constraints:
+          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml

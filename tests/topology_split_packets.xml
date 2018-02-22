@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<experiment>
+	<services>
+		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:4.4" supervisor="true" />
+		<service name="client1" image="warpenguin.no-ip.org/client10:8.0" command="['server1']" replicas="2" share="true"/>
+		<service name="server1" image="warpenguin.no-ip.org/server:8.0" replicas="20" share="true"/>
+		
+		<service name="client2" image="warpenguin.no-ip.org/client10:8.0" command="['server2']" replicas="2" share="true"/>
+		<service name="server2" image="warpenguin.no-ip.org/server:8.0" replicas="20" share="true"/>
+		
+		<service name="client3" image="warpenguin.no-ip.org/client10:8.0" command="['server3']" replicas="2" share="true"/>
+		<service name="server3" image="warpenguin.no-ip.org/server:8.0" replicas="20" share="true"/>
+	</services>
+	<bridges>
+                <bridge name="s1"/>
+                <bridge name="s1:1"/>
+                <bridge name="s1:2"/>
+                <bridge name="s1:3"/>
+                <bridge name="s1:4"/>
+                <bridge name="s1:5"/>
+                <bridge name="s1:6"/>
+                <bridge name="s1:7"/>
+                <bridge name="s1:8"/>
+                <bridge name="s1:9"/>
+                <bridge name="s1:10"/>
+                <bridge name="s1:11"/>
+                <bridge name="s1:12"/>
+                <bridge name="s1:13"/>
+                <bridge name="s1:14"/>
+                <bridge name="s1:15"/>
+                <bridge name="s1:16"/>
+                <bridge name="s1:17"/>
+                <bridge name="s1:18"/>
+                <bridge name="s1:19"/>
+                <bridge name="s1:20"/>
+                <bridge name="s1:21"/>
+                <bridge name="s1:22"/>
+                <bridge name="s1:23"/>
+                <bridge name="s1:24"/>
+                <bridge name="s1:25"/>
+                <bridge name="s1:26"/>
+                <bridge name="s1:27"/>
+                <bridge name="s1:28"/>
+                <bridge name="s1:29"/>
+                <bridge name="s2"/>
+		
+		<bridge name="s3"/>
+                <bridge name="s3:1"/>
+                <bridge name="s3:2"/>
+                <bridge name="s3:3"/>
+                <bridge name="s3:4"/>
+                <bridge name="s3:5"/>
+                <bridge name="s3:6"/>
+                <bridge name="s3:7"/>
+                <bridge name="s3:8"/>
+                <bridge name="s3:9"/>
+                <bridge name="s3:10"/>
+                <bridge name="s3:11"/>
+                <bridge name="s3:12"/>
+                <bridge name="s3:13"/>
+                <bridge name="s3:14"/>
+                <bridge name="s3:15"/>
+                <bridge name="s3:16"/>
+                <bridge name="s3:17"/>
+                <bridge name="s3:18"/>
+                <bridge name="s3:19"/>
+                <bridge name="s3:20"/>
+                <bridge name="s3:21"/>
+                <bridge name="s3:22"/>
+                <bridge name="s3:23"/>
+                <bridge name="s3:24"/>
+                <bridge name="s3:25"/>
+                <bridge name="s3:26"/>
+                <bridge name="s3:27"/>
+                <bridge name="s3:28"/>
+                <bridge name="s3:29"/>
+                <bridge name="s4"/>
+		
+		<bridge name="s5"/>
+                <bridge name="s5:1"/>
+                <bridge name="s5:2"/>
+                <bridge name="s5:3"/>
+                <bridge name="s5:4"/>
+                <bridge name="s5:5"/>
+                <bridge name="s5:6"/>
+                <bridge name="s5:7"/>
+                <bridge name="s5:8"/>
+                <bridge name="s5:9"/>
+                <bridge name="s5:10"/>
+                <bridge name="s5:11"/>
+                <bridge name="s5:12"/>
+                <bridge name="s5:13"/>
+                <bridge name="s5:14"/>
+                <bridge name="s5:15"/>
+                <bridge name="s5:16"/>
+                <bridge name="s5:17"/>
+                <bridge name="s5:18"/>
+                <bridge name="s5:19"/>
+                <bridge name="s5:20"/>
+                <bridge name="s5:21"/>
+                <bridge name="s5:22"/>
+                <bridge name="s5:23"/>
+                <bridge name="s5:24"/>
+                <bridge name="s5:25"/>
+                <bridge name="s5:26"/>
+                <bridge name="s5:27"/>
+                <bridge name="s5:28"/>
+                <bridge name="s5:29"/>
+                <bridge name="s6"/>
+	</bridges>
+        <links>
+                <link origin="client1" dest="s1" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+                <link origin="s1" dest="s1:1" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+		<link origin="s1:1" dest="s1:2" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:2" dest="s1:3" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:3" dest="s1:4" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:4" dest="s1:5" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:5" dest="s1:6" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:6" dest="s1:7" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:7" dest="s1:8" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:8" dest="s1:9" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:9" dest="s1:10" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:10" dest="s1:11" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:11" dest="s1:12" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:12" dest="s1:13" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:13" dest="s1:14" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:14" dest="s1:15" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:15" dest="s1:16" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:16" dest="s1:17" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:17" dest="s1:18" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:18" dest="s1:19" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:19" dest="s1:20" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:20" dest="s1:21" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:21" dest="s1:22" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:22" dest="s1:23" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:23" dest="s1:24" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:24" dest="s1:25" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:25" dest="s1:26" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:26" dest="s1:27" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:27" dest="s1:28" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:28" dest="s1:29" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s1:29" dest="s2" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s2" dest="server1" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+		
+		<link origin="client2" dest="s3" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+                <link origin="s3" dest="s3:1" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+		<link origin="s3:1" dest="s3:2" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:2" dest="s3:3" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:3" dest="s3:4" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:4" dest="s3:5" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:5" dest="s3:6" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:6" dest="s3:7" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:7" dest="s3:8" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:8" dest="s3:9" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:9" dest="s3:10" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:10" dest="s3:11" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:11" dest="s3:12" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:12" dest="s3:13" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:13" dest="s3:14" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:14" dest="s3:15" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:15" dest="s3:16" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:16" dest="s3:17" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:17" dest="s3:18" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:18" dest="s3:19" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:19" dest="s3:20" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:20" dest="s3:21" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:21" dest="s3:22" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:22" dest="s3:23" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:23" dest="s3:24" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:24" dest="s3:25" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:25" dest="s3:26" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:26" dest="s3:27" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:27" dest="s3:28" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:28" dest="s3:29" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s3:29" dest="s4" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s4" dest="server2" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+		
+		<link origin="client3" dest="s5" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+                <link origin="s5" dest="s5:1" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+		<link origin="s5:1" dest="s5:2" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:2" dest="s5:3" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:3" dest="s5:4" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:4" dest="s5:5" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:5" dest="s5:6" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:6" dest="s5:7" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:7" dest="s5:8" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:8" dest="s5:9" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:9" dest="s5:10" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:10" dest="s5:11" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:11" dest="s5:12" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:12" dest="s5:13" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:13" dest="s5:14" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:14" dest="s5:15" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:15" dest="s5:16" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:16" dest="s5:17" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:17" dest="s5:18" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:18" dest="s5:19" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:19" dest="s5:20" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:20" dest="s5:21" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:21" dest="s5:22" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:22" dest="s5:23" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:23" dest="s5:24" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:24" dest="s5:25" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:25" dest="s5:26" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:26" dest="s5:27" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:27" dest="s5:28" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:28" dest="s5:29" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s5:29" dest="s6" latency="10"  drop="0" upload="5Mbps" download="5Mbps" network="test1"/>
+                <link origin="s6" dest="server3" latency="10"  drop="0" upload="100Mbps" download="100Mbps" network="test1"/>
+        </links>
+</experiment>

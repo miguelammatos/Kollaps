@@ -112,7 +112,7 @@ def stopExperiment():
             s.send(struct.pack("<1B", CommunicationsManager.SHUTDOWN_COMMAND))
             data = s.recv(64)
             s.close()
-            data_tuple = struct.unpack("<2I", data)
+            data_tuple = struct.unpack("<2Q", data)
             sent += data_tuple[0]
             received += data_tuple[1]
             with DashboardState.lock:

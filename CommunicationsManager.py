@@ -14,6 +14,7 @@ if sys.version_info >= (3, 0):
     from typing import Dict, List
 
 # Header:
+# counter
 # Num of flows
 # Flow:
 # throughput
@@ -71,47 +72,56 @@ class CommunicationsManager:
         :param active_flows: List[NetGraph.Path]
         :return:
         """
-        # TODO List
-        # Check if we need to split packets
-        if len(active_flows) < 1:
-            return
         with self.stop_lock:
             if self.stop:
                 return
 
-        # calculate size of packet
-        fmt = "<1i"
-        for flow in active_flows:
-            fmt += "1i1"+self.link_unit
-            for link in flow.links:
-                fmt += "1"+self.link_unit
-        size = struct.calcsize(fmt)
+        while active_flows:
+            packet_flows = []
 
-        # Build the packet
-        data = ctypes.create_string_buffer(size)
-        accumulated_size = 0
-        struct.pack_into("<1i", data, accumulated_size, len(active_flows))
-        accumulated_size += struct.calcsize("<1i")
-        for flow in active_flows:
-            struct.pack_into("<1i", data, accumulated_size, int(flow.used_bandwidth))
-            accumulated_size += struct.calcsize("<1i")
-            struct.pack_into("<1"+self.link_unit, data, accumulated_size, len(flow.links))
-            accumulated_size += struct.calcsize("<1"+self.link_unit)
-            for link in flow.links:
-                struct.pack_into("<1"+self.link_unit, data, accumulated_size, link.index)
+            # calculate size of packet
+            fmt = "<1H"
+            while active_flows:
+                flow = active_flows.pop()
+                fmt += "1i1"+self.link_unit
+                for link in flow.links:
+                    fmt += "1"+self.link_unit
+                size = struct.calcsize(fmt)
+                if (size < CommunicationsManager.BUFFER_LEN):  # If we fit in the packet append it
+                    packet_flows.append(flow)
+                    continue
+                else:  # if we dont fit, send the other ones
+                    active_flows.append(flow)  # and put the current one back in
+                    break
+
+
+
+            # Build the packet
+            size = struct.calcsize(fmt)
+            data = ctypes.create_string_buffer(size)
+            accumulated_size = 0
+            struct.pack_into("<1H", data, accumulated_size, len(active_flows))
+            accumulated_size += struct.calcsize("<1H")
+            while packet_flows:
+                flow = packet_flows.pop()
+                struct.pack_into("<1i", data, accumulated_size, int(flow.used_bandwidth))
+                accumulated_size += struct.calcsize("<1i")
+                struct.pack_into("<1"+self.link_unit, data, accumulated_size, len(flow.links))
                 accumulated_size += struct.calcsize("<1"+self.link_unit)
+                for link in flow.links:
+                    struct.pack_into("<1"+self.link_unit, data, accumulated_size, link.index)
+                    accumulated_size += struct.calcsize("<1"+self.link_unit)
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        for service in self.graph.services:
-            hosts = self.graph.services[service]
-            for host in hosts:
-                if host != self.graph.root:
-                    s.sendto(data, (host.ip, CommunicationsManager.UDP_PORT))
-                    self.sent += 1
-        s.close()
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            for service in self.graph.services:
+                hosts = self.graph.services[service]
+                for host in hosts:
+                    if host != self.graph.root:
+                        s.sendto(data, (host.ip, CommunicationsManager.UDP_PORT))
+                        self.sent += 1
+            s.close()
 
     def receive_flows(self):
-        # TODO check for split packets
         last_time = time()
         while True:
             data, addr = self.sock.recvfrom(CommunicationsManager.BUFFER_LEN)
@@ -120,8 +130,8 @@ class CommunicationsManager:
             if current_time - last_time > 10:
                 last_time = current_time
             offset = 0
-            num_of_flows = struct.unpack_from("<1i", data, offset)[0]
-            offset += struct.calcsize("<1i")
+            num_of_flows = struct.unpack_from("<1H", data, offset)[0]
+            offset += struct.calcsize("<1H")
             for i in range(num_of_flows):
                 bandwidth = struct.unpack_from("<1i", data, offset)[0]
                 offset += struct.calcsize("<1i")
@@ -149,7 +159,7 @@ class CommunicationsManager:
                     connection.close()
 
                 elif command == CommunicationsManager.SHUTDOWN_COMMAND:
-                    connection.send(struct.pack("<2I", self.sent, self.received))
+                    connection.send(struct.pack("<2Q", self.sent, self.received))
                     connection.close()
                     self.dashboard_socket.close()
                     self.sock.close()

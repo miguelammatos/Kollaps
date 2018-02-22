@@ -5,9 +5,6 @@ services:
     command: ["netsim", "python3 /opt/NEED/emucore.py"]
     deploy:
       mode: global
-      placement:
-        constraints:
-          - node.labels.gigabit == true
     volumes:
       - type: bind
         source: /var/run/docker.sock
@@ -16,15 +13,12 @@ services:
       - NEEDnet
 
   dashboard:
-    image: warpenguin.no-ip.org/dashboard:4.3
+    image: warpenguin.no-ip.org/dashboard:4.4
     ports:
       - "8088:8088"
     hostname: dashboard
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -36,16 +30,13 @@ services:
       - outside
 
   client1:
-    image: warpenguin.no-ip.org/client:7.3
+    image: warpenguin.no-ip.org/client10:8.0
     command: ['server1']
     hostname: client1
     labels:
       netsim: "true"
     deploy:
-      replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
+      replicas: 2
     configs:
       - source: topology
         target: /topology.xml
@@ -56,15 +47,12 @@ services:
       - NEEDnet
 
   server1:
-    image: warpenguin.no-ip.org/server:7.3
+    image: warpenguin.no-ip.org/server:8.0
     hostname: server1
     labels:
       netsim: "true"
     deploy:
       replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -75,16 +63,13 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client:7.3
+    image: warpenguin.no-ip.org/client10:8.0
     command: ['server2']
     hostname: client2
     labels:
       netsim: "true"
     deploy:
-      replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
+      replicas: 2
     configs:
       - source: topology
         target: /topology.xml
@@ -95,15 +80,12 @@ services:
       - NEEDnet
 
   server2:
-    image: warpenguin.no-ip.org/server:7.3
+    image: warpenguin.no-ip.org/server:8.0
     hostname: server2
     labels:
       netsim: "true"
     deploy:
       replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -114,16 +96,13 @@ services:
       - NEEDnet
 
   client3:
-    image: warpenguin.no-ip.org/client:7.3
+    image: warpenguin.no-ip.org/client10:8.0
     command: ['server3']
     hostname: client3
     labels:
       netsim: "true"
     deploy:
-      replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
+      replicas: 2
     configs:
       - source: topology
         target: /topology.xml
@@ -134,15 +113,12 @@ services:
       - NEEDnet
 
   server3:
-    image: warpenguin.no-ip.org/server:7.3
+    image: warpenguin.no-ip.org/server:8.0
     hostname: server3
     labels:
       netsim: "true"
     deploy:
       replicas: 20
-      placement:
-        constraints:
-          - node.labels.gigabit == true
     configs:
       - source: topology
         target: /topology.xml
@@ -154,7 +130,7 @@ services:
 
 configs:
   topology:
-    file: topology_many_links.xml
+    file: topology_split_packets.xml
 
 networks:
   NEEDnet:
