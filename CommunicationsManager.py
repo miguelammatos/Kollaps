@@ -100,7 +100,7 @@ class CommunicationsManager:
             size = struct.calcsize(fmt)
             data = ctypes.create_string_buffer(size)
             accumulated_size = 0
-            struct.pack_into("<1H", data, accumulated_size, len(active_flows))
+            struct.pack_into("<1H", data, accumulated_size, len(packet_flows))
             accumulated_size += struct.calcsize("<1H")
             while packet_flows:
                 flow = packet_flows.pop()
