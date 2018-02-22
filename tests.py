@@ -51,7 +51,7 @@ def mock_query_usage(service):
     :param service: NetGraph.Service
     :return: int  # in bytes
     """
-    if service.name != "server1":
+    if service.name != "server":
         return 0
     Mbits = 50
     sent_delta = (CT.current_throughput/8)*mock_update_usage.time_delta
@@ -111,8 +111,8 @@ class MockFlowDisseminator:
         if len(data) > 0:
             sleep(0.5)
         bandwidthMbps = CT.current_throughput/(1000*1000)
-        #path = [2, 4, 7]
-        path = [0, 42, 44, 65]
+        path = [2, 4, 7]
+        #path = [0, 42, 44, 65]
         self.flow_collector(bandwidthMbps*1000, path)
         #sleep(0.01)
         #bandwidthMbps = 10
@@ -171,6 +171,7 @@ def main():
         h = randrange(0, len(hosts))
         root = list(graph.services.values())[sv][h]
         if root.supervisor:
+            sv = randrange(0, len(graph.services))
             continue
         else:
             graph.root = root

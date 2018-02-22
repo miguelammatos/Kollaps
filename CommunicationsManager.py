@@ -87,7 +87,7 @@ class CommunicationsManager:
                 for link in flow.links:
                     fmt += "1"+self.link_unit
                 size = struct.calcsize(fmt)
-                if (size < CommunicationsManager.BUFFER_LEN):  # If we fit in the packet append it
+                if size <= CommunicationsManager.BUFFER_LEN:  # If we fit in the packet append it
                     packet_flows.append(flow)
                     continue
                 else:  # if we dont fit, send the other ones
@@ -122,13 +122,9 @@ class CommunicationsManager:
             s.close()
 
     def receive_flows(self):
-        last_time = time()
         while True:
             data, addr = self.sock.recvfrom(CommunicationsManager.BUFFER_LEN)
             self.received += 1
-            current_time = time()
-            if current_time - last_time > 10:
-                last_time = current_time
             offset = 0
             num_of_flows = struct.unpack_from("<1H", data, offset)[0]
             offset += struct.calcsize("<1H")
