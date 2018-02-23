@@ -15,11 +15,15 @@ img.logo{
 	margin-left: 10%;
 	display: content;
 }
+html{
+    height: 100%;
+}
 body{
 	background: var(--back2);
 	font-family:calibri; 
 	text-align: center;
 	color: white;
+	height: 100%;
 }
 
 div{    /*Defaults for all divs*/
@@ -41,7 +45,9 @@ div{    /*Defaults for all divs*/
 	margin: 10px;
 	text-align: left;
 }
-
+.main{
+	padding: 5px;
+}
 .half{
 	width: 50%;
 	margin: auto;	
@@ -52,7 +58,11 @@ div{    /*Defaults for all divs*/
 }
 
 #graph{
-    height: 1000px;
+    height: 80vh;
+    width: 93%;
+    margin-bottom: 50px;
+    padding-bottom: 50px;
+
 }
 
 nav ul{
@@ -217,5 +227,5 @@ img.delete{
 }
 
 footer{
-    bottom:0;
+    bottom:5%;
 }
