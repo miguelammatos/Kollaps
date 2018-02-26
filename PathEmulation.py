@@ -11,12 +11,14 @@ class PEState:
     shutdown = False
 
 def init(controll_port):
+    return 0
     with PEState.PathLock:
         if not PEState.shutdown:
             TCAL.init(controll_port)
 
 
 def initialize_path(path):
+    return 0
     """
     :param path: NetGraph.Path
     :return:
@@ -34,12 +36,14 @@ def initialize_path(path):
 
 
 def update_usage():
+    return 0
     with PEState.PathLock:
         if not PEState.shutdown:
             TCAL.updateUsage()
 
 
 def query_usage(service):
+    return 0
     """
     :param service: NetGraph.Service
     :return: int  # in bytes
@@ -52,6 +56,7 @@ def query_usage(service):
 
 
 def change_bandwidth(service, new_bandwidth):
+    return 0
     """
     :param service: NetGraph.Service
     :param new_bandwidth: int  # in Kbps
@@ -62,6 +67,7 @@ def change_bandwidth(service, new_bandwidth):
             TCAL.changeBandwidth(service.ip, int(new_bandwidth))
 
 def tearDown():
+    return 0
     with PEState.PathLock:
         PEState.shutdown = True
         TCAL.tearDown()

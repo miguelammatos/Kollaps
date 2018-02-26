@@ -58,10 +58,7 @@ def main():
     sys.stderr.flush()
 
     # Enter the emulation loop
-    #manager.emulation_loop()
-    while True:
-        sleep(10)
-
+    manager.emulation_loop()
 
 if __name__ == '__main__':
     main()
