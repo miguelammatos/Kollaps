@@ -9,6 +9,7 @@ import PathEmulation
 from socket import gethostname
 import netifaces
 import os, signal, sys
+from time import sleep
 
 def main():
     if len(sys.argv) != 2:
@@ -58,6 +59,9 @@ def main():
 
     # Enter the emulation loop
     #manager.emulation_loop()
+    while True:
+        sleep(10)
+
 
 if __name__ == '__main__':
     main()
