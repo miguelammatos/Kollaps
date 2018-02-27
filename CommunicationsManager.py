@@ -58,6 +58,7 @@ class CommunicationsManager:
 
         self.dashboard_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.dashboard_socket.bind(('0.0.0.0', CommunicationsManager.TCP_PORT))
+        self.dashboard_socket.settimeout(5)
 
         self.thread = Thread(target=self.receive_flows)
         self.thread.daemon = True
@@ -157,6 +158,10 @@ class CommunicationsManager:
 
                 elif command == CommunicationsManager.SHUTDOWN_COMMAND:
                     connection.send(struct.pack("<2Q", self.sent, self.received))
+                    ack = connection.recv(1)
+                    if struct.unpack("<1B", ack) != CommunicationsManager.ACK:
+                        connection.close()
+                        continue
                     connection.close()
                     self.dashboard_socket.close()
                     self.sock.close()

@@ -36,7 +36,7 @@ services:
       - outside
 
   client1:
-    image: warpenguin.no-ip.org/client:9.0
+    image: warpenguin.no-ip.org/client:9.2
     command: ['server1']
     hostname: client1
     labels:
@@ -56,7 +56,7 @@ services:
       - NEEDnet
 
   server1:
-    image: warpenguin.no-ip.org/server:9.0
+    image: warpenguin.no-ip.org/server:9.2
     hostname: server1
     labels:
       netsim: "true"
@@ -75,7 +75,7 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client:9.0
+    image: warpenguin.no-ip.org/client:9.2
     command: ['server2']
     hostname: client2
     labels:
@@ -95,7 +95,7 @@ services:
       - NEEDnet
 
   server2:
-    image: warpenguin.no-ip.org/server:9.0
+    image: warpenguin.no-ip.org/server:9.2
     hostname: server2
     labels:
       netsim: "true"
@@ -114,7 +114,7 @@ services:
       - NEEDnet
 
   client3:
-    image: warpenguin.no-ip.org/client:9.0
+    image: warpenguin.no-ip.org/client:9.2
     command: ['server3']
     hostname: client3
     labels:
@@ -134,7 +134,7 @@ services:
       - NEEDnet
 
   server3:
-    image: warpenguin.no-ip.org/server:9.0
+    image: warpenguin.no-ip.org/server:9.2
     hostname: server3
     labels:
       netsim: "true"

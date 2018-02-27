@@ -111,6 +111,7 @@ def stopExperiment():
             s.connect((host.ip, CommunicationsManager.TCP_PORT))
             s.send(struct.pack("<1B", CommunicationsManager.SHUTDOWN_COMMAND))
             data = s.recv(64)
+            s.send("<1B", CommunicationsManager.ACK)
             s.close()
             data_tuple = struct.unpack("<2Q", data)
             sent += data_tuple[0]
@@ -125,7 +126,10 @@ def stopExperiment():
 
     with DashboardState.lock:
         received += DashboardState.comms.received
-        DashboardState.lost_metadata = 1-(received/sent)
+        if received == 0 or sent == 0:
+            DashboardState.lost_metadata = 1
+        else:
+            DashboardState.lost_metadata = 1-(received/sent)
         DashboardState.stopping = False
 
 def startExperiment():
