@@ -58,7 +58,6 @@ class CommunicationsManager:
 
         self.dashboard_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.dashboard_socket.bind(('0.0.0.0', CommunicationsManager.TCP_PORT))
-        self.dashboard_socket.settimeout(5)
 
         self.thread = Thread(target=self.receive_flows)
         self.thread.daemon = True
@@ -147,33 +146,37 @@ class CommunicationsManager:
         self.dashboard_socket.listen(1)
         while True:
             connection, addr = self.dashboard_socket.accept()
-            data = connection.recv(1)
-            if data:
-                command = struct.unpack("<1B", data)[0]
-                if command == CommunicationsManager.STOP_COMMAND:
-                    stop_experiment()
-                    with self.stop_lock:
-                        self.stop = True
-                    connection.close()
-
-                elif command == CommunicationsManager.SHUTDOWN_COMMAND:
-                    connection.send(struct.pack("<2Q", self.sent, self.received))
-                    ack = connection.recv(1)
-                    if struct.unpack("<1B", ack) != CommunicationsManager.ACK:
+            connection.settimeout(5)
+            try:
+                data = connection.recv(1)
+                if data:
+                    command = struct.unpack("<1B", data)[0]
+                    if command == CommunicationsManager.STOP_COMMAND:
                         connection.close()
-                        continue
-                    connection.close()
-                    self.dashboard_socket.close()
-                    self.sock.close()
-                    PathEmulation.tearDown()
-                    interrupt_main()
+                        with self.stop_lock:
+                            self.stop = True
+                        stop_experiment()
+                        PathEmulation.tearDown()
 
-                elif command == CommunicationsManager.READY_COMMAND:
-                    connection.send(struct.pack("<1B", CommunicationsManager.ACK))
-                    connection.close()
+                    elif command == CommunicationsManager.SHUTDOWN_COMMAND:
+                        connection.send(struct.pack("<2Q", self.sent, self.received))
+                        ack = connection.recv(1)
+                        if struct.unpack("<1B", ack) != CommunicationsManager.ACK:
+                            connection.close()
+                            continue
+                        connection.close()
+                        self.dashboard_socket.close()
+                        self.sock.close()
+                        interrupt_main()
 
-                elif command == CommunicationsManager.START_COMMAND:
-                    connection.close()
-                    print("Starting Experiment!")
-                    start_experiment()
+                    elif command == CommunicationsManager.READY_COMMAND:
+                        connection.send(struct.pack("<1B", CommunicationsManager.ACK))
+                        connection.close()
+
+                    elif command == CommunicationsManager.START_COMMAND:
+                        connection.close()
+                        print("Starting Experiment!")
+                        start_experiment()
+            except OSError as e:
+                continue  # Connection timed out (most likely)
 
