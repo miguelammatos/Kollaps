@@ -111,7 +111,7 @@ def stopExperiment():
             s.connect((host.ip, CommunicationsManager.TCP_PORT))
             s.send(struct.pack("<1B", CommunicationsManager.SHUTDOWN_COMMAND))
             data = s.recv(64)
-            s.send("<1B", CommunicationsManager.ACK)
+            s.send(struct.pack("<1B", CommunicationsManager.ACK))
             s.close()
             data_tuple = struct.unpack("<2Q", data)
             sent += data_tuple[0]
