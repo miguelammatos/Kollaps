@@ -151,7 +151,6 @@ class CommunicationsManager:
                 command = struct.unpack("<1B", data)[0]
                 if command == CommunicationsManager.STOP_COMMAND:
                     stop_experiment()
-                    PathEmulation.tearDown()
                     with self.stop_lock:
                         self.stop = True
                     connection.close()
@@ -161,6 +160,7 @@ class CommunicationsManager:
                     connection.close()
                     self.dashboard_socket.close()
                     self.sock.close()
+                    PathEmulation.tearDown()
                     interrupt_main()
 
                 elif command == CommunicationsManager.READY_COMMAND:
