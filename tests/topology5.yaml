@@ -16,7 +16,7 @@ services:
       - NEEDnet
 
   dashboard:
-    image: warpenguin.no-ip.org/dashboard:4.5
+    image: warpenguin.no-ip.org/dashboard:4.8
     ports:
       - "8088:8088"
     hostname: dashboard
@@ -36,7 +36,7 @@ services:
       - outside
 
   client1:
-    image: warpenguin.no-ip.org/client:8.2
+    image: warpenguin.no-ip.org/client:10.0
     command: ['server']
     hostname: client1
     labels:
@@ -46,6 +46,8 @@ services:
       placement:
         constraints:
           - node.labels.gigabit == true
+    volumes:
+      - "/tmp/eval:/var/log/eval"
     configs:
       - source: topology
         target: /topology.xml
@@ -56,7 +58,7 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client:8.2
+    image: warpenguin.no-ip.org/client:10.0
     command: ['server']
     hostname: client2
     labels:
@@ -66,6 +68,8 @@ services:
       placement:
         constraints:
           - node.labels.gigabit == true
+    volumes:
+      - "/tmp/eval:/var/log/eval"
     configs:
       - source: topology
         target: /topology.xml
@@ -76,7 +80,7 @@ services:
       - NEEDnet
 
   client3:
-    image: warpenguin.no-ip.org/client:8.2
+    image: warpenguin.no-ip.org/client:10.0
     command: ['server']
     hostname: client3
     labels:
@@ -86,6 +90,8 @@ services:
       placement:
         constraints:
           - node.labels.gigabit == true
+    volumes:
+      - "/tmp/eval:/var/log/eval"
     configs:
       - source: topology
         target: /topology.xml
@@ -96,7 +102,7 @@ services:
       - NEEDnet
 
   server:
-    image: warpenguin.no-ip.org/server:8.2
+    image: warpenguin.no-ip.org/server:9.4
     hostname: server
     labels:
       netsim: "true"
