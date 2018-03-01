@@ -56,9 +56,13 @@ def trim(n, *d):
 
 
 def main():
-    client1_file = "0505de112bc529cd58065605de043de2c54e42e307b4cf0ad5ecb30cf97da90d.log"
-    client2_file = "8f1ca8f9ae1d79895f49c7fc285fbe9adc6305d25d2d50e3fc5e5d10cd9981b1.log"
-    client3_file = "0183ccfa2687d762f62ed01beb2ba4c4cc50afeb4c9c5b01e6d9a7320d70806f.log"
+    # client1_file = "0505de112bc529cd58065605de043de2c54e42e307b4cf0ad5ecb30cf97da90d.log"
+    # client2_file = "8f1ca8f9ae1d79895f49c7fc285fbe9adc6305d25d2d50e3fc5e5d10cd9981b1.log"
+    # client3_file = "0183ccfa2687d762f62ed01beb2ba4c4cc50afeb4c9c5b01e6d9a7320d70806f.log"
+
+    client1_file = "c1.log"
+    client2_file = "c2.log"
+    client3_file = "c3.log"
 
     f = open(client1_file)
     d1 = parse_iperf(f)
@@ -81,8 +85,8 @@ def main():
     c3 = numpy.array([x[1] for x in d3])
     s = c1+c2+c3
 
-    data = [("Client1", c1, 19761),
-            ("Client2", c2, 20238),
+    data = [("Client1", c1, 17777),
+            ("Client2", c2, 22222),
             ("Client3", c3, 10000),
             ("Total", s, 50000)]
 
