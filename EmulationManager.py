@@ -1,5 +1,6 @@
 from time import time, sleep
 from threading import Lock
+from itertools import islice
 
 from NetGraph import NetGraph
 import PathEmulation
@@ -109,10 +110,8 @@ class EmulationManager:
         for path in self.active_paths:
             max_bandwidth = path.max_bandwidth
             for link in path.links:
-                used_bandwidth = 0
                 rtt_reverse_sum = 0
                 for flow in link.flows:
-                    used_bandwidth += flow[BW]
                     rtt_reverse_sum += (1.0/flow[RTT])
                 max_bandwidth_on_link = []
                 # calculate the bandwidth for everyone
@@ -122,8 +121,8 @@ class EmulationManager:
                 # Maximize link utilization to 100%
                 spare_bw = link.bandwidth_Kbps - max_bandwidth_on_link[0]
                 our_share = max_bandwidth_on_link[0]/link.bandwidth_Kbps
-                hungry_usage_sum = our_share
-                for i, flow in enumerate(link.flows[1:]):
+                hungry_usage_sum = our_share  # We must be out of the loop to avoid division by zero
+                for i, flow in islice(enumerate(link.flows), 1, None):
                     # Check if a flow is "hungry" (wants more than its allocated share)
                     if flow[BW] > max_bandwidth_on_link[i]:
                         spare_bw -= max_bandwidth_on_link[i]

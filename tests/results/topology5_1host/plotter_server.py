@@ -5,12 +5,13 @@ import re
 timestamp_re = re.compile(r"^\d+$")
 throughput_re = re.compile(r"\[.*\]\s*(\d+)\.\d+-\d+\.\d+\s+sec\s+[0-9\.]+\s+\w+\s+([0-9\.]+)\s+(\w+)/sec\s+(\d+)\s+[0-9\.]+\s+\w+")
 throughput_server_re = re.compile(r"^\[.*\]\s*(\d+)\.\d+-\d+\.\d+\s+sec\s+[0-9\.]+\s+\w+\s+([0-9\.]+)\s+(\w+)/sec\s*$")
+throughput_server_udp_re = re.compile(r"^\[.*\]\s*(\d+)\.\d+-\d+\.\d+\s+sec\s+[0-9\.]+\s+\w+\s+([0-9\.]+)\s+(\w+)\/sec\s+[0-9\.]+\s+ms\s+\d+\/\d+\s+\(\d+\%\)\s+$")
 Kbps_re = re.compile(r"^Kbits")
 Mbps_re = re.compile(r"^Mbits")
 bps_re = re.compile(r"^bits")
 
 
-def parse_iperf(client, server):
+def parse_iperf(client, server, udp):
     start_timestamp = 0
     Kbps = []
     lines = client.readlines()
@@ -19,9 +20,15 @@ def parse_iperf(client, server):
             start_timestamp = int(line.strip())  # get the last timestamp
 
     lines = server.readlines()
+
+    if udp:
+        thput_re = throughput_server_udp_re
+    else:
+        thput_re = throughput_server_re
+
     for line in lines:
-        if throughput_server_re.match(line):
-            matches = throughput_server_re.findall(line)[0]
+        if thput_re.match(line):
+            matches = thput_re.findall(line)[0]
             if Kbps_re.match(matches[2]):
                 multiplier = 1
             elif Mbps_re.match(matches[2]):
@@ -61,7 +68,8 @@ def trim(n, *d):
 
 def main():
 
-    folder = "run6_server/"
+    folder = "run7_EWMA/"
+    udp = False
 
     client1_file = folder+"c1.log"
     client2_file = folder+"c2.log"
@@ -73,19 +81,19 @@ def main():
 
     fc = open(client1_file)
     fs = open(server1_file)
-    d1 = parse_iperf(fc, fs)
+    d1 = parse_iperf(fc, fs, udp)
     fc.close()
     fs.close()
 
     fc = open(client2_file)
     fs = open(server2_file)
-    d2 = parse_iperf(fc, fs)
+    d2 = parse_iperf(fc, fs, udp)
     fc.close()
     fs.close()
 
     fc = open(client3_file)
     fs = open(server3_file)
-    d3 = parse_iperf(fc, fs)
+    d3 = parse_iperf(fc, fs, udp)
     fc.close()
     fs.close()
 
