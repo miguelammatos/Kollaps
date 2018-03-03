@@ -11,17 +11,25 @@ if sys.version_info >= (3, 0):
 
 class EmulationManager:
 
+    # Generic loop tuning
     ERROR_MARGIN = 0.01  # in percent
     POOL_PERIOD = 0.05 # in seconds
+
+    # Exponential weighted moving average tuning
+    AVERAGE_ERASE_ITERATIONS = 100 # clear every 5 seconds
+    ALPHA = 0.125
+    ONE_MINUS_ALPHA = 1-ALPHA
 
     def __init__(self, graph):
         self.graph = graph  # type: NetGraph
         self.active_links = {}  # type: Dict[int, NetGraph.Link]
         self.active_paths = []
         self.repeat_detection = {}
+        self.moving_averages = {}
         self.state_lock = Lock()
         self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
+        self.iterations = 0
 
     def initialize(self):
         PathEmulation.init(CommunicationsManager.UDP_PORT)
@@ -44,6 +52,7 @@ class EmulationManager:
 
 
     def reset_flow_state(self):
+        self.iterations += 1
         for link_index in self.active_links:
             link = self.active_links[link_index]
             del link.flows[:]
@@ -51,6 +60,10 @@ class EmulationManager:
         self.active_links.clear()
         del self.active_paths[:]
         self.repeat_detection.clear()
+
+        if self.iterations > EmulationManager.AVERAGE_ERASE_ITERATIONS:
+            self.moving_averages.clear()
+            self.iterations = 0
 
     def check_active_flows(self):
         PathEmulation.update_usage()
@@ -131,10 +144,15 @@ class EmulationManager:
                 path.current_bandwidth = max_bandwidth
 
     def collect_flow(self, bandwidth, link_indices):
+        """
+        :param bandwidth:
+        :param link_indices:
+        :return: Whether or not the packet is useful (not duplicated)
+        """
         key = str(link_indices[0]) + ":" + str(link_indices[-1])
         with self.state_lock:
             if key in self.repeat_detection:
-                return
+                return False
             else:
                 self.repeat_detection[key] = True
             concurrent_links = []
@@ -148,5 +166,13 @@ class EmulationManager:
 
             # If we are sharing links, then update them with this flows bandwidth usage and RTT
             if len(concurrent_links) > 0:
+                if key in self.moving_averages:
+                    self.moving_averages[key] = EmulationManager.ONE_MINUS_ALPHA * self.moving_averages[key] +\
+                                                EmulationManager.ALPHA * bandwidth
+                else:
+                    self.moving_averages[key] = bandwidth
+                averaged_bandwidth = self.moving_averages[key]
+
                 for link in concurrent_links:
-                    link.flows.append((rtt, bandwidth))
+                    link.flows.append((rtt, averaged_bandwidth))
+        return True

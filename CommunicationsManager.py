@@ -126,10 +126,10 @@ class CommunicationsManager:
     def receive_flows(self):
         while True:
             data, addr = self.sock.recvfrom(CommunicationsManager.BUFFER_LEN)
-            self.received += 1
             offset = 0
             num_of_flows = struct.unpack_from("<1H", data, offset)[0]
             offset += struct.calcsize("<1H")
+            accepted = False
             for i in range(num_of_flows):
                 bandwidth = struct.unpack_from("<1i", data, offset)[0]
                 offset += struct.calcsize("<1i")
@@ -140,7 +140,10 @@ class CommunicationsManager:
                     index = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
                     offset += struct.calcsize("<1"+self.link_unit)
                     links.append(index)
-                self.flow_collector(bandwidth, links)
+
+                accepted = accepted or self.flow_collector(bandwidth, links)
+            if accepted:
+                self.received += 1  # only count a packet as received if it is not dropped by the emulation manager
 
     def receive_dashboard_commands(self):
         self.dashboard_socket.listen(1)
