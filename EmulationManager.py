@@ -53,7 +53,6 @@ class EmulationManager:
     def recover_out_of_sync_flows(self):
         # recover flows that were marked as repeated last iteration
         for key in self.out_of_sync_flows:
-            print("recovering " + key)
             args = self.out_of_sync_flows[key]
             bandwidth = args[0]
             link_indices = args[1]
