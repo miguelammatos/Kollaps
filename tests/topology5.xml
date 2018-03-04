@@ -2,10 +2,10 @@
 <experiment>
 	<services>
 		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:4.9" supervisor="true" />
-		<service name="client1" image="warpenguin.no-ip.org/client:10.7" command="['server']"/>
-		<service name="client2" image="warpenguin.no-ip.org/client:10.7" command="['server']"/>
-		<service name="client3" image="warpenguin.no-ip.org/client:10.7" command="['server']"/>
-		<service name="server" image="warpenguin.no-ip.org/server:10.7" replicas="3" share="false"/>
+		<service name="client1" image="warpenguin.no-ip.org/client:10.8" command="['server']"/>
+		<service name="client2" image="warpenguin.no-ip.org/client:10.8" command="['server']"/>
+		<service name="client3" image="warpenguin.no-ip.org/client:10.8" command="['server']"/>
+		<service name="server" image="warpenguin.no-ip.org/server:10.8" replicas="3" share="false"/>
 	</services>
 	<bridges>
                 <bridge name="s1"/>
