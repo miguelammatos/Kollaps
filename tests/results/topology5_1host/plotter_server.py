@@ -33,11 +33,11 @@ def parse_iperf(client, server, udp):
         if thput_re.match(line):
             matches = thput_re.findall(line)[0]
             if Kbps_re.match(matches[2]):
-                multiplier = 1
-            elif Mbps_re.match(matches[2]):
                 multiplier = 1000
+            elif Mbps_re.match(matches[2]):
+                multiplier = 1000000
             elif bps_re.match(matches[2]):
-                multiplier = 1.0/1000.0
+                multiplier = 1.0
             else:
                 raise Exception("Throughput not in Kbps or Mbps or bps")
             Kbps.append((int(matches[0])+start_timestamp, float(matches[1])*multiplier))
@@ -172,7 +172,6 @@ def main():
     gnuplot_data.append(gdsum)
 
 
-    g.plot(*gnuplot_data)
 
     for i, gd in enumerate(gnuplot_data):
         print(gd.get_option("title"))
@@ -180,6 +179,15 @@ def main():
         print(" max:      " + str(numpy_arrays[i].max()))
         print(" min:      " + str(numpy_arrays[i].min()))
         print(" dev:      " + str(numpy_arrays[i].std()))
+
+
+    g('set xlabel "Seconds"')
+    g('set ylabel "Throughput"')
+    g('set xtics 25')
+    g('set format y "%.0s%cbit/s"')
+    g('set ytics 10000000')
+    g('set mytics 10')
+    g.plot(*gnuplot_data)
 
 if __name__ == '__main__':
     main()
