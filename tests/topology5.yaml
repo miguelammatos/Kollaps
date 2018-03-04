@@ -16,7 +16,7 @@ services:
       - NEEDnet
 
   dashboard:
-    image: warpenguin.no-ip.org/dashboard:4.8
+    image: warpenguin.no-ip.org/dashboard:4.9
     ports:
       - "8088:8088"
     hostname: dashboard
@@ -36,7 +36,7 @@ services:
       - outside
 
   client1:
-    image: warpenguin.no-ip.org/client_udp:10.5
+    image: warpenguin.no-ip.org/client:10.7
     command: ['server']
     hostname: client1
     labels:
@@ -58,7 +58,7 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client_udp:10.5
+    image: warpenguin.no-ip.org/client:10.7
     command: ['server']
     hostname: client2
     labels:
@@ -80,7 +80,7 @@ services:
       - NEEDnet
 
   client3:
-    image: warpenguin.no-ip.org/client_udp:10.5
+    image: warpenguin.no-ip.org/client:10.7
     command: ['server']
     hostname: client3
     labels:
@@ -102,7 +102,7 @@ services:
       - NEEDnet
 
   server:
-    image: warpenguin.no-ip.org/server:10.5
+    image: warpenguin.no-ip.org/server:10.7
     hostname: server
     labels:
       netsim: "true"

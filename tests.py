@@ -4,7 +4,7 @@ from XMLGraphParser import XMLGraphParser
 from EmulationManager import EmulationManager
 from utils import fail
 
-from random import randrange, seed
+from random import randrange, seed, uniform
 import PathEmulation
 from CommunicationsManager import CommunicationsManager
 
@@ -130,7 +130,7 @@ class MockFlowDisseminator:
         #    print("    " + str(i))
         #self.concurrency_timer -= 1
         #if self.concurrency_timer > 0:
-        Timer(0.025, self.receive_flows, args=([],)).start()
+        Timer(0.05 + uniform(-0.005, 0.005), self.receive_flows, args=([],)).start()
 
 def setup_mocking():
     PathEmulation.init = mock_init

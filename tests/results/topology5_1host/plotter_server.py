@@ -68,7 +68,7 @@ def trim(n, *d):
 
 def main():
 
-    folder = "run7_EWMA/"
+    folder = "run8/"
     udp = False
 
     client1_file = folder+"c1.log"

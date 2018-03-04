@@ -8,7 +8,7 @@ from CommunicationsManager import CommunicationsManager
 
 import sys
 if sys.version_info >= (3, 0):
-    from typing import Dict, List
+    from typing import Dict, List, Tuple
 
 class EmulationManager:
 
@@ -17,20 +17,18 @@ class EmulationManager:
     POOL_PERIOD = 0.05 # in seconds
 
     # Exponential weighted moving average tuning
-    AVERAGE_ERASE_ITERATIONS = 100 # clear every 5 seconds
     ALPHA = 0.125
     ONE_MINUS_ALPHA = 1-ALPHA
 
     def __init__(self, graph):
         self.graph = graph  # type: NetGraph
         self.active_links = {}  # type: Dict[int, NetGraph.Link]
-        self.active_paths = []
-        self.repeat_detection = {}
-        self.moving_averages = {}
+        self.active_paths = []  # type: List[NetGraph.Path]
+        self.repeat_detection = {}  # type: Dict[str, bool]
+        self.out_of_sync_flows = {}  # type: Dict[str, Tuple[int, List[int]]]
         self.state_lock = Lock()
         self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
-        self.iterations = 0
 
     def initialize(self):
         PathEmulation.init(CommunicationsManager.UDP_PORT)
@@ -48,12 +46,23 @@ class EmulationManager:
                 self.recalculate_path_bandwidths()
                 self.reset_flow_state()
                 self.check_active_flows()
+                self.recover_out_of_sync_flows()
             self.comms.broadcast_flows(self.active_paths)
             sleep(EmulationManager.POOL_PERIOD)
 
+    def recover_out_of_sync_flows(self):
+        # recover flows that were marked as repeated last iteration
+        for key in self.out_of_sync_flows:
+            print("recovering " + key)
+            args = self.out_of_sync_flows[key]
+            bandwidth = args[0]
+            link_indices = args[1]
+            key = str(link_indices[0]) + ":" + str(link_indices[-1])
+            self.add_flow(bandwidth, link_indices)
+            self.repeat_detection[key] = True
+        self.out_of_sync_flows.clear()
 
     def reset_flow_state(self):
-        self.iterations += 1
         for link_index in self.active_links:
             link = self.active_links[link_index]
             del link.flows[:]
@@ -61,10 +70,6 @@ class EmulationManager:
         self.active_links.clear()
         del self.active_paths[:]
         self.repeat_detection.clear()
-
-        if self.iterations > EmulationManager.AVERAGE_ERASE_ITERATIONS:
-            self.moving_averages.clear()
-            self.iterations = 0
 
     def check_active_flows(self):
         PathEmulation.update_usage()
@@ -129,7 +134,6 @@ class EmulationManager:
                         hungry_usage_sum += max_bandwidth_on_link[i]/link.bandwidth_Kbps
                     else:
                         spare_bw -= flow[BW]
-
                 normalized_share = our_share/hungry_usage_sum  # we get a share of the spare proportional to our RTT
                 max_bandwidth_on_link[0] += (normalized_share*spare_bw)
 
@@ -142,36 +146,42 @@ class EmulationManager:
                 PathEmulation.change_bandwidth(path.links[-1].destination, max_bandwidth)
                 path.current_bandwidth = max_bandwidth
 
+    def add_flow(self, bandwidth, link_indices):
+        """
+        :param bandwidth: int
+        :param link_indices: List[int]
+        """
+        concurrent_links = []
+        # Calculate RTT of this flow and check if we are sharing any link with it
+        rtt = 0
+        for index in link_indices:
+            link = self.graph.links[index]
+            rtt += (link.latency*2)
+            if index in self.active_links:
+                concurrent_links.append(link)
+
+        # If we are sharing links, then update them with this flows bandwidth usage and RTT
+        if len(concurrent_links) > 0:
+            for link in concurrent_links:
+                link.flows.append((rtt, bandwidth))
+
     def collect_flow(self, bandwidth, link_indices):
         """
-        :param bandwidth:
-        :param link_indices:
+        :param bandwidth: int
+        :param link_indices: List[int]
         :return: Whether or not the packet is useful (not duplicated)
         """
         key = str(link_indices[0]) + ":" + str(link_indices[-1])
         with self.state_lock:
             if key in self.repeat_detection:
-                return False
+                if key in self.out_of_sync_flows:  # Buffer at most 1 out of sync flow
+                    return False
+                else:
+                    self.out_of_sync_flows[key] = (bandwidth, link_indices)
+                    return True
             else:
                 self.repeat_detection[key] = True
-            concurrent_links = []
-            # Calculate RTT of this flow and check if we are sharing any link with it
-            rtt = 0
-            for index in link_indices:
-                link = self.graph.links[index]
-                rtt += (link.latency*2)
-                if index in self.active_links:
-                    concurrent_links.append(link)
 
-            # If we are sharing links, then update them with this flows bandwidth usage and RTT
-            if len(concurrent_links) > 0:
-                if key in self.moving_averages:
-                    self.moving_averages[key] = EmulationManager.ONE_MINUS_ALPHA * self.moving_averages[key] +\
-                                                EmulationManager.ALPHA * bandwidth
-                else:
-                    self.moving_averages[key] = bandwidth
-                averaged_bandwidth = self.moving_averages[key]
+            self.add_flow(bandwidth, link_indices)
 
-                for link in concurrent_links:
-                    link.flows.append((rtt, averaged_bandwidth))
         return True
