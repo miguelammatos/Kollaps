@@ -1,5 +1,0 @@
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.gigabit == true
