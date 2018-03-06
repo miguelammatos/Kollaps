@@ -1,0 +1,8 @@
+set terminal x11
+set xlabel "Seconds"
+set ylabel "Throughput"
+set xtics 25
+set format y "%.0s%cbit/s"
+set ytics 10000000
+set mytics 10
+plot "/tmp/tmptGpB1B.gnuplot/fifo" title "Client1" with lines, "/tmp/tmp4apAbm.gnuplot/fifo" title "Client2" with lines, "/tmp/tmpaZZsOB.gnuplot/fifo" title "Client3" with lines, "/tmp/tmpiIr0CB.gnuplot/fifo" title "Total" with lines

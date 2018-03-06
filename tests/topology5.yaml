@@ -36,7 +36,7 @@ services:
       - outside
 
   client1:
-    image: warpenguin.no-ip.org/client:10.8
+    image: warpenguin.no-ip.org/client_ping:10.8
     command: ['server']
     hostname: client1
     labels:
@@ -58,7 +58,7 @@ services:
       - NEEDnet
 
   client2:
-    image: warpenguin.no-ip.org/client:10.8
+    image: warpenguin.no-ip.org/client_ping:10.8
     command: ['server']
     hostname: client2
     labels:
@@ -80,7 +80,7 @@ services:
       - NEEDnet
 
   client3:
-    image: warpenguin.no-ip.org/client:10.8
+    image: warpenguin.no-ip.org/client_ping:10.8
     command: ['server']
     hostname: client3
     labels:

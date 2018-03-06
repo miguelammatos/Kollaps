@@ -113,11 +113,15 @@ def pad(*d):
 def main():
 
     ### CONFIGURATION #####
-    #folder = "run6_server/"
+    folder = "run6_server/"
     #folder = "run7_EWMA/"
     #folder = "run8/"
-    folder = "run9_sync_buffers/"
+    #folder = "run9_sync_buffers/"
     interesting_files = "*.log"
+    line_data_file = folder+"lines.dat"
+    bar_data_file = folder+"bars.dat"
+    line_plot_file = folder+"lines.gp"
+    bars_plot_file = folder+"bars.gp"
     udp = False
     #######################
 
@@ -151,10 +155,10 @@ def main():
     overlap(*data_sets)
     trim(60, 60, *data_sets)
 
-    g = Gnuplot.Gnuplot()
+    lines_file = open(line_data_file, mode="w")
+    bars_file = open(bar_data_file, mode="w")
 
     numpy_arrays = []
-    gnuplot_data = []
     total = None
     for i, data in enumerate(data_sets):
         name = "Client"+str(i+1)
@@ -164,30 +168,68 @@ def main():
         else:
             total += c
         numpy_arrays.append(c)
-        gd = Gnuplot.Data(c, title=name, with_="lines")
-        gnuplot_data.append(gd)
+        print(name)
+        print(" mean:     " + str(c.mean()))
+        print(" max:      " + str(c.max()))
+        print(" min:      " + str(c.min()))
+        print(" dev:      " + str(c.std()))
 
     numpy_arrays.append(total)
-    gdsum = Gnuplot.Data(total, title="Total", with_="lines")
-    gnuplot_data.append(gdsum)
+    print("Total")
+    print(" mean:     " + str(total.mean()))
+    print(" max:      " + str(total.max()))
+    print(" min:      " + str(total.min()))
+    print(" dev:      " + str(total.std()))
 
+    for i in range(len(numpy_arrays[0])):
+        line = str(i)
+        for j in range(len(numpy_arrays)):
+            line += "     " + str(numpy_arrays[j][i])
+        lines_file.write(line + "\n")
+    lines_file.close()
 
+    for i in range(len(numpy_arrays)):
+        if i < len(numpy_arrays)-1:
+            name = "Client" + str(i+1)
+        else:
+            name = "Total"
+        bars_file.write(name + "     " +
+                        str(numpy_arrays[i].mean()) + "     " +
+                        str(numpy_arrays[i].max()) +  "     " +
+                        str(numpy_arrays[i].min()) +  "\n")
 
-    for i, gd in enumerate(gnuplot_data):
-        print(gd.get_option("title"))
-        print(" mean:     " + str(numpy_arrays[i].mean()))
-        print(" max:      " + str(numpy_arrays[i].max()))
-        print(" min:      " + str(numpy_arrays[i].min()))
-        print(" dev:      " + str(numpy_arrays[i].std()))
+    bars_file.close()
 
+    lplot_file = open(line_plot_file, mode="w")
+    plot_lines = []
+    plot_lines.append('set xlabel "Seconds"')
+    plot_lines.append('set ylabel "Throughput"')
+    plot_lines.append('set xtics 25')
+    plot_lines.append('set format y "%.0s%cbit/s"')
+    plot_lines.append('set ytics 10000000')
+    plot_lines.append('set mytics 10')
+    plot_line = 'plot'
+    for i in range(1, len(numpy_arrays)):
+        plot_line += ' "lines.dat" using 1:' + str(i+1) + " title 'Client" + str(i) + "' with lines,"
 
-    g('set xlabel "Seconds"')
-    g('set ylabel "Throughput"')
-    g('set xtics 25')
-    g('set format y "%.0s%cbit/s"')
-    g('set ytics 10000000')
-    g('set mytics 10')
-    g.plot(*gnuplot_data)
+    plot_line += ' "lines.dat" using 1:' + str(len(numpy_arrays)+1) + " title 'Total' with lines"
+    plot_lines.append(plot_line)
+    lplot_file.writelines([l+"\n" for l in plot_lines])
+    lplot_file.close()
+
+    bplot_file = open(bars_plot_file, mode="w")
+    plot_lines = []
+    plot_lines.append('set ylabel "Throughput"')
+    plot_lines.append('set format y "%.0s%cbit/s"')
+    plot_lines.append('set ytics 10000000')
+    plot_lines.append('set mytics 10')
+    plot_lines.append('set style data histogram')
+    plot_lines.append('set style histogram errorbars gap 1 lw 1')
+    plot_lines.append('set style fill solid 0.5')
+    plot_lines.append('set boxwidth 0.9')
+    plot_lines.append('plot "bars.dat" using 2:3:4:xtic(1) lc rgb "#DAA520" title "Mean throughput"')
+    bplot_file.writelines([l+"\n" for l in plot_lines])
+    bplot_file.close()
 
 if __name__ == '__main__':
     main()
