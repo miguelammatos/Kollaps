@@ -4,7 +4,7 @@
 
 1. Create a docker swarm network (only overlay and macvlan have been tested) (check cluster-deployments/ansible/network for a playbook for configuring a swarm macvlan network on a cluster)
 
-2. Write a topology file or use one from the  folder. (The network attribute of all the links must correspond to an existing docker swarm network configuration.) (All the links must use the same network, this is due to a current limitation of TCAL)
+2. Write a topology file or use one from the https://github.com/joaoneves792/NEED_Evaluation repository. (The network attribute of all the links must correspond to an existing docker swarm network configuration.) (All the links must use the same network, this is due to a current limitation of TCAL)
 
 ## Building the images
 
