@@ -79,6 +79,7 @@ def stopExperiment():
             DashboardState.stopping = True
     sent = 0
     received = 0
+    received += DashboardState.comms.received
 
     to_kill = []
     for node in DashboardState.hosts:
@@ -118,6 +119,10 @@ def stopExperiment():
             received += data_tuple[1]
             with DashboardState.lock:
                 host.status = 'Down'
+                if sent > 0:
+                    DashboardState.lost_metadata = 1-(received/sent)
+                else:
+                    DashboardState.lost_metadata = 0
                 continue
         except OSError as e:
             print(e)
@@ -125,11 +130,6 @@ def stopExperiment():
             sleep(0.5)
 
     with DashboardState.lock:
-        received += DashboardState.comms.received
-        if received == 0 or sent == 0:
-            DashboardState.lost_metadata = 1
-        else:
-            DashboardState.lost_metadata = 1-(received/sent)
         DashboardState.stopping = False
 
 def startExperiment():

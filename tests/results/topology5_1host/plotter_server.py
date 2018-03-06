@@ -131,10 +131,11 @@ def main():
 
     ### CONFIGURATION #####
     #folder = "run6_server/"
-    folder = "run7_EWMA/"
+    #folder = "run7_EWMA/"
     #folder = "run8/"
     #folder = "run9_sync_buffers/"
     #folder = "run_ping/"
+    folder = "run1/"
     interesting_files = "*.log"
     line_data_file = folder+"lines.dat"
     bar_data_file = folder+"bars.dat"

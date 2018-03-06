@@ -14,7 +14,8 @@ class EmulationManager:
 
     # Generic loop tuning
     ERROR_MARGIN = 0.01  # in percent
-    POOL_PERIOD = 0.05 # in seconds
+    #POOL_PERIOD = 0.05 # in seconds
+    POOL_PERIOD = 0.1 # in seconds
 
     # Exponential weighted moving average tuning
     ALPHA = 0.125

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <experiment>
 	<services>
-		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:4.5" supervisor="true" />
-		<service name="client1" image="warpenguin.no-ip.org/client:8.2" command="['server1']" replicas="10"/>
-		<service name="server1" image="warpenguin.no-ip.org/server:8.2" replicas="10"/>
-		<service name="client2" image="warpenguin.no-ip.org/client:8.2" command="['server2']" replicas="10"/>
-		<service name="server2" image="warpenguin.no-ip.org/server:8.2" replicas="10"/>
-		<service name="client3" image="warpenguin.no-ip.org/client:8.2" command="['server3']" replicas="10"/>
-		<service name="server3" image="warpenguin.no-ip.org/server:8.2" replicas="10"/>
+		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:4.9" supervisor="true" />
+		<service name="client1" image="warpenguin.no-ip.org/client:10.8" command="['server1']" replicas="10"/>
+		<service name="server1" image="warpenguin.no-ip.org/server:10.8" replicas="10"/>
+		<service name="client2" image="warpenguin.no-ip.org/client:10.8" command="['server2']" replicas="10"/>
+		<service name="server2" image="warpenguin.no-ip.org/server:10.8" replicas="10"/>
+		<service name="client3" image="warpenguin.no-ip.org/client:10.8" command="['server3']" replicas="10"/>
+		<service name="server3" image="warpenguin.no-ip.org/server:10.8" replicas="10"/>
 	</services>
 	<bridges>
                 <bridge name="s1"/>
