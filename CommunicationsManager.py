@@ -38,8 +38,9 @@ class CommunicationsManager:
     def __init__(self, flow_collector, graph):
         self.graph = graph  # type: NetGraph
         self.flow_collector = flow_collector
-        self.sent = 0
+        self.produced = 0
         self.received = 0
+        self.consumed = 0
         self.stop_lock = Lock()
         self.stop = False
 
@@ -52,6 +53,14 @@ class CommunicationsManager:
         #    self.link_unit = "I"
         else:
             fail("Topology has too many links: " + str(link_count))
+
+        self.broadcast_group = []
+        for service in self.graph.services:
+            hosts = self.graph.services[service]
+            for host in hosts:
+                if host != self.graph.root:
+                    self.broadcast_group.append(host.ip)
+
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('0.0.0.0', CommunicationsManager.UDP_PORT))
@@ -114,12 +123,9 @@ class CommunicationsManager:
                     struct.pack_into("<1"+self.link_unit, data, accumulated_size, link.index)
                     accumulated_size += struct.calcsize("<1"+self.link_unit)
 
-            for service in self.graph.services:
-                hosts = self.graph.services[service]
-                for host in hosts:
-                    if host != self.graph.root:
-                        self.broadcast_socket.sendto(data, (host.ip, CommunicationsManager.UDP_PORT))
-                        self.sent += 1
+            for ip in self.broadcast_group:
+                self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
+            self.produced += len(self.broadcast_group)
 
     def receive_flows(self):
         while True:
@@ -141,7 +147,8 @@ class CommunicationsManager:
 
                 accepted = accepted or self.flow_collector(bandwidth, links)
             if accepted:
-                self.received += 1  # only count a packet as received if it is not dropped by the emulation manager
+                self.consumed += 1  # only count a packet as received if it is not dropped by the emulation manager
+            self.received += 1
 
     def receive_dashboard_commands(self):
         self.dashboard_socket.listen(1)
@@ -160,7 +167,7 @@ class CommunicationsManager:
                         PathEmulation.tearDown()
 
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
-                        connection.send(struct.pack("<2Q", self.sent, self.received))
+                        connection.send(struct.pack("<3Q", self.produced, self.consumed, self.received))
                         ack = connection.recv(1)
                         if struct.unpack("<1B", ack) != CommunicationsManager.ACK:
                             connection.close()

@@ -30,7 +30,9 @@
         {% if (lost > -1) %}
         <div class="header half">
             <p>Experiment stopped.</p>
-            <p>Lost metadata:{{'%0.3f'| format(lost*100|float)}}%</p>
+            <p>Lost metadata:{{'%0.5f'| format(lost*100|float)}}%</p>
+            <p>Lost packets:{{'%0.5f'| format(lost_packets*100|float)}}%</p>
+            <p>Rejected metadata:{{'%0.5f'| format( (lost*100-lost_packets*100)|float)}}</p>
         </div>
         {% endif %}
 

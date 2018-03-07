@@ -115,11 +115,6 @@ class EmulationManager:
         for path in self.active_paths:
             max_bandwidth = path.max_bandwidth
             for link in path.links:
-                if len(link.flows) < link.last_concurrent_count:
-                    # if we received less flows then last time
-                    # hold off updating for the next cycle
-                    link.last_concurrent_count = len(link.flows)
-                    continue
                 rtt_reverse_sum = 0
                 for flow in link.flows:
                     rtt_reverse_sum += (1.0/flow[RTT])
@@ -146,8 +141,6 @@ class EmulationManager:
                 if max_bandwidth_on_link[0] < max_bandwidth:
                     max_bandwidth = max_bandwidth_on_link[0]
 
-                link.last_concurrent_count = len(link.flows)
-
             # Apply the new bandwidth on this path
             if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
                 if max_bandwidth <= path.current_bandwidth:
@@ -160,6 +153,7 @@ class EmulationManager:
 
     def add_flow(self, bandwidth, link_indices):
         """
+        Note: when this is called we must already kow that this is a concurrent flow
         :param bandwidth: int
         :param link_indices: List[int]
         """
@@ -171,11 +165,8 @@ class EmulationManager:
             rtt += (link.latency*2)
             if index in self.active_links:
                 concurrent_links.append(link)
-
-        # If we are sharing links, then update them with this flows bandwidth usage and RTT
-        if len(concurrent_links) > 0:
-            for link in concurrent_links:
-                link.flows.append((rtt, bandwidth))
+        for link in concurrent_links:
+            link.flows.append((rtt, bandwidth))
 
     def collect_flow(self, bandwidth, link_indices):
         """
@@ -183,6 +174,14 @@ class EmulationManager:
         :param link_indices: List[int]
         :return: Whether or not the packet is useful (not duplicated)
         """
+        # Check if this flow is interesting to us
+        with self.state_lock:
+            concurrent = False
+            for i in link_indices:
+                concurrent = (concurrent or (i in self.active_links))
+            if not concurrent:
+                return True
+
         key = str(link_indices[0]) + ":" + str(link_indices[-1])
         with self.state_lock:
             if key in self.repeat_detection:

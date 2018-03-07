@@ -27,6 +27,7 @@ class DashboardState:
     hosts = {}  # type: Dict[NetGraph.Service, Host]
     flows = OrderedDict() # type: Dict[str, Tuple[int, int, int]]
     lost_metadata = -1
+    lost_packets = -1
     comms = None  # type: CommunicationsManager
     stopping = False
     ready = False
@@ -46,7 +47,7 @@ def main():
     with DashboardState.lock:
         if graph is not None:
             answer = render_template('index.html', hosts=DashboardState.hosts, stopping=DashboardState.stopping,
-                                     lost=DashboardState.lost_metadata)
+                                     lost=DashboardState.lost_metadata, lost_packets=DashboardState.lost_packets)
             return answer
 
 
@@ -77,7 +78,8 @@ def stopExperiment():
             return
         else:
             DashboardState.stopping = True
-    sent = 0
+    produced = 0
+    consumed = 0
     received = 0
     received += DashboardState.comms.received
 
@@ -114,15 +116,18 @@ def stopExperiment():
             data = s.recv(64)
             s.send(struct.pack("<1B", CommunicationsManager.ACK))
             s.close()
-            data_tuple = struct.unpack("<2Q", data)
-            sent += data_tuple[0]
-            received += data_tuple[1]
+            data_tuple = struct.unpack("<3Q", data)
+            produced += data_tuple[0]
+            consumed += data_tuple[1]
+            received += data_tuple[2]
             with DashboardState.lock:
                 host.status = 'Down'
-                if sent > 0:
-                    DashboardState.lost_metadata = 1-(received/sent)
+                if produced > 0:
+                    DashboardState.lost_metadata = 1-(consumed/produced)
+                    DashboardState.lost_packets = 1-(received/produced)
                 else:
                     DashboardState.lost_metadata = 0
+                    DashboardState.lost_packets = 0
                 continue
         except OSError as e:
             print(e)
