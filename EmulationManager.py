@@ -115,6 +115,11 @@ class EmulationManager:
         for path in self.active_paths:
             max_bandwidth = path.max_bandwidth
             for link in path.links:
+                if len(link.flows) < link.last_concurrent_count:
+                    # if we received less flows then last time
+                    # hold off updating for the next cycle
+                    link.last_concurrent_count = len(link.flows)
+                    continue
                 rtt_reverse_sum = 0
                 for flow in link.flows:
                     rtt_reverse_sum += (1.0/flow[RTT])
@@ -140,6 +145,8 @@ class EmulationManager:
                 # If this link restricts us more than previously assume this bandwidth as the max
                 if max_bandwidth_on_link[0] < max_bandwidth:
                     max_bandwidth = max_bandwidth_on_link[0]
+
+                link.last_concurrent_count = len(link.flows)
 
             # Apply the new bandwidth on this path
             if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:

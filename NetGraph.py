@@ -68,6 +68,7 @@ class NetGraph:
             self.bandwidth = bandwidth  # type: str
             self.bandwidth_Kbps = Kbps  # type: int
             self.flows = []  # type: List[Tuple[int, int]]  # (RTT, Bandwidth)
+            self.last_concurrent_count = 0
             self.network = network
 
     class Path(object):
