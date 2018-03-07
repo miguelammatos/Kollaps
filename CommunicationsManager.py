@@ -1,10 +1,11 @@
+from EmulationManager import EmulationManager
 from NetGraph import NetGraph
 from utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT
 import PathEmulation
 
 from threading import Thread, Lock
 from _thread import interrupt_main
-from time import time
+from time import time, sleep
 import socket
 import struct
 import ctypes
@@ -123,9 +124,15 @@ class CommunicationsManager:
                     struct.pack_into("<1"+self.link_unit, data, accumulated_size, link.index)
                     accumulated_size += struct.calcsize("<1"+self.link_unit)
 
-            for ip in self.broadcast_group:
-                self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
             self.produced += len(self.broadcast_group)
+            Thread(target=self.broadcast, daemon=True, args=(data,)).start()
+
+
+    def broadcast(self, data):
+        interval = (EmulationManager.POOL_PERIOD/2.0)/len(self.broadcast_group)
+        for ip in self.broadcast_group:
+            self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
+            sleep(interval)
 
     def receive_flows(self):
         while True:
@@ -169,6 +176,9 @@ class CommunicationsManager:
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
                         connection.send(struct.pack("<3Q", self.produced, self.consumed, self.received))
                         ack = connection.recv(1)
+                        if len(ack) != 1:
+                            connection.close()
+                            continue
                         if struct.unpack("<1B", ack) != CommunicationsManager.ACK:
                             connection.close()
                             continue

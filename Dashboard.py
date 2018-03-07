@@ -114,6 +114,11 @@ def stopExperiment():
             s.connect((host.ip, CommunicationsManager.TCP_PORT))
             s.send(struct.pack("<1B", CommunicationsManager.SHUTDOWN_COMMAND))
             data = s.recv(64)
+            if len(data) < struct.calcsize("<3Q"):
+                s.close()
+                print("Got less than 24 bytes for counters.")
+                to_kill.insert(0, host)
+                continue
             s.send(struct.pack("<1B", CommunicationsManager.ACK))
             s.close()
             data_tuple = struct.unpack("<3Q", data)
