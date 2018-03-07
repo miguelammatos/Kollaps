@@ -1,3 +1,5 @@
+import random
+
 from NetGraph import NetGraph
 from utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT
 import PathEmulation
@@ -130,6 +132,7 @@ class CommunicationsManager:
 
     def broadcast(self, data):
         interval = (self.iteration_interval/2.0)/len(self.broadcast_group)
+        random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
         for ip in self.broadcast_group:
             self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
             sleep(interval)

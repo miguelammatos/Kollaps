@@ -82,6 +82,7 @@ def stopExperiment():
     consumed = 0
     received = 0
     received += DashboardState.comms.received
+    consumed += DashboardState.comms.consumed
 
     to_kill = []
     for node in DashboardState.hosts:
