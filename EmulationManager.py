@@ -18,7 +18,7 @@ class EmulationManager:
     POOL_PERIOD = 0.1 # in seconds
 
     # Exponential weighted moving average tuning
-    ALPHA = 0.125
+    ALPHA = 0.5
     ONE_MINUS_ALPHA = 1-ALPHA
 
     def __init__(self, graph):
@@ -143,8 +143,13 @@ class EmulationManager:
 
             # Apply the new bandwidth on this path
             if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
-                PathEmulation.change_bandwidth(path.links[-1].destination, max_bandwidth)
-                path.current_bandwidth = max_bandwidth
+                if max_bandwidth <= path.current_bandwidth:
+                    path.current_bandwidth = max_bandwidth  # if its less then we now for sure it is correct
+                else:
+                    #  if it is more then we have to be careful, it might be a spike due to lost metadata
+                    path.current_bandwidth = EmulationManager.ONE_MINUS_ALPHA* path.current_bandwidth + \
+                                             EmulationManager.ALPHA * max_bandwidth
+                PathEmulation.change_bandwidth(path.links[-1].destination, path.current_bandwidth)
 
     def add_flow(self, bandwidth, link_indices):
         """
