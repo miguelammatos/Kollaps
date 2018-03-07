@@ -4,21 +4,23 @@
 
 1. Create a docker swarm network (only overlay and macvlan have been tested) (check cluster-deployments/ansible/network for a playbook for configuring a swarm macvlan network on a cluster)
 
-2. Write a topology file or use one from the tests folder. (The network attribute of all the links must correspond to an existing docker swarm network configuration.) (All the links must use the same network, this is due to a current limitation of TCAL)
+2. Write a topology file or use one from the https://github.com/joaoneves792/NEED_Evaluation repository. (The network attribute of all the links must correspond to an existing docker swarm network configuration.) (All the links must use the same network, this is due to a current limitation of TCAL)
 
 ## Building the images
 
-3. Build the privilegedbootstrapper image (in cluster-deployments/docker/tc/bootstrapper) it must be tagged: warpenguin.no-ip.org/privilegedbootstrapper:1.3
+Dockerfiles for building the images are provided in the https://github.com/joaoneves792/NEED_Images repository.
 
-4. Build the dashboard image (located in cluster-deployments/docker/need/dashboard) it can have any tag as long as it matches the one used in the topology xml file.
+3. Build the privilegedbootstrapper image it must be tagged: warpenguin.no-ip.org/privilegedbootstrapper:1.3
+
+4. Build the dashboard image it can have any tag as long as it matches the one used in the topology xml file.
 
 Optional (build images for iperf client and server)
 
-4.1 Build the service image (located in cluster-deployments/docker/need/service) it must have the tag warpenguin.no-ip.org/service:1.0 (because the client image depends on this one)
+4.1 Build the service image it must have the tag warpenguin.no-ip.org/service:1.0 (because the client image depends on this one)
 
-4.2 Build the client image (located in cluster-deployments/docker/need/client) the tag should match the one used in the xml topology file
+4.2 Build the client image the tag should match the one used in the xml topology file
 
-4.3 Build the server image (located in cluster-deployments/docker/need/server), this image depends on the client image so make sure the Dockerfile entry FROM uses the client image previously built.
+4.3 Build the server image, this image depends on the client image so make sure the Dockerfile entry FROM uses the client image previously built.
 
 ## Deploying an experiment
 
@@ -48,6 +50,9 @@ $ docker stack deploy -c deployment_file.yaml arbitrary_name_for_the_stack
 ```bash
 $ docker stack rm name_of_the_stack
 ```
+
+12. The dashboard will report the ammount of metadata lost during an experiment. This number will only be accurate when all hosts display their status as "Down". Lost metadata corresponds to the amount of metadata required to perform bandwidth congestion emulation that was produced but not consumed.
+This can happen either because the udp packets got lost, or because emulationCore instances fall out of sync.
   
 # VERY IMPORTANT NOTICE!!!
 
