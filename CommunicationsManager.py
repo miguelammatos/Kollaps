@@ -56,6 +56,8 @@ class CommunicationsManager:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('0.0.0.0', CommunicationsManager.UDP_PORT))
 
+        self.broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
         self.dashboard_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.dashboard_socket.bind(('0.0.0.0', CommunicationsManager.TCP_PORT))
 
@@ -96,8 +98,6 @@ class CommunicationsManager:
                     active_flows.append(flow)  # and put the current one back in
                     break
 
-
-
             # Build the packet
             size = struct.calcsize(fmt)
             data = ctypes.create_string_buffer(size)
@@ -114,14 +114,12 @@ class CommunicationsManager:
                     struct.pack_into("<1"+self.link_unit, data, accumulated_size, link.index)
                     accumulated_size += struct.calcsize("<1"+self.link_unit)
 
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             for service in self.graph.services:
                 hosts = self.graph.services[service]
                 for host in hosts:
                     if host != self.graph.root:
-                        s.sendto(data, (host.ip, CommunicationsManager.UDP_PORT))
+                        self.broadcast_socket.sendto(data, (host.ip, CommunicationsManager.UDP_PORT))
                         self.sent += 1
-            s.close()
 
     def receive_flows(self):
         while True:
@@ -170,6 +168,7 @@ class CommunicationsManager:
                         connection.close()
                         self.dashboard_socket.close()
                         self.sock.close()
+                        self.broadcast_socket.close()
                         interrupt_main()
 
                     elif command == CommunicationsManager.READY_COMMAND:
