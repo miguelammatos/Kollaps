@@ -1,4 +1,3 @@
-from EmulationManager import EmulationManager
 from NetGraph import NetGraph
 from utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT
 import PathEmulation
@@ -36,7 +35,8 @@ class CommunicationsManager:
     START_COMMAND = 4
     ACK = 250
 
-    def __init__(self, flow_collector, graph):
+    def __init__(self, flow_collector, graph, interval):
+        self.iteration_interval = interval
         self.graph = graph  # type: NetGraph
         self.flow_collector = flow_collector
         self.produced = 0
@@ -129,7 +129,7 @@ class CommunicationsManager:
 
 
     def broadcast(self, data):
-        interval = (EmulationManager.POOL_PERIOD/2.0)/len(self.broadcast_group)
+        interval = (self.iteration_interval/2.0)/len(self.broadcast_group)
         for ip in self.broadcast_group:
             self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
             sleep(interval)

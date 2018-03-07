@@ -28,7 +28,7 @@ class EmulationManager:
         self.repeat_detection = {}  # type: Dict[str, bool]
         self.out_of_sync_flows = {}  # type: Dict[str, Tuple[int, List[int]]]
         self.state_lock = Lock()
-        self.comms = CommunicationsManager(self.collect_flow, self.graph)
+        self.comms = CommunicationsManager(self.collect_flow, self.graph, EmulationManager.POOL_PERIOD)
         self.last_time = 0
 
     def initialize(self):

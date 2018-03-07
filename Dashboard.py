@@ -249,7 +249,7 @@ if __name__ == "__main__":
                     continue
                 DashboardState.hosts[host] = Host(host.name, host.name + "." + str(i))
 
-    DashboardState.comms = CommunicationsManager(collect_flow, graph)
+    DashboardState.comms = CommunicationsManager(collect_flow, graph, 0.1)
 
     DashboardState.graph = graph
 

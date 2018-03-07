@@ -74,7 +74,7 @@ def mock_change_bandwidth(service, new_bandwidth):
 
 
 class MockFlowDisseminator:
-    def __init__(self, flow_collector, graph):
+    def __init__(self, flow_collector, graph, interval):
         self.graph = graph  # type: NetGraph
         self.flow_collector = flow_collector
 
