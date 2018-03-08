@@ -14,8 +14,8 @@ class EmulationManager:
 
     # Generic loop tuning
     ERROR_MARGIN = 0.01  # in percent
-    #POOL_PERIOD = 0.05 # in seconds
-    POOL_PERIOD = 0.1 # in seconds
+    POOL_PERIOD = 0.05 # in seconds
+    ITERATIONS_TO_AVERAGE = 4
 
     # Exponential weighted moving average tuning
     ALPHA = 0.25
@@ -25,8 +25,8 @@ class EmulationManager:
         self.graph = graph  # type: NetGraph
         self.active_links = {}  # type: Dict[int, NetGraph.Link]
         self.active_paths = []  # type: List[NetGraph.Path]
-        self.repeat_detection = {}  # type: Dict[str, bool]
-        self.out_of_sync_flows = {}  # type: Dict[str, Tuple[int, List[int]]]
+        self.flow_accumulator = {}  # type: Dict[str, List[List[int], int, int]]
+        self.concurrent_flows_keys = []
         self.state_lock = Lock()
         self.comms = CommunicationsManager(self.collect_flow, self.graph, EmulationManager.POOL_PERIOD)
         self.last_time = 0
@@ -43,33 +43,21 @@ class EmulationManager:
         self.last_time = time()
         self.check_active_flows()  # to prevent bug where data has already passed through the filters before
         while True:
+            for i in range(EmulationManager.ITERATIONS_TO_AVERAGE):
+                with self.state_lock:
+                    self.active_links.clear()
+                    self.active_paths.clear()
+                    self.check_active_flows()
+                self.comms.broadcast_flows(self.active_paths)
+                sleep(EmulationManager.POOL_PERIOD)
             with self.state_lock:
+                for key in self.concurrent_flows_keys:
+                    self.add_flow(key)
                 self.recalculate_path_bandwidths()
-                self.reset_flow_state()
-                self.check_active_flows()
-                self.recover_out_of_sync_flows()
-            self.comms.broadcast_flows(self.active_paths)
-            sleep(EmulationManager.POOL_PERIOD)
-
-    def recover_out_of_sync_flows(self):
-        # recover flows that were marked as repeated last iteration
-        for key in self.out_of_sync_flows:
-            args = self.out_of_sync_flows[key]
-            bandwidth = args[0]
-            link_indices = args[1]
-            key = str(link_indices[0]) + ":" + str(link_indices[-1])
-            self.add_flow(bandwidth, link_indices)
-            self.repeat_detection[key] = True
-        self.out_of_sync_flows.clear()
-
-    def reset_flow_state(self):
-        for link_index in self.active_links:
-            link = self.active_links[link_index]
-            del link.flows[:]
-
-        self.active_links.clear()
-        del self.active_paths[:]
-        self.repeat_detection.clear()
+                self.concurrent_flows_keys.clear()
+                self.flow_accumulator.clear()
+                for link_index in self.active_links:
+                    self.active_links[link_index].flows.clear()
 
     def check_active_flows(self):
         PathEmulation.update_usage()
@@ -103,9 +91,14 @@ class EmulationManager:
                 # This is an active flow
                 path.used_bandwidth = throughput
                 self.active_paths.append(path)
+                link_indices = []
                 for link in path.links:
                     self.active_links[link.index] = link
-                    link.flows.append((path.RTT, throughput))
+                    link_indices.append(link.index)
+
+                # Collect our own flow
+                self.accumulate_flow(throughput, link_indices)
+
         self.last_time = current_time
 
 
@@ -151,12 +144,20 @@ class EmulationManager:
                                              EmulationManager.ALPHA * max_bandwidth
                 PathEmulation.change_bandwidth(path.links[-1].destination, path.current_bandwidth)
 
-    def add_flow(self, bandwidth, link_indices):
+    def add_flow(self, key):
         """
-        Note: when this is called we must already kow that this is a concurrent flow
+        This method grabs an accumulated flow, averages it and adds the corresponding information to the active links
         :param bandwidth: int
         :param link_indices: List[int]
         """
+        INDICES = 0
+        BW = 1
+        COUNTER = 2
+
+        flow = self.flow_accumulator[key]
+        link_indices = flow[INDICES]
+        bandwidth = flow[BW]/flow[COUNTER]
+
         concurrent_links = []
         # Calculate RTT of this flow and check if we are sharing any link with it
         rtt = 0
@@ -168,31 +169,38 @@ class EmulationManager:
         for link in concurrent_links:
             link.flows.append((rtt, bandwidth))
 
-    def collect_flow(self, bandwidth, link_indices):
+    def accumulate_flow(self, bandwidth, link_indices):
         """
+        This method adds a flow to the accumulator (Note: it doesnt grab the lock)
         :param bandwidth: int
         :param link_indices: List[int]
-        :return: Whether or not the packet is useful (not duplicated)
         """
+        INDICES = 0
+        BW = 1
+        COUNTER = 2
+        key = str(link_indices[0]) + ":" + str(link_indices[-1])
+        if key in self.flow_accumulator:
+            flow = self.flow_accumulator[key]
+            flow[BW] += bandwidth
+            flow[COUNTER] += 1
+        else:
+            self.flow_accumulator[key] = [link_indices, bandwidth, 1]
+            self.concurrent_flows_keys.append(key)
+
+    def collect_flow(self, bandwidth, link_indices):
+        """
+        This method collects a flow from other nodes, it checks if it is interesting and if so calls accumulate_flow
+        :param bandwidth: int
+        :param link_indices: List[int]
+        :return: Whether or not the packet is useful (not duplicated) deprecated!
+        """
+        # TODO the return value is no longer useful
+
         # Check if this flow is interesting to us
         with self.state_lock:
             concurrent = False
             for i in link_indices:
                 concurrent = (concurrent or (i in self.active_links))
-            if not concurrent:
-                return True
-
-        key = str(link_indices[0]) + ":" + str(link_indices[-1])
-        with self.state_lock:
-            if key in self.repeat_detection:
-                if key in self.out_of_sync_flows:  # Buffer at most 1 out of sync flow
-                    return False
-                else:
-                    self.out_of_sync_flows[key] = (bandwidth, link_indices)
-                    return True
-            else:
-                self.repeat_detection[key] = True
-
-            self.add_flow(bandwidth, link_indices)
-
+            if concurrent:
+                self.accumulate_flow(bandwidth, link_indices)
         return True
