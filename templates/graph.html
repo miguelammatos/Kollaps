@@ -44,7 +44,7 @@
           // create an array with edges
           var edges = new vis.DataSet([
           {% for link in graph.links %}
-            {from: '{{link.source.__hash__()}}', to: '{{link.destination.__hash__()}}', arrows:'to', label: '{{link.bandwidth}}'},
+            {from: '{{link.source.__hash__()}}', to: '{{link.destination.__hash__()}}', arrows:'to', label: '{{link.bandwidth}}/{{link.latency}}ms', font: {align: 'bottom'}},
           {% endfor %}
           ]);
 
