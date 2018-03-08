@@ -18,7 +18,7 @@ class EmulationManager:
     POOL_PERIOD = 0.1 # in seconds
 
     # Exponential weighted moving average tuning
-    ALPHA = 0.5
+    ALPHA = 0.25
     ONE_MINUS_ALPHA = 1-ALPHA
 
     def __init__(self, graph):

@@ -127,15 +127,18 @@ class CommunicationsManager:
                     accumulated_size += struct.calcsize("<1"+self.link_unit)
 
             self.produced += len(self.broadcast_group)
-            Thread(target=self.broadcast, daemon=True, args=(data,)).start()
+            #Thread(target=self.broadcast, daemon=True, args=(data,)).start()
+            random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
+            for ip in self.broadcast_group:
+                self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
 
 
     def broadcast(self, data):
-        interval = (self.iteration_interval/2.0)/len(self.broadcast_group)
+        # interval = (self.iteration_interval/2.0)/len(self.broadcast_group)
         random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
         for ip in self.broadcast_group:
             self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
-            sleep(interval)
+            # sleep(interval)
 
     def receive_flows(self):
         while True:
