@@ -15,7 +15,7 @@ class EmulationManager:
     # Generic loop tuning
     ERROR_MARGIN = 0.01  # in percent
     POOL_PERIOD = 0.05 # in seconds
-    ITERATIONS_TO_AVERAGE = 4
+    ITERATIONS_TO_INTEGRATE = 2
 
     # Exponential weighted moving average tuning
     ALPHA = 0.25
@@ -43,7 +43,7 @@ class EmulationManager:
         self.last_time = time()
         self.check_active_flows()  # to prevent bug where data has already passed through the filters before
         while True:
-            for i in range(EmulationManager.ITERATIONS_TO_AVERAGE):
+            for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):
                 with self.state_lock:
                     self.active_links.clear()
                     self.active_paths.clear()
@@ -146,7 +146,7 @@ class EmulationManager:
 
     def add_flow(self, key):
         """
-        This method grabs an accumulated flow, averages it and adds the corresponding information to the active links
+        This method grabs an accumulated flow, and adds the corresponding information to the active links
         :param bandwidth: int
         :param link_indices: List[int]
         """
@@ -156,7 +156,7 @@ class EmulationManager:
 
         flow = self.flow_accumulator[key]
         link_indices = flow[INDICES]
-        bandwidth = flow[BW]/flow[COUNTER]
+        bandwidth = flow[BW] #/flow[COUNTER]
 
         concurrent_links = []
         # Calculate RTT of this flow and check if we are sharing any link with it
@@ -181,8 +181,8 @@ class EmulationManager:
         key = str(link_indices[0]) + ":" + str(link_indices[-1])
         if key in self.flow_accumulator:
             flow = self.flow_accumulator[key]
-            flow[BW] += bandwidth
-            flow[COUNTER] += 1
+            flow[BW] = bandwidth
+            # flow[COUNTER] += 1
         else:
             self.flow_accumulator[key] = [link_indices, bandwidth, 1]
             self.concurrent_flows_keys.append(key)
