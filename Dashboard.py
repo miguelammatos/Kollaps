@@ -176,12 +176,14 @@ def startExperiment():
 
 
 def resolve_hostnames():
+    docker_resolver = dns.resolver.Resolver(configure=False)
+    docker_resolver.nameservers = ['127.0.0.11']
     for service in graph.services:
         service_instances = graph.services[service]
         ips = []
         while len(ips) != len(service_instances):
             try:
-                answers = dns.resolver.query(service, 'A')
+                answers = docker_resolver.query(service, 'A')
                 ips = [str(ip) for ip in answers]
                 if len(ips) != len(service_instances):
                     sleep(3)

@@ -162,12 +162,18 @@ class NetGraph:
         # this is a problem since services with multiple replicas (same hostname)
         # will only have ONE entry in /etc/hosts, so the other hosts will never be found...
         # Solution: forcefully use dns queries that skip /etc/hosts (this pulls the dnspython dependency...)
+
+        # Moreover, in some scenarios the /etc/resolv.conf is broken inside the containers
+        # So to get the names to resolve properly we need to force to use dockers internal nameserver
+        # 127.0.0.11
+        docker_resolver = dns.resolver.Resolver(configure=False)
+        docker_resolver.nameservers = ['127.0.0.11']
         for service in self.services:
             hosts = self.services[service]
             ips = []
             while len(ips) != len(hosts):
                 try:
-                    answers = dns.resolver.query(service, 'A')
+                    answers = docker_resolver.query(service, 'A')
                     ips = [str(ip) for ip in answers]
                     if len(ips) != len(hosts):
                         sleep(3)
