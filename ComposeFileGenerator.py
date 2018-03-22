@@ -39,6 +39,8 @@ class ComposeFileGenerator:
             print("      netsim: \"true\"")
         print("    deploy:")
         print("      replicas: " + str(len(service_list)))
+        if not service_list[0].supervisor:
+            print("      endpoint_mode: dnsrr")
         print("    configs:")
         print("      - source: topology")
         print("        target: /topology.xml")
