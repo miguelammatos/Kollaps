@@ -13,6 +13,7 @@ from sched import scheduler
 
 import sys
 from time import time, sleep
+import gc
 
 class CT:
     current_throughput = 50*1000*1000
@@ -146,6 +147,7 @@ def setup_mocking():
     CommunicationsManager.receive_flows = MockFlowDisseminator.receive_flows
 
 def main():
+    gc.set_debug(gc.DEBUG_STATS)
     setup_mocking()
 
     topology_file = sys.argv[1]

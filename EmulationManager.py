@@ -10,6 +10,7 @@ import sys
 if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
 
+
 class EmulationManager:
 
     # Generic loop tuning
