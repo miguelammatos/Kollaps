@@ -8,7 +8,6 @@ from utils import fail
 from socket import gethostname
 import netifaces
 import os, signal, sys
-import gc
 
 def main():
     if len(sys.argv) != 2:
@@ -19,7 +18,6 @@ def main():
     # Because of the bootstrapper hack we cant get output from the emucore through standard docker logs...
     sys.stdout = open("/var/log/need.log", "w")
     sys.stderr = open("/var/log/need_error.log", "w")
-    gc.set_debug(gc.DEBUG_STATS)
 
     graph = NetGraph()
 
