@@ -81,8 +81,8 @@ def stopExperiment():
     produced = 0
     consumed = 0
     received = 0
-    received += DashboardState.comms.received
-    consumed += DashboardState.comms.consumed
+    #received += DashboardState.comms.received
+    #consumed += DashboardState.comms.consumed
 
     to_kill = []
     for node in DashboardState.hosts:
@@ -252,7 +252,7 @@ if __name__ == "__main__":
                     continue
                 DashboardState.hosts[host] = Host(host.name, host.name + "." + str(i))
 
-    DashboardState.comms = CommunicationsManager(collect_flow, graph, 0.1)
+    DashboardState.comms = CommunicationsManager(collect_flow, graph)
 
     DashboardState.graph = graph
 

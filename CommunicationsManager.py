@@ -37,8 +37,7 @@ class CommunicationsManager:
     START_COMMAND = 4
     ACK = 250
 
-    def __init__(self, flow_collector, graph, interval):
-        self.iteration_interval = interval
+    def __init__(self, flow_collector, graph):
         self.graph = graph  # type: NetGraph
         self.flow_collector = flow_collector
         self.produced = 0
@@ -58,11 +57,14 @@ class CommunicationsManager:
             fail("Topology has too many links: " + str(link_count))
 
         self.broadcast_group = []
+        self.supervisor_count = 0
         for service in self.graph.services:
             hosts = self.graph.services[service]
             for host in hosts:
                 if host != self.graph.root:
                     self.broadcast_group.append(host.ip)
+                if host.supervisor:
+                    self.supervisor_count += 1
 
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -126,7 +128,7 @@ class CommunicationsManager:
                     struct.pack_into("<1"+self.link_unit, data, accumulated_size, link.index)
                     accumulated_size += struct.calcsize("<1"+self.link_unit)
 
-            self.produced += len(self.broadcast_group)
+            self.produced += len(self.broadcast_group)-self.supervisor_count
             #Thread(target=self.broadcast, daemon=True, args=(data,)).start()
             random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
             for ip in self.broadcast_group:
@@ -134,7 +136,6 @@ class CommunicationsManager:
 
 
     def broadcast(self, data):
-        # interval = (self.iteration_interval/2.0)/len(self.broadcast_group)
         random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
         for ip in self.broadcast_group:
             self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))

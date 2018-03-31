@@ -6,6 +6,9 @@ from NetGraph import NetGraph
 import PathEmulation
 from CommunicationsManager import CommunicationsManager
 
+import os
+import sched, time
+
 import sys
 if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
@@ -29,7 +32,7 @@ class EmulationManager:
         self.flow_accumulator = {}  # type: Dict[str, List[List[int], int, int]]
         self.concurrent_flows_keys = []
         self.state_lock = Lock()
-        self.comms = CommunicationsManager(self.collect_flow, self.graph, EmulationManager.POOL_PERIOD)
+        self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
 
     def initialize(self):
