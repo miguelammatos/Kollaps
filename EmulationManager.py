@@ -6,9 +6,6 @@ from NetGraph import NetGraph
 import PathEmulation
 from CommunicationsManager import CommunicationsManager
 
-import os
-import sched, time
-
 import sys
 if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
