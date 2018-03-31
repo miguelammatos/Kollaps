@@ -11,7 +11,7 @@ if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
 
 LOG_FILE = "/var/log/NEED_LOG.json"
-AVERAGE_INTERVAL = 60.0
+AVERAGE_INTERVAL = 1.0
 
 class LoggerState:
     graph = None  # type: NetGraph
@@ -56,5 +56,7 @@ if __name__ == "__main__":
             LoggerState.flows.clear()
         json.dump(output, log_file)
         log_file.write("\n")
+        log_file.flush()
         output.clear()
-        time.sleep(AVERAGE_INTERVAL - ((time.time() - starttime) % AVERAGE_INTERVAL))
+        sleep_time = AVERAGE_INTERVAL - ((time.time() - starttime) % AVERAGE_INTERVAL)
+        time.sleep(sleep_time)
