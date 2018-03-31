@@ -45,6 +45,7 @@ class NetGraph:
             self.ip = ""  # to be filled in later
             self.last_bytes = 0  # number of bytes sent to this service
             self.supervisor = False
+            self.supervisor_port = 0
 
     class Bridge(Node):
         def __init__(self, name):

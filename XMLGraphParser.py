@@ -40,13 +40,17 @@ class XMLGraphParser:
                 shared = (service.attrib['share'] == "true")
 
             supervisor = False
+            supervisor_port = 0
             if 'supervisor' in service.attrib:
                 supervisor = True
+                if 'port' in service.attrib:
+                    supervisor_port =  int(service.attrib['port'])
 
             for i in range(replicas):
                     srv = self.graph.new_service(service.attrib['name'], service.attrib['image'], command, shared)
                     if supervisor:
                         self.supervisors.append(srv)
+                        srv.supervisor_port = supervisor_port
 
     def parse_bridges(self, root):
         for bridge in root:

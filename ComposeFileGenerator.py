@@ -30,9 +30,9 @@ class ComposeFileGenerator:
         print("    image: " + service_list[0].image)
         if service_list[0].command is not None:
             print("    command: " + service_list[0].command)
-        if service_list[0].supervisor:
+        if service_list[0].supervisor_port > 0:
             print("    ports:")
-            print('      - "8088:8088"')
+            print('      - "' + str(service_list[0].supervisor_port) + ':' + str(service_list[0].supervisor_port) + '"')
         print("    hostname: " + service_list[0].name)
         if not service_list[0].supervisor:
             print("    labels:")
