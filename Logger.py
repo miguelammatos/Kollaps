@@ -52,7 +52,7 @@ if __name__ == "__main__":
         with LoggerState.lock:
             output["ts"] = time.time()
             for key in LoggerState.flows:
-                output[key] = LoggerState.flows[key][0]/LoggerState.flows[key][1]
+                output[key] = (LoggerState.flows[key][0]/LoggerState.flows[key][1], LoggerState.flows[key][1])
             LoggerState.flows.clear()
         json.dump(output, log_file)
         log_file.write("\n")
