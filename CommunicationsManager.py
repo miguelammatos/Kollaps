@@ -96,9 +96,11 @@ class CommunicationsManager:
 
         if self.largest_produced_gap < 0:
             self.produced_ts = time()
-        produced_gap = time() - self.produced_ts
+        current_time = time()
+        produced_gap = current_time - self.produced_ts
         if produced_gap > self.largest_produced_gap:
             self.largest_produced_gap = produced_gap
+        self.produced_ts = current_time
 
         active_flows = active_paths[:]
 
