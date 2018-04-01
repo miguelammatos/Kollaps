@@ -54,9 +54,10 @@ if __name__ == "__main__":
             for key in LoggerState.flows:
                 output[key] = (LoggerState.flows[key][0]/LoggerState.flows[key][1], LoggerState.flows[key][1])
             LoggerState.flows.clear()
-        json.dump(output, log_file)
-        log_file.write("\n")
-        log_file.flush()
+        if(len(output) > 1):
+            json.dump(output, log_file)
+            log_file.write("\n")
+            log_file.flush()
         output.clear()
         sleep_time = AVERAGE_INTERVAL - ((time.time() - starttime) % AVERAGE_INTERVAL)
         time.sleep(sleep_time)
