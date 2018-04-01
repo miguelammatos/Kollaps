@@ -27,10 +27,12 @@
         </div>
         {% endif %}
 
-        {% if (lost > -1) %}
+        {% if (lost_packets > -1) %}
         <div class="header half">
             <p>Experiment stopped.</p>
-            <p>Lost metadata:{{'%0.5f'| format(lost*100|float)}}%</p>
+            <p>Lost metadata:{{'%0.5f'| format(lost_packets*100|float)}}%</p>
+            <p>Max gap:{{max_gap}}ms</p>
+            <p>Max gap average:{{max_gap_avg}}ms</p>
             <!-- <p>Lost packets:{{'%0.5f'| format(lost_packets*100|float)}}%</p> -->
             <!-- <p>Rejected metadata:{{'%0.5f'| format( (lost*100-lost_packets*100)|float)}}</p> -->
         </div>

@@ -26,7 +26,8 @@ class DashboardState:
     lock = Lock()
     hosts = {}  # type: Dict[NetGraph.Service, Host]
     flows = OrderedDict() # type: Dict[str, Tuple[int, int, int]]
-    lost_metadata = -1
+    largest_produced_gap = -1
+    largest_produced_gap_average = -1
     lost_packets = -1
     comms = None  # type: CommunicationsManager
     stopping = False
@@ -47,7 +48,9 @@ def main():
     with DashboardState.lock:
         if graph is not None:
             answer = render_template('index.html', hosts=DashboardState.hosts, stopping=DashboardState.stopping,
-                                     lost=DashboardState.lost_metadata, lost_packets=DashboardState.lost_packets)
+                                     max_gap=DashboardState.largest_produced_gap,
+                                     max_gap_avg=DashboardState.largest_produced_gap_average,
+                                     lost_packets=DashboardState.lost_packets)
             return answer
 
 
@@ -79,10 +82,8 @@ def stopExperiment():
         else:
             DashboardState.stopping = True
     produced = 0
-    consumed = 0
     received = 0
-    #received += DashboardState.comms.received
-    #consumed += DashboardState.comms.consumed
+    gaps = []
 
     to_kill = []
     for node in DashboardState.hosts:
@@ -124,15 +125,13 @@ def stopExperiment():
             s.close()
             data_tuple = struct.unpack("<3Q", data)
             produced += data_tuple[0]
-            consumed += data_tuple[1]
+            gaps.append(data_tuple[1])
             received += data_tuple[2]
             with DashboardState.lock:
                 host.status = 'Down'
                 if produced > 0:
-                    DashboardState.lost_metadata = 1-(consumed/produced)
                     DashboardState.lost_packets = 1-(received/produced)
                 else:
-                    DashboardState.lost_metadata = 0
                     DashboardState.lost_packets = 0
                 continue
         except OSError as e:
@@ -141,6 +140,12 @@ def stopExperiment():
             sleep(0.5)
 
     with DashboardState.lock:
+        gap_sum = 0
+        for gap in gaps:
+            if gap > DashboardState.largest_produced_gap:
+                DashboardState.largest_produced_gap = gap
+            gap_sum += gap
+        DashboardState.largest_produced_gap_average = gap_sum/len(gaps)
         DashboardState.stopping = False
 
 def startExperiment():

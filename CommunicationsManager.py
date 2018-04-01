@@ -43,6 +43,8 @@ class CommunicationsManager:
         self.produced = 0
         self.received = 0
         self.consumed = 0
+        self.produced_ts = 0
+        self.largest_produced_gap = -1
         self.stop_lock = Lock()
         self.stop = False
 
@@ -91,6 +93,12 @@ class CommunicationsManager:
         with self.stop_lock:
             if self.stop:
                 return
+
+        if self.largest_produced_gap < 0:
+            self.produced_ts = time()
+        produced_gap = time() - self.produced_ts
+        if produced_gap > self.largest_produced_gap:
+            self.largest_produced_gap = produced_gap
 
         active_flows = active_paths[:]
 
@@ -181,7 +189,7 @@ class CommunicationsManager:
                         PathEmulation.tearDown()
 
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
-                        connection.send(struct.pack("<3Q", self.produced, self.consumed, self.received))
+                        connection.send(struct.pack("<3Q", self.produced, int(round(self.largest_produced_gap*1000)), self.received))
                         ack = connection.recv(1)
                         if len(ack) != 1:
                             connection.close()
