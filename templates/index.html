@@ -31,8 +31,10 @@
         <div class="header half">
             <p>Experiment stopped.</p>
             <p>Lost metadata:{{'%0.5f'| format(lost_packets*100|float)}}%</p>
+            {% if (max_gap > -1) %}
             <p>Max gap:{{max_gap}}ms</p>
             <p>Max gap average:{{max_gap_avg}}ms</p>
+            {% endif %}
         </div>
         {% endif %}
 

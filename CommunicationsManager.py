@@ -4,9 +4,8 @@ from NetGraph import NetGraph
 from utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT
 import PathEmulation
 
-from threading import Thread, Lock
+from threading import Thread
 from _thread import interrupt_main
-from time import time, sleep
 import socket
 import struct
 import ctypes
@@ -16,7 +15,6 @@ if sys.version_info >= (3, 0):
     from typing import Dict, List
 
 # Header:
-# counter
 # Num of flows
 # Flow:
 # throughput
@@ -36,6 +34,7 @@ class CommunicationsManager:
     READY_COMMAND = 3
     START_COMMAND = 4
     ACK = 250
+    i_SIZE = struct.calcsize("<1i")
 
     def __init__(self, flow_collector, graph):
         self.graph = graph  # type: NetGraph
@@ -43,20 +42,16 @@ class CommunicationsManager:
         self.produced = 0
         self.received = 0
         self.consumed = 0
-        self.produced_ts = 0
         self.largest_produced_gap = -1
-        self.stop_lock = Lock()
-        self.stop = False
 
         link_count = len(self.graph.links)
         if link_count <= BYTE_LIMIT:
             self.link_unit = "B"
         elif link_count <= SHORT_LIMIT:
             self.link_unit = "H"
-        #elif link_count <= INT_LIMIT:
-        #    self.link_unit = "I"
         else:
             fail("Topology has too many links: " + str(link_count))
+        self.link_size = struct.calcsize("<1"+self.link_unit)
 
         self.broadcast_group = []
         self.supervisor_count = 0
@@ -67,7 +62,6 @@ class CommunicationsManager:
                     self.broadcast_group.append(host.ip)
                 if host.supervisor:
                     self.supervisor_count += 1
-
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('0.0.0.0', CommunicationsManager.UDP_PORT))
@@ -87,69 +81,62 @@ class CommunicationsManager:
 
     def broadcast_flows(self, active_paths):
         """
-        :param active_flows: List[NetGraph.Path]
+        :param active_paths: List[NetGraph.Path]
         :return:
         """
-        with self.stop_lock:
-            if self.stop:
-                return
+        ########################################
+        # After profiling, this method was found to be responsible for 1/2 of cpu usage
+        # The code that follows has been optimized
+        # Check an older commit for more readable code, the functionality has not changed since
+        # commit ca5c9c62e583e07d7b6d7ec7950737aacdf656fb
+        ########################################
 
-        if self.largest_produced_gap < 0:
-            self.produced_ts = time()
-        current_time = time()
-        produced_gap = current_time - self.produced_ts
-        if produced_gap > self.largest_produced_gap:
-            self.largest_produced_gap = produced_gap
-        self.produced_ts = current_time
 
-        active_flows = active_paths[:]
 
-        while active_flows:
-            packet_flows = []
+        #  This code is expensive
+        # if self.largest_produced_gap < 0:
+        #     self.produced_ts = time()
+        # current_time = time()
+        # produced_gap = current_time - self.produced_ts
+        # if produced_gap > self.largest_produced_gap:
+        #     self.largest_produced_gap = produced_gap
+        # self.produced_ts = current_time
 
-            # calculate size of packet
+        i = 0
+
+        while i < len(active_paths):
+            packet = [0]
+            flows_counter = 0
             fmt = "<1H"
-            while active_flows:
-                flow = active_flows.pop()
-                fmt += "1i1"+self.link_unit
-                for link in flow.links:
-                    fmt += "1"+self.link_unit
-                size = struct.calcsize(fmt)
-                if size <= CommunicationsManager.BUFFER_LEN:  # If we fit in the packet append it
-                    packet_flows.append(flow)
-                    continue
-                else:  # if we dont fit, send the other ones
-                    active_flows.append(flow)  # and put the current one back in
+            free_space = CommunicationsManager.BUFFER_LEN - struct.calcsize(fmt)
+
+            while i < len(active_paths):
+                flow = active_paths[i]
+                # check if this flow still fits
+                if free_space-CommunicationsManager.i_SIZE-(self.link_size*(len(flow.links)+1)) < 0:
                     break
 
-            # Build the packet
+                i += 1
+                flows_counter += 1
+                fmt += "1i"+("1"+self.link_unit)*(len(flow.links)+1)
+                packet.append(int(flow.used_bandwidth))
+                packet.append(len(flow.links))
+                for link in flow.links:
+                    packet.append(link.index)
+
+            packet[0] = flows_counter
             size = struct.calcsize(fmt)
             data = ctypes.create_string_buffer(size)
-            accumulated_size = 0
-            struct.pack_into("<1H", data, accumulated_size, len(packet_flows))
-            accumulated_size += struct.calcsize("<1H")
-            while packet_flows:
-                flow = packet_flows.pop()
-                struct.pack_into("<1i", data, accumulated_size, int(flow.used_bandwidth))
-                accumulated_size += struct.calcsize("<1i")
-                struct.pack_into("<1"+self.link_unit, data, accumulated_size, len(flow.links))
-                accumulated_size += struct.calcsize("<1"+self.link_unit)
-                for link in flow.links:
-                    struct.pack_into("<1"+self.link_unit, data, accumulated_size, link.index)
-                    accumulated_size += struct.calcsize("<1"+self.link_unit)
+            struct.pack_into(fmt, data, 0, *packet)
 
             self.produced += len(self.broadcast_group)-self.supervisor_count
-            #Thread(target=self.broadcast, daemon=True, args=(data,)).start()
-            random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
+            # The following line can improve results under some scenarios but is overall too expensive
+            #random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
             for ip in self.broadcast_group:
-                self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
-
-
-    def broadcast(self, data):
-        random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
-        for ip in self.broadcast_group:
-            self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
-            # sleep(interval)
+                try:
+                    self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
+                except AttributeError:
+                    pass  # Ignore if we set socket to None
 
     def receive_flows(self):
         while True:
@@ -185,13 +172,13 @@ class CommunicationsManager:
                     command = struct.unpack("<1B", data)[0]
                     if command == CommunicationsManager.STOP_COMMAND:
                         connection.close()
-                        with self.stop_lock:
-                            self.stop = True
+                        self.broadcast_socket = None
                         stop_experiment()
                         PathEmulation.tearDown()
 
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
-                        connection.send(struct.pack("<3Q", self.produced, int(round(self.largest_produced_gap*1000)), self.received))
+                        connection.send(struct.pack("<3Q", self.produced,
+                                                    int(round(self.largest_produced_gap*1000)), self.received))
                         ack = connection.recv(1)
                         if len(ack) != 1:
                             connection.close()
@@ -213,6 +200,5 @@ class CommunicationsManager:
                         connection.close()
                         print("Starting Experiment!")
                         start_experiment()
-            except OSError as e:
+            except OSError:
                 continue  # Connection timed out (most likely)
-
