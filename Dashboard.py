@@ -125,14 +125,9 @@ def stopExperiment():
             s.close()
             data_tuple = struct.unpack("<3Q", data)
             produced += data_tuple[0]
-            gaps.append(data_tuple[1])
             received += data_tuple[2]
             with DashboardState.lock:
                 host.status = 'Down'
-                if produced > 0:
-                    DashboardState.lost_packets = 1-(received/produced)
-                else:
-                    DashboardState.lost_packets = 0
                 continue
         except OSError as e:
             print(e)
@@ -140,12 +135,10 @@ def stopExperiment():
             sleep(0.5)
 
     with DashboardState.lock:
-        gap_sum = 0
-        for gap in gaps:
-            if gap > DashboardState.largest_produced_gap:
-                DashboardState.largest_produced_gap = gap
-            gap_sum += gap
-        DashboardState.largest_produced_gap_average = gap_sum/len(gaps)
+        if produced > 0:
+            DashboardState.lost_packets = 1-(received/produced)
+        else:
+            DashboardState.lost_packets = 0
         DashboardState.stopping = False
 
 def startExperiment():

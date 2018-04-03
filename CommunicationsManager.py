@@ -1,10 +1,10 @@
 import random
 
 from NetGraph import NetGraph
-from utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT
+from utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error
 import PathEmulation
 
-from threading import Thread
+from threading import Thread, Lock
 from _thread import interrupt_main
 import socket
 import struct
@@ -43,6 +43,7 @@ class CommunicationsManager:
         self.received = 0
         self.consumed = 0
         self.largest_produced_gap = -1
+        self.stop_lock = Lock()
 
         link_count = len(self.graph.links)
         if link_count <= BYTE_LIMIT:
@@ -132,11 +133,9 @@ class CommunicationsManager:
             self.produced += len(self.broadcast_group)-self.supervisor_count
             # The following line can improve results under some scenarios but is overall too expensive
             #random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
-            for ip in self.broadcast_group:
-                try:
+            with self.stop_lock:
+                for ip in self.broadcast_group:
                     self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
-                except AttributeError:
-                    pass  # Ignore if we set socket to None
 
     def receive_flows(self):
         while True:
@@ -172,25 +171,29 @@ class CommunicationsManager:
                     command = struct.unpack("<1B", data)[0]
                     if command == CommunicationsManager.STOP_COMMAND:
                         connection.close()
-                        self.broadcast_socket = None
                         stop_experiment()
-                        PathEmulation.tearDown()
+                        with self.stop_lock:
+                            PathEmulation.tearDown()
+                            self.broadcast_group.clear()
 
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
                         connection.send(struct.pack("<3Q", self.produced,
                                                     int(round(self.largest_produced_gap*1000)), self.received))
                         ack = connection.recv(1)
                         if len(ack) != 1:
+                            error("Bad ACK")
                             connection.close()
                             continue
                         if struct.unpack("<1B", ack) != CommunicationsManager.ACK:
+                            error("Bad ACK")
                             connection.close()
                             continue
                         connection.close()
-                        self.dashboard_socket.close()
-                        self.sock.close()
-                        self.broadcast_socket.close()
-                        interrupt_main()
+                        with self.stop_lock:
+                            self.broadcast_socket.close()
+                            self.dashboard_socket.close()
+                            self.sock.close()
+                            interrupt_main()
 
                     elif command == CommunicationsManager.READY_COMMAND:
                         connection.send(struct.pack("<1B", CommunicationsManager.ACK))
@@ -200,5 +203,5 @@ class CommunicationsManager:
                         connection.close()
                         print("Starting Experiment!")
                         start_experiment()
-            except OSError:
+            except OSError as e:
                 continue  # Connection timed out (most likely)

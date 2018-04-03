@@ -12,6 +12,9 @@ def fail(message):
     print("Error Message: " + message, file=sys.stderr)
     exit(-1)
 
+def error(message):
+    print("ERROR: " + message, file=sys.stderr)
+
 def start_experiment():
     # Temporary hack to start the experiment
     subprocess.run('echo "done" > /tmp/readypipe', shell=True)
