@@ -55,11 +55,13 @@ class CommunicationsManager:
             fail("Topology has too many links: " + str(link_count))
         self.link_size = struct.calcsize("<1"+self.link_unit)
 
+        self.broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.broadcast_group = []
         self.supervisor_count = 0
         broadcast = os.environ.get('BROADCAST_ADDRESS', '')
         if broadcast:
             self.broadcast_group.append(broadcast)
+            self.broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
         for service in self.graph.services:
             hosts = self.graph.services[service]
@@ -72,7 +74,6 @@ class CommunicationsManager:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('0.0.0.0', CommunicationsManager.UDP_PORT))
 
-        self.broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.dashboard_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.dashboard_socket.bind(('0.0.0.0', CommunicationsManager.TCP_PORT))
