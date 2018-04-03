@@ -103,64 +103,28 @@ class CommunicationsManager:
         #     self.largest_produced_gap = produced_gap
         # self.produced_ts = current_time
 
-        active_flows = active_paths[:]
-
-        while active_flows:
-            packet_flows = []
-
-            # calculate size of packet
+        i = 0
+        while i < len(active_paths):
+            packet = [0]
+            flows_counter = 0
             fmt = "<1H"
-            while active_flows:
-                flow = active_flows.pop()
-                fmt += "1i1" + self.link_unit
-                for link in flow.links:
-                    fmt += "1" + self.link_unit
-                size = struct.calcsize(fmt)
-                if size <= CommunicationsManager.BUFFER_LEN:  # If we fit in the packet append it
-                    packet_flows.append(flow)
-                    continue
-                else:  # if we dont fit, send the other ones
-                    active_flows.append(flow)  # and put the current one back in
+            free_space = CommunicationsManager.BUFFER_LEN - struct.calcsize(fmt)
+            while i < len(active_paths):
+                flow = active_paths[i]
+                # check if this flow still fits
+                if free_space-CommunicationsManager.i_SIZE-(self.link_size*(len(flow.links)+1)) < 0:
                     break
-
-            # Build the packet
+                i += 1
+                flows_counter += 1
+                fmt += "1i"+("1"+self.link_unit)*(len(flow.links)+1)
+                packet.append(int(flow.used_bandwidth))
+                packet.append(len(flow.links))
+                for link in flow.links:
+                    packet.append(link.index)
+            packet[0] = flows_counter
             size = struct.calcsize(fmt)
             data = ctypes.create_string_buffer(size)
-            accumulated_size = 0
-            struct.pack_into("<1H", data, accumulated_size, len(packet_flows))
-            accumulated_size += struct.calcsize("<1H")
-            while packet_flows:
-                flow = packet_flows.pop()
-                struct.pack_into("<1i", data, accumulated_size, int(flow.used_bandwidth))
-                accumulated_size += struct.calcsize("<1i")
-                struct.pack_into("<1" + self.link_unit, data, accumulated_size, len(flow.links))
-                accumulated_size += struct.calcsize("<1" + self.link_unit)
-                for link in flow.links:
-                    struct.pack_into("<1" + self.link_unit, data, accumulated_size, link.index)
-                    accumulated_size += struct.calcsize("<1" + self.link_unit)
-
-        #i = 0
-        #while i < len(active_paths):
-        #    packet = [0]
-        #    flows_counter = 0
-        #    fmt = "<1H"
-        #    free_space = CommunicationsManager.BUFFER_LEN - struct.calcsize(fmt)
-        #    while i < len(active_paths):
-        #        flow = active_paths[i]
-                # check if this flow still fits
-        #        if free_space-CommunicationsManager.i_SIZE-(self.link_size*(len(flow.links)+1)) < 0:
-        #            break
-        #        i += 1
-        #        flows_counter += 1
-        #        fmt += "1i"+("1"+self.link_unit)*(len(flow.links)+1)
-        #        packet.append(int(flow.used_bandwidth))
-        #        packet.append(len(flow.links))
-        #        for link in flow.links:
-        #            packet.append(link.index)
-        #    packet[0] = flows_counter
-        #    size = struct.calcsize(fmt)
-        #    data = ctypes.create_string_buffer(size)
-        #    struct.pack_into(fmt, data, 0, *packet)
+            struct.pack_into(fmt, data, 0, *packet)
             # The following line can improve results under some scenarios but is overall too expensive
             #random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
 
