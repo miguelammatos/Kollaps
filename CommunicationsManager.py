@@ -9,6 +9,7 @@ from _thread import interrupt_main
 import socket
 import struct
 import ctypes
+import os
 
 import sys
 if sys.version_info >= (3, 0):
@@ -56,10 +57,14 @@ class CommunicationsManager:
 
         self.broadcast_group = []
         self.supervisor_count = 0
+        broadcast = os.environ.get('BROADCAST_ADDRESS', '')
+        if broadcast:
+            self.broadcast_group.append(broadcast)
+
         for service in self.graph.services:
             hosts = self.graph.services[service]
             for host in hosts:
-                if host != self.graph.root:
+                if host != self.graph.root and not broadcast:
                     self.broadcast_group.append(host.ip)
                 if host.supervisor:
                     self.supervisor_count += 1
@@ -79,6 +84,7 @@ class CommunicationsManager:
         self.dashboard_thread = Thread(target=self.receive_dashboard_commands)
         self.dashboard_thread.daemon = True
         self.dashboard_thread.start()
+
 
     def broadcast_flows(self, active_paths):
         """
