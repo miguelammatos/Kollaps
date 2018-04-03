@@ -51,6 +51,7 @@ class XMLGraphParser:
                     if supervisor:
                         self.supervisors.append(srv)
                         srv.supervisor_port = supervisor_port
+                        srv.supervisor = True
 
     def parse_bridges(self, root):
         for bridge in root:

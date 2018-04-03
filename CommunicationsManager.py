@@ -140,7 +140,7 @@ class CommunicationsManager:
             #random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
 
             with self.stop_lock:
-                self.produced += self.peer_count
+                self.produced += self.peer_count if len(self.broadcast_group) > 0 else 0
                 for ip in self.broadcast_group:
                     self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
 
