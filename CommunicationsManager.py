@@ -175,8 +175,7 @@ class CommunicationsManager:
 
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
                         print("Received Shutdown command")
-                        connection.send(struct.pack("<3Q", self.produced,
-                                                    int(round(self.largest_produced_gap*1000)), self.received))
+                        connection.send(struct.pack("<3Q", self.produced, 50, self.received))
                         ack = connection.recv(1)
                         if len(ack) != 1:
                             error("Bad ACK")
