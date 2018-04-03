@@ -149,7 +149,7 @@ class CommunicationsManager:
         while True:
             data, addr = self.sock.recvfrom(CommunicationsManager.BUFFER_LEN)
             if addr[0] == self.graph.root.ip:
-                return
+                continue
             offset = 0
             num_of_flows = struct.unpack_from("<1H", data, offset)[0]
             offset += struct.calcsize("<1H")
