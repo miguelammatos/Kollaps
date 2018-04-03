@@ -67,13 +67,14 @@ class CommunicationsManager:
         for service in self.graph.services:
             hosts = self.graph.services[service]
             for host in hosts:
-                if host != self.graph.root and not broadcast:
-                    self.broadcast_group.append(host.ip)
+                if host != self.graph.root:
+                    self.peer_count += 1
+                    if not broadcast:
+                        self.broadcast_group.append(host.ip)
                 if host.supervisor:
                     self.supervisor_count += 1
-                else:
-                    if host != self.graph.root:
-                        self.peer_count += 1
+
+        self.peer_count -= self.supervisor_count
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('0.0.0.0', CommunicationsManager.UDP_PORT))
@@ -147,6 +148,8 @@ class CommunicationsManager:
     def receive_flows(self):
         while True:
             data, addr = self.sock.recvfrom(CommunicationsManager.BUFFER_LEN)
+            if addr == self.graph.root.ip:
+                return
             offset = 0
             num_of_flows = struct.unpack_from("<1H", data, offset)[0]
             offset += struct.calcsize("<1H")
