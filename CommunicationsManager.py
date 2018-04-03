@@ -72,7 +72,8 @@ class CommunicationsManager:
                 if host.supervisor:
                     self.supervisor_count += 1
                 else:
-                    self.peer_count += 1
+                    if host != self.graph.root:
+                        self.peer_count += 1
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('0.0.0.0', CommunicationsManager.UDP_PORT))
