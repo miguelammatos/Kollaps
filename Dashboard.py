@@ -130,6 +130,7 @@ def stopExperiment():
                 host.status = 'Down'
                 continue
         except OSError as e:
+            print("timed out")
             print(e)
             to_kill.insert(0, host)
             sleep(0.5)

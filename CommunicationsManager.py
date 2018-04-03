@@ -157,7 +157,7 @@ class CommunicationsManager:
             self.received += 1
 
     def receive_dashboard_commands(self):
-        self.dashboard_socket.listen(1)
+        self.dashboard_socket.listen()
         while True:
             connection, addr = self.dashboard_socket.accept()
             connection.settimeout(5)
@@ -169,10 +169,12 @@ class CommunicationsManager:
                         connection.close()
                         stop_experiment()
                         with self.stop_lock:
+                            print("Stopping experiment")
                             PathEmulation.tearDown()
                             self.broadcast_group = []
 
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
+                        print("Received Shutdown command")
                         connection.send(struct.pack("<3Q", self.produced,
                                                     int(round(self.largest_produced_gap*1000)), self.received))
                         ack = connection.recv(1)
@@ -189,6 +191,7 @@ class CommunicationsManager:
                             self.broadcast_socket.close()
                             self.dashboard_socket.close()
                             self.sock.close()
+                            print("Shutting down")
                             interrupt_main()
 
                     elif command == CommunicationsManager.READY_COMMAND:
