@@ -58,6 +58,7 @@ class CommunicationsManager:
         self.broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.broadcast_group = []
         self.supervisor_count = 0
+        self.peer_count = 0
         broadcast = os.environ.get('BROADCAST_ADDRESS', '')
         if broadcast:
             self.broadcast_group.append(broadcast)
@@ -70,6 +71,8 @@ class CommunicationsManager:
                     self.broadcast_group.append(host.ip)
                 if host.supervisor:
                     self.supervisor_count += 1
+                else:
+                    self.peer_count += 1
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('0.0.0.0', CommunicationsManager.UDP_PORT))
@@ -136,7 +139,7 @@ class CommunicationsManager:
             #random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
 
             with self.stop_lock:
-                self.produced += len(self.broadcast_group)-self.supervisor_count
+                self.produced += self.peer_count
                 for ip in self.broadcast_group:
                     self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
 
