@@ -26,11 +26,12 @@ def initialize_path(path):
     destination = path.links[-1].destination  # type: NetGraph.Service
     bandwidth = path.max_bandwidth
     latency = path.latency
+    jitter = path.jitter
     drop = path.drop
 
     with PEState.PathLock:
         if not PEState.shutdown:
-            TCAL.initDestination(destination.ip, bandwidth, latency, drop)
+            TCAL.initDestination(destination.ip, bandwidth, latency, jitter, drop)
 
 
 def update_usage():

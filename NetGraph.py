@@ -54,13 +54,14 @@ class NetGraph:
 
     class Link:
         # Links are unidirectional
-        def __init__(self, source, destination, latency, drop, bandwidth, Kbps, network):
+        def __init__(self, source, destination, latency, jitter, drop, bandwidth, Kbps, network):
             self.index = 0
             self.source = source  # type: NetGraph.Node
             self.destination = destination  # type: NetGraph.Node
             try:
                 self.latency = int(latency)
                 self.drop = float(drop)
+                self.jitter = int(jitter)
             except:
                 fail("Provided link data is not valid: "
                      + latency + "ms "
@@ -77,22 +78,26 @@ class NetGraph:
             total_latency = 0
             total_not_drop_probability = 1.0
             max_bandwidth = None
+            max_jitter = 0
             for link in self.links:
                 try:
                     if max_bandwidth is None:
                         max_bandwidth = link.bandwidth_Kbps
                     if link.bandwidth_Kbps < max_bandwidth:
                         max_bandwidth = link.bandwidth_Kbps
+                    if link.jitter > max_jitter:
+                        max_jitter = link.jitter
                     total_latency += int(link.latency)
                     total_not_drop_probability *= (1.0-float(link.drop))
                 except:
                     fail("Provided link data is not valid: "
-                         + link.latency + "ms "
-                         + link.drop + "drop rate "
+                         + str(link.latency) + "ms "
+                         + str(link.drop) + "drop rate "
                          + link.bandwidth)
             self.max_bandwidth = max_bandwidth
             self.current_bandwidth = max_bandwidth
             self.latency = total_latency
+            self.jitter = max_jitter
             self.RTT = self.latency*2
             # Product of reverse probabilities reversed
             # basically calculate the probability of not dropping across the entire path
@@ -129,7 +134,7 @@ class NetGraph:
             fail("Cant add bridge with name: " + name + ". Another node with the same name already exists")
         return bridge
 
-    def new_link(self, source, destination, latency, drop, bandwidth, network):
+    def new_link(self, source, destination, latency, jitter, drop, bandwidth, network):
         if network not in self.networks:
             self.networks.append(network)
         source_nodes = self.get_nodes(source)
@@ -139,7 +144,7 @@ class NetGraph:
                 bandwidth_kbps = self.bandwidth_in_kbps(bandwidth)
                 if self.reference_bandwidth < bandwidth_kbps:
                     self.reference_bandwidth = bandwidth_kbps
-                link = NetGraph.Link(node, dest, latency, drop, bandwidth, bandwidth_kbps, network)
+                link = NetGraph.Link(node, dest, latency, jitter, drop, bandwidth, bandwidth_kbps, network)
                 link.index = self.link_counter
                 self.link_counter += 1
                 self.links.append(link)
