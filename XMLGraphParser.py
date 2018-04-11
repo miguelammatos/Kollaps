@@ -76,7 +76,7 @@ class XMLGraphParser:
             if link.tag != 'link':
                 fail('Invalid tag inside <links>: ' + link.tag)
             if 'origin' not in link.attrib or 'dest' not in link.attrib or 'latency' not in link.attrib or \
-                    'drop' not in link.attrib or 'upload' not in link.attrib or 'download' not in link.attrib or \
+                    'drop' not in link.attrib or 'upload' not in link.attrib or \
                     'network' not in link.attrib:
                 fail("Incomplete link description.")
 
@@ -87,6 +87,8 @@ class XMLGraphParser:
             if 'jitter' in link.attrib:
                 jitter = link.attrib['jitter']
 
+            bidirectional = ('download' in link.attrib)
+
             both_shared = (source_nodes[0].shared_link and destination_nodes[0].shared_link)
             if both_shared:
                 src_meta_bridge = self.create_meta_bridge()
@@ -95,47 +97,55 @@ class XMLGraphParser:
                 # create a link between both meta bridges
                 self.graph.new_link(src_meta_bridge, dst_meta_bridge, link.attrib['latency'],
                                     jitter, link.attrib['drop'], link.attrib['upload'], link.attrib['network'])
-                self.graph.new_link(dst_meta_bridge, src_meta_bridge, link.attrib['latency'],
+                if bidirectional:
+                    self.graph.new_link(dst_meta_bridge, src_meta_bridge, link.attrib['latency'],
                                     jitter, link.attrib['drop'], link.attrib['download'], link.attrib['network'])
                 # connect source to src meta bridge
                 self.graph.new_link(link.attrib['origin'], src_meta_bridge, 0,
                                     0, 0.0, link.attrib['upload'], link.attrib['network'])
-                self.graph.new_link(src_meta_bridge, link.attrib['origin'], 0,
+                if bidirectional:
+                    self.graph.new_link(src_meta_bridge, link.attrib['origin'], 0,
                                     0, 0.0, link.attrib['download'], link.attrib['network'])
                 # connect destination to dst meta bridge
                 self.graph.new_link(dst_meta_bridge, link.attrib['dest'], 0,
                                     0, 0.0, link.attrib['upload'], link.attrib['network'])
-                self.graph.new_link(link.attrib['dest'], dst_meta_bridge, 0,
+                if bidirectional:
+                    self.graph.new_link(link.attrib['dest'], dst_meta_bridge, 0,
                                     0, 0.0, link.attrib['download'], link.attrib['network'])
             elif source_nodes[0].shared_link:
                 meta_bridge = self.create_meta_bridge()
                 # create a link between meta bridge and destination
                 self.graph.new_link(meta_bridge, link.attrib['dest'], link.attrib['latency'],
                                     jitter, link.attrib['drop'], link.attrib['upload'], link.attrib['network'])
-                self.graph.new_link(link.attrib['dest'], meta_bridge, link.attrib['latency'],
+                if bidirectional:
+                    self.graph.new_link(link.attrib['dest'], meta_bridge, link.attrib['latency'],
                                     jitter, link.attrib['drop'], link.attrib['download'], link.attrib['network'])
                 # connect origin to meta bridge
                 self.graph.new_link(link.attrib['origin'], meta_bridge, 0,
                                     0, 0.0, link.attrib['upload'], link.attrib['network'])
-                self.graph.new_link(meta_bridge, link.attrib['origin'], 0,
+                if bidirectional:
+                    self.graph.new_link(meta_bridge, link.attrib['origin'], 0,
                                     0, 0.0, link.attrib['download'], link.attrib['network'])
             elif destination_nodes[0].shared_link:
                 meta_bridge = self.create_meta_bridge()
                 # create a link between origin and meta_bridge
                 self.graph.new_link(link.attrib['origin'], meta_bridge, link.attrib['latency'],
                                     jitter, link.attrib['drop'], link.attrib['upload'], link.attrib['network'])
-                self.graph.new_link(meta_bridge, link.attrib['origin'], link.attrib['latency'],
+                if bidirectional:
+                    self.graph.new_link(meta_bridge, link.attrib['origin'], link.attrib['latency'],
                                     jitter, link.attrib['drop'], link.attrib['download'], link.attrib['network'])
                 # connect meta bridge to destination
                 self.graph.new_link(meta_bridge, link.attrib['dest'], 0,
                                     0, 0.0, link.attrib['upload'], link.attrib['network'])
-                self.graph.new_link(link.attrib['dest'], meta_bridge, 0,
+                if bidirectional:
+                    self.graph.new_link(link.attrib['dest'], meta_bridge, 0,
                                     0, 0.0, link.attrib['download'], link.attrib['network'])
             else:
                 # Regular case create a link between origin and destination
                 self.graph.new_link(link.attrib['origin'], link.attrib['dest'], link.attrib['latency'],
                                 jitter, link.attrib['drop'], link.attrib['upload'], link.attrib['network'])
-                self.graph.new_link(link.attrib['dest'], link.attrib['origin'], link.attrib['latency'],
+                if bidirectional:
+                    self.graph.new_link(link.attrib['dest'], link.attrib['origin'], link.attrib['latency'],
                                 jitter, link.attrib['drop'], link.attrib['download'], link.attrib['network'])
 
     def fill_graph(self):
