@@ -61,7 +61,7 @@ class NetGraph:
             try:
                 self.latency = int(latency)
                 self.drop = float(drop)
-                self.jitter = int(jitter)
+                self.jitter = float(jitter)
             except:
                 fail("Provided link data is not valid: "
                      + latency + "ms "
