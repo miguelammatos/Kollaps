@@ -1,5 +1,6 @@
 from utils import fail
 from time import sleep
+from math import sqrt
 import re
 
 import dns.resolver
@@ -78,15 +79,15 @@ class NetGraph:
             total_latency = 0
             total_not_drop_probability = 1.0
             max_bandwidth = None
-            max_jitter = 0
+            jitter = 0
             for link in self.links:
                 try:
                     if max_bandwidth is None:
                         max_bandwidth = link.bandwidth_Kbps
                     if link.bandwidth_Kbps < max_bandwidth:
                         max_bandwidth = link.bandwidth_Kbps
-                    if link.jitter > max_jitter:
-                        max_jitter = link.jitter
+                    # Accumulate jitter by summing the variances
+                    jitter = sqrt( (jitter*jitter)+(link.jitter*link.jitter))
                     total_latency += int(link.latency)
                     total_not_drop_probability *= (1.0-float(link.drop))
                 except:
@@ -97,7 +98,7 @@ class NetGraph:
             self.max_bandwidth = max_bandwidth
             self.current_bandwidth = max_bandwidth
             self.latency = total_latency
-            self.jitter = max_jitter
+            self.jitter = jitter
             self.RTT = self.latency*2
             # Product of reverse probabilities reversed
             # basically calculate the probability of not dropping across the entire path
