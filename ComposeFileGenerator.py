@@ -1,11 +1,13 @@
 from NetGraph import NetGraph
 from utils import fail
+from uuid import uuid4
 
 
 class ComposeFileGenerator:
     def __init__(self, topology_file, graph):
         self.graph = graph  # type: NetGraph
         self.topology_file = topology_file
+        self.experiment_UUID = "NEED_" + str(uuid4())
 
     def print_header(self):
         print("version: \"3.3\"")
@@ -14,7 +16,7 @@ class ComposeFileGenerator:
     def print_bootstrapper(self):
         print("  bootstrapper:")
         print("    image: warpenguin.no-ip.org/privilegedbootstrapper:1.3")
-        print("    command: [\"netsim\", \"python3 /opt/NEED/emucore.py\"]")
+        print("    command: [\"" + self.experiment_UUID + "\", \"python3 /opt/NEED/emucore.py\"]")
         print("    deploy:")
         print("      mode: global")
         print("    volumes:")
@@ -36,7 +38,7 @@ class ComposeFileGenerator:
         print("    hostname: " + service_list[0].name)
         if not service_list[0].supervisor:
             print("    labels:")
-            print("      netsim: \"true\"")
+            print("      " + self.experiment_UUID + ": \"true\"")
         print("    deploy:")
         print("      replicas: " + str(len(service_list)))
         if not service_list[0].supervisor:
