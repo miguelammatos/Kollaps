@@ -7,7 +7,7 @@ class ComposeFileGenerator:
     def __init__(self, topology_file, graph):
         self.graph = graph  # type: NetGraph
         self.topology_file = topology_file
-        self.experiment_UUID = "NEED_" + str(uuid4())
+        self.experiment_UUID = str(uuid4())
 
     def print_header(self):
         print("version: \"3.3\"")
@@ -28,7 +28,7 @@ class ComposeFileGenerator:
         print("")
 
     def print_service(self, service_list):
-        print("  " + service_list[0].name + ":")
+        print("  " + service_list[0].name + "-" + self.experiment_UUID + ":")
         print("    image: " + service_list[0].image)
         if service_list[0].command is not None:
             print("    command: " + service_list[0].command)
@@ -43,6 +43,8 @@ class ComposeFileGenerator:
         print("      replicas: " + str(len(service_list)))
         if not service_list[0].supervisor:
             print("      endpoint_mode: dnsrr")
+        print("    environment:")
+        print("      NEED_UUID: '" + self.experiment_UUID + "'")
         print("    configs:")
         print("      - source: topology")
         print("        target: /topology.xml")

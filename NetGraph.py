@@ -1,6 +1,7 @@
 from utils import fail
 from time import sleep
 from math import sqrt
+from os import environ
 import re
 
 import dns.resolver
@@ -173,6 +174,8 @@ class NetGraph:
         # Moreover, in some scenarios the /etc/resolv.conf is broken inside the containers
         # So to get the names to resolve properly we need to force to use dockers internal nameserver
         # 127.0.0.11
+
+        experimentUUID = environ.get('NEED_UUID', '')
         docker_resolver = dns.resolver.Resolver(configure=False)
         docker_resolver.nameservers = ['127.0.0.11']
         for service in self.services:
@@ -180,7 +183,7 @@ class NetGraph:
             ips = []
             while len(ips) != len(hosts):
                 try:
-                    answers = docker_resolver.query(service, 'A')
+                    answers = docker_resolver.query(service + "-" + experimentUUID, 'A')
                     ips = [str(ip) for ip in answers]
                     if len(ips) != len(hosts):
                         sleep(3)

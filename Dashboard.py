@@ -2,6 +2,7 @@ import re
 import struct
 import sys
 from collections import OrderedDict
+from os import environ
 
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, json
 from threading import Lock, Thread
@@ -175,6 +176,9 @@ def startExperiment():
 
 
 def resolve_hostnames():
+    # See comments in NetGraph.py
+
+    experimentUUID = environ.get('NEED_UUID', '')
     docker_resolver = dns.resolver.Resolver(configure=False)
     docker_resolver.nameservers = ['127.0.0.11']
     for service in graph.services:
@@ -182,7 +186,7 @@ def resolve_hostnames():
         ips = []
         while len(ips) != len(service_instances):
             try:
-                answers = docker_resolver.query(service, 'A')
+                answers = docker_resolver.query(service + "-" + experimentUUID, 'A')
                 ips = [str(ip) for ip in answers]
                 if len(ips) != len(service_instances):
                     sleep(3)
