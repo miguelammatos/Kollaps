@@ -153,7 +153,6 @@ class CommunicationsManager:
             offset = 0
             num_of_flows = struct.unpack_from("<1H", data, offset)[0]
             offset += struct.calcsize("<1H")
-            accepted = False
             for i in range(num_of_flows):
                 bandwidth = struct.unpack_from("<1i", data, offset)[0]
                 offset += struct.calcsize("<1i")
@@ -165,9 +164,7 @@ class CommunicationsManager:
                     offset += struct.calcsize("<1"+self.link_unit)
                     links.append(index)
 
-                accepted = accepted or self.flow_collector(bandwidth, links)
-            if accepted:
-                self.consumed += 1  # only count a packet as received if it is not dropped by the emulation manager
+                self.flow_collector(bandwidth, links)
             self.received += 1
 
     def receive_dashboard_commands(self):

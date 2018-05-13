@@ -1,6 +1,4 @@
-import re
 import struct
-import sys
 from collections import OrderedDict
 from os import environ
 
@@ -14,6 +12,7 @@ from NetGraph import NetGraph
 from XMLGraphParser import XMLGraphParser
 
 import dns.resolver
+import netifaces
 
 import sys
 if sys.version_info >= (3, 0):
@@ -181,6 +180,15 @@ def resolve_hostnames():
     experimentUUID = environ.get('NEED_UUID', '')
     docker_resolver = dns.resolver.Resolver(configure=False)
     docker_resolver.nameservers = ['127.0.0.11']
+
+    # We need to save our own ips for setting the root of the graph
+    own_ips = []
+    for interface in netifaces.interfaces():
+        try:
+            own_ips.append(netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'])
+        except KeyError:
+            pass
+
     for service in graph.services:
         service_instances = graph.services[service]
         ips = []
@@ -197,7 +205,9 @@ def resolve_hostnames():
                 service_instances[i].ip = ips[i]
         for i, host in enumerate(service_instances):
             if host.supervisor:
-                continue
+                for ip in own_ips:
+                    if ip == host.ip:
+                        graph.root = host
             with DashboardState.lock:
                 DashboardState.hosts[host].ip = ips[i]
                 DashboardState.hosts[host].status = 'Pending'
