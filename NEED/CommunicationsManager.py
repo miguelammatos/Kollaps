@@ -1,8 +1,8 @@
 import random
 
-from NetGraph import NetGraph
-from utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error
-import PathEmulation
+from NEED.NetGraph import NetGraph
+from NEED.utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error
+import NEED.PathEmulation as PathEmulation
 
 from threading import Thread, Lock
 from _thread import interrupt_main

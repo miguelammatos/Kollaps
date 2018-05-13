@@ -7,9 +7,9 @@ from threading import Lock, Thread
 from time import sleep
 import socket
 
-from CommunicationsManager import CommunicationsManager
-from NetGraph import NetGraph
-from XMLGraphParser import XMLGraphParser
+from NEED.CommunicationsManager import CommunicationsManager
+from NEED.NetGraph import NetGraph
+from NEED.XMLGraphParser import XMLGraphParser
 
 import dns.resolver
 import netifaces
@@ -208,6 +208,7 @@ def resolve_hostnames():
                 for ip in own_ips:
                     if ip == host.ip:
                         graph.root = host
+                continue
             with DashboardState.lock:
                 DashboardState.hosts[host].ip = ips[i]
                 DashboardState.hosts[host].status = 'Pending'

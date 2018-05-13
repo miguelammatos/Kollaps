@@ -1,12 +1,12 @@
 #! /usr/bin/python
-from NetGraph import NetGraph
-from XMLGraphParser import XMLGraphParser
-from EmulationManager import EmulationManager
-from utils import fail
+from NEED.NetGraph import NetGraph
+from NEED.XMLGraphParser import XMLGraphParser
+from NEED.EmulationManager import EmulationManager
+from NEED.utils import fail
+from NEED.CommunicationsManager import CommunicationsManager
+import NEED.PathEmulation as PathEmulation
 
 from random import randrange, seed, uniform
-import PathEmulation
-from CommunicationsManager import CommunicationsManager
 
 from threading import Thread, Timer
 from sched import scheduler

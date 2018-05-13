@@ -1,4 +1,4 @@
-from utils import fail
+from NEED.utils import fail
 from time import sleep
 from math import sqrt
 from os import environ

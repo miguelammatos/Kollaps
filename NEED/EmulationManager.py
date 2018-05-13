@@ -2,9 +2,9 @@ from time import time, sleep
 from threading import Lock
 from itertools import islice
 
-from NetGraph import NetGraph
-import PathEmulation
-from CommunicationsManager import CommunicationsManager
+from NEED.NetGraph import NetGraph
+import NEED.PathEmulation as PathEmulation
+from NEED.CommunicationsManager import CommunicationsManager
 
 import sys
 if sys.version_info >= (3, 0):

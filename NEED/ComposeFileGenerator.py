@@ -1,5 +1,5 @@
-from NetGraph import NetGraph
-from utils import fail
+from NEED.NetGraph import NetGraph
+from NEED.utils import fail
 from uuid import uuid4
 
 

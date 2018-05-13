@@ -1,5 +1,5 @@
 from TCAL import pyTCAL as TCAL  # TODO this breaks compatibility with py2 for some reason...
-from NetGraph import NetGraph
+from NEED.NetGraph import NetGraph
 from threading import Lock
 
 import sys

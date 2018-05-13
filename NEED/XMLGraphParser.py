@@ -2,8 +2,8 @@ import xml.etree.ElementTree as ET
 from random import choice, randint
 from string import ascii_letters
 
-from utils import fail
-from NetGraph import NetGraph
+from NEED.utils import fail
+from NEED.NetGraph import NetGraph
 
 import sys
 if sys.version_info >= (3, 0):
