@@ -182,12 +182,13 @@ def resolve_hostnames():
     docker_resolver.nameservers = ['127.0.0.11']
 
     # We need to save our own ips for setting the root of the graph
-    own_ips = []
-    for interface in netifaces.interfaces():
-        try:
-            own_ips.append(netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'])
-        except KeyError:
-            pass
+    # Check the comment in CommunicationsManager.init for why this code is commented
+    # own_ips = []
+    # for interface in netifaces.interfaces():
+    #     try:
+    #         own_ips.append(netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'])
+    #     except KeyError:
+    #         pass
 
     for service in DashboardState.graph.services:
         service_instances = DashboardState.graph.services[service]
@@ -205,9 +206,9 @@ def resolve_hostnames():
                 service_instances[i].ip = ips[i]
         for i, host in enumerate(service_instances):
             if host.supervisor:
-                for ip in own_ips:
-                    if ip == host.ip:
-                        DashboardState.graph.root = host
+                # for ip in own_ips:
+                #     if ip == host.ip:
+                #         DashboardState.graph.root = host
                 continue
             with DashboardState.lock:
                 DashboardState.hosts[host].ip = ips[i]

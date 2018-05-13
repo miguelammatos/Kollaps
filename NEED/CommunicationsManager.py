@@ -59,10 +59,22 @@ class CommunicationsManager:
         self.broadcast_group = []
         self.supervisor_count = 0
         self.peer_count = 0
-        broadcast = os.environ.get('BROADCAST_ADDRESS', '')
-        if broadcast:
-            self.broadcast_group.append(broadcast)
-            self.broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+        # Broadcast is temporarily disabled!
+        # There seems to be a regression in the latest version of Docker (18.04.0-ce)
+        # Service discovery is broken on overlay networks, services can resolve to wrong ip addresses
+        # Why does that affect broadcast? because in broadcast mode we need to check for our own packets
+        # and for that we need the root of the graph to be set so we can compare ip addresses in receive_flows()
+        # For some reason this seems to work ok if we only attach 1 network to a container but when we attach
+        # more than one network to a container (like we do in supervisors) the bug is always triggered
+        # Since supervisors rely on this module, but don't necessarily need to set the root of the graph
+        # we are temporarily allowing them not to, so that we can still run experiments...
+
+        # broadcast = os.environ.get('BROADCAST_ADDRESS', '')
+        # if broadcast:
+        #     self.broadcast_group.append(broadcast)
+        #     self.broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        broadcast = False
 
         for service in self.graph.services:
             hosts = self.graph.services[service]
@@ -138,7 +150,7 @@ class CommunicationsManager:
             data = ctypes.create_string_buffer(size)
             struct.pack_into(fmt, data, 0, *packet)
             # The following line can improve results under some scenarios but is overall too expensive
-            #random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
+            # random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
 
             with self.stop_lock:
                 self.produced += self.peer_count if len(self.broadcast_group) > 0 else 0
@@ -148,8 +160,9 @@ class CommunicationsManager:
     def receive_flows(self):
         while True:
             data, addr = self.sock.recvfrom(CommunicationsManager.BUFFER_LEN)
-            if addr[0] == self.graph.root.ip:
-                continue
+            # See broadcast comment above
+            # if addr[0] == self.graph.root.ip:
+            #    continue
             offset = 0
             num_of_flows = struct.unpack_from("<1H", data, offset)[0]
             offset += struct.calcsize("<1H")
