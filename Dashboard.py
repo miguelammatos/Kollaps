@@ -46,7 +46,7 @@ class Host:
 @app.route('/')
 def main():
     with DashboardState.lock:
-        if graph is not None:
+        if DashboardState.graph is not None:
             answer = render_template('index.html', hosts=DashboardState.hosts, stopping=DashboardState.stopping,
                                      max_gap=DashboardState.largest_produced_gap,
                                      max_gap_avg=DashboardState.largest_produced_gap_average,
@@ -189,8 +189,8 @@ def resolve_hostnames():
         except KeyError:
             pass
 
-    for service in graph.services:
-        service_instances = graph.services[service]
+    for service in DashboardState.graph.services:
+        service_instances = DashboardState.graph.services[service]
         ips = []
         while len(ips) != len(service_instances):
             try:
@@ -207,11 +207,14 @@ def resolve_hostnames():
             if host.supervisor:
                 for ip in own_ips:
                     if ip == host.ip:
-                        graph.root = host
+                        DashboardState.graph.root = host
                 continue
             with DashboardState.lock:
                 DashboardState.hosts[host].ip = ips[i]
                 DashboardState.hosts[host].status = 'Pending'
+
+    # We can only instantiate the CommunicationsManager after the graphs root has been set
+    DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph)
 
 def query_until_ready():
     resolve_hostnames()
@@ -266,7 +269,6 @@ if __name__ == "__main__":
                     continue
                 DashboardState.hosts[host] = Host(host.name, host.name + "." + str(i))
 
-    DashboardState.comms = CommunicationsManager(collect_flow, graph)
 
     DashboardState.graph = graph
 
