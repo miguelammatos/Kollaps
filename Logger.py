@@ -2,9 +2,9 @@ from threading import Lock
 import time
 import json
 
-from CommunicationsManager import CommunicationsManager
-from NetGraph import NetGraph
-from XMLGraphParser import XMLGraphParser
+from NEED.CommunicationsManager import CommunicationsManager
+from NEED.NetGraph import NetGraph
+from NEED.XMLGraphParser import XMLGraphParser
 
 import sys
 if sys.version_info >= (3, 0):

@@ -1,10 +1,10 @@
 #! /usr/bin/python
 import sys
 
-from NetGraph import NetGraph
-from XMLGraphParser import XMLGraphParser
-from ComposeFileGenerator import ComposeFileGenerator
-from utils import fail, SHORT_LIMIT
+from NEED.NetGraph import NetGraph
+from NEED.XMLGraphParser import XMLGraphParser
+from NEED.ComposeFileGenerator import ComposeFileGenerator
+from NEED.utils import fail, SHORT_LIMIT
 
 
 def main():
