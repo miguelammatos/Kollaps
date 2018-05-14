@@ -33,7 +33,7 @@ class EmulationManager:
         self.state_lock = Lock()
         self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
-        EmulationManager.POOL_PERIOD = environ(float(ENVIRONMENT.POOL_PERIOD), EmulationManager.POOL_PERIOD)
+        EmulationManager.POOL_PERIOD = float(environ(ENVIRONMENT.POOL_PERIOD, EmulationManager.POOL_PERIOD))
 
     def initialize(self):
         PathEmulation.init(CommunicationsManager.UDP_PORT)
