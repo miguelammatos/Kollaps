@@ -7,6 +7,13 @@ BYTE_LIMIT = 255
 SHORT_LIMIT = 65535
 # INT_LIMIT = 4294967296
 
+
+class ENVIRONMENT:
+    NETWORK_INTERFACE = 'NETWORK_INTERFACE'
+    BROADCAST = 'BROADCAST_ADDRESS'
+    POOL_PERIOD = 'NEED_POOL_PERIOD'
+
+
 def fail(message):
     print("An error occured, terminating!", file=sys.stderr)
     print("Error Message: " + message, file=sys.stderr)

@@ -1,10 +1,12 @@
 from time import time, sleep
 from threading import Lock
 from itertools import islice
+from os import environ
 
 from NEED.NetGraph import NetGraph
 import NEED.PathEmulation as PathEmulation
 from NEED.CommunicationsManager import CommunicationsManager
+from NEED.utils import ENVIRONMENT
 
 import sys
 if sys.version_info >= (3, 0):
@@ -31,6 +33,7 @@ class EmulationManager:
         self.state_lock = Lock()
         self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
+        EmulationManager.POOL_PERIOD = environ(float(ENVIRONMENT.POOL_PERIOD), EmulationManager.POOL_PERIOD)
 
     def initialize(self):
         PathEmulation.init(CommunicationsManager.UDP_PORT)
