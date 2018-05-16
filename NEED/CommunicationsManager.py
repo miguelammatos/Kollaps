@@ -168,7 +168,7 @@ class CommunicationsManager:
             offset += struct.calcsize("<1H")
             for i in range(num_of_flows):
                 bandwidth = struct.unpack_from("<1Q", data, offset)[0]
-                offset += struct.calcsize("<1i")
+                offset += struct.calcsize("<1Q")
                 num_of_links = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
                 offset += struct.calcsize("<1"+self.link_unit)
                 links = []
