@@ -250,7 +250,7 @@ def query_until_ready():
 def collect_flow(bandwidth, links):
     key = str(links[0]) + ":" + str(links[-1])
     with DashboardState.lock:
-        DashboardState.flows[key] = (links[0], links[-1], bandwidth)
+        DashboardState.flows[key] = (links[0], links[-1], int(bandwidth/1000))
     return True
 
 

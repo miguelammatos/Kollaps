@@ -24,7 +24,7 @@ def collect_flow(bandwidth, links):
     key = str(links[0]) + ":" + str(links[-1])
     with LoggerState.lock:
         if key in LoggerState.flows:
-            LoggerState.flows[key][0] += bandwidth
+            LoggerState.flows[key][0] += int(bandwidth/1000)
             LoggerState.flows[key][1] += 1
         else:
             LoggerState.flows[key] = [bandwidth, 1]
