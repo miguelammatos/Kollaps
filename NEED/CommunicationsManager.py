@@ -140,7 +140,7 @@ class CommunicationsManager:
                     break
                 i += 1
                 flows_counter += 1
-                fmt += "1i"+("1"+self.link_unit)*(len(flow.links)+1)
+                fmt += "1Q"+("1"+self.link_unit)*(len(flow.links)+1)
                 packet.append(int(flow.used_bandwidth))
                 packet.append(len(flow.links))
                 for link in flow.links:
@@ -167,7 +167,7 @@ class CommunicationsManager:
             num_of_flows = struct.unpack_from("<1H", data, offset)[0]
             offset += struct.calcsize("<1H")
             for i in range(num_of_flows):
-                bandwidth = struct.unpack_from("<1i", data, offset)[0]
+                bandwidth = struct.unpack_from("<1Q", data, offset)[0]
                 offset += struct.calcsize("<1i")
                 num_of_links = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
                 offset += struct.calcsize("<1"+self.link_unit)

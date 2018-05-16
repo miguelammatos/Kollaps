@@ -56,7 +56,7 @@ class NetGraph:
 
     class Link:
         # Links are unidirectional
-        def __init__(self, source, destination, latency, jitter, drop, bandwidth, Kbps, network):
+        def __init__(self, source, destination, latency, jitter, drop, bandwidth, bps, network):
             self.index = 0
             self.source = source  # type: NetGraph.Node
             self.destination = destination  # type: NetGraph.Node
@@ -70,7 +70,7 @@ class NetGraph:
                      + drop + "drop rate "
                      + bandwidth)
             self.bandwidth = bandwidth  # type: str
-            self.bandwidth_Kbps = Kbps  # type: int
+            self.bandwidth_bps = bps  # type: int
             self.flows = []  # type: List[Tuple[int, int]]  # (RTT, Bandwidth)
             self.network = network
 
@@ -84,9 +84,9 @@ class NetGraph:
             for link in self.links:
                 try:
                     if max_bandwidth is None:
-                        max_bandwidth = link.bandwidth_Kbps
-                    if link.bandwidth_Kbps < max_bandwidth:
-                        max_bandwidth = link.bandwidth_Kbps
+                        max_bandwidth = link.bandwidth_bps
+                    if link.bandwidth_bps < max_bandwidth:
+                        max_bandwidth = link.bandwidth_bps
                     # Accumulate jitter by summing the variances
                     jitter = sqrt( (jitter*jitter)+(link.jitter*link.jitter))
                     total_latency += int(link.latency)
@@ -96,7 +96,7 @@ class NetGraph:
                          + str(link.latency) + "ms "
                          + str(link.drop) + "drop rate "
                          + link.bandwidth)
-            self.max_bandwidth = max_bandwidth
+            self.max_bandwidth = max_bandwidth  # in bps
             self.current_bandwidth = max_bandwidth
             self.latency = total_latency
             self.jitter = jitter
@@ -143,27 +143,27 @@ class NetGraph:
         destination_nodes = self.get_nodes(destination)
         for node in source_nodes:
             for dest in destination_nodes:
-                bandwidth_kbps = self.bandwidth_in_kbps(bandwidth)
-                if self.reference_bandwidth < bandwidth_kbps:
-                    self.reference_bandwidth = bandwidth_kbps
-                link = NetGraph.Link(node, dest, latency, jitter, drop, bandwidth, bandwidth_kbps, network)
+                bandwidth_bps = self.bandwidth_in_bps(bandwidth)
+                if self.reference_bandwidth < bandwidth_bps:
+                    self.reference_bandwidth = bandwidth_bps
+                link = NetGraph.Link(node, dest, latency, jitter, drop, bandwidth, bandwidth_bps, network)
                 link.index = self.link_counter
                 self.link_counter += 1
                 self.links.append(link)
                 node.attach_link(link)
 
-    def bandwidth_in_kbps(self, bandwidth_string):
+    def bandwidth_in_bps(self, bandwidth_string):
         if re.match(self.bandwidth_re, bandwidth_string) is None:
             fail("Bandwidth is not properly specified, accepted values must be: [0-9]+[KMG]bps")
         results = re.findall(self.bandwidth_re, bandwidth_string)
         base = results[0][0]
         multiplier = results[0][1]
         if multiplier == 'K':
-            return int(base)
+            return int(base)*1000
         if multiplier == 'M':
-            return int(base) * 1000
-        if multiplier == 'G':
             return int(base) * 1000 * 1000
+        if multiplier == 'G':
+            return int(base) * 1000 * 1000 * 1000
 
     def resolve_hostnames(self):
         # python's built in address resolver looks in /etc/hosts first
@@ -219,7 +219,7 @@ class NetGraph:
             Q.sort(key=lambda ls: ls[0])
             u = Q.pop(0)[1]  # type: NetGraph.Node
             for link in u.links:
-                alt = dist[u] + (self.reference_bandwidth/link.bandwidth_Kbps)
+                alt = dist[u] + (self.reference_bandwidth/link.bandwidth_bps)
                 if alt < dist[link.destination]:
                     node = link.destination
                     dist[node] = alt

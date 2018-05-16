@@ -80,8 +80,8 @@ class EmulationManager:
                     bytes_delta = bytes  # in case of overflow ignore the bytes before the overflow
                 else:
                     bytes_delta = bytes - host.last_bytes
-                kbits = (bytes_delta / 1000) * 8
-                throughput = kbits / time_delta
+                bits = (bytes_delta) * 8
+                throughput = bits / time_delta
                 host.last_bytes = bytes
 
                 # Get the network path
@@ -118,17 +118,17 @@ class EmulationManager:
                 max_bandwidth_on_link = []
                 # calculate the bandwidth for everyone
                 for flow in link.flows:
-                    max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_Kbps)
+                    max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_bps)
 
                 # Maximize link utilization to 100%
-                spare_bw = link.bandwidth_Kbps - max_bandwidth_on_link[0]
-                our_share = max_bandwidth_on_link[0]/link.bandwidth_Kbps
+                spare_bw = link.bandwidth_bps - max_bandwidth_on_link[0]
+                our_share = max_bandwidth_on_link[0]/link.bandwidth_bps
                 hungry_usage_sum = our_share  # We must be out of the loop to avoid division by zero
                 for i, flow in islice(enumerate(link.flows), 1, None):
                     # Check if a flow is "hungry" (wants more than its allocated share)
                     if flow[BW] > max_bandwidth_on_link[i]:
                         spare_bw -= max_bandwidth_on_link[i]
-                        hungry_usage_sum += max_bandwidth_on_link[i]/link.bandwidth_Kbps
+                        hungry_usage_sum += max_bandwidth_on_link[i]/link.bandwidth_bps
                     else:
                         spare_bw -= flow[BW]
                 normalized_share = our_share/hungry_usage_sum  # we get a share of the spare proportional to our RTT

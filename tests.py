@@ -31,7 +31,7 @@ def mock_initialize_path(path):
     if len(path.links) < 1:
         return
     destination = path.links[-1].destination  # type: NetGraph.Service
-    bandwidth = path.max_bandwidth
+    bandwidth = int(path.max_bandwidth/1000)
     latency = path.latency
     drop = path.drop
     print("Initializing " + destination.name + ":" + str(destination.__hash__()) + " with "
@@ -70,8 +70,8 @@ def mock_change_bandwidth(service, new_bandwidth):
     :param new_bandwidth: int  # in Kbps
     :return:
     """
-    print("Changing " + service.name + ":" + str(service.__hash__()) + " to " + str(new_bandwidth) + "Kbps")
-    CT.current_throughput = new_bandwidth*1000 - 0.01*new_bandwidth*1000
+    print("Changing " + service.name + ":" + str(service.__hash__()) + " to " + str(int(new_bandwidth/1000)) + "Kbps")
+    CT.current_throughput = new_bandwidth - 0.01*new_bandwidth
 
 
 class MockFlowDisseminator:
@@ -111,10 +111,9 @@ class MockFlowDisseminator:
     def receive_flows(self, data):
         if len(data) > 0:
             sleep(0.5)
-        bandwidthMbps = CT.current_throughput/(1000*1000)
         path = [2, 4, 7]
         #path = [0, 42, 44, 65]
-        self.flow_collector(bandwidthMbps*1000, path)
+        self.flow_collector(CT.current_throughput, path)
         #sleep(0.01)
         #bandwidthMbps = 10
         #path = [2, 4, 8]

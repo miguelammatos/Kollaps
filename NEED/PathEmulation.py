@@ -31,7 +31,7 @@ def initialize_path(path):
 
     with PEState.PathLock:
         if not PEState.shutdown:
-            TCAL.initDestination(destination.ip, bandwidth, latency, jitter, drop)
+            TCAL.initDestination(destination.ip, int(bandwidth/1000), latency, jitter, drop)
 
 
 def update_usage():
@@ -55,12 +55,12 @@ def query_usage(service):
 def change_bandwidth(service, new_bandwidth):
     """
     :param service: NetGraph.Service
-    :param new_bandwidth: int  # in Kbps
+    :param new_bandwidth: int  # in bps
     :return:
     """
     with PEState.PathLock:
         if not PEState.shutdown:
-            TCAL.changeBandwidth(service.ip, int(new_bandwidth))
+            TCAL.changeBandwidth(service.ip, int(new_bandwidth/1000))
 
 def tearDown():
     with PEState.PathLock:
