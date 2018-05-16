@@ -27,7 +27,7 @@ def collect_flow(bandwidth, links):
             LoggerState.flows[key][0] += int(bandwidth/1000)
             LoggerState.flows[key][1] += 1
         else:
-            LoggerState.flows[key] = [bandwidth, 1]
+            LoggerState.flows[key] = [int(bandwidth/1000), 1]
     return True
 
 
