@@ -34,6 +34,7 @@ class EmulationManager:
         self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
         EmulationManager.POOL_PERIOD = float(environ.get(ENVIRONMENT.POOL_PERIOD, str(EmulationManager.POOL_PERIOD)))
+        print("Pool Period: " + str(EmulationManager.POOL_PERIOD))
 
     def initialize(self):
         PathEmulation.init(CommunicationsManager.UDP_PORT)

@@ -15,7 +15,7 @@ class ComposeFileGenerator:
 
     def print_bootstrapper(self):
         print("  bootstrapper:")
-        print("    image: warpenguin.no-ip.org/privilegedbootstrapper:1.3")
+        print("    image: privilegedbootstrapper:1.3")
         print("    command: [\"" + self.experiment_UUID + "\", \"python3 /opt/NEED/emucore.py\"]")
         print("    deploy:")
         print("      mode: global")
@@ -35,7 +35,7 @@ class ComposeFileGenerator:
         if service_list[0].supervisor_port > 0:
             print("    ports:")
             print('      - "' + str(service_list[0].supervisor_port) + ':' + str(service_list[0].supervisor_port) + '"')
-        print("    hostname: " + service_list[0].name)
+        print("    hostname: " + service_list[0].name)  # + "-" + self.experiment_UUID) This might be the potential cause for the broadcast regression
         if not service_list[0].supervisor:
             print("    labels:")
             print("      " + self.experiment_UUID + ": \"true\"")

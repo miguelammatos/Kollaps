@@ -21,7 +21,6 @@ class NetGraph:
         self.networks = []  # type: List[str]
         self.supervisors = []  # type: List[NetGraph.Service]
 
-
         self.root = None  # type: NetGraph.Service
         self.paths = {}  # type: Dict[NetGraph.Node,NetGraph.Path]
 
