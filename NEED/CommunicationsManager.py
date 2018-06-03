@@ -31,8 +31,12 @@ def initialize_process():
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 
-def send_datagram(data, ips, port):
+def send_datagram(packet, fmt, ips, port):
     global broadcast_socket
+    size = struct.calcsize(fmt)
+    data = ctypes.create_string_buffer(size)
+    # We cant pickle structs...
+    struct.pack_into(fmt, data, 0, *packet)
     for ip in ips:
         broadcast_socket.sendto(data, (ip, port))
 
@@ -129,14 +133,15 @@ class CommunicationsManager:
                 for link in flow.links:
                     packet.append(link.index)
             packet[0] = flows_counter
-            size = struct.calcsize(fmt)
-            data = ctypes.create_string_buffer(size)
-            struct.pack_into(fmt, data, 0, *packet)
+            # We cant pickle structs...
+            # size = struct.calcsize(fmt)
+            # data = ctypes.create_string_buffer(size)
+            # struct.pack_into(fmt, data, 0, *packet)
 
             with self.stop_lock:
                 self.produced += self.peer_count
                 for slice in self.broadcast_groups:
-                    self.process_pool.apply_async(send_datagram, (data, slice, CommunicationsManager.UDP_PORT,))
+                    self.process_pool.apply_async(send_datagram, (packet, fmt, slice, CommunicationsManager.UDP_PORT,))
 
     def receive_flows(self):
         while True:
