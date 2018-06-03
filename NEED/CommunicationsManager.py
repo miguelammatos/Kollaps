@@ -72,8 +72,6 @@ class CommunicationsManager:
         self.supervisor_count = 0
         self.peer_count = 0
 
-        broadcast = False
-
         broadcast_group = []
         for service in self.graph.services:
             hosts = self.graph.services[service]
@@ -136,7 +134,7 @@ class CommunicationsManager:
             struct.pack_into(fmt, data, 0, *packet)
 
             with self.stop_lock:
-                self.produced += self.peer_count if len(self.broadcast_group) > 0 else 0
+                self.produced += self.peer_count
                 for slice in self.broadcast_groups:
                     self.process_pool.apply_async(send_datagram, (data, slice, CommunicationsManager.UDP_PORT))
 
@@ -175,7 +173,7 @@ class CommunicationsManager:
                         with self.stop_lock:
                             print("Stopping experiment")
                             PathEmulation.tearDown()
-                            self.broadcast_group = []
+                            self.broadcast_groups = []
 
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
                         print("Received Shutdown command")
