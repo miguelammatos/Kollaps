@@ -119,21 +119,24 @@ class EmulationManager:
                 for flow in link.flows:
                     rtt_reverse_sum += (1.0/flow[RTT])
                 max_bandwidth_on_link = []
-                # calculate the bandwidth for everyone
-                for flow in link.flows:
-                    max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_bps)
-
-                # Maximize link utilization to 100%
+                # calculate our bandwidth
+                max_bandwidth_on_link.append(((1.0/link.flows[0][RTT])/rtt_reverse_sum)*link.bandwidth_bps)
                 spare_bw = link.bandwidth_bps - max_bandwidth_on_link[0]
                 our_share = max_bandwidth_on_link[0]/link.bandwidth_bps
                 hungry_usage_sum = our_share  # We must be out of the loop to avoid division by zero
-                for i, flow in islice(enumerate(link.flows), 1, None):
+                for i in range(1, len(link.flows)):
+                    flow = link.flows[i]
+                    # calculate the bandwidth for everyone
+                    max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_bps)
+
+                    # Maximize link utilization to 100%
                     # Check if a flow is "hungry" (wants more than its allocated share)
                     if flow[BW] > max_bandwidth_on_link[i]:
                         spare_bw -= max_bandwidth_on_link[i]
                         hungry_usage_sum += max_bandwidth_on_link[i]/link.bandwidth_bps
                     else:
                         spare_bw -= flow[BW]
+
                 normalized_share = our_share/hungry_usage_sum  # we get a share of the spare proportional to our RTT
                 max_bandwidth_on_link[0] += (normalized_share*spare_bw)
 
@@ -205,9 +208,8 @@ class EmulationManager:
 
         # Check if this flow is interesting to us
         with self.state_lock:
-            concurrent = False
             for i in link_indices:
-                concurrent = (concurrent or (i in self.active_links))
-            if concurrent:
-                self.accumulate_flow(bandwidth, link_indices)
+                if i in self.active_links:
+                    self.accumulate_flow(bandwidth, link_indices)
+                    break
         return True
