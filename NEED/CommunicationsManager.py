@@ -88,6 +88,7 @@ class CommunicationsManager:
         workers = CommunicationsManager.MAX_WORKERS
         self.process_pool = Pool(processes=workers, initializer=initialize_process())
         slice_count = int(len(broadcast_group)/workers)
+        slice_count = slice_count if slice_count > 0 else 1
         self.broadcast_groups = [broadcast_group[i:i+slice_count] for i in range(0, len(broadcast_group), slice_count)]
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
