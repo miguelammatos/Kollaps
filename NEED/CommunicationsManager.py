@@ -5,6 +5,7 @@ from NEED.utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHOR
 import NEED.PathEmulation as PathEmulation
 
 from threading import Thread, Lock
+from multiprocessing import Pool
 from _thread import interrupt_main
 import socket
 import struct
@@ -22,6 +23,18 @@ if sys.version_info >= (3, 0):
 # Num of links
 # id's of links
 
+broadcast_socket = None  # Global variable used within the process pool(so we dont need to create new ones all the time)
+
+
+def initialize_process():
+    global broadcast_socket
+    broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
+def send_datagram(data, ips, port):
+    global broadcast_socket
+    for ip in ips:
+        broadcast_socket.sendto(data, (ip, port))
 
 class CommunicationsManager:
     UDP_PORT = 7073
@@ -36,6 +49,7 @@ class CommunicationsManager:
     START_COMMAND = 4
     ACK = 250
     i_SIZE = struct.calcsize("<1i")
+    MAX_WORKERS = 10
 
     def __init__(self, flow_collector, graph):
         self.graph = graph  # type: NetGraph
@@ -55,42 +69,29 @@ class CommunicationsManager:
             fail("Topology has too many links: " + str(link_count))
         self.link_size = struct.calcsize("<1"+self.link_unit)
 
-        self.broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.broadcast_group = []
         self.supervisor_count = 0
         self.peer_count = 0
 
-        # Broadcast is temporarily disabled!
-        # There seems to be a regression in the latest version of Docker (18.04.0-ce)
-        # Service discovery is broken on overlay networks, services can resolve to wrong ip addresses
-        # Why does that affect broadcast? because in broadcast mode we need to check for our own packets
-        # and for that we need the root of the graph to be set so we can compare ip addresses in receive_flows()
-        # For some reason this seems to work ok if we only attach 1 network to a container but when we attach
-        # more than one network to a container (like we do in supervisors) the bug is always triggered
-        # Since supervisors rely on this module, but don't necessarily need to set the root of the graph
-        # we are temporarily allowing them not to, so that we can still run experiments...
-
-        # broadcast = os.environ.get('BROADCAST_ADDRESS', '')
-        # if broadcast:
-        #     self.broadcast_group.append(broadcast)
-        #     self.broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         broadcast = False
 
+        broadcast_group = []
         for service in self.graph.services:
             hosts = self.graph.services[service]
             for host in hosts:
                 if host != self.graph.root:
                     self.peer_count += 1
-                    if not broadcast:
-                        self.broadcast_group.append(host.ip)
+                    broadcast_group.append(host.ip)
                 if host.supervisor:
                     self.supervisor_count += 1
-
         self.peer_count -= self.supervisor_count
+
+        workers = CommunicationsManager.MAX_WORKERS
+        self.process_pool = Pool(processes=workers, initializer=initialize_process())
+        slice_count = int(len(self.broadcast_group)/workers)
+        self.broadcast_groups = [broadcast_group[i:i+slice_count] for i in range(0, len(broadcast_group), slice_count)]
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('0.0.0.0', CommunicationsManager.UDP_PORT))
-
 
         self.dashboard_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.dashboard_socket.bind(('0.0.0.0', CommunicationsManager.TCP_PORT))
@@ -109,23 +110,6 @@ class CommunicationsManager:
         :param active_paths: List[NetGraph.Path]
         :return:
         """
-        ########################################
-        # After profiling, this method was found to be responsible for 1/2 of cpu usage
-        # The code that follows has been optimized
-        # Check an older commit for more readable code, the functionality has not changed since
-        # commit ca5c9c62e583e07d7b6d7ec7950737aacdf656fb
-        ########################################
-
-
-
-        #  This code is expensive
-        # if self.largest_produced_gap < 0:
-        #     self.produced_ts = time()
-        # current_time = time()
-        # produced_gap = current_time - self.produced_ts
-        # if produced_gap > self.largest_produced_gap:
-        #     self.largest_produced_gap = produced_gap
-        # self.produced_ts = current_time
 
         i = 0
         while i < len(active_paths):
@@ -149,20 +133,15 @@ class CommunicationsManager:
             size = struct.calcsize(fmt)
             data = ctypes.create_string_buffer(size)
             struct.pack_into(fmt, data, 0, *packet)
-            # The following line can improve results under some scenarios but is overall too expensive
-            # random.shuffle(self.broadcast_group)  # takes ~0.5ms on a list of 500 strings
 
             with self.stop_lock:
                 self.produced += self.peer_count if len(self.broadcast_group) > 0 else 0
-                for ip in self.broadcast_group:
-                    self.broadcast_socket.sendto(data, (ip, CommunicationsManager.UDP_PORT))
+                for slice in self.broadcast_groups:
+                    self.process_pool.apply_async(send_datagram, (data, slice, CommunicationsManager.UDP_PORT))
 
     def receive_flows(self):
         while True:
             data, addr = self.sock.recvfrom(CommunicationsManager.BUFFER_LEN)
-            # See broadcast comment above
-            # if addr[0] == self.graph.root.ip:
-            #    continue
             offset = 0
             num_of_flows = struct.unpack_from("<1H", data, offset)[0]
             offset += struct.calcsize("<1H")
@@ -211,7 +190,7 @@ class CommunicationsManager:
                             continue
                         connection.close()
                         with self.stop_lock:
-                            self.broadcast_socket.close()
+                            self.process_pool.terminate()
                             self.dashboard_socket.close()
                             self.sock.close()
                             print("Shutting down")

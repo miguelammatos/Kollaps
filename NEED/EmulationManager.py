@@ -47,6 +47,7 @@ class EmulationManager:
     def emulation_loop(self):
         self.last_time = time()
         self.check_active_flows()  # to prevent bug where data has already passed through the filters before
+        starttime = time()
         while True:
             for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):
                 with self.state_lock:
@@ -54,7 +55,8 @@ class EmulationManager:
                     self.active_paths.clear()
                     self.check_active_flows()
                 self.comms.broadcast_flows(self.active_paths)
-                sleep(EmulationManager.POOL_PERIOD)
+                sleep_time = EmulationManager.POOL_PERIOD - ((time() - starttime) % EmulationManager.POOL_PERIOD)
+                sleep(sleep_time)
             with self.state_lock:
                 for key in self.concurrent_flows_keys:
                     self.add_flow(key)
