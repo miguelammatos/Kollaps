@@ -64,6 +64,7 @@ class EmulationManager:
                 self.concurrent_flows_keys.clear()
                 self.flow_accumulator.clear()
                 for link_index in self.active_links:
+                    self.active_links[link_index].last_flows_count = len(self.active_links[link_index].flows)
                     self.active_links[link_index].flows.clear()
 
     def check_active_flows(self):
@@ -140,9 +141,13 @@ class EmulationManager:
                 normalized_share = our_share/hungry_usage_sum  # we get a share of the spare proportional to our RTT
                 max_bandwidth_on_link[0] += (normalized_share*spare_bw)
 
-                # If this link restricts us more than previously assume this bandwidth as the max
+                # If this link restricts us more than previously try to assume this bandwidth as the max
                 if max_bandwidth_on_link[0] < max_bandwidth:
-                    max_bandwidth = max_bandwidth_on_link[0]
+                    # hold off increasing bandwidth for 1 cycle if there are less flows than last time
+                    if len(link.flows) >= link.last_flows_count:
+                        max_bandwidth = max_bandwidth_on_link[0]
+                    else:
+                        max_bandwidth = path.current_bandwidth
 
             # Apply the new bandwidth on this path
             if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
