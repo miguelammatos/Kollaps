@@ -3,7 +3,7 @@ from threading import Lock
 from multiprocessing import Pool
 from multiprocessing.pool import AsyncResult
 from os import environ
-from copy import deepcopy
+from copy import copy
 
 from NEED.NetGraph import NetGraph
 import NEED.PathEmulation as PathEmulation
@@ -30,9 +30,6 @@ def apply_bandwidth(flow_accumulator, active_paths_ids):
     COUNTER = 2
     RTT = 0
     BW = 1
-
-    print(flow_accumulator)
-    print(active_paths_ids)
 
     # First update the graph with the information of the flow accumulator
     active_links = []
@@ -153,8 +150,8 @@ class EmulationManager:
             with self.state_lock:
                 if async_result.ready():
                     # We need shallow copies otherwise the dict/list is emptied before being pickled!
-                    flow_accumulator_copy = deepcopy(self.flow_accumulator)
-                    active_paths_ids_copy = deepcopy(self.active_paths_ids)
+                    flow_accumulator_copy = copy(self.flow_accumulator)
+                    active_paths_ids_copy = copy(self.active_paths_ids)
                     async_result = self.worker_process.apply_async(apply_bandwidth, (flow_accumulator_copy, active_paths_ids_copy,))
                 self.flow_accumulator.clear()
 
