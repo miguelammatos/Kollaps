@@ -143,6 +143,7 @@ class CommunicationsManager:
                 for slice in self.broadcast_groups:
                     self.process_pool.apply_async(send_datagram, (packet, fmt, slice, CommunicationsManager.UDP_PORT,))
 
+
     def receive_flows(self):
         while True:
             data, addr = self.sock.recvfrom(CommunicationsManager.BUFFER_LEN)

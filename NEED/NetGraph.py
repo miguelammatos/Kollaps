@@ -17,12 +17,14 @@ class NetGraph:
         self.bridges = {}  # type: Dict[str,List[NetGraph.Service]]
         self.links = []  # type: List[NetGraph.Link]
         self.link_counter = 0  # increment counter that will give each link an index
+        self.path_counter = 0  # increment counter that will give each path an id
 
         self.networks = []  # type: List[str]
         self.supervisors = []  # type: List[NetGraph.Service]
 
         self.root = None  # type: NetGraph.Service
         self.paths = {}  # type: Dict[NetGraph.Node,NetGraph.Path]
+        self.paths_by_id = {} # type: Dict[int, NetGraph.Path]
 
         self.reference_bandwidth = 0  # Maximum bandwidth on the topology, used for calculating link cost
         self.bandwidth_re = re.compile("([0-9]+)([KMG])bps")
@@ -75,8 +77,9 @@ class NetGraph:
             self.network = network
 
     class Path(object):
-        def __init__(self, links, used_bandwidth=0):
+        def __init__(self, links, id, used_bandwidth=0):
             self.links = links  # type: List[NetGraph.Link]
+            self.id = id
             total_latency = 0
             total_not_drop_probability = 1.0
             max_bandwidth = None
@@ -214,7 +217,9 @@ class NetGraph:
             Q.append([self.reference_bandwidth, b])
             dist[b] = self.reference_bandwidth
 
-        self.paths[self.root] = NetGraph.Path([])
+        self.paths[self.root] = NetGraph.Path([], self.path_counter)
+        self.paths_by_id[self.path_counter] = self.paths[self.self.root]
+        self.path_counter += 1
         while len(Q) > 0:
             Q.sort(key=lambda ls: ls[0])
             u = Q.pop(0)[1]  # type: NetGraph.Node
@@ -226,7 +231,9 @@ class NetGraph:
                     # append to the previous path
                     path = self.paths[u].links[:]
                     path.append(link)
-                    self.paths[node] = NetGraph.Path(path)
+                    self.paths[node] = NetGraph.Path(path, self.path_counter)
+                    self.paths_by_id[self.path_counter] = self.paths[node]
+                    self.path_counter += 1
                     for e in Q:  # find the node in Q and change its priority
                         if e[1] == node:
                             e[0] = alt

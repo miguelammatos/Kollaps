@@ -28,6 +28,7 @@ class EmulationManager:
         self.graph = graph  # type: NetGraph
         self.active_links = {}  # type: Dict[int, NetGraph.Link]
         self.active_paths = []  # type: List[NetGraph.Path]
+        self.active_paths_ids = [] # type: List[int]
         self.flow_accumulator = {}  # type: Dict[str, List[List[int], int, int]]
         self.concurrent_flows_keys = []
         self.state_lock = Lock()
@@ -102,6 +103,7 @@ class EmulationManager:
                 # This is an active flow
                 path.used_bandwidth = throughput
                 self.active_paths.append(path)
+                self.active_paths_ids.append(path.id)
                 link_indices = []
                 for link in path.links:
                     self.active_links[link.index] = link
