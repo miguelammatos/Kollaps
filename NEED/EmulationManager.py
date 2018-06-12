@@ -50,6 +50,7 @@ def apply_bandwidth(flow_accumulator, active_paths_ids):
             graph.links[index].flows.append((rtt, bandwidth))
 
     # Now apply the RTT Aware Min-Max to calculate the new BW
+    changes = []
     for id in active_paths_ids:
         path = graph.paths_by_id[id]
         max_bandwidth = path.max_bandwidth
@@ -91,12 +92,13 @@ def apply_bandwidth(flow_accumulator, active_paths_ids):
                 #  if it is more then we have to be careful, it might be a spike due to lost metadata
                 path.current_bandwidth = EmulationManager.ONE_MINUS_ALPHA* path.current_bandwidth + \
                                          EmulationManager.ALPHA * max_bandwidth
-            PathEmulation.change_bandwidth(path.links[-1].destination, path.current_bandwidth)
+            changes.append((path.links[-1].index, path.current_bandwidth))
 
     # clear the state on the graph
     for link in active_links:
         link.flows.clear()
 
+    return changes
 
 class EmulationManager:
 
@@ -149,6 +151,9 @@ class EmulationManager:
                 self.comms.broadcast_flows(self.active_paths)
             with self.state_lock:
                 if async_result.ready():
+                    changes = async_result.get()
+                    for change in changes:
+                        PathEmulation.change_bandwidth(self.graph.links[change[0]].destination, change[1])
                     # We need shallow copies otherwise the dict/list is emptied before being pickled!
                     flow_accumulator_copy = copy(self.flow_accumulator)
                     active_paths_ids_copy = copy(self.active_paths_ids)

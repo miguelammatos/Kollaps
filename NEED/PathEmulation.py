@@ -1,6 +1,6 @@
 from TCAL import pyTCAL as TCAL  # TODO this breaks compatibility with py2 for some reason...
 from NEED.NetGraph import NetGraph
-from multiprocessing import Lock
+from threading import Lock
 
 import sys
 if sys.version_info >= (3, 0):
