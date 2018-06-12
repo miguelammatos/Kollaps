@@ -218,7 +218,7 @@ class NetGraph:
             dist[b] = self.reference_bandwidth
 
         self.paths[self.root] = NetGraph.Path([], self.path_counter)
-        self.paths_by_id[self.path_counter] = self.paths[self.self.root]
+        self.paths_by_id[self.path_counter] = self.paths[self.root]
         self.path_counter += 1
         while len(Q) > 0:
             Q.sort(key=lambda ls: ls[0])

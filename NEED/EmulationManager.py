@@ -1,7 +1,9 @@
 from time import time, sleep
 from threading import Lock
-from itertools import islice
+from multiprocessing import Pool
+from multiprocessing.pool import AsyncResult
 from os import environ
+from copy import copy
 
 from NEED.NetGraph import NetGraph
 import NEED.PathEmulation as PathEmulation
@@ -11,6 +13,92 @@ from NEED.utils import ENVIRONMENT
 import sys
 if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
+
+# Global variable used within the worker process
+graph = None  # type: NetGraph
+
+
+def initialize_worker(graph_copy):
+    global graph  # type: NetGraph
+    graph = graph_copy
+
+
+def apply_bandwidth(flow_accumulator, active_paths_ids):
+    global graph  # type: NetGraph
+    INDICES = 0
+    BW = 1
+    COUNTER = 2
+    RTT = 0
+    BW = 1
+
+    print(flow_accumulator)
+    print(active_paths_ids)
+
+    # First update the graph with the information of the flow accumulator
+    active_links = []
+    for key in flow_accumulator:
+        flow = flow_accumulator[key]
+        link_indices = flow[INDICES]
+        bandwidth = flow[BW]
+
+        # Calculate RTT of this flow
+        rtt = 0
+        for index in link_indices:
+            link = graph.links[index]
+            rtt += (link.latency*2)
+            active_links.append(link)
+
+        # Add it to the link's flows
+        for index in link_indices:
+            graph.links[index].flows.append((rtt, bandwidth))
+
+    # Now apply the RTT Aware Min-Max to calculate the new BW
+    for id in active_paths_ids:
+        path = graph.paths_by_id[id]
+        max_bandwidth = path.max_bandwidth
+        for link in path.links:
+            rtt_reverse_sum = 0
+            for flow in link.flows:
+                rtt_reverse_sum += (1.0/flow[RTT])
+            max_bandwidth_on_link = []
+            # calculate our bandwidth
+            max_bandwidth_on_link.append(((1.0/link.flows[0][RTT])/rtt_reverse_sum)*link.bandwidth_bps)
+            spare_bw = link.bandwidth_bps - max_bandwidth_on_link[0]
+            our_share = max_bandwidth_on_link[0]/link.bandwidth_bps
+            hungry_usage_sum = our_share  # We must be out of the loop to avoid division by zero
+            for i in range(1, len(link.flows)):
+                flow = link.flows[i]
+                # calculate the bandwidth for everyone
+                max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_bps)
+
+                # Maximize link utilization to 100%
+                # Check if a flow is "hungry" (wants more than its allocated share)
+                if flow[BW] > max_bandwidth_on_link[i]:
+                    spare_bw -= max_bandwidth_on_link[i]
+                    hungry_usage_sum += max_bandwidth_on_link[i]/link.bandwidth_bps
+                else:
+                    spare_bw -= flow[BW]
+
+            normalized_share = our_share/hungry_usage_sum  # we get a share of the spare proportional to our RTT
+            max_bandwidth_on_link[0] += (normalized_share*spare_bw)
+
+            # If this link restricts us more than previously try to assume this bandwidth as the max
+            if max_bandwidth_on_link[0] < max_bandwidth:
+                max_bandwidth = max_bandwidth_on_link[0]
+
+        # Apply the new bandwidth on this path
+        if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
+            if max_bandwidth <= path.current_bandwidth:
+                path.current_bandwidth = max_bandwidth  # if its less then we now for sure it is correct
+            else:
+                #  if it is more then we have to be careful, it might be a spike due to lost metadata
+                path.current_bandwidth = EmulationManager.ONE_MINUS_ALPHA* path.current_bandwidth + \
+                                         EmulationManager.ALPHA * max_bandwidth
+            PathEmulation.change_bandwidth(path.links[-1].destination, path.current_bandwidth)
+
+    # clear the state on the graph
+    for link in active_links:
+        link.flows.clear()
 
 
 class EmulationManager:
@@ -26,16 +114,15 @@ class EmulationManager:
 
     def __init__(self, graph):
         self.graph = graph  # type: NetGraph
-        self.active_links = {}  # type: Dict[int, NetGraph.Link]
         self.active_paths = []  # type: List[NetGraph.Path]
         self.active_paths_ids = [] # type: List[int]
         self.flow_accumulator = {}  # type: Dict[str, List[List[int], int, int]]
-        self.concurrent_flows_keys = []
         self.state_lock = Lock()
         self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
         EmulationManager.POOL_PERIOD = float(environ.get(ENVIRONMENT.POOL_PERIOD, str(EmulationManager.POOL_PERIOD)))
         print("Pool Period: " + str(EmulationManager.POOL_PERIOD))
+        self.worker_process = Pool(processes=1, initializer=initialize_worker, initargs=(self.graph,))
 
     def initialize(self):
         PathEmulation.init(CommunicationsManager.UDP_PORT)
@@ -49,6 +136,8 @@ class EmulationManager:
         self.last_time = time()
         self.check_active_flows()  # to prevent bug where data has already passed through the filters before
         last_time = time()
+        async_result = None  # type: AsyncResult
+        async_result = self.worker_process.apply_async(apply_bandwidth, ({}, [],))  # needed to initialize result
         while True:
             for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):
                 cur_time = time()
@@ -57,19 +146,17 @@ class EmulationManager:
                 if sleep_time > 0.0:
                     sleep(sleep_time)
                 with self.state_lock:
-                    self.active_links.clear()
                     self.active_paths.clear()
+                    self.active_paths_ids.clear()
                     self.check_active_flows()
                 self.comms.broadcast_flows(self.active_paths)
             with self.state_lock:
-                for key in self.concurrent_flows_keys:
-                    self.add_flow(key)
-                self.recalculate_path_bandwidths()
-                self.concurrent_flows_keys.clear()
+                if async_result.ready():
+                    # We need shallow copies other wise the dict/list is emptied before being pickled!
+                    flow_accumulator_copy = copy(self.flow_accumulator)
+                    active_paths_ids_copy = copy(self.active_paths_ids)
+                    async_result = self.worker_process.apply_async(apply_bandwidth, (flow_accumulator_copy, active_paths_ids_copy,))
                 self.flow_accumulator.clear()
-                for link_index in self.active_links:
-                    self.active_links[link_index].last_flows_count = len(self.active_links[link_index].flows)
-                    self.active_links[link_index].flows.clear()
 
     def check_active_flows(self):
         PathEmulation.update_usage()
@@ -106,88 +193,12 @@ class EmulationManager:
                 self.active_paths_ids.append(path.id)
                 link_indices = []
                 for link in path.links:
-                    self.active_links[link.index] = link
                     link_indices.append(link.index)
 
                 # Collect our own flow
                 self.accumulate_flow(throughput, link_indices)
 
         self.last_time = current_time
-
-
-    def recalculate_path_bandwidths(self):
-        RTT = 0
-        BW = 1
-        for path in self.active_paths:
-            max_bandwidth = path.max_bandwidth
-            for link in path.links:
-                rtt_reverse_sum = 0
-                for flow in link.flows:
-                    rtt_reverse_sum += (1.0/flow[RTT])
-                max_bandwidth_on_link = []
-                # calculate our bandwidth
-                max_bandwidth_on_link.append(((1.0/link.flows[0][RTT])/rtt_reverse_sum)*link.bandwidth_bps)
-                spare_bw = link.bandwidth_bps - max_bandwidth_on_link[0]
-                our_share = max_bandwidth_on_link[0]/link.bandwidth_bps
-                hungry_usage_sum = our_share  # We must be out of the loop to avoid division by zero
-                for i in range(1, len(link.flows)):
-                    flow = link.flows[i]
-                    # calculate the bandwidth for everyone
-                    max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_bps)
-
-                    # Maximize link utilization to 100%
-                    # Check if a flow is "hungry" (wants more than its allocated share)
-                    if flow[BW] > max_bandwidth_on_link[i]:
-                        spare_bw -= max_bandwidth_on_link[i]
-                        hungry_usage_sum += max_bandwidth_on_link[i]/link.bandwidth_bps
-                    else:
-                        spare_bw -= flow[BW]
-
-                normalized_share = our_share/hungry_usage_sum  # we get a share of the spare proportional to our RTT
-                max_bandwidth_on_link[0] += (normalized_share*spare_bw)
-
-                # If this link restricts us more than previously try to assume this bandwidth as the max
-                if max_bandwidth_on_link[0] < max_bandwidth:
-                    # hold off increasing bandwidth for 1 cycle if there are less flows than last time
-                    if len(link.flows) >= link.last_flows_count:
-                        max_bandwidth = max_bandwidth_on_link[0]
-                    else:
-                        max_bandwidth = path.current_bandwidth
-
-            # Apply the new bandwidth on this path
-            if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
-                if max_bandwidth <= path.current_bandwidth:
-                    path.current_bandwidth = max_bandwidth  # if its less then we now for sure it is correct
-                else:
-                    #  if it is more then we have to be careful, it might be a spike due to lost metadata
-                    path.current_bandwidth = EmulationManager.ONE_MINUS_ALPHA* path.current_bandwidth + \
-                                             EmulationManager.ALPHA * max_bandwidth
-                PathEmulation.change_bandwidth(path.links[-1].destination, path.current_bandwidth)
-
-    def add_flow(self, key):
-        """
-        This method grabs an accumulated flow, and adds the corresponding information to the active links
-        :param bandwidth: int
-        :param link_indices: List[int]
-        """
-        INDICES = 0
-        BW = 1
-        COUNTER = 2
-
-        flow = self.flow_accumulator[key]
-        link_indices = flow[INDICES]
-        bandwidth = flow[BW] #/flow[COUNTER]
-
-        concurrent_links = []
-        # Calculate RTT of this flow and check if we are sharing any link with it
-        rtt = 0
-        for index in link_indices:
-            link = self.graph.links[index]
-            rtt += (link.latency*2)
-            if index in self.active_links:
-                concurrent_links.append(link)
-        for link in concurrent_links:
-            link.flows.append((rtt, bandwidth))
 
     def accumulate_flow(self, bandwidth, link_indices):
         """
@@ -205,7 +216,6 @@ class EmulationManager:
             # flow[COUNTER] += 1
         else:
             self.flow_accumulator[key] = [link_indices, bandwidth, 1]
-            self.concurrent_flows_keys.append(key)
 
     def collect_flow(self, bandwidth, link_indices):
         """
@@ -218,8 +228,5 @@ class EmulationManager:
 
         # Check if this flow is interesting to us
         with self.state_lock:
-            for i in link_indices:
-                if i in self.active_links:
-                    self.accumulate_flow(bandwidth, link_indices)
-                    break
+            self.accumulate_flow(bandwidth, link_indices)
         return True
