@@ -152,7 +152,7 @@ class EmulationManager:
                 self.comms.broadcast_flows(self.active_paths)
             with self.state_lock:
                 if async_result.ready():
-                    # We need shallow copies other wise the dict/list is emptied before being pickled!
+                    # We need shallow copies otherwise the dict/list is emptied before being pickled!
                     flow_accumulator_copy = copy(self.flow_accumulator)
                     active_paths_ids_copy = copy(self.active_paths_ids)
                     async_result = self.worker_process.apply_async(apply_bandwidth, (flow_accumulator_copy, active_paths_ids_copy,))
@@ -184,11 +184,9 @@ class EmulationManager:
 
                 # Check if this is an active flow
                 if throughput <= (path.max_bandwidth * EmulationManager.ERROR_MARGIN):
-                    path.used_bandwidth = 0
                     continue
 
                 # This is an active flow
-                path.used_bandwidth = throughput
                 self.active_paths.append(path)
                 self.active_paths_ids.append(path.id)
                 link_indices = []

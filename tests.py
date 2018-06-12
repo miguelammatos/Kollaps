@@ -111,7 +111,7 @@ class MockFlowDisseminator:
     def receive_flows(self, data):
         if len(data) > 0:
             sleep(0.5)
-        path = [2, 4, 7]
+        path = [0, 6, 8]
         #path = [0, 42, 44, 65]
         self.flow_collector(CT.current_throughput, path)
         #sleep(0.01)
