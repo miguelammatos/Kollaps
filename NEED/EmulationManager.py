@@ -184,9 +184,11 @@ class EmulationManager:
 
                 # Check if this is an active flow
                 if throughput <= (path.max_bandwidth * EmulationManager.ERROR_MARGIN):
+                    path.used_bandwidth = 0
                     continue
 
                 # This is an active flow
+                path.used_bandwidth = throughput
                 self.active_paths.append(path)
                 self.active_paths_ids.append(path.id)
                 link_indices = []
