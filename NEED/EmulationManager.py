@@ -152,19 +152,19 @@ class EmulationManager:
         async_result = self.worker_process.apply_async(apply_bandwidth, ([], [], [],))  # needed to initialize result
         while True:
             for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):
-                #cur_time = time()
-                #sleep_time = EmulationManager.POOL_PERIOD - (cur_time - last_time)
-                #last_time = cur_time
-                #if sleep_time > 0.0:
-                #    sleep(sleep_time)
-                sleep(EmulationManager.POOL_PERIOD - ((time() - last_time) % EmulationManager.POOL_PERIOD))
+                cur_time = time()
+                sleep_time = EmulationManager.POOL_PERIOD - (cur_time - last_time)
+                last_time = cur_time
+                if sleep_time > 0.0:
+                    sleep(sleep_time)
+                #sleep(EmulationManager.POOL_PERIOD - ((time() - last_time) % EmulationManager.POOL_PERIOD))
                 with self.state_lock:
                     self.active_paths.clear()
                     self.active_paths_ids.clear()
                     self.check_active_flows()
                 self.comms.broadcast_flows(self.active_paths)
             with self.state_lock:
-                if async_result.ready():
+                if async_result.ready():  # apply the changes and prepare for new calculations
                     changes = async_result.get()
                     for change in changes:
                         PathEmulation.change_bandwidth(self.graph.links[change[0]].destination, change[1])
