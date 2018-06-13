@@ -152,12 +152,10 @@ class EmulationManager:
         async_result = self.worker_process.apply_async(apply_bandwidth, ([], [], [],))  # needed to initialize result
         while True:
             for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):
-                cur_time = time()
-                sleep_time = EmulationManager.POOL_PERIOD - (cur_time - last_time)
-                last_time = cur_time
+                sleep_time = EmulationManager.POOL_PERIOD - (time() - last_time)
                 if sleep_time > 0.0:
                     sleep(sleep_time)
-                #sleep(EmulationManager.POOL_PERIOD - ((time() - last_time) % EmulationManager.POOL_PERIOD))
+                last_time = time()
                 with self.state_lock:
                     self.active_paths.clear()
                     self.active_paths_ids.clear()
