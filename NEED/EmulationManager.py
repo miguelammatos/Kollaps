@@ -172,7 +172,7 @@ class EmulationManager:
                     for path in self.active_paths:
                         our_flows.append(([l.index for l in path.links], path.used_bandwidth))
                     # We need shallow copies otherwise the dict/list is emptied before being pickled!
-                    flow_accumulator_copy = copy(self.flow_accumulator.values())
+                    flow_accumulator_copy = copy(list(self.flow_accumulator.values()))
                     active_paths_ids_copy = copy(self.active_paths_ids)
                     async_result = self.worker_process.apply_async(apply_bandwidth, (our_flows,
                                                                                      flow_accumulator_copy,
