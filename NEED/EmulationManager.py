@@ -23,31 +23,44 @@ def initialize_worker(graph_copy):
     graph = graph_copy
 
 
-def apply_bandwidth(flow_accumulator, active_paths_ids):
-    global graph  # type: NetGraph
+def apply_flow(flow, g):
     INDICES = 0
     BW = 1
-    COUNTER = 2
+    link_indices = flow[INDICES]
+    bandwidth = flow[BW]
+    # Calculate RTT of this flow
+    rtt = 0
+    for index in link_indices:
+        link = graph.links[index]
+        rtt += (link.latency*2)
+    # Add it to the link's flows
+    for index in link_indices:
+        graph.links[index].flows.append((rtt, bandwidth))
+
+
+def apply_bandwidth(our_flows, flow_accumulator, active_paths_ids):
+    global graph  # type: NetGraph
+    INDICES = 0
     RTT = 0
     BW = 1
 
-    # First update the graph with the information of the flow accumulator
+    # First update the graph with the information of the flows
     active_links = []
-    for key in flow_accumulator:
-        flow = flow_accumulator[key]
-        link_indices = flow[INDICES]
-        bandwidth = flow[BW]
 
-        # Calculate RTT of this flow
-        rtt = 0
+    # Why is this block repeated twice? because our flows are assumed to be the first entry in link.flows
+    for flow in our_flows:
+        link_indices = flow[INDICES]
+        apply_flow(flow, graph)
         for index in link_indices:
             link = graph.links[index]
-            rtt += (link.latency*2)
             active_links.append(link)
 
-        # Add it to the link's flows
+    for flow in flow_accumulator:
+        link_indices = flow[INDICES]
+        apply_flow(flow, graph)
         for index in link_indices:
-            graph.links[index].flows.append((rtt, bandwidth))
+            link = graph.links[index]
+            active_links.append(link)
 
     # Now apply the RTT Aware Min-Max to calculate the new BW
     changes = []
@@ -115,7 +128,7 @@ class EmulationManager:
         self.graph = graph  # type: NetGraph
         self.active_paths = []  # type: List[NetGraph.Path]
         self.active_paths_ids = [] # type: List[int]
-        self.flow_accumulator = {}  # type: Dict[str, List[List[int], int, int]]
+        self.flow_accumulator = {}  # type: Dict[str, List[List[int], int]]
         self.state_lock = Lock()
         self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
@@ -136,7 +149,7 @@ class EmulationManager:
         self.check_active_flows()  # to prevent bug where data has already passed through the filters before
         last_time = time()
         async_result = None  # type: AsyncResult
-        async_result = self.worker_process.apply_async(apply_bandwidth, ({}, [],))  # needed to initialize result
+        async_result = self.worker_process.apply_async(apply_bandwidth, ([], [], [],))  # needed to initialize result
         while True:
             for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):
                 #cur_time = time()
@@ -155,10 +168,15 @@ class EmulationManager:
                     changes = async_result.get()
                     for change in changes:
                         PathEmulation.change_bandwidth(self.graph.links[change[0]].destination, change[1])
+                    our_flows = []
+                    for path in self.active_paths:
+                        our_flows.append(([l.index for l in path.links], path.used_bandwidth))
                     # We need shallow copies otherwise the dict/list is emptied before being pickled!
-                    flow_accumulator_copy = copy(self.flow_accumulator)
+                    flow_accumulator_copy = copy(self.flow_accumulator.values())
                     active_paths_ids_copy = copy(self.active_paths_ids)
-                    async_result = self.worker_process.apply_async(apply_bandwidth, (flow_accumulator_copy, active_paths_ids_copy,))
+                    async_result = self.worker_process.apply_async(apply_bandwidth, (our_flows,
+                                                                                     flow_accumulator_copy,
+                                                                                     active_paths_ids_copy,))
                 self.flow_accumulator.clear()
 
     def check_active_flows(self):
@@ -194,12 +212,10 @@ class EmulationManager:
                 path.used_bandwidth = throughput
                 self.active_paths.append(path)
                 self.active_paths_ids.append(path.id)
-                link_indices = []
-                for link in path.links:
-                    link_indices.append(link.index)
 
                 # Collect our own flow
-                self.accumulate_flow(throughput, link_indices)
+                # self.accumulate_flow(throughput, [l.index for l in path.links])
+                # We no longer accumulate our flow, these are treated separately
 
         self.last_time = current_time
 
@@ -211,21 +227,18 @@ class EmulationManager:
         """
         INDICES = 0
         BW = 1
-        COUNTER = 2
         key = str(link_indices[0]) + ":" + str(link_indices[-1])
         if key in self.flow_accumulator:
             flow = self.flow_accumulator[key]
             flow[BW] = bandwidth
-            # flow[COUNTER] += 1
         else:
-            self.flow_accumulator[key] = [link_indices, bandwidth, 1]
+            self.flow_accumulator[key] = [link_indices, bandwidth]
 
     def collect_flow(self, bandwidth, link_indices):
         """
         This method collects a flow from other nodes, it checks if it is interesting and if so calls accumulate_flow
         :param bandwidth: int
         :param link_indices: List[int]
-        :return: Whether or not the packet is useful (not duplicated) deprecated!
         """
         # TODO the return value is no longer useful
 
