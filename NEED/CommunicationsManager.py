@@ -66,12 +66,12 @@ class CommunicationsManager:
 
         link_count = len(self.graph.links)
         if link_count <= BYTE_LIMIT:
-            self.link_unit = "B"
+            self.link_unit = "1B"
         elif link_count <= SHORT_LIMIT:
-            self.link_unit = "H"
+            self.link_unit = "1H"
         else:
             fail("Topology has too many links: " + str(link_count))
-        self.link_size = struct.calcsize("<1"+self.link_unit)
+        self.link_size = struct.calcsize("<"+self.link_unit)
 
         self.supervisor_count = 0
         self.peer_count = 0
@@ -118,8 +118,10 @@ class CommunicationsManager:
         while i < len(active_paths):
             packet = [0]
             flows_counter = 0
-            fmt = "<1H"
-            free_space = CommunicationsManager.BUFFER_LEN - struct.calcsize(fmt)
+            fmt = ["<1H"]
+            free_space = CommunicationsManager.BUFFER_LEN - struct.calcsize("".join(fmt))
+            packet_append = packet.append
+            fmt_append = fmt.append
             while i < len(active_paths):
                 flow = active_paths[i]
                 # check if this flow still fits
@@ -127,11 +129,13 @@ class CommunicationsManager:
                     break
                 i += 1
                 flows_counter += 1
-                fmt += "1Q"+("1"+self.link_unit)*(len(flow.links)+1)
-                packet.append(int(flow.used_bandwidth))
-                packet.append(len(flow.links))
+                fmt_append("1Q")
+                for i in range(len(flow.links)+1):
+                    fmt_append(self.link_unit)
+                packet_append(int(flow.used_bandwidth))
+                packet_append(len(flow.links))
                 for link in flow.links:
-                    packet.append(link.index)
+                    packet_append(link.index)
             packet[0] = flows_counter
             # We cant pickle structs...
             # size = struct.calcsize(fmt)
@@ -141,8 +145,7 @@ class CommunicationsManager:
             with self.stop_lock:
                 self.produced += self.peer_count
                 for slice in self.broadcast_groups:
-                    self.process_pool.apply_async(send_datagram, (packet, fmt, slice, CommunicationsManager.UDP_PORT,))
-
+                    self.process_pool.apply_async(send_datagram, (packet, "".join(fmt), slice, CommunicationsManager.UDP_PORT,))
 
     def receive_flows(self):
         while True:
@@ -153,12 +156,12 @@ class CommunicationsManager:
             for i in range(num_of_flows):
                 bandwidth = struct.unpack_from("<1Q", data, offset)[0]
                 offset += struct.calcsize("<1Q")
-                num_of_links = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
-                offset += struct.calcsize("<1"+self.link_unit)
+                num_of_links = struct.unpack_from("<"+self.link_unit, data, offset)[0]
+                offset += struct.calcsize("<"+self.link_unit)
                 links = []
                 for j in range(num_of_links):
-                    index = struct.unpack_from("<1"+self.link_unit, data, offset)[0]
-                    offset += struct.calcsize("<1"+self.link_unit)
+                    index = struct.unpack_from("<"+self.link_unit, data, offset)[0]
+                    offset += struct.calcsize("<"+self.link_unit)
                     links.append(index)
 
                 self.flow_collector(bandwidth, links)
