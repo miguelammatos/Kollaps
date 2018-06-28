@@ -23,22 +23,25 @@ if sys.version_info >= (3, 0):
 # Num of links
 # id's of links
 
-broadcast_socket = None  # Global variable used within the process pool(so we dont need to create new ones all the time)
+# Global variable used within the process pool(so we dont need to create new ones all the time)
+broadcast_sockets = {}  # type: Dict[str, socket.socket]
 
 
-def initialize_process():
-    global broadcast_socket
-    broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+def initialize_process(broadcast_group):
+    global broadcast_sockets
+    for ip in broadcast_group:
+        broadcast_sockets[ip] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        broadcast_sockets[ip].connect(ip, CommunicationsManager.UDP_PORT)
 
 
-def send_datagram(packet, fmt, ips, port):
+def send_datagram(packet, fmt, ips):
     global broadcast_socket
     size = struct.calcsize(fmt)
     data = ctypes.create_string_buffer(size)
     # We cant pickle structs...
     struct.pack_into(fmt, data, 0, *packet)
     for ip in ips:
-        broadcast_socket.sendto(data, (ip, port))
+        broadcast_socket[ip].send(data)
 
 class CommunicationsManager:
     UDP_PORT = 7073
@@ -88,7 +91,7 @@ class CommunicationsManager:
         self.peer_count -= self.supervisor_count
 
         workers = CommunicationsManager.MAX_WORKERS
-        self.process_pool = Pool(processes=workers, initializer=initialize_process)
+        self.process_pool = Pool(processes=workers, initializer=initialize_process, initargs=(broadcast_group,))
         slice_count = int(len(broadcast_group)/workers)
         slice_count = slice_count if slice_count > 0 else 1
         self.broadcast_groups = [broadcast_group[i:i+slice_count] for i in range(0, len(broadcast_group), slice_count)]
@@ -145,11 +148,11 @@ class CommunicationsManager:
             with self.stop_lock:
                 self.produced += self.peer_count
                 for slice in self.broadcast_groups:
-                    self.process_pool.apply_async(send_datagram, (packet, "".join(fmt), slice, CommunicationsManager.UDP_PORT,))
+                    self.process_pool.apply_async(send_datagram, (packet, "".join(fmt), slice,))
 
     def receive_flows(self):
         while True:
-            data, addr = self.sock.recvfrom(CommunicationsManager.BUFFER_LEN)
+            data = self.sock.recv(CommunicationsManager.BUFFER_LEN)
             offset = 0
             num_of_flows = struct.unpack_from("<1H", data, offset)[0]
             offset += struct.calcsize("<1H")
