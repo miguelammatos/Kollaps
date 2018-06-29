@@ -23,25 +23,15 @@ if sys.version_info >= (3, 0):
 # Num of links
 # id's of links
 
-# Global variable used within the process pool(so we dont need to create new ones all the time)
-broadcast_sockets = {}  # type: Dict[str, socket.socket]
 
-
-def initialize_process(broadcast_group):
-    global broadcast_sockets
-    for ip in broadcast_group:
-        broadcast_sockets[ip] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        broadcast_sockets[ip].connect(ip, CommunicationsManager.UDP_PORT)
-
-
-def send_datagram(packet, fmt, ips):
-    global broadcast_socket
+def send_datagram(packet, fmt, sockets):
     size = struct.calcsize(fmt)
     data = ctypes.create_string_buffer(size)
     # We cant pickle structs...
     struct.pack_into(fmt, data, 0, *packet)
-    for ip in ips:
-        broadcast_socket[ip].send(data)
+    for s in sockets:
+        s.send(data)
+
 
 class CommunicationsManager:
     UDP_PORT = 7073
@@ -85,13 +75,15 @@ class CommunicationsManager:
             for host in hosts:
                 if host != self.graph.root:
                     self.peer_count += 1
-                    broadcast_group.append(host.ip)
+                    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    s.connect((host.ip, CommunicationsManager.UDP_PORT))
+                    broadcast_group.append(s)
                 if host.supervisor:
                     self.supervisor_count += 1
         self.peer_count -= self.supervisor_count
 
         workers = CommunicationsManager.MAX_WORKERS
-        self.process_pool = Pool(processes=workers, initializer=initialize_process, initargs=(broadcast_group,))
+        self.process_pool = Pool(processes=workers)
         slice_count = int(len(broadcast_group)/workers)
         slice_count = slice_count if slice_count > 0 else 1
         self.broadcast_groups = [broadcast_group[i:i+slice_count] for i in range(0, len(broadcast_group), slice_count)]
