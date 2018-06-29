@@ -31,7 +31,7 @@ def initialize_process(broadcast_group):
     global broadcast_sockets
     for ip in broadcast_group:
         broadcast_sockets[ip] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        broadcast_sockets[ip].connect((ip, CommunicationsManager.UDP_PORT))
+        broadcast_sockets[ip].connect(ip, CommunicationsManager.UDP_PORT)
 
 
 def send_datagram(packet, fmt, ips):
