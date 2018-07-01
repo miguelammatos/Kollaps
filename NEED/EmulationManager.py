@@ -133,7 +133,10 @@ class EmulationManager:
         self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
         EmulationManager.POOL_PERIOD = float(environ.get(ENVIRONMENT.POOL_PERIOD, str(EmulationManager.POOL_PERIOD)))
+        EmulationManager.ITERATIONS_TO_INTEGRATE = int(environ.get(ENVIRONMENT.ITERATION_COUNT,
+                                                                   str(EmulationManager.ITERATIONS_TO_INTEGRATE)))
         print("Pool Period: " + str(EmulationManager.POOL_PERIOD))
+        print("Iteration Count: " + str(EmulationManager.ITERATIONS_TO_INTEGRATE))
         self.worker_process = Pool(processes=1, initializer=initialize_worker, initargs=(self.graph,))
 
     def initialize(self):
