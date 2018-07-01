@@ -150,7 +150,7 @@ class CommunicationsManager:
             with self.stop_lock:
                 self.produced += self.peer_count
                 for slice in self.broadcast_groups:
-                    self.process_pool.apply_async(send_datagram, (packet, "".join(fmt), slice, CommunicationsManager.UDP_PORT,))
+                    self.process_pool.apply_async(send_datagram, (packet, "".join(fmt), slice,))
 
     def receive_flows(self):
         while True:
