@@ -14,6 +14,9 @@ def main():
         topology_file = "/topology.xml"
     else:
         topology_file = sys.argv[1]
+    # For future reference: This topology file must not exceed 512KB otherwise docker refuses
+    # to copy it as a config file, this has happened with the 2k scale-free topology...
+
 
     # Because of the bootstrapper hack we cant get output from the emucore through standard docker logs...
     sys.stdout = open("/var/log/need.log", "w")
