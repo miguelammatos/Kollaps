@@ -15,7 +15,7 @@ class ComposeFileGenerator:
 
     def print_bootstrapper(self):
         print("  bootstrapper:")
-        print("    image: privilegedbootstrapper:1.3")
+        print("    image: privilegedbootstrapper:1.3") #Full image name removed for anonymous submission
         print("    command: [\"" + self.experiment_UUID + "\", \"python3 /opt/NEED/emucore.py\"]")
         print("    deploy:")
         print("      mode: global")
