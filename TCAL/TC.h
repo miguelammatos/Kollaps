@@ -7,7 +7,10 @@
 
 
 #include <unordered_map>
+
+extern "C" {
 #include "Destination.h"
+};
 
 #define TXQUEUELEN 1000
 

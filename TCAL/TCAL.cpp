@@ -1,10 +1,16 @@
+#include <stdlib.h>
+
+
 #include <iostream>
 #include <list>
 #include <chrono>
 #include <thread>
 #include <cstring>
 #include "unordered_map"
+
+extern "C" {
 #include "Destination.h"
+};
 #include "TC.h"
 
 
@@ -30,8 +36,8 @@ extern "C" void init(short controllPort){
 }
 
 extern "C" void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, float packetLoss){
-    auto dest = new Destination(ip, bandwidth, latency, jitter, packetLoss);
-    dest->setHandle(++handleCounter);
+    Destination* dest = destination_create(ip, bandwidth, latency, jitter, packetLoss);
+    dest->handle = ++handleCounter;
     hosts[ip] = dest;
 
     //Initialize the tc data structures
@@ -39,8 +45,8 @@ extern "C" void initDestination(unsigned int ip, int bandwidth, int latency, flo
 
 }
 extern "C" void changeBandwidth(unsigned int ip, int bandwidth){
-    auto dest = hosts[ip];
-    dest->setBandwidth(bandwidth);
+    Destination* dest = hosts[ip];
+    dest->bandwidth = bandwidth;
     TC::changeBandwidth(dest, interface);
 }
 
@@ -49,13 +55,13 @@ extern "C" void updateUsage(){
 }
 
 extern "C" unsigned long queryUsage(unsigned int ip){
-    auto dest = hosts[ip];
+    Destination* dest = hosts[ip];
     return TC::queryUsage(dest, interface);
 }
 
 extern "C" void tearDown(){
     for(auto it=hosts.begin(); it!=hosts.end(); it++){
-        delete(it->second);
+        free(it->second);
     }
     hosts.clear();
     TC::destroy(interface);

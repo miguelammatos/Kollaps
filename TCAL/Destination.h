@@ -5,33 +5,18 @@
 #ifndef UNTITLED_DESTINATION_H
 #define UNTITLED_DESTINATION_H
 
-#include "string"
+typedef struct {
+    unsigned int ipv4;
+    int latency;
+    float jitter;
+    int bandwidth; //in Kbps
+    float packetLossRate;
+    unsigned int handle;
+}Destination;
 
-class Destination {
-    unsigned int _ipv4;
-    int _latency;
-    float _jitter;
-    int _bandwidth; //in Kbps
-    float _packetLossRate;
-
-    unsigned int _handle;
-public:
-    Destination(unsigned int ipv4,
-                int bandwidth, int latency, float jitter, float packetLossRate);
-    std::string getOctetHex(short octet);
-    const int getIp();
-    std::string getIpHex();
-    const int getLatency();
-    const float getJitter();
-    const int getBandwidth();
-    const float getPacketLossRate();
-    void setBandwidth(int bandwidth);
-    const unsigned int getHandle();
-
-    void setHandle(unsigned int handle);
-private:
-    unsigned int ipToInt(short octet);
-};
+Destination* destination_create(unsigned int ipv4, int bandwidth, int latency, float jitter, float packetLossRate);
+void destination_getOctetHex(Destination* self, short octet, char* hexOctet);
+void destination_getIpHex(Destination* self, char* hexIp);
 
 
 #endif //UNTITLED_DESTINATION_H

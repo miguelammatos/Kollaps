@@ -11,7 +11,8 @@
 #include "TC.h"
 extern "C" {
     #include "utils.h"
-}
+    #include "Destination.h"
+};
 
 
 namespace TC {
@@ -89,47 +90,56 @@ void TC::init(const std::string& interface, short controllPort) {
 void TC::initDestination(Destination *dest, const std::string interface) {
     std::stringstream args;
     std::stringstream handleStream;
-    handleStream << std::hex << dest->getHandle();
+    handleStream << std::hex << dest->handle;
 
     //Create the htb class for imposing the bandwidth limit
     args << "class add dev " << interface << " parent 4 classid 4:" << handleStream.str()
-         << " htb rate " << dest->getBandwidth() << "Kbit ceil " << dest->getBandwidth() << "Kbit"
-         << " quantum " << dest->getBandwidth()/(dest->getBandwidth()/10.0f);
+         << " htb rate " << dest->bandwidth << "Kbit ceil " << dest->bandwidth << "Kbit"
+         << " quantum " << dest->bandwidth/(dest->bandwidth/10.0f);
     callTC(args.str());
     args.str(std::string());
 
     args.precision(6);
     args << "qdisc add dev " << interface << " parent 4:"<< handleStream.str() << " handle " << handleStream.str()
-         << " netem delay " << dest->getLatency() << "ms";
-    if(dest->getJitter() > 0){
-        args << " " << dest->getJitter() << "ms distribution normal";
+         << " netem delay " << dest->latency << "ms";
+    if(dest->jitter > 0){
+        args << " " << dest->jitter << "ms distribution normal";
     }
-    if(dest->getPacketLossRate() > 0.0f) {
-        args << " loss random " << std::fixed << dest->getPacketLossRate();
+    if(dest->packetLossRate > 0.0f) {
+        args << " loss random " << std::fixed << dest->packetLossRate;
     }
     callTC(args.str());
 
+
+    char octet3[] = "00";
+    char octet4[] = "00";
+    destination_getOctetHex(dest, 3, octet3);
+    destination_getOctetHex(dest, 4, octet4);
+    char hexIp[] = "00000000";
+    destination_getIpHex(dest, hexIp);
+
     //Check if second level hashtable exists
     args.str(std::string());
-    args << "filter get dev " << interface << " parent 4:0 prio 2 handle f" << dest->getOctetHex(3) << ": protocol ip u32";
+    args << "filter get dev " << interface << " parent 4:0 prio 2 handle f" <<  octet3 << ": protocol ip u32";
     if(callTC(args.str())){
         args.str(std::string());
-        args << "filter add dev " << interface << " parent 4:0 prio 2 handle f" << dest->getOctetHex(3)
+        args << "filter add dev " << interface << " parent 4:0 prio 2 handle f" << octet3
              << ": protocol ip u32 divisor 256";
         callTC(args.str());
 
         args.str(std::string());
         args << "filter add dev " << interface << " parent 4:0 protocol ip prio 2 u32 ht e00:"
-             << dest->getOctetHex(3) <<":0 match ip dst any hashkey mask " << SECOND_HASH_MASK
-             << " at 16 link f" << dest->getOctetHex(3) << ":";
+             << octet3 <<":0 match ip dst any hashkey mask " << SECOND_HASH_MASK
+             << " at 16 link f" << octet3 << ":";
         callTC(args.str());
     }
 
     //Add the rule itself
     args.str(std::string());
     args << "filter add dev " << interface << " parent 4:0 protocol ip prio 2 u32 ht f"
-         << dest->getOctetHex(3) << ":" << dest->getOctetHex(4) << " match u32 0x"
-         << dest->getIpHex() << " 0xffffffff at 16 flowid 4:" << handleStream.str();
+         << octet3 << ":" << octet4 << " match u32 0x"
+         << hexIp << " 0xffffffff at 16 flowid 4:" << handleStream.str();
+
         /*<< dest->getOctetHex(3) << ":" << dest->getOctetHex(4) << " match ip dst "
           << dest->getIP() << "/32 flowid 4:" << handleStream.str();*/
     callTC(args.str());
@@ -214,7 +224,7 @@ void TC::updateUsage(const std::string interface) {
 
 
 unsigned long TC::queryUsage(Destination *dest, const std::string interface) {
-    return TC::usage[dest->getHandle()];
+    return TC::usage[dest->handle];
 }
 
 void TC::changeBandwidth(Destination *dest, std::string interface) {
@@ -234,7 +244,7 @@ void TC::changeBandwidth(Destination *dest, std::string interface) {
     req.t.tcm_family = AF_UNSPEC,
     req.t.tcm_ifindex = if_nametoindex(interface.c_str());
 
-    unsigned int handle = (4 << 16) | dest->getHandle();
+    unsigned int handle = (4 << 16) | dest->handle;
     req.t.tcm_handle = handle;
 
     struct rtattr *tail = NLMSG_TAIL(&req.n);
@@ -243,7 +253,7 @@ void TC::changeBandwidth(Destination *dest, std::string interface) {
 
     __u64 rate64, ceil64; //Should be bytes per second
 
-    auto bandwidth = (unsigned long)dest->getBandwidth();
+    auto bandwidth = (unsigned long)dest->bandwidth;
     rate64 = (bandwidth*1000)/8; //Need to convert from Kbps to Bytes per second
     ceil64 = rate64;
 
