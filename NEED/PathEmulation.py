@@ -1,6 +1,7 @@
 from NEED.NetGraph import NetGraph
 from threading import Lock
 from ctypes import CDLL, c_float
+from os import path
 
 import sys
 if sys.version_info >= (3, 0):
@@ -14,7 +15,12 @@ class PEState:
 def init(controll_port):
     with PEState.PathLock:
         if not PEState.shutdown:
-            PEState.TCAL = CDLL("./TCAL/libTCAL.so")
+            # Get the libTCAL.so full path from the current file
+            filepath = path.abspath(__file__)
+            folderpath = "/".join(filepath.split('/')[0:-2])
+            tcalPath = folderpath + "/TCAL/libTCAL.so"
+
+            PEState.TCAL = CDLL(tcalPath)
             PEState.TCAL.init(controll_port)
 
 
