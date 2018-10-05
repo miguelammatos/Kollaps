@@ -32,9 +32,14 @@ int main(int argc, char** argv){
     char hexIp[] = "ffffffff";
     destination_getIpHex(dest, hexIp);
     printf("0x%s\n", hexIp);
-    
-    //init(55);
-    //initDestination(ip, 100000, 10, 0.0f, 0.0f);
     free(dest);
+    
+    init(55);
+    for(int i=0; i<500; i++){
+	ip +=i;
+    	initDestination(ip, 100000, 10, 0.0f, 0.0f);
+    	changeBandwidth(ip, 200000);
+    }
+    tearDown();
     return 0;
 }

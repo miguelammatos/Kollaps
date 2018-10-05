@@ -8,6 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstring>
+
 #include "TC.h"
 extern "C" {
     #include "utils.h"
@@ -16,7 +17,7 @@ extern "C" {
 
 
 namespace TC {
-    std::unordered_map<int, unsigned long> usage;
+    Usage* usage = NULL;
     struct rtnl_handle rth = {};
     int hz = 0;
     double ticks_in_usec = 0;
@@ -25,7 +26,7 @@ namespace TC {
 int TC::callTC(std::string args) {
     std::stringstream cmd;
     cmd << TC_BIN << " " << args;
-    std::cout << cmd.str() << std::endl;
+    //std::cout << cmd.str() << std::endl;
     int ret = system(cmd.str().c_str());
     return WEXITSTATUS(ret);
 }
@@ -147,7 +148,12 @@ void TC::initDestination(Destination *dest, const std::string interface) {
 }
 
 void TC::destroy(std::string interface) {
-    usage.clear();
+    Usage *u, *tmp;
+    HASH_ITER(hh, TC::usage, u, tmp){
+        HASH_DEL(TC::usage, u);
+        free(u);
+    }
+
     rtnl_close(&rth);
 
     set_if_down(interface.c_str(), 0);
@@ -193,9 +199,19 @@ int update_class(const struct sockaddr_nl *who,
     if (tb[TCA_STATS]) {
         struct tc_stats st = {};
         memcpy(&st, RTA_DATA(tb[TCA_STATS]), MIN(RTA_PAYLOAD(tb[TCA_STATS]), sizeof(st)));
-        TC::usage[TC_H_MIN(t->tcm_handle)] = st.bytes;
-        /*std::cout << (TC_H_MAJ(t->tcm_handle) >> 16) << ":" << TC_H_MIN(t->tcm_handle)
-                  << " Sent: " << st.bytes << std::endl;*/
+        Usage *s;
+        unsigned int handle = TC_H_MIN(t->tcm_handle);
+
+        HASH_FIND_INT(TC::usage, &handle, s);
+        if (s==NULL) {
+            s = (Usage*)malloc(sizeof(Usage));
+            s->usage = st.bytes;
+            s->handle = handle;
+            HASH_ADD_INT(TC::usage, handle, s);
+        }else{
+            s->usage = st.bytes;
+        }
+
     }
     return 0;
 }
@@ -224,7 +240,9 @@ void TC::updateUsage(const std::string interface) {
 
 
 unsigned long TC::queryUsage(Destination *dest, const std::string interface) {
-    return TC::usage[dest->handle];
+    Usage* u;
+    HASH_FIND_INT(TC::usage, &(dest->handle), u);
+    return u->usage;
 }
 
 void TC::changeBandwidth(Destination *dest, std::string interface) {

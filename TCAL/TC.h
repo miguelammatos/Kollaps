@@ -6,10 +6,9 @@
 #define TC_H
 
 
-#include <unordered_map>
-
 extern "C" {
 #include "Destination.h"
+#include "uthash/uthash.h"
 };
 
 #define TXQUEUELEN 1000
@@ -23,6 +22,13 @@ extern "C" {
 #define TC_H_MIN(h) ((h)&TC_H_MIN_MASK)
 #define TC_H_MAJ_MASK (0xFFFF0000U)
 #define TC_H_MAJ(h) ((h)&TC_H_MAJ_MASK)
+
+typedef struct {
+    unsigned int handle;
+    unsigned long usage;
+    UT_hash_handle hh;
+}Usage;
+
 
 namespace TC {
     int callTC(std::string args);

@@ -4,7 +4,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
 #include "Destination.h"
 
 Destination* destination_create(unsigned int ipv4, int bandwidth, int latency,
