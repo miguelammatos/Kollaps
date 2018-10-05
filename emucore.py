@@ -2,7 +2,7 @@
 from NEED.NetGraph import NetGraph
 from NEED.XMLGraphParser import XMLGraphParser
 from NEED.EmulationManager import EmulationManager
-from NEED.utils import fail, ENVIRONMENT
+from NEED.utils import fail, ENVIRONMENT, int2ip
 
 
 from socket import gethostname
@@ -42,7 +42,7 @@ def main():
 
     currentServiceName = gethostname()
     for host in graph.services[currentServiceName]:
-        if host.ip == ownIP:
+        if int2ip(host.ip) == ownIP:
             graph.root = host
     if graph.root is None:
         fail("Failed to identify current service instance in topology!")

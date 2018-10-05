@@ -1,6 +1,6 @@
 from NEED.NetGraph import NetGraph
 from threading import Lock
-from ctypes import CDLL
+from ctypes import CDLL, c_float
 
 import sys
 if sys.version_info >= (3, 0):
@@ -33,7 +33,7 @@ def initialize_path(path):
 
     with PEState.PathLock:
         if not PEState.shutdown and PEState.TCAL:
-            PEState.TCAL.initDestination(destination.ip, int(bandwidth/1000), latency, jitter, drop)
+            PEState.TCAL.initDestination(destination.ip, int(bandwidth/1000), latency, c_float(jitter), c_float(drop))
 
 
 def update_usage():
