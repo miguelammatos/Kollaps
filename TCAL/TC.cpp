@@ -9,21 +9,19 @@
 #include <iomanip>
 #include <cstring>
 
-#include "TC.h"
 extern "C" {
     #include "utils.h"
     #include "Destination.h"
+    #include "TC.h"
 };
 
 
-namespace TC {
-    Usage* usage = NULL;
-    struct rtnl_handle rth = {};
-    int hz = 0;
-    double ticks_in_usec = 0;
-}
+Usage* usage = NULL;
+struct rtnl_handle rth = {};
+int hz = 0;
+double ticks_in_usec = 0;
 
-int TC::callTC(std::string args) {
+int callTC(std::string args) {
     std::stringstream cmd;
     cmd << TC_BIN << " " << args;
     //std::cout << cmd.str() << std::endl;
@@ -32,7 +30,7 @@ int TC::callTC(std::string args) {
 }
 
 
-void TC::init(const std::string& interface, short controllPort) {
+void TC_init(char* interface, short controllPort) {
     std::stringstream args;
 
     if(rtnl_open(&rth, 0)){
@@ -45,7 +43,7 @@ void TC::init(const std::string& interface, short controllPort) {
      * this has been fixed in newer kernels, but older kernels dont automatically
      * restore the txqueuelen upon attaching a qdisc
      */
-    set_txqueuelen(interface.c_str(), TXQUEUELEN);
+    set_txqueuelen(interface, TXQUEUELEN);
 
     hz = get_hz();
     ticks_in_usec = get_tick_in_usec();
@@ -88,7 +86,7 @@ void TC::init(const std::string& interface, short controllPort) {
 
 }
 
-void TC::initDestination(Destination *dest, const std::string interface) {
+void TC_initDestination(Destination *dest, char* interface) {
     std::stringstream args;
     std::stringstream handleStream;
     handleStream << std::hex << dest->handle;
@@ -147,22 +145,22 @@ void TC::initDestination(Destination *dest, const std::string interface) {
 
 }
 
-void TC::destroy(std::string interface) {
+void TC_destroy(char* interface) {
     Usage *u, *tmp;
-    HASH_ITER(hh, TC::usage, u, tmp){
-        HASH_DEL(TC::usage, u);
+    HASH_ITER(hh, usage, u, tmp){
+        HASH_DEL(usage, u);
         free(u);
     }
 
     rtnl_close(&rth);
 
-    set_if_down(interface.c_str(), 0);
+    set_if_down(interface, 0);
 
     std::stringstream args;
     args << "qdisc delete root dev " << interface;
     callTC(args.str());
 
-    set_if_up(interface.c_str(), 0);
+    set_if_up(interface, 0);
 
 }
 
@@ -202,12 +200,12 @@ int update_class(const struct sockaddr_nl *who,
         Usage *s;
         unsigned int handle = TC_H_MIN(t->tcm_handle);
 
-        HASH_FIND_INT(TC::usage, &handle, s);
+        HASH_FIND_INT(usage, &handle, s);
         if (s==NULL) {
             s = (Usage*)malloc(sizeof(Usage));
             s->usage = st.bytes;
             s->handle = handle;
-            HASH_ADD_INT(TC::usage, handle, s);
+            HASH_ADD_INT(usage, handle, s);
         }else{
             s->usage = st.bytes;
         }
@@ -216,7 +214,7 @@ int update_class(const struct sockaddr_nl *who,
     return 0;
 }
 
-void TC::updateUsage(const std::string interface) {
+void TC_updateUsage(char* interface) {
     /*Use rtnetlink to communicate with the kernel directly
      * this should be a lot more efficient than calling tc
      * altough the API is not very well documented
@@ -225,7 +223,7 @@ void TC::updateUsage(const std::string interface) {
 
     struct tcmsg t = { .tcm_family = AF_UNSPEC };
     t.tcm_parent = (4<<16);  //We are only interested in classes from qdisc 4 (the htb root)
-    t.tcm_ifindex = if_nametoindex(interface.c_str());
+    t.tcm_ifindex = if_nametoindex(interface);
     if (rtnl_dump_request(&rth, RTM_GETTCLASS, &t, sizeof(t)) < 0) {
         std::cerr << "Cannot send tc dump request" << std::endl;
         rtnl_close(&rth);
@@ -239,13 +237,13 @@ void TC::updateUsage(const std::string interface) {
 }
 
 
-unsigned long TC::queryUsage(Destination *dest, const std::string interface) {
+unsigned long TC_queryUsage(Destination *dest, char* interface) {
     Usage* u;
-    HASH_FIND_INT(TC::usage, &(dest->handle), u);
+    HASH_FIND_INT(usage, &(dest->handle), u);
     return u->usage;
 }
 
-void TC::changeBandwidth(Destination *dest, std::string interface) {
+void TC_changeBandwidth(Destination *dest, char* interface) {
     /*Use rtnetlink to communicate with the kernel directly
      * this should be a lot more efficient than calling tc
      * altough the API is not very well documented
@@ -260,7 +258,7 @@ void TC::changeBandwidth(Destination *dest, std::string interface) {
     req.n.nlmsg_flags = NLM_F_REQUEST,
     req.n.nlmsg_type = RTM_NEWTCLASS,
     req.t.tcm_family = AF_UNSPEC,
-    req.t.tcm_ifindex = if_nametoindex(interface.c_str());
+    req.t.tcm_ifindex = if_nametoindex(interface);
 
     unsigned int handle = (4 << 16) | dest->handle;
     req.t.tcm_handle = handle;

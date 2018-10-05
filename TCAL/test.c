@@ -35,7 +35,7 @@ int main(int argc, char** argv){
     free(dest);
     
     init(55);
-    for(int i=0; i<500; i++){
+    for(int i=0; i<50; i++){
 	ip +=i;
     	initDestination(ip, 100000, 10, 0.0f, 0.0f);
     	changeBandwidth(ip, 200000);

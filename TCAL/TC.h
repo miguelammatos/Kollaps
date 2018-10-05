@@ -6,10 +6,8 @@
 #define TC_H
 
 
-extern "C" {
 #include "Destination.h"
 #include "uthash/uthash.h"
-};
 
 #define TXQUEUELEN 1000
 
@@ -30,19 +28,12 @@ typedef struct {
 }Usage;
 
 
-namespace TC {
-    int callTC(std::string args);
+void TC_init(char* interface, short controllPort);
+void TC_initDestination(Destination *dest, char* interface);
+void TC_changeBandwidth(Destination *dest, char* interface);
+void TC_updateUsage(char* interface);
+unsigned long TC_queryUsage(Destination *dest, char* interface);
 
-    void init(const std::string &interface, short controllPort);
-
-    void initDestination(Destination *dest, std::string interface);
-
-    void changeBandwidth(Destination *dest, std::string interface);
-
-    void updateUsage(std::string interface);
-    unsigned long queryUsage(Destination *dest, std::string interface);
-
-    void destroy(std::string interface);
-}
+void TC_destroy(char* interface);
 
 #endif //TC_H
