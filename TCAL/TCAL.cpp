@@ -11,7 +11,7 @@
 
 
 
-std::unordered_map<std::string, Destination*> hosts;
+std::unordered_map<unsigned int, Destination*> hosts;
 unsigned int handleCounter = 5;
 
 //To be fully correct we should check on what interface a given IP is reachable
@@ -20,7 +20,7 @@ unsigned int handleCounter = 5;
 std::string interface;
 
 
-void init(short controllPort){
+extern "C" void init(short controllPort){
     char* env = std::getenv("NETWORK_INTERFACE");
     if(nullptr == env){
         std::cout << "NETWORK_INTERFACE environment variable not set! Aborting." << std::endl;
@@ -31,7 +31,7 @@ void init(short controllPort){
     TC::init(interface, controllPort);
 }
 
-void initDestination(std::string ip, int bandwidth, int latency, float jitter, float packetLoss){
+extern "C" void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, float packetLoss){
     auto dest = new Destination(ip, bandwidth, latency, jitter, packetLoss);
     dest->setHandle(++handleCounter);
     hosts[ip] = dest;
@@ -40,22 +40,22 @@ void initDestination(std::string ip, int bandwidth, int latency, float jitter, f
     TC::initDestination(dest, interface);
 
 }
-void changeBandwidth(std::string ip, int bandwidth){
+extern "C" void changeBandwidth(unsigned int ip, int bandwidth){
     auto dest = hosts[ip];
     dest->setBandwidth(bandwidth);
     TC::changeBandwidth(dest, interface);
 }
 
-void updateUsage(){
+extern "C" void updateUsage(){
     TC::updateUsage(interface);
 }
 
-unsigned long queryUsage(std::string ip){
+extern "C" unsigned long queryUsage(unsigned int ip){
     auto dest = hosts[ip];
     return TC::queryUsage(dest, interface);
 }
 
-void tearDown(){
+extern "C" void tearDown(){
     for(auto it=hosts.begin(); it!=hosts.end(); it++){
         delete(it->second);
     }

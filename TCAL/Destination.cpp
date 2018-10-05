@@ -7,7 +7,7 @@
 #include <iostream>
 #include "Destination.h"
 
-Destination::Destination(const std::string &ipv4, int bandwidth, int latency,
+Destination::Destination(unsigned int ipv4, int bandwidth, int latency,
                          float jitter, float packetLossRate) {
     _ipv4 = ipv4;
     _latency = latency;
@@ -32,10 +32,6 @@ const unsigned int Destination::getHandle() {
     return _handle;
 }
 
-const std::string& Destination::getIP() {
-    return _ipv4;
-}
-
 const int Destination::getLatency() {
     return _latency;
 }
@@ -49,7 +45,7 @@ const float Destination::getPacketLossRate() {
 }
 
 unsigned int Destination::ipToInt(short octet) {
-    const unsigned bits_per_term = 8;
+    /*const unsigned bits_per_term = 8;
     const unsigned num_terms = 4;
 
     std::istringstream ip(_ipv4);
@@ -60,11 +56,28 @@ unsigned int Destination::ipToInt(short octet) {
         if(i == octet)
             return term;
     }
-    return 255;//Error
+    return 255;//Error*/
+
+    //1=0 2=8 3=16 4=24
+    //0=0 1=8 2=16 3=24
+    char shift = ((octet-1)*8);
+    int mask = (0xff000000 >> shift);
+    int maskedIp = _ipv4 & mask;
+    return maskedIp >> shift;
 }
 
 std::string Destination::getOctetHex(short octet) {
     std::stringstream ss;
     ss << std::hex << std::setfill('0') << std::setw(2)<< ipToInt(octet);
+    return ss.str();
+}
+
+const int Destination::getIp() {
+    return _ipv4;
+}
+
+std::string Destination::getIpHex() {
+    std::stringstream ss;
+    ss << std::hex << std::setfill('0') << std::setw(8)<< _ipv4;
     return ss.str();
 }

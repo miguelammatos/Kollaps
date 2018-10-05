@@ -1,15 +1,13 @@
 #ifndef TCAL_H
 #define TCAL_H
 
-#include <string>
+extern "C" void init(short controllPort);
 
-void init(short controllPort);
+extern "C" void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, float packetLoss);
+extern "C" void changeBandwidth(unsigned int ip, int bandwidth);
+extern "C" void updateUsage();
+extern "C" unsigned long queryUsage(unsigned int ip);
 
-void initDestination(std::string ip, int bandwidth, int latency, float jitter, float packetLoss);
-void changeBandwidth(std::string ip, int bandwidth);
-void updateUsage();
-unsigned long queryUsage(std::string ip);
-
-void tearDown();
+extern "C" void tearDown();
 
 #endif

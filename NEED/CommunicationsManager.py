@@ -1,7 +1,7 @@
 import random
 
 from NEED.NetGraph import NetGraph
-from NEED.utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error
+from NEED.utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error, int2ip
 import NEED.PathEmulation as PathEmulation
 
 from threading import Thread, Lock
@@ -87,7 +87,7 @@ class CommunicationsManager:
             for host in hosts:
                 if host != self.graph.root:
                     self.peer_count += 1
-                    broadcast_group.append(host.ip)
+                    broadcast_group.append(int2ip(host.ip))
                 if host.supervisor:
                     self.supervisor_count += 1
         self.peer_count -= self.supervisor_count

@@ -128,8 +128,10 @@ void TC::initDestination(Destination *dest, const std::string interface) {
     //Add the rule itself
     args.str(std::string());
     args << "filter add dev " << interface << " parent 4:0 protocol ip prio 2 u32 ht f"
-         << dest->getOctetHex(3) << ":" << dest->getOctetHex(4) << " match ip dst "
-         << dest->getIP() << "/32 flowid 4:" << handleStream.str();
+         << dest->getOctetHex(3) << ":" << dest->getOctetHex(4) << " match u32 0x"
+         << dest->getIpHex() << "0xffffffff at 128 flowid 4:" << handleStream.str();
+        /*<< dest->getOctetHex(3) << ":" << dest->getOctetHex(4) << " match ip dst "
+          << dest->getIP() << "/32 flowid 4:" << handleStream.str();*/
     callTC(args.str());
 
 }

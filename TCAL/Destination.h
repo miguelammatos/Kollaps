@@ -8,7 +8,7 @@
 #include "string"
 
 class Destination {
-    std::string _ipv4;
+    unsigned int _ipv4;
     int _latency;
     float _jitter;
     int _bandwidth; //in Kbps
@@ -16,10 +16,11 @@ class Destination {
 
     unsigned int _handle;
 public:
-    Destination(const std::string &ipv4,
+    Destination(unsigned int ipv4,
                 int bandwidth, int latency, float jitter, float packetLossRate);
-    const std::string& getIP();
     std::string getOctetHex(short octet);
+    const int getIp();
+    std::string getIpHex();
     const int getLatency();
     const float getJitter();
     const int getBandwidth();

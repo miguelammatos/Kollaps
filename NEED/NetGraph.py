@@ -1,4 +1,4 @@
-from NEED.utils import fail
+from NEED.utils import fail, ip2int
 from time import sleep
 from math import sqrt
 from os import environ
@@ -194,7 +194,7 @@ class NetGraph:
                     sleep(3)
             ips.sort()  # needed for deterministic behaviour
             for i in range(len(hosts)):
-                hosts[i].ip = ips[i]
+                hosts[i].ip = ip2int(ips[i])
 
     def calculate_shortest_paths(self):
         # Dijkstra's shortest path implementation

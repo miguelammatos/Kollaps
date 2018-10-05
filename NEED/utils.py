@@ -1,6 +1,7 @@
-from __future__ import print_function
 import subprocess
 import sys
+import struct
+import socket
 
 
 BYTE_LIMIT = 255
@@ -30,4 +31,11 @@ def start_experiment():
 def stop_experiment():
     # Temporary hack to stop the experiment
     subprocess.run('echo "done" > /tmp/donepipe', shell=True)
+
+
+def ip2int(addr):
+    return struct.unpack("!I", socket.inet_aton(addr))[0]
+
+def int2ip(addr):
+    return socket.inet_ntoa(struct.pack("!I", addr))
 
