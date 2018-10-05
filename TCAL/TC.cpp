@@ -70,7 +70,7 @@ void TC::init(const std::string& interface, short controllPort) {
     //The kernel apparently truncates the hashkey to a value <= divisor so we have to use only the last bits
     args << "filter add dev " << interface
          << " protocol ip parent 4:0 prio 2 u32 ht 800:: match ip dst any hashkey mask "
-         << FIRST_HASH_MASK << " at 16 link e00:";
+         << FIRST_HASH_MASK << " at 16 link e00:"; //16 is offset in bytes (not bits)!!
     callTC(args.str());
 
     //Setup a filter to allow traffic on the controll port to go unrestricted and with maximum priority
@@ -129,7 +129,7 @@ void TC::initDestination(Destination *dest, const std::string interface) {
     args.str(std::string());
     args << "filter add dev " << interface << " parent 4:0 protocol ip prio 2 u32 ht f"
          << dest->getOctetHex(3) << ":" << dest->getOctetHex(4) << " match u32 0x"
-         << dest->getIpHex() << " 0xffffffff at 128 flowid 4:" << handleStream.str();
+         << dest->getIpHex() << " 0xffffffff at 16 flowid 4:" << handleStream.str();
         /*<< dest->getOctetHex(3) << ":" << dest->getOctetHex(4) << " match ip dst "
           << dest->getIP() << "/32 flowid 4:" << handleStream.str();*/
     callTC(args.str());

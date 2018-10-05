@@ -63,7 +63,7 @@ unsigned int Destination::ipToInt(short octet) {
     char shift = ((octet-1)*8);
     int mask = (0xff000000 >> shift);
     int maskedIp = _ipv4 & mask;
-    return maskedIp >> shift;
+    return maskedIp >> (24-shift);
 }
 
 std::string Destination::getOctetHex(short octet) {
