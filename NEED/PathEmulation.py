@@ -1,6 +1,6 @@
-from TCAL import pyTCAL as TCAL  # TODO this breaks compatibility with py2 for some reason...
 from NEED.NetGraph import NetGraph
 from threading import Lock
+from ctypes import CDLL
 
 import sys
 if sys.version_info >= (3, 0):
@@ -9,11 +9,13 @@ if sys.version_info >= (3, 0):
 class PEState:
     PathLock = Lock()
     shutdown = False
+    TCAL = None
 
 def init(controll_port):
     with PEState.PathLock:
         if not PEState.shutdown:
-            TCAL.init(controll_port)
+            PEState.TCAL = CDLL("./TCAL/libTCAL.so")
+            PEState.TCAL.init(controll_port)
 
 
 def initialize_path(path):
@@ -30,14 +32,14 @@ def initialize_path(path):
     drop = path.drop
 
     with PEState.PathLock:
-        if not PEState.shutdown:
-            TCAL.initDestination(destination.ip, int(bandwidth/1000), latency, jitter, drop)
+        if not PEState.shutdown and PEState.TCAL:
+            PEState.TCAL.initDestination(destination.ip, int(bandwidth/1000), latency, jitter, drop)
 
 
 def update_usage():
     with PEState.PathLock:
-        if not PEState.shutdown:
-            TCAL.updateUsage()
+        if not PEState.shutdown and PEState.TCAL:
+            PEState.TCAL.updateUsage()
 
 
 def query_usage(service):
@@ -46,8 +48,8 @@ def query_usage(service):
     :return: int  # in bytes
     """
     with PEState.PathLock:
-        if not PEState.shutdown:
-            return TCAL.queryUsage(service.ip)
+        if not PEState.shutdown and PEState.TCAL:
+            return PEState.TCAL.queryUsage(service.ip)
         else:
             return 0
 
@@ -59,10 +61,11 @@ def change_bandwidth(service, new_bandwidth):
     :return:
     """
     with PEState.PathLock:
-        if not PEState.shutdown:
-            TCAL.changeBandwidth(service.ip, int(new_bandwidth/1000))
+        if not PEState.shutdown and PEState.TCAL:
+            PEState.TCAL.changeBandwidth(service.ip, int(new_bandwidth/1000))
 
 def tearDown():
     with PEState.PathLock:
         PEState.shutdown = True
-        TCAL.tearDown()
+        if PEState.TCAL:
+            PEState.TCAL.tearDown()

@@ -21,3 +21,4 @@ clean:
 	-rm $(OBJS)
 	-rm ./*.o	
 	-rm *.so
+	-rm ./test
