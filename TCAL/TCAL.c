@@ -8,6 +8,7 @@
 
 
 Destination* hosts = NULL;
+Destination* hostsByHandle = NULL;
 unsigned int handleCounter = 5;
 
 //To be fully correct we should check on what interface a given IP is reachable
@@ -30,7 +31,8 @@ void init(short controllPort){
 void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, float packetLoss){
     Destination* dest = destination_create(ip, bandwidth, latency, jitter, packetLoss);
     dest->handle = ++handleCounter;
-    HASH_ADD_INT(hosts, ipv4, dest);
+    HASH_ADD(hh_ip, hosts, ipv4, sizeof(int), dest);
+    HASH_ADD(hh_h, hostsByHandle, handle, sizeof(int), dest);
 
     //Initialize the tc data structures
     TC_initDestination(dest, interface);
@@ -38,7 +40,7 @@ void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, 
 }
 void changeBandwidth(unsigned int ip, int bandwidth){
     Destination* dest;
-    HASH_FIND_INT(hosts, &ip, dest);
+    HASH_FIND(hh_ip, hosts, &ip, sizeof(int), dest);
     dest->bandwidth = bandwidth;
     TC_changeBandwidth(dest, interface);
 }
@@ -49,14 +51,15 @@ void updateUsage(){
 
 unsigned long queryUsage(unsigned int ip){
     Destination* dest;
-    HASH_FIND_INT(hosts, &ip, dest);
-    return TC_queryUsage(dest, interface);
+    HASH_FIND(hh_ip, hosts, &ip, sizeof(int), dest);
+    return dest->usage;
 }
 
 void tearDown(){
     Destination *d, *tmp;
-    HASH_ITER(hh, hosts, d, tmp){
-        HASH_DEL(hosts, d);
+    HASH_ITER(hh_ip, hosts, d, tmp){
+        HASH_DELETE(hh_ip, hosts, d);
+        HASH_DELETE(hh_h, hostsByHandle, d);
         free(d);
     }
 

@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <stdarg.h>
+
 int main(int argc, char** argv){
     struct in_addr addr;
     unsigned int ip;
@@ -35,11 +37,33 @@ int main(int argc, char** argv){
     free(dest);
     
     init(55);
-    for(int i=0; i<50; i++){
+    int original_ip = ip;
+    for(int i=0; i<5; i++){
 	ip +=i;
     	initDestination(ip, 100000, 10, 0.0f, 0.0f);
     	changeBandwidth(ip, 200000);
     }
+    updateUsage();
+    ip = original_ip;
+    for(int i=0; i<5; i++){
+	ip +=i;
+	if(queryUsage(ip)){
+		printf("FAIL!");
+		exit(-1);	
+	}
+    }
     tearDown();
+
+    char* buffer = NULL;
+    int required_size = 0;
+    char fmt[] = "Hello %d";
+    required_size = snprintf(buffer, 0, fmt, 1);
+    required_size += 1; //for null termination
+    buffer = (char*)malloc(required_size*sizeof(char));
+    required_size = snprintf(buffer, required_size, fmt, 1);
+
+    printf("%s\n", buffer);
+    free(buffer);
+
     return 0;
 }

@@ -21,18 +21,10 @@
 #define TC_H_MAJ_MASK (0xFFFF0000U)
 #define TC_H_MAJ(h) ((h)&TC_H_MAJ_MASK)
 
-typedef struct {
-    unsigned int handle;
-    unsigned long usage;
-    UT_hash_handle hh;
-}Usage;
-
-
 void TC_init(char* interface, short controllPort);
 void TC_initDestination(Destination *dest, char* interface);
 void TC_changeBandwidth(Destination *dest, char* interface);
 void TC_updateUsage(char* interface);
-unsigned long TC_queryUsage(Destination *dest, char* interface);
 
 void TC_destroy(char* interface);
 

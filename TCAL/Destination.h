@@ -15,7 +15,9 @@ typedef struct {
     int bandwidth; //in Kbps
     float packetLossRate;
     unsigned int handle;
-    UT_hash_handle hh;
+    unsigned long usage;
+    UT_hash_handle hh_ip;
+    UT_hash_handle hh_h;
 }Destination;
 
 Destination* destination_create(unsigned int ipv4, int bandwidth, int latency, float jitter, float packetLossRate);

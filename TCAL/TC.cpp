@@ -10,16 +10,19 @@
 #include <cstring>
 
 extern "C" {
+    #include "stdarg.h"
     #include "utils.h"
     #include "Destination.h"
     #include "TC.h"
 };
 
 
-Usage* usage = NULL;
+extern Destination* hostsByHandle;
 struct rtnl_handle rth = {};
 int hz = 0;
 double ticks_in_usec = 0;
+
+
 
 int callTC(std::string args) {
     std::stringstream cmd;
@@ -146,12 +149,6 @@ void TC_initDestination(Destination *dest, char* interface) {
 }
 
 void TC_destroy(char* interface) {
-    Usage *u, *tmp;
-    HASH_ITER(hh, usage, u, tmp){
-        HASH_DEL(usage, u);
-        free(u);
-    }
-
     rtnl_close(&rth);
 
     set_if_down(interface, 0);
@@ -197,19 +194,11 @@ int update_class(const struct sockaddr_nl *who,
     if (tb[TCA_STATS]) {
         struct tc_stats st = {};
         memcpy(&st, RTA_DATA(tb[TCA_STATS]), MIN(RTA_PAYLOAD(tb[TCA_STATS]), sizeof(st)));
-        Usage *s;
         unsigned int handle = TC_H_MIN(t->tcm_handle);
 
-        HASH_FIND_INT(usage, &handle, s);
-        if (s==NULL) {
-            s = (Usage*)malloc(sizeof(Usage));
-            s->usage = st.bytes;
-            s->handle = handle;
-            HASH_ADD_INT(usage, handle, s);
-        }else{
-            s->usage = st.bytes;
-        }
-
+        Destination *d;
+        HASH_FIND(hh_h, hostsByHandle, &handle, sizeof(int), d);
+        d->usage = st.bytes;
     }
     return 0;
 }
@@ -236,12 +225,6 @@ void TC_updateUsage(char* interface) {
     }
 }
 
-
-unsigned long TC_queryUsage(Destination *dest, char* interface) {
-    Usage* u;
-    HASH_FIND_INT(usage, &(dest->handle), u);
-    return u->usage;
-}
 
 void TC_changeBandwidth(Destination *dest, char* interface) {
     /*Use rtnetlink to communicate with the kernel directly

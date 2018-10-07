@@ -15,6 +15,7 @@ Destination* destination_create(unsigned int ipv4, int bandwidth, int latency,
     self->latency = latency;
     self->jitter = jitter;
     self->packetLossRate = packetLossRate;
+    self->usage = 0;
     return self;
 
 }
