@@ -10,6 +10,7 @@ import socket
 from NEED.CommunicationsManager import CommunicationsManager
 from NEED.NetGraph import NetGraph
 from NEED.XMLGraphParser import XMLGraphParser
+from NEED.utils import int2ip, ip2int
 
 import dns.resolver
 import netifaces
@@ -203,7 +204,7 @@ def resolve_hostnames():
                 sleep(3)
         ips.sort()  # needed for deterministic behaviour
         for i in range(len(service_instances)):
-                service_instances[i].ip = ips[i]
+                service_instances[i].ip = ip2int(ips[i])
         for i, host in enumerate(service_instances):
             if host.supervisor:
                 # for ip in own_ips:
