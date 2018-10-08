@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <stdarg.h>
 
@@ -50,15 +51,18 @@ int main(int argc, char** argv){
     	initDestination(ip, 100000, 10, 0.0f, 0.0f);
     	changeBandwidth(ip, 200000);
     }
+    while(1){
     updateUsage();
-    ip = original_ip;
+    sleep(1);
+    }
+    /*ip = original_ip;
     for(int i=0; i<5; i++){
 	ip +=i;
 	if(queryUsage(ip)){
 		printf("FAIL!");
 		exit(-1);	
 	}
-    }
+    }*/
     tearDown();
 
     char* buffer = NULL;

@@ -11,6 +11,7 @@ class PEState:
     PathLock = Lock()
     shutdown = False
     TCAL = None
+    callback = None  # We need to keep a reference otherwise gets garbage collected causing crashes
 
 def init(controll_port):
     with PEState.PathLock:
@@ -77,6 +78,7 @@ def register_usage_callback(callback):
     """
     CALLBACKTYPE = CFUNCTYPE(c_int, c_uint, c_ulong)
     c_callback = CALLBACKTYPE(callback)
+    PEState.callback = c_callback
     with PEState.PathLock:
         if not PEState.shutdown and PEState.TCAL:
             PEState.TCAL.registerUsageCallback(c_callback)
