@@ -196,7 +196,7 @@ class NetGraph:
             ips.sort()  # needed for deterministic behaviour
             for i in range(len(hosts)):
                 int_ip = ip2int(ips[i])
-                hosts[i].ip = ip2int(int_ip)
+                hosts[i].ip = int_ip
                 self.hosts_by_ip[int_ip] = hosts[i]
 
     def calculate_shortest_paths(self):
