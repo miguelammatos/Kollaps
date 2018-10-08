@@ -16,7 +16,7 @@ extern "C" {
     #include "TC.h"
 };
 
-extern void (*usageCallback)(unsigned int, unsigned long);
+extern int (*usageCallback)(unsigned int, unsigned long);
 extern Destination* hostsByHandle;
 struct rtnl_handle rth = {};
 int hz = 0;

@@ -1,6 +1,6 @@
 from NEED.NetGraph import NetGraph
 from threading import Lock
-from ctypes import CDLL, c_float
+from ctypes import CDLL, c_float, CFUNCTYPE, c_voidp, c_int, c_ulong, c_uint
 from os import path
 
 import sys
@@ -69,6 +69,18 @@ def change_bandwidth(service, new_bandwidth):
     with PEState.PathLock:
         if not PEState.shutdown and PEState.TCAL:
             PEState.TCAL.changeBandwidth(service.ip, int(new_bandwidth/1000))
+
+def register_usage_callback(callback):
+    """
+    :param callback: func
+    :return:
+    """
+    CALLBACKTYPE = CFUNCTYPE(c_int, c_uint, c_ulong)
+    c_callback = CALLBACKTYPE(callback)
+    with PEState.PathLock:
+        if not PEState.shutdown and PEState.TCAL:
+            PEState.TCAL.registerUsageCallback(c_callback)
+
 
 def tearDown():
     with PEState.PathLock:

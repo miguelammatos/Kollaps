@@ -10,8 +10,9 @@
 
 #include <stdarg.h>
 
-void callback(unsigned int ip, unsigned long bytes){
+int callback(unsigned int ip, unsigned long bytes){
 	printf("%d %d\n", ip, bytes);
+	return 0;
 }
 
 

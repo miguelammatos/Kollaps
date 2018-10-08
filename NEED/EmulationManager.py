@@ -17,6 +17,8 @@ if sys.version_info >= (3, 0):
 # Global variable used within the worker process
 graph = None  # type: NetGraph
 
+# Global variable used within the callback to TCAL
+emuManager = None  # type: EmulationManager
 
 def initialize_worker(graph_copy):
     global graph  # type: NetGraph
@@ -113,6 +115,9 @@ def apply_bandwidth(our_flows, flow_accumulator, active_paths_ids):
 
     return changes
 
+def collect_usage(ip, sent_bytes):
+    emuManager.collect_own_flow(ip, sent_bytes)
+
 class EmulationManager:
 
     # Generic loop tuning
@@ -124,8 +129,8 @@ class EmulationManager:
     ALPHA = 0.25
     ONE_MINUS_ALPHA = 1-ALPHA
 
-    def __init__(self, graph):
-        self.graph = graph  # type: NetGraph
+    def __init__(self, netgraph):
+        self.graph = netgraph  # type: NetGraph
         self.active_paths = []  # type: List[NetGraph.Path]
         self.active_paths_ids = [] # type: List[int]
         self.flow_accumulator = {}  # type: Dict[str, List[List[int], int]]
@@ -139,12 +144,18 @@ class EmulationManager:
         print("Iteration Count: " + str(EmulationManager.ITERATIONS_TO_INTEGRATE))
         self.worker_process = Pool(processes=1, initializer=initialize_worker, initargs=(self.graph,))
 
+        self.check_flows_time_delta = 0
+        #We need to give the callback a reference to ourselves (kind of hackish...)
+        global emuManager
+        emuManager = self
+
     def initialize(self):
         PathEmulation.init(CommunicationsManager.UDP_PORT)
         for service in self.graph.paths:
             if isinstance(service, NetGraph.Service):
                 path = self.graph.paths[service]
                 PathEmulation.initialize_path(path)
+        PathEmulation.register_usage_callback(collect_usage)
 
 
     def emulation_loop(self):
@@ -181,44 +192,35 @@ class EmulationManager:
                 self.flow_accumulator.clear()
 
     def check_active_flows(self):
-        PathEmulation.update_usage()
         current_time = time()
-        time_delta = current_time - self.last_time
-        for service in self.graph.services:
-            hosts = self.graph.services[service]
-            for host in hosts:
-                if host == self.graph.root:
-                    continue
-                if host not in self.graph.paths:  # unreachable
-                    continue
-                # Calculate current throughput
-                bytes = PathEmulation.query_usage(host)
-                if bytes < host.last_bytes:
-                    bytes_delta = bytes  # in case of overflow ignore the bytes before the overflow
-                else:
-                    bytes_delta = bytes - host.last_bytes
-                bits = (bytes_delta) * 8
-                throughput = bits / time_delta
-                host.last_bytes = bytes
-
-                # Get the network path
-                path = self.graph.paths[host]
-
-                # Check if this is an active flow
-                if throughput <= (path.max_bandwidth * EmulationManager.ERROR_MARGIN):
-                    path.used_bandwidth = 0
-                    continue
-
-                # This is an active flow
-                path.used_bandwidth = throughput
-                self.active_paths.append(path)
-                self.active_paths_ids.append(path.id)
-
-                # Collect our own flow
-                # self.accumulate_flow(throughput, [l.index for l in path.links])
-                # We no longer accumulate our flow, these are treated separately
-
+        self.check_flows_time_delta = current_time - self.last_time
         self.last_time = current_time
+        PathEmulation.update_usage()
+
+    def collect_own_flow(self, ip, sent_bytes):
+        host = self.graph.hosts_by_ip[ip]
+        # Calculate current throughput
+        if sent_bytes < host.last_bytes:
+            bytes_delta = sent_bytes  # in case of overflow ignore the bytes before the overflow
+        else:
+            bytes_delta = sent_bytes - host.last_bytes
+        bits = (bytes_delta) * 8
+        throughput = bits / self.check_flows_time_delta
+        host.last_bytes = bytes
+
+        # Get the network path
+        path = self.graph.paths[host]
+
+        # Check if this is an active flow
+        if throughput <= (path.max_bandwidth * EmulationManager.ERROR_MARGIN):
+            path.used_bandwidth = 0
+            return
+
+        # This is an active flow
+        path.used_bandwidth = throughput
+        self.active_paths.append(path)
+        self.active_paths_ids.append(path.id)
+
 
     def accumulate_flow(self, bandwidth, link_indices):
         """
