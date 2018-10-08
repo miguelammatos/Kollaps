@@ -206,7 +206,7 @@ class EmulationManager:
             bytes_delta = sent_bytes - host.last_bytes
         bits = (bytes_delta) * 8
         throughput = bits / self.check_flows_time_delta
-        host.last_bytes = bytes
+        host.last_bytes = sent_bytes
 
         # Get the network path
         path = self.graph.paths[host]
