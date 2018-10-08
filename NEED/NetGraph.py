@@ -46,7 +46,7 @@ class NetGraph:
             super(NetGraph.Service, self).__init__(name, shared)
             self.image = image
             self.command = command
-            self.ip = 0  # to be filled in later
+            self.ip = 167772161  # to be filled in later (this is just a value that can safely be converted to an IP)
             self.last_bytes = 0  # number of bytes sent to this service
             self.supervisor = False
             self.supervisor_port = 0
