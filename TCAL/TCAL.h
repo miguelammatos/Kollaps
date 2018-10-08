@@ -7,6 +7,7 @@ void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, 
 void changeBandwidth(unsigned int ip, int bandwidth);
 void updateUsage();
 unsigned long queryUsage(unsigned int ip);
+void registerUsageCallback(void(*callback)(unsigned int, unsigned long));
 
 void tearDown();
 

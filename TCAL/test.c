@@ -10,6 +10,11 @@
 
 #include <stdarg.h>
 
+void callback(unsigned int ip, unsigned long bytes){
+	printf("%d %d\n", ip, bytes);
+}
+
+
 int main(int argc, char** argv){
     struct in_addr addr;
     unsigned int ip;
@@ -37,6 +42,7 @@ int main(int argc, char** argv){
     free(dest);
     
     init(55);
+    registerUsageCallback(&callback);
     int original_ip = ip;
     for(int i=0; i<5; i++){
 	ip +=i;

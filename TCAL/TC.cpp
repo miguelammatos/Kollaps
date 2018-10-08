@@ -16,7 +16,7 @@ extern "C" {
     #include "TC.h"
 };
 
-
+extern void (*usageCallback)(unsigned int, unsigned long);
 extern Destination* hostsByHandle;
 struct rtnl_handle rth = {};
 int hz = 0;
@@ -198,7 +198,11 @@ int update_class(const struct sockaddr_nl *who,
 
         Destination *d;
         HASH_FIND(hh_h, hostsByHandle, &handle, sizeof(int), d);
-        d->usage = st.bytes;
+        if(d->usage != st.bytes) {
+            d->usage = st.bytes;
+            if(usageCallback)
+                usageCallback(d->ipv4, st.bytes);
+        }
     }
     return 0;
 }

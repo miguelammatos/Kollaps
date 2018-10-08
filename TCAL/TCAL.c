@@ -10,6 +10,8 @@
 Destination* hosts = NULL;
 Destination* hostsByHandle = NULL;
 unsigned int handleCounter = 5;
+void (*usageCallback)(unsigned int, unsigned long) = NULL;
+
 
 //To be fully correct we should check on what interface a given IP is reachable
 //However the mechanisms to do so on Linux are poorly documented
@@ -53,6 +55,10 @@ unsigned long queryUsage(unsigned int ip){
     Destination* dest;
     HASH_FIND(hh_ip, hosts, &ip, sizeof(int), dest);
     return dest->usage;
+}
+
+void registerUsageCallback(void(*callback)(unsigned int, unsigned long)){
+    usageCallback = callback;
 }
 
 void tearDown(){

@@ -14,6 +14,7 @@ if sys.version_info >= (3, 0):
 class NetGraph:
     def __init__(self):
         self.services = {}  # type: Dict[str,List[NetGraph.Service]]
+        self.hosts_by_ip = {} # type: Dict[int, NetGraph.Service]
         self.bridges = {}  # type: Dict[str,List[NetGraph.Service]]
         self.links = []  # type: List[NetGraph.Link]
         self.link_counter = 0  # increment counter that will give each link an index
@@ -194,7 +195,9 @@ class NetGraph:
                     sleep(3)
             ips.sort()  # needed for deterministic behaviour
             for i in range(len(hosts)):
-                hosts[i].ip = ip2int(ips[i])
+                int_ip = ip2int(ips[i])
+                hosts[i].ip = ip2int(int_ip)
+                self.hosts_by_ip[int_ip] = hosts[i]
 
     def calculate_shortest_paths(self):
         # Dijkstra's shortest path implementation
