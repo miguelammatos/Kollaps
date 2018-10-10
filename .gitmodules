@@ -1,3 +1,6 @@
 [submodule "TCAL"]
 	path = TCAL
 	url = https://github.com/joaoneves792/TCAL.git
+[submodule "TCAL/libutc"]
+	path = TCAL/libutc
+	url = https://github.com/joaoneves792/libutc.git

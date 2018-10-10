@@ -2,19 +2,24 @@
 // Created by joao on 2/1/18.
 //
 
-#include <asm/param.h>
+/*#include <asm/param.h>
 #include <asm/types.h>
 #include <linux/pkt_sched.h>
 #include <time.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string.h>*/
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <stropts.h>
+#include <unistd.h>
+#include <string.h>
+#include <net/if.h>
 
 #include "utils.h"
 
 //Copy pasted utilities from libnetlink source...
-int rcvbuf = 1024 * 1024;
+/*int rcvbuf = 1024 * 1024;
 
 int get_hz(void) {
     char name[1024];
@@ -63,19 +68,19 @@ double get_tick_in_usec(void){
         return -1;
     }
     fclose(fp);
-
+*/
     /* compatibility hack: for old iproute binaries (ignoring
      * the kernel clock resolution) the kernel advertises a
      * tick multiplier of 1000 in case of nano-second resolution,
      * which really is 1. */
-    if (clock_res == 1000000000)
+    /*if (clock_res == 1000000000)
         t2us = us2t;
 
     double clock_factor  = (double)clock_res / TIME_UNITS_PER_SEC;
     return  (double)t2us / us2t * clock_factor;
 }
-
-int tc_calc_rtable(struct tc_ratespec *r, __u32 *rtab,
+*/
+/*int tc_calc_rtable(struct tc_ratespec *r, __u32 *rtab,
                    int cell_log, unsigned int mtu,
                    enum link_layer linklayer, double ticks_in_usec)
 {
@@ -113,8 +118,9 @@ void rtnl_close(struct rtnl_handle *rth)
         close(rth->fd);
         rth->fd = -1;
     }
-}
+}*/
 
+/*
 int rtnl_open_byproto(struct rtnl_handle *rth, unsigned int subscriptions,
                       int protocol)
 {
@@ -142,9 +148,9 @@ int rtnl_open_byproto(struct rtnl_handle *rth, unsigned int subscriptions,
         perror("SO_RCVBUF");
         return -1;
     }
-
+*/
     /* Older kernels may no support extended ACK reporting */
-    setsockopt(rth->fd, SOL_NETLINK, NETLINK_EXT_ACK,
+/*    setsockopt(rth->fd, SOL_NETLINK, NETLINK_EXT_ACK,
                &one, sizeof(one));
 
     memset(&rth->local, 0, sizeof(rth->local));
@@ -173,8 +179,9 @@ int rtnl_open_byproto(struct rtnl_handle *rth, unsigned int subscriptions,
     }
     rth->seq = time(NULL);
     return 0;
-}
+}*/
 
+/*
 int rtnl_open(struct rtnl_handle *rth, unsigned int subscriptions)
 {
     return rtnl_open_byproto(rth, subscriptions, NETLINK_ROUTE);
@@ -314,7 +321,7 @@ int rtnl_dump_filter_l(struct rtnl_handle *rth,
                         return -1;
 
                     found_done = 1;
-                    break; /* process next filter */
+                    break; // process next filter
                 }
 
                 if (h->nlmsg_type == NLMSG_ERROR) {
@@ -441,7 +448,7 @@ static int __rtnl_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n,
             if (nladdr.nl_pid != 0 ||
                 h->nlmsg_pid != rtnl->local.nl_pid ||
                 h->nlmsg_seq != seq) {
-                /* Don't forget to skip that message. */
+                // Don't forget to skip that message.
                 status -= NLMSG_ALIGN(len);
                 h = (struct nlmsghdr *)((char *)h + NLMSG_ALIGN(len));
                 continue;
@@ -539,58 +546,6 @@ int parse_rtattr_flags(struct rtattr *tb[], int max, struct rtattr *rta,
 int parse_rtattr(struct rtattr *tb[], int max, struct rtattr *rta, int len)
 {
     return parse_rtattr_flags(tb, max, rta, len, 0);
-}
+}*/
 
 
-int set_txqueuelen(const char* ifname, int num_packets) {
-
-    struct ifreq ifr;
-    int fd;
-    int ret;
-
-    if((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        return -1;
-    }
-
-    ifr.ifr_addr.sa_family = AF_INET;
-    strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
-
-    ifr.ifr_qlen = num_packets;
-
-    ioctl(fd, SIOCSIFTXQLEN, &ifr);
-    if(ret < 0) {
-        perror("Error during SIOCSIFTXQLEN ioctl (set txqueuelen)");
-        close(fd);
-        return -1;
-    }
-
-    close(fd);
-    return 0;
-}
-
-
-int set_if_flags(const char *ifname, short flags)
-{
-    struct ifreq ifr;
-    int res = 0;
-
-    ifr.ifr_flags = flags;
-    strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
-
-    int skfd;
-    skfd = socket(AF_INET, SOCK_DGRAM, 0);
-
-    res = ioctl(skfd, SIOCSIFFLAGS, &ifr);
-    close(skfd);
-    return res;
-}
-
-int set_if_up(const char *ifname, short flags)
-{
-    return set_if_flags(ifname, flags | IFF_UP);
-}
-
-int set_if_down(const char *ifname, short flags)
-{
-    return set_if_flags(ifname, flags & ~IFF_UP);
-}

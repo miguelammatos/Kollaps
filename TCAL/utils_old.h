@@ -7,22 +7,23 @@
 #ifndef TCAL_UTILS_H
 #define TCAL_UTILS_H
 
-#include <net/if.h>
+/*#include <net/if.h>
 #include <asm/types.h>
 #include <linux/netlink.h>
 #include <linux/pkt_sched.h>
 #include <libmnl/libmnl.h>
 #include <linux/rtnetlink.h>
+#include <stdio.h>*/
 
-#define TIME_UNITS_PER_SEC	1000000
+/*#define TIME_UNITS_PER_SEC	1000000
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define NLMSG_TAIL(nmsg) \
 	((struct rtattr *) (((char *) (nmsg)) + NLMSG_ALIGN((nmsg)->nlmsg_len)))
-
+*/
 
 //For some reason, some distros package an old version of netlink.h that doesnt include this:
-#define NETLINK_EXT_ACK			11
+/*#define NETLINK_EXT_ACK			11
 
 
 enum link_layer {
@@ -89,7 +90,7 @@ __attribute__((warn_unused_result));
 
 int addattr_l(struct nlmsghdr *n, int maxlen, int type,
 			  const void *data, int alen);
-
+*/
 int set_if_down(const char *ifname, short flags);
 int set_if_up(const char *ifname, short flags);
 int set_txqueuelen(const char* ifname, int num_packets);

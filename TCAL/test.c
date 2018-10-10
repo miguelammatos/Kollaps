@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 #include <stdarg.h>
 
@@ -44,17 +45,17 @@ int main(int argc, char** argv){
     free(dest);
     
     init(55);
-    registerUsageCallback(&callback);
-    int original_ip = ip;
+    //registerUsageCallback(&callback);
+    /*int original_ip = ip;
     for(int i=0; i<5; i++){
 	ip +=i;
-    	initDestination(ip, 100000, 10, 0.0f, 0.0f);
-    	changeBandwidth(ip, 200000);
-    }
-    while(1){
+    	//initDestination(ip, 100000, 10, 0.0f, 0.0f);
+    	//changeBandwidth(ip, 200000);
+    }*/
+    /*while(1){
     updateUsage();
     sleep(1);
-    }
+    }*/
     /*ip = original_ip;
     for(int i=0; i<5; i++){
 	ip +=i;
@@ -64,17 +65,5 @@ int main(int argc, char** argv){
 	}
     }*/
     tearDown();
-
-    char* buffer = NULL;
-    int required_size = 0;
-    char fmt[] = "Hello %d";
-    required_size = snprintf(buffer, 0, fmt, 1);
-    required_size += 1; //for null termination
-    buffer = (char*)malloc(required_size*sizeof(char));
-    required_size = snprintf(buffer, required_size, fmt, 1);
-
-    printf("%s\n", buffer);
-    free(buffer);
-
     return 0;
 }
