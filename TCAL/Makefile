@@ -23,7 +23,7 @@ libutc.a:
 	#objcopy --localize-symbol=main --localize-symbol=get_qdisc_kind --localize-symbol=get_filter_kind $(LIBUTC) $@
 
 libTCAL.so: $(OBJS)
-	$(CC) -o $@ -shared $(OBJS) $(LDLIBS)
+	$(CC) -o $@ -shared -static $(OBJS) $(LDLIBS) -lc
 test: test.c
 	$(CC) -o $@ $^ -L. -lTCAL
 
