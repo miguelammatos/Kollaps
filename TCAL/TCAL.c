@@ -10,7 +10,7 @@
 Destination* hosts = NULL;
 Destination* hostsByHandle = NULL;
 unsigned int handleCounter = 5;
-int (*usageCallback)(unsigned int, unsigned long) = NULL;
+void (*usageCallback)(unsigned int, unsigned long) = NULL;
 
 
 //To be fully correct we should check on what interface a given IP is reachable
@@ -57,7 +57,7 @@ unsigned long queryUsage(unsigned int ip){
     return dest->usage;
 }
 
-void registerUsageCallback(int(*callback)(unsigned int, unsigned long)){
+void registerUsageCallback(void(*callback)(unsigned int, unsigned long)){
     usageCallback = callback;
 }
 

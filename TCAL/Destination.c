@@ -31,6 +31,6 @@ void destination_getOctetHex(Destination* self, short octet, char* hexOctet){
 
 
 void destination_getIpHex(Destination* self, char* hexIp){
-#define SIZEOF_IP 9
-    snprintf(hexIp, SIZEOF_IP, "%08x", self->ipv4);
+#define SIZEOF_IP 11
+    snprintf(hexIp, SIZEOF_IP, "0x%08x", self->ipv4);
 }

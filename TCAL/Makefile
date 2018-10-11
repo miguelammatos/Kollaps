@@ -6,7 +6,7 @@ LIBUTC=./libutc/tc/libutc.a
 
 CC=musl-gcc
 #CC=gcc
-CFLAGS = -g -fPIC -I./libutc/include -I./libutc/tc/
+CFLAGS = -g -fPIC -I./libutc/include -I ./libutc/ip/  -I./libutc/include/uapi -I./libutc/tc/
 LDFLAGS= -shared -ldl -lm
 LDLIBS = ./libutc.a $(LIBNETLINK) $(LIBUTIL)
 

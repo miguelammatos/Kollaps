@@ -19,7 +19,14 @@ int callback(unsigned int ip, unsigned long bytes){
 
 
 int main(int argc, char** argv){
-    struct in_addr addr;
+        int size = snprintf(NULL, 0, "%0.6f", 0.5f);
+	char *loss = (char*)malloc(sizeof(char)*(size+1));
+        snprintf(loss, size+1, "%0.6f", 0.5f);
+        printf("%s\n", loss);
+	free(loss);
+	
+	
+	/*    struct in_addr addr;
     unsigned int ip;
     inet_aton(argv[1], &addr);
     ip = htonl(addr.s_addr);
@@ -44,7 +51,7 @@ int main(int argc, char** argv){
     printf("0x%s\n", hexIp);
     free(dest);
     
-    init(55);
+    init(55);*/
     //registerUsageCallback(&callback);
     /*int original_ip = ip;
     for(int i=0; i<5; i++){
@@ -64,6 +71,6 @@ int main(int argc, char** argv){
 		exit(-1);	
 	}
     }*/
-    tearDown();
+    //tearDown();
     return 0;
 }

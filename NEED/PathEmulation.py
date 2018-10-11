@@ -76,7 +76,7 @@ def register_usage_callback(callback):
     :param callback: func
     :return:
     """
-    CALLBACKTYPE = CFUNCTYPE(c_int, c_uint, c_ulong)
+    CALLBACKTYPE = CFUNCTYPE(c_voidp, c_uint, c_ulong)
     c_callback = CALLBACKTYPE(callback)
     PEState.callback = c_callback
     with PEState.PathLock:
