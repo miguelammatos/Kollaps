@@ -27,11 +27,11 @@ struct qdisc_util;
 
 
 
-void TC_init(char* interface, short controllPort);
-void TC_initDestination(Destination *dest, char* interface);
-void TC_changeBandwidth(Destination *dest, char* interface);
-void TC_updateUsage(char* interface);
+void TC_init(short controllPort);
+void TC_initDestination(Destination *dest);
+void TC_changeBandwidth(Destination *dest);
+void TC_updateUsage(unsigned int if_index);
 
-void TC_destroy(char* interface);
+void TC_destroy(unsigned int if_index);
 
 #endif //TC_H

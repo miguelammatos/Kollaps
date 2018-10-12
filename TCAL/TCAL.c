@@ -2,32 +2,23 @@
 #include <stdio.h>
 #include "Destination.h"
 #include "uthash/uthash.h"
+#include "uthash/utlist.h"
 
 #include "TC.h"
+#include "TCAL.h"
 
 
 
 Destination* hosts = NULL;
 Destination* hostsByHandle = NULL;
+netif* interfaces = NULL;
+
 unsigned int handleCounter = 5;
 void (*usageCallback)(unsigned int, unsigned long) = NULL;
 
 
-//To be fully correct we should check on what interface a given IP is reachable
-//However the mechanisms to do so on Linux are poorly documented
-//So instead we just use an environment variable to decide what interface to use...
-char* interface;
-
-
 void init(short controllPort){
-    char* env = getenv("NETWORK_INTERFACE");
-    if(NULL == env){
-        printf("NETWORK_INTERFACE environment variable not set! Aborting.\n");
-        exit(-1);
-    }
-    interface = env;
-    printf("Using interface: %s\n", interface);
-    TC_init(interface, controllPort);
+    TC_init(controllPort);
 }
 
 void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, float packetLoss){
@@ -37,18 +28,28 @@ void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, 
     HASH_ADD(hh_h, hostsByHandle, handle, sizeof(int), dest);
 
     //Initialize the tc data structures
-    TC_initDestination(dest, interface);
+    TC_initDestination(dest);
+    netif* existing_if = NULL;
+    LL_SEARCH_SCALAR(interfaces, existing_if, if_index, dest->if_index);
+    if(!existing_if){
+        existing_if = (netif*)malloc(sizeof(netif));
+        existing_if->if_index = dest->if_index;
+        LL_PREPEND(interfaces, existing_if);
+    }
 
 }
 void changeBandwidth(unsigned int ip, int bandwidth){
     Destination* dest;
     HASH_FIND(hh_ip, hosts, &ip, sizeof(int), dest);
     dest->bandwidth = bandwidth;
-    TC_changeBandwidth(dest, interface);
+    TC_changeBandwidth(dest);
 }
 
 void updateUsage(){
-    TC_updateUsage(interface);
+    netif* ifelem;
+    LL_FOREACH(interfaces, ifelem){
+        TC_updateUsage(ifelem->if_index);
+    }
 }
 
 unsigned long queryUsage(unsigned int ip){
@@ -69,5 +70,12 @@ void tearDown(){
         free(d);
     }
 
-    TC_destroy(interface);
+    netif *ifelem, *iftmp;
+    LL_FOREACH(interfaces, ifelem){
+        TC_destroy(ifelem->if_index);
+    }
+    LL_FOREACH_SAFE(interfaces,ifelem,iftmp) {
+        LL_DELETE(interfaces,ifelem);
+        free(ifelem);
+    }
 }

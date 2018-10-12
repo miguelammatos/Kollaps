@@ -48,7 +48,7 @@ int color = 0;
 int oneline = 0;
 
 #define ARG(string){ argv[argc++]=string; }
-#define ADD_DEV { ARG("add")ARG("dev")ARG(interface) }
+#define ADD_DEV { ARG("add")ARG("dev")ARG(netiface) }
 #define PARENT {ARG("parent")};
 #define HTB_HANDLE {ARG("4:0")};
 #define PROTOCOL_IP {ARG("protocol")ARG("ip")};
@@ -60,26 +60,36 @@ int oneline = 0;
 #define MAX_INT_CHAR_LEN 10
 
 
-void TC_init(char* interface, short controllPort) {
-    int argc = 0;
-    char* argv[100];
+short freePort = 0;
 
+void TC_init(short controllPort) {
+    freePort = controllPort;
     fillNormalDist();
-
-    char controllPort_buf[MAX_INT_CHAR_LEN];
-    snprintf(controllPort_buf, MAX_INT_CHAR_LEN, "%hu", controllPort);
-
     tc_core_init();
     open_rtnl(&rth_persistent);
+    hz = get_hz();
+}
+
+void init_interface(unsigned int if_index){
+
+    int argc = 0;
+    char* argv[100];
+    char* netiface;
+
+    char controllPort_buf[MAX_INT_CHAR_LEN];
+    snprintf(controllPort_buf, MAX_INT_CHAR_LEN, "%hu", freePort);
+
+    netiface = strdup(ll_index_to_name(if_index));
 
     /*VERY IMPORTANT docker sets txqueuelen to 0 on virtual interfaces
      * if we attach qdiscs to them, some will rely on txquelen and misbehave
      * this has been fixed in newer kernels, but older kernels dont automatically
      * restore the txqueuelen upon attaching a qdisc
      */
-    set_txqueuelen(interface, TXQUEUELEN);
 
-    hz = get_hz();
+
+    set_txqueuelen(netiface, TXQUEUELEN);
+
 
     //Create the prio qdisc
     //This automatically creates 3 classes 1:1 1:2 and 1:3 with different priorities
@@ -144,16 +154,33 @@ void TC_init(char* interface, short controllPort) {
     close_rtnl(&rth);
     argc = 0;
 
+    free(netiface);
 }
 
 
-void TC_initDestination(Destination *dest, char* interface) {
+void TC_initDestination(Destination *dest) {
     int argc = 0;
     char* argv[100];
+    char* netiface;
 
     open_rtnl(&rth);
-    get_route_interface(dest->ipv4);
+    unsigned int if_index = get_route_interface(dest->ipv4);
     close_rtnl(&rth);
+    dest->if_index = if_index;
+
+    netiface = strdup(ll_index_to_name(dest->if_index));
+
+    //Check if this interface has been initialized
+    ARG("get")ARG("dev")ARG(netiface)PARENT ARG("1:0")ARG("prio")ARG("1")
+    ARG("handle")ARG("800:")PROTOCOL_IP ARG("u32")
+    PRINT
+    open_rtnl(&rth);
+    int status = (do_filter(argc, argv, NULL, 0));
+    close_rtnl(&rth);
+    argc = 0;
+    if(status) {
+        init_interface(if_index);
+    }
 
     char htb_class_handle[MAX_INT_CHAR_LEN+2];
     char netem_qdisc_handle[MAX_INT_CHAR_LEN];
@@ -230,11 +257,11 @@ void TC_initDestination(Destination *dest, char* interface) {
 
 
     //Check if second level hashtable exists
-    ARG("get")ARG("dev")ARG(interface)PARENT HTB_HANDLE ARG("prio")ARG("2")
+    ARG("get")ARG("dev")ARG(netiface)PARENT HTB_HANDLE ARG("prio")ARG("2")
     ARG("handle")ARG(second_ht_handle)PROTOCOL_IP ARG("u32")
     PRINT
     open_rtnl(&rth);
-    int status = (do_filter(argc, argv, NULL, 0));
+    status = (do_filter(argc, argv, NULL, 0));
     close_rtnl(&rth);
     argc = 0;
 
@@ -267,22 +294,27 @@ void TC_initDestination(Destination *dest, char* interface) {
     do_filter(argc, argv, NULL, 0);
     close_rtnl(&rth);
     argc = 0;
+    free(netiface);
 
 }
 
-void TC_destroy(char* interface) {
+void TC_destroy(unsigned int if_index) {
+    char* netiface;
     rtnl_close(&rth_persistent);
 
-    set_if_down(interface, 0);
+    netiface = strdup(ll_index_to_name(if_index));
+
+    set_if_down(netiface, 0);
 
     char* argv[10];
     int argc = 0;
-    ARG("delete")ARG("root")ARG("dev")ARG(interface);
+    ARG("delete")ARG("root")ARG("dev")ARG(netiface);
     open_rtnl(&rth);
     do_qdisc(argc, argv);
     close_rtnl(&rth);
 
-    set_if_up(interface, 0);
+    set_if_up(netiface, 0);
+    free(netiface);
 
 }
 
@@ -332,7 +364,7 @@ int update_class(const struct sockaddr_nl *who,
     return 0;
 }
 
-void TC_updateUsage(char* interface) {
+void TC_updateUsage(unsigned int if_index) {
     /*Use rtnetlink to communicate with the kernel directly
      * this should be a lot more efficient than calling tc
      * altough the API is not very well documented
@@ -340,7 +372,7 @@ void TC_updateUsage(char* interface) {
 
     struct tcmsg t = { .tcm_family = AF_UNSPEC };
     t.tcm_parent = (4<<16);  //We are only interested in classes from qdisc 4 (the htb root)
-    t.tcm_ifindex = ll_name_to_index(interface);
+    t.tcm_ifindex = if_index;
     if (rtnl_dump_request(&rth_persistent, RTM_GETTCLASS, &t, sizeof(t)) < 0) {
         printf("Cannot send tc dump request\n");
         return;
@@ -352,7 +384,7 @@ void TC_updateUsage(char* interface) {
 }
 
 
-void TC_changeBandwidth(Destination *dest, char* interface) {
+void TC_changeBandwidth(Destination *dest) {
     /*Use rtnetlink to communicate with the kernel directly
      * this should be a more efficient than calling tc
      * altough the API is not very well documented
@@ -367,7 +399,7 @@ void TC_changeBandwidth(Destination *dest, char* interface) {
     req.n.nlmsg_flags = NLM_F_REQUEST,
     req.n.nlmsg_type = RTM_NEWTCLASS,
     req.t.tcm_family = AF_UNSPEC,
-    req.t.tcm_ifindex = ll_name_to_index(interface);
+    req.t.tcm_ifindex = dest->if_index;
 
     unsigned int handle = (4 << 16) | dest->handle;
     req.t.tcm_handle = handle;
