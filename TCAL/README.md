@@ -3,14 +3,22 @@ Traffic controll abstraction layer
 
 ##Build instructions
 
-make swig
+Make sure you have the libutc submodule
 
-make 
+You will need the musl-gcc wrapper!
 
-##How to use from python
+Run make
 
-Copy ./pyTCAL.py and ./\_pytcal.so to your application directory
+##How to use
+The Makefile produces a libTCAL.so shared library.
+Check TCAL.h for the exposed interface.
 
-The functions declared in TCAL should now be available from python after doing
+Be carefull though, as this library cannot be linked against.
 
-import pyTCAL
+Instead it must be loaded dynamically at runtime (with dlopen)
+
+An example is provided in test.c
+
+(the reason for this is because we statically link musl libc inside the .so, 
+That is not supposed to be supported, but we need a .so that will work in any environment without compiling)
+

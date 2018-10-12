@@ -2,19 +2,17 @@
 // Created by joao on 10/5/18.
 //
 #include "TCAL.h"
-#include "Destination.h"
-
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <dlfcn.h>
 
 #include <stdarg.h>
 
-int callback(unsigned int ip, unsigned long bytes){
+void callback(unsigned int ip, unsigned long bytes){
 	printf("%d %d\n", ip, bytes);
-	return 0;
 }
 
 
@@ -25,51 +23,47 @@ int main(int argc, char** argv){
     ip = htonl(addr.s_addr);
     printf("%s\n", argv[1]);
     printf("%ud\n", ip);
-   
-    struct in_addr addr2;
-    addr2.s_addr = ntohl(ip);
-    char* rebuiltIP = inet_ntoa(addr2);
-    printf("Rebuilt: %s\n", rebuiltIP);
+  
     
+    void (*init)(short);
+    void (*initDestination)(unsigned int, int, int, float, float);
+    void (*changeBandwidth)(unsigned int, int);
+    void (*updateUsage)();
+    void (*registerUsageCallback)(void(*callback)(unsigned int, unsigned long));
+    void (*tearDown)();
 
-    /*Destination* dest = destination_create(ip, 100000, 10, 0.0f, 0.0f);
-    char octet1[] = "FF";
-    char octet2[] = "FF";
-    char octet3[] = "FF";
-    char octet4[] = "FF";
+    void* handle;
+    handle = dlopen("libTCAL.so", RTLD_LAZY);
+    if (!handle) {
+	fprintf(stderr, "%s\n", dlerror());
+        exit(-1);
+    }
 
-    destination_getOctetHex(dest, 1, octet1);
-    destination_getOctetHex(dest, 2, octet2);
-    destination_getOctetHex(dest, 3, octet3);
-    destination_getOctetHex(dest, 4, octet4);
+    dlerror();    /* Clear any existing error */
 
-    printf("Octets 0x%s 0x%s 0x%s 0x%s\n", octet1, octet2, octet3, octet4);
-    
-    char hexIp[] = "ffffffff";
-    destination_getIpHex(dest, hexIp);
-    printf("0x%s\n", hexIp);
-    free(dest);
-    */
-    /*init(55);
-    //registerUsageCallback(&callback);
+    *(void **) (&init)  = dlsym(handle, "init");
+    *(void **) (&initDestination)  = dlsym(handle, "initDestination");
+    *(void **) (&changeBandwidth)  = dlsym(handle, "changeBandwidth");
+    *(void **) (&updateUsage)  = dlsym(handle, "updateUsage");
+    *(void **) (&registerUsageCallback)  = dlsym(handle, "registerUsageCallback");
+    *(void **) (&tearDown)  = dlsym(handle, "tearDown");
+
+    init(55);
+    registerUsageCallback(&callback);
     int original_ip = ip;
     for(int i=0; i<5; i++){
-	ip +=i;
-    	//initDestination(ip, 100000, 10, 0.0f, 0.0f);
-    	//changeBandwidth(ip, 200000);
-    }*/
-    /*while(1){
-    updateUsage();
-    sleep(1);
-    }*/
-    /*ip = original_ip;
-    for(int i=0; i<5; i++){
-	ip +=i;
-	if(queryUsage(ip)){
-		printf("FAIL!");
-		exit(-1);	
-	}
-    }*/
-    //tearDown();
+	ip++;
+    	initDestination(ip, 100000, 10, 0.0f, 0.0f);
+    	changeBandwidth(ip, 200000);
+    }
+    int n = 0;
+    while(1){
+    	updateUsage();
+	sleep(1);
+	n++;
+    if(n >= 20)
+	    break;
+    }
+    tearDown();
     return 0;
 }

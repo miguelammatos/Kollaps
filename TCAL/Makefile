@@ -6,7 +6,7 @@ LIBUTC=./libutc/tc/libutc.a
 
 CC=musl-gcc
 #CC=gcc
-CFLAGS = -g -fPIC -I./libutc/include -I ./libutc/ip/  -I./libutc/include/uapi -I./libutc/tc/
+CFLAGS = -O3 -fPIC -I./libutc/include -I ./libutc/ip/  -I./libutc/include/uapi -I./libutc/tc/
 LDFLAGS= -shared -ldl -lm
 LDLIBS = ./libutc.a $(LIBNETLINK) $(LIBUTIL)
 
@@ -24,8 +24,9 @@ libutc.a:
 
 libTCAL.so: $(OBJS)
 	$(CC) -o $@ -shared -static $(OBJS) $(LDLIBS) -lc
+	objcopy --strip-all --keep-symbols=exported.sym $@ $@
 test: test.c
-	$(CC) -o $@ $^ -L. -lTCAL
+	gcc -g -o $@ $^ -ldl
 
 
 #######################################
@@ -35,6 +36,5 @@ clean:
 	-rm $(OBJS)
 	-rm ./*.o
 	-rm ./*.a
-	-rm *.so
 	-rm ./test
-	#-make -C ./libutc distclean
+	-make -C ./libutc distclean
