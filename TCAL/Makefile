@@ -1,4 +1,4 @@
-OBJS= TCAL.o Destination.o TC.o
+OBJS= TCAL.o Destination.o TCAL_utils.o TC.o
 LIBNETLINK=./libutc/lib/libnetlink.a
 LIBUTIL=./libutc/lib/libutil.a
 LIBUTC=./libutc/tc/libutc.a
