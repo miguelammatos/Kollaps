@@ -6,18 +6,14 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdio.h>
-//#include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <stdarg.h>
-//#include <net/if.h>
+#include <ctype.h>
+#include <math.h>
 
 
-//To avoid warnings, declare these here:
-struct sockaddr_nl;
-struct nlmsghdr;
-struct rtattr;
-
+#include "TC.h"
 #include "tc_common.h"
 #include "tc_core.h"
 #include "tc_util.h"
@@ -26,7 +22,6 @@ struct rtattr;
 
 #include "utils.h"
 #include "Destination.h"
-#include "TC.h"
 
 
 extern void (*usageCallback)(unsigned int, unsigned long);
@@ -50,6 +45,7 @@ bool use_names = 0;
 int json = 0;
 int color = 0;
 int oneline = 0;
+__s16 normalDistribution[NORMAL_SIZE];
 
 #define ARG(string){ argv[argc++]=string; }
 #define ADD_DEV { ARG("add")ARG("dev")ARG(interface) }
@@ -62,15 +58,43 @@ int oneline = 0;
 
 extern struct qdisc_util prio_qdisc_util;
 extern struct qdisc_util htb_qdisc_util;
-extern struct qdisc_util netem_qdisc_util;
 extern struct filter_util u32_filter_util;
+struct qdisc_util netem_qdisc_costum_util = {
+    .id		= "netem",
+    .parse_qopt	= netem_parse_costum_opt,
+    .print_qopt	= NULL,
+};
 
 #define QDISC_COUNT 3
 #define FILTER_COUNT 1
-static struct qdisc_util* qdisc_list[QDISC_COUNT] = {&prio_qdisc_util, &htb_qdisc_util, &netem_qdisc_util};
+static struct qdisc_util* qdisc_list[QDISC_COUNT] = {&prio_qdisc_util, &htb_qdisc_util, &netem_qdisc_costum_util};
 static struct filter_util* filter_list[FILTER_COUNT] = {&u32_filter_util};
 
 #define MAX_INT_CHAR_LEN 10
+
+void fillNormalDist(){
+    int i, n;
+    int value;
+    double x;
+
+    __s16 *table;
+
+    table = (__s16 *)calloc(MAX_DIST+1, sizeof(__s16));
+
+    n = 0;
+    for (x = -10.0; x < 10.05; x += .00005) {
+        i = rint(MAX_DIST * (.5 + .5*erf((x)/sqrt(2.0))));
+        value = (int)rint(x*NETEM_DIST_SCALE);
+        if (value < SHRT_MIN) value = SHRT_MIN;
+        if (value > SHRT_MAX) value = SHRT_MAX;
+        table[i] = value;
+    }
+    for (i = n = 0; i < MAX_DIST; i += 4) {
+        normalDistribution[n++] = table[i];
+    }
+
+    free(table);
+}
 
 int set_txqueuelen(const char* ifname, int num_packets) {
 
@@ -157,6 +181,8 @@ void TC_init(char* interface, short controllPort) {
     int argc = 0;
     char* argv[100];
 
+    fillNormalDist();
+
     char controllPort_buf[MAX_INT_CHAR_LEN];
     snprintf(controllPort_buf, MAX_INT_CHAR_LEN, "%hu", controllPort);
 
@@ -241,6 +267,70 @@ void TC_init(char* interface, short controllPort) {
 
 }
 
+static int get_ticks(__u32 *ticks, const char *str)
+{
+    unsigned int t;
+
+    if (get_time(&t, str))
+        return -1;
+
+    if (tc_core_time2big(t)) {
+        fprintf(stderr, "Illegal %u time (too large)\n", t);
+        return -1;
+    }
+
+    *ticks = tc_core_time2tick(t);
+    return 0;
+}
+
+int netem_parse_costum_opt(struct qdisc_util *qu, int argc, char **argv, struct nlmsghdr *n, const char *dev){
+    int dist_size = 0;
+    struct rtattr *tail;
+    struct tc_netem_qopt opt = { .limit = 1000 };
+    __s16 *dist_data = NULL;
+
+    for ( ; argc > 0; --argc, ++argv) {
+        if (matches(*argv, "latency") == 0 ||
+            matches(*argv, "delay") == 0) {
+            NEXT_ARG();
+            if (get_ticks(&opt.latency, *argv)) {
+                return -1;
+            }
+            if (NEXT_IS_NUMBER()) {
+                NEXT_ARG();
+                if (get_ticks(&opt.jitter, *argv)) {
+                    return -1;
+                }
+            }
+        } else if (matches(*argv, "loss") == 0 ||
+                   matches(*argv, "drop") == 0) {
+            NEXT_ARG();
+            if (!strcmp(*argv, "random")) {
+                NEXT_ARG();
+                double per;
+                if (parse_percent(&per, *argv))
+                    return -1;
+                opt.loss = rint(per * UINT32_MAX);
+            }
+        } else if (matches(*argv, "distribution") == 0) {
+            NEXT_ARG();
+            dist_data = normalDistribution;
+            dist_size = NORMAL_SIZE;
+        }
+    }
+        tail = NLMSG_TAIL(n);
+        if (addattr_l(n, 1024, TCA_OPTIONS, &opt, sizeof(opt)) < 0)
+            return -1;
+        if (dist_data) {
+            if (addattr_l(n, MAX_DIST * sizeof(dist_data[0]),
+                          TCA_NETEM_DELAY_DIST,
+                          dist_data, dist_size * sizeof(dist_data[0])) < 0)
+                return -1;
+        }
+        tail->rta_len = (void *) NLMSG_TAIL(n) - (void *) tail;
+        return 0;
+}
+
 void TC_initDestination(Destination *dest, char* interface) {
     int argc = 0;
     char* argv[100];
@@ -289,9 +379,9 @@ void TC_initDestination(Destination *dest, char* interface) {
         ARG(jitter)ARG("distribution")ARG("normal")
     }
     if(dest->packetLossRate > 0.0f) {
-        size = snprintf(NULL, 0, "%0.6f", dest->packetLossRate);
+        size = snprintf(NULL, 0, "%0.6f%%", dest->packetLossRate*100);
         loss = (char*)malloc(sizeof(char)*(size+1));
-        snprintf(loss, size+1, "%0.6f", dest->packetLossRate);
+        snprintf(loss, size+1, "%0.6f%%", dest->packetLossRate*100);
         ARG("loss")ARG("random")ARG(loss)
     }
     PRINT

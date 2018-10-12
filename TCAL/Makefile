@@ -19,8 +19,8 @@ libutc.a:
 	cd ./libutc && ./configure
 	cd -
 	make -C ./libutc
-	cp $(LIBUTC) $@
-	#objcopy --localize-symbol=main --localize-symbol=get_qdisc_kind --localize-symbol=get_filter_kind $(LIBUTC) $@
+	#cp $(LIBUTC) $@
+	objcopy --strip-symbol=get_distribution $(LIBUTC) $@
 
 libTCAL.so: $(OBJS)
 	$(CC) -o $@ -shared -static $(OBJS) $(LDLIBS) -lc

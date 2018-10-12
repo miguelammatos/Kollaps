@@ -21,7 +21,7 @@ if __name__ == '__main__':
     TCAL = CDLL("./libTCAL.so")
     TCAL.init(55)
     TCAL.registerUsageCallback(c_callback)
-    TCAL.initDestination(ip2int("10.0.0.8"),10000, 5, c_float(0.1), c_float(0.5))
+    TCAL.initDestination(ip2int("10.0.0.8"),10000, 5, c_float(0.5), c_float(0.0))
     TCAL.initDestination(ip2int("10.0.0.1"),10000, 5, c_float(0.0), c_float(0.0))
     TCAL.initDestination(ip2int("10.0.0.6"),10000, 5, c_float(0.0), c_float(0.0))
     for i in range(20):
