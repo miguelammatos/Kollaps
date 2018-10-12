@@ -61,7 +61,7 @@ int main(int argc, char** argv){
     	updateUsage();
 	sleep(1);
 	n++;
-    if(n >= 20)
+    if(n >= 5)
 	    break;
     }
     tearDown();
