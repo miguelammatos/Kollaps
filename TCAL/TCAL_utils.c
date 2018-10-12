@@ -212,3 +212,86 @@ int netem_parse_costum_opt(struct qdisc_util *qu, int argc, char **argv, struct 
     tail->rta_len = (void *) NLMSG_TAIL(n) - (void *) tail;
     return 0;
 }
+
+static struct
+{
+    unsigned int tb;
+    int cloned;
+    int flushed;
+    char *flushb;
+    int flushp;
+    int flushe;
+    int protocol, protocolmask;
+    int scope, scopemask;
+    __u64 typemask;
+    int tos, tosmask;
+    int iif, iifmask;
+    int oif, oifmask;
+    int mark, markmask;
+    int realm, realmmask;
+    __u32 metric, metricmask;
+    inet_prefix rprefsrc;
+    inet_prefix rvia;
+    inet_prefix rdst;
+    inet_prefix mdst;
+    inet_prefix rsrc;
+    inet_prefix msrc;
+} filter;
+
+
+int get_route_interface(unsigned int ip){
+    struct {
+        struct nlmsghdr	n;
+        struct rtmsg		r;
+        char			buf[1024];
+    } req = {
+            .n.nlmsg_len = NLMSG_LENGTH(sizeof(struct rtmsg)),
+            .n.nlmsg_flags = NLM_F_REQUEST,
+            .n.nlmsg_type = RTM_GETROUTE,
+            .r.rtm_family = AF_INET,
+    };
+
+    char  *idev = NULL;
+    char  *odev = NULL;
+
+    struct nlmsghdr *answer;
+
+    memset(&filter, 0, sizeof(filter));
+    filter.mdst.bitlen = -1;
+    filter.msrc.bitlen = -1;
+    filter.oif = 0;
+    filter.cloned = 2;
+
+    inet_prefix addr;
+    struct in_addr addr_c;
+    addr_c.s_addr = ntohl(ip);
+    char* rebuiltIP = inet_ntoa(addr_c);
+    get_prefix(&addr, rebuiltIP, req.r.rtm_family);
+    if (req.r.rtm_family == AF_UNSPEC)
+        req.r.rtm_family = addr.family;
+    if (addr.bytelen)
+        addattr_l(&req.n, sizeof(req), RTA_DST, &addr.data, addr.bytelen);
+    req.r.rtm_dst_len = addr.bitlen;
+
+    if (req.r.rtm_dst_len == 0) {
+        fprintf(stderr, "need at least a destination address\n");
+        return -1;
+    }
+
+    req.r.rtm_family = AF_INET;
+
+    req.r.rtm_flags |= RTM_F_LOOKUP_TABLE;
+
+    if (rtnl_talk(&rth, &req.n, &answer) < 0)
+        return -2;
+
+    struct rtmsg *r = NLMSG_DATA(answer);
+    int len = answer->nlmsg_len;
+    struct rtattr *tb[RTA_MAX+1];
+
+    len -= NLMSG_LENGTH(sizeof(*r));
+    parse_rtattr(tb, RTA_MAX, RTM_RTA(r), len);
+    unsigned int if_index = rta_getattr_u32(tb[RTA_OIF]);
+    free(answer);
+    return if_index;
+}

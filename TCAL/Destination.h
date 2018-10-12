@@ -16,6 +16,7 @@ typedef struct {
     float packetLossRate;
     unsigned int handle;
     unsigned long usage;
+    unsigned int if_index; //Index of the interface this destination is reachable on
     UT_hash_handle hh_ip;
     UT_hash_handle hh_h;
 }Destination;

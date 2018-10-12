@@ -27,4 +27,5 @@ struct filter_util *get_filter_kind(const char *str);
 void open_rtnl(struct rtnl_handle* h);
 void close_rtnl(struct rtnl_handle* h);
 
+int get_route_interface(unsigned int ip);
 #endif //TCAL_TCAL_UTILS_H

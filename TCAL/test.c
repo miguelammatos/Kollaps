@@ -19,21 +19,20 @@ int callback(unsigned int ip, unsigned long bytes){
 
 
 int main(int argc, char** argv){
-        int size = snprintf(NULL, 0, "%0.6f", 0.5f);
-	char *loss = (char*)malloc(sizeof(char)*(size+1));
-        snprintf(loss, size+1, "%0.6f", 0.5f);
-        printf("%s\n", loss);
-	free(loss);
-	
-	
-	/*    struct in_addr addr;
+    struct in_addr addr;
     unsigned int ip;
     inet_aton(argv[1], &addr);
     ip = htonl(addr.s_addr);
     printf("%s\n", argv[1]);
     printf("%ud\n", ip);
+   
+    struct in_addr addr2;
+    addr2.s_addr = ntohl(ip);
+    char* rebuiltIP = inet_ntoa(addr2);
+    printf("Rebuilt: %s\n", rebuiltIP);
     
-    Destination* dest = destination_create(ip, 100000, 10, 0.0f, 0.0f);
+
+    /*Destination* dest = destination_create(ip, 100000, 10, 0.0f, 0.0f);
     char octet1[] = "FF";
     char octet2[] = "FF";
     char octet3[] = "FF";
@@ -50,10 +49,10 @@ int main(int argc, char** argv){
     destination_getIpHex(dest, hexIp);
     printf("0x%s\n", hexIp);
     free(dest);
-    
-    init(55);*/
+    */
+    /*init(55);
     //registerUsageCallback(&callback);
-    /*int original_ip = ip;
+    int original_ip = ip;
     for(int i=0; i<5; i++){
 	ip +=i;
     	//initDestination(ip, 100000, 10, 0.0f, 0.0f);

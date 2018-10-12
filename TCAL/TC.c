@@ -151,6 +151,10 @@ void TC_initDestination(Destination *dest, char* interface) {
     int argc = 0;
     char* argv[100];
 
+    open_rtnl(&rth);
+    get_route_interface(dest->ipv4);
+    close_rtnl(&rth);
+
     char htb_class_handle[MAX_INT_CHAR_LEN+2];
     char netem_qdisc_handle[MAX_INT_CHAR_LEN];
     snprintf(htb_class_handle, MAX_INT_CHAR_LEN+2, "4:%x", dest->handle);
