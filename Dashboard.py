@@ -13,7 +13,6 @@ from NEED.XMLGraphParser import XMLGraphParser
 from NEED.utils import int2ip, ip2int
 
 import dns.resolver
-import netifaces
 
 import sys
 if sys.version_info >= (3, 0):
