@@ -124,7 +124,6 @@ TCLIB += tc_stab.o
 TCLIBOBJ = $(TCBASEOBJ)
 TCLIBOBJ += $(TCLIB)
 TCLIBOBJ += q_prio.o
-TCLIBOBJ += q_netem.o
 TCLIBOBJ += f_u32.o
 TCLIBOBJ += q_htb.o
 TCLIBOBJ += em_u32.o
@@ -145,7 +144,8 @@ MODDESTDIR := $(DESTDIR)$(LIBDIR)/tc
 	$(QUIET_CC)$(CC) $(CFLAGS) $(LDFLAGS) -shared -fpic $< -o $@
 
 
-all: tc $(TCSO) libutc.a
+all: libutc.a
+#all: tc $(TCSO) libutc.a
 
 tc: $(TCOBJ) $(LIBNETLINK) libtc.a
 	$(QUIET_LINK)$(CC) -static $^ $(LDFLAGS) $(LDLIBS) -o $@
