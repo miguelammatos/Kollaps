@@ -30,7 +30,9 @@ def main():
             fail("Path from " + path.links[0].source.name + " to " + path.links[-1].destination.name
                  + " is too long (over 249 hops)")
 
-    ComposeFileGenerator(topology_file, graph).generate()
+    generator = ComposeFileGenerator(topology_file, graph)
+    generator.generate()
+    print("Experiment UUID: " + generator.experiment_UUID, file=sys.stderr)
 
 
 if __name__ == '__main__':

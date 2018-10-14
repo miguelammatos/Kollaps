@@ -1,0 +1,24 @@
+FROM alpine:3.8
+
+RUN apk update && \
+    apk add --no-cache python3 \
+		       git \
+		       openssh
+           
+#RUN pip3 install --upgrade pip; \
+RUN pip3 install docker pex
+
+WORKDIR /
+
+ADD ./bootstrapper.py /
+ADD ./config /root/.ssh/config
+ADD --chown=0 ./id_rsa.NEED /
+
+RUN git clone --branch wheel --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
+    mkdir -p /opt/NEED/ ;\
+    mkdir -p /opt/NEED_build/ ;\
+    pip3 wheel --no-deps -w /NEED /NEED ;\
+    pex -o /opt/NEED_build/NEED.pex -f /NEED dnspython need --not-zip-safe --python-shebang="#!/usr/bin/env python3" -m need.emucore:main 
+
+
+ENTRYPOINT ["/usr/bin/python3", "/bootstrapper.py"]

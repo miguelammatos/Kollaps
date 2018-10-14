@@ -1,0 +1,6 @@
+Host NEED github.com
+    HostName github.com
+    User git 
+    IdentityFile /id_rsa.NEED 
+    IdentitiesOnly yes
+    StrictHostKeyChecking no

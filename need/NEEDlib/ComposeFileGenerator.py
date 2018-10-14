@@ -16,13 +16,14 @@ class ComposeFileGenerator:
     def print_bootstrapper(self):
         print("  bootstrapper:")
         print("    image: privilegedbootstrapper:1.3") #Full image name removed for anonymous submission
-        print("    command: [\"" + self.experiment_UUID + "\", \"python3 /opt/NEED/emucore.py\"]")
+        print("    command: [\"" + self.experiment_UUID + "\", \"/opt/NEED/NEED.pex\"]")
         print("    deploy:")
         print("      mode: global")
         print("    volumes:")
         print("      - type: bind")
         print("        source: /var/run/docker.sock")
         print("        target: /var/run/docker.sock")
+        print('      - "NEEDbin:/opt/NEED"')
         print("    networks:")
         print("      - NEEDnet")
         print("")
@@ -51,6 +52,9 @@ class ComposeFileGenerator:
         print("        uid: '0'")
         print("        gid: '0'")
         print("        mode: 0555")
+        print("    volumes:")
+        print('      - "NEEDbin:/opt/NEED:ro"')
+
         print("    networks:")
         print("      - NEEDnet")
         if service_list[0].supervisor:
@@ -78,10 +82,18 @@ class ComposeFileGenerator:
         print("    driver: overlay")
         print("")
 
+    def print_volumes(self):
+        print("volumes:")
+        print("  NEEDbin:")
+        print("    external:")
+        print("      name: need_bin")
+        print("")
+
     def generate(self):
         self.print_header()
         self.print_bootstrapper()
         for service in self.graph.services:
             self.print_service(self.graph.services[service])
+        self.print_volumes()
         self.print_configs()
         self.print_networks()
