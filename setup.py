@@ -14,6 +14,7 @@ setup(name='need',
           'need.TCAL':['libTCAL.so'],
       },
       entry_points = {
-          'console_scripts': ['deploymentGenerator=need.deploymentGenerator:main']
+          'console_scripts': ['NEEDdeploymentGenerator=need.deploymentGenerator:main',
+                              'NEEDDashboard=need.Dashboard:main'],
       },
       zip_safe=False)
