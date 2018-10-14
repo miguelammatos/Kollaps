@@ -8,10 +8,12 @@ setup(name='need',
       packages=['need', 'need.NEEDlib', 'need.TCAL'],
       install_requires=[
           'dnspython',
+          'flask',
       ],
       include_package_data=True,
       package_data={
           'need.TCAL':['libTCAL.so'],
+          'need':['static/*', 'templates/*.html'],
       },
       entry_points = {
           'console_scripts': ['NEEDdeploymentGenerator=need.deploymentGenerator:main',
