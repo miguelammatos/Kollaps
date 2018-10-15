@@ -1,21 +1,22 @@
 //
 // Created by joao on 10/12/18.
 //
-#include "common_include.h"
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/time.h>
 #include <stdarg.h>
 #include <ctype.h>
 #include <math.h>
+
+//To avoid warnings, declare these here:
+struct sockaddr_nl;
+struct nlmsghdr;
+struct rtattr;
+struct qdisc_util;
 
 #include "tc_common.h"
 #include "tc_core.h"

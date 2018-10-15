@@ -6,16 +6,19 @@ LIBUTC=./libutc/tc/libutc.a
 
 CC=musl-gcc
 #CC=gcc
-CFLAGS = -std=c11 -O3 -fPIC -I./libutc/include -I ./libutc/ip/  -I./libutc/include/uapi -I./libutc/tc/
+CFLAGS = -O3 -fPIC -I./libutc/include -I ./libutc/ip/  -I./libutc/include/uapi -I./libutc/tc/
 LDFLAGS= -shared -ldl -lm
 LDLIBS = $(LIBUTC) $(LIBNETLINK) $(LIBUTIL)
 
 all: libTCAL.so
 
-libTCAL.so: $(OBJS)
+.PHONY: libutc
+libutc: 
 	cd ./libutc && ./configure
 	cd -
 	make -C ./libutc
+
+libTCAL.so: libutc $(OBJS)
 	$(CC) -o $@ -shared -static $(OBJS) $(LDLIBS) -lc
 	objcopy --strip-all --keep-symbols=exported.sym $@ $@
 

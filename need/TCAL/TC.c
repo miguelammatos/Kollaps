@@ -12,7 +12,6 @@
 #include <ctype.h>
 #include <math.h>
 
-#include "common_include.h"
 
 #include "TC.h"
 #include "tc_common.h"
