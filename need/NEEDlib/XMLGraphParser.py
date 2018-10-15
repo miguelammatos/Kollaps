@@ -156,6 +156,10 @@ class XMLGraphParser:
         if root.tag != 'experiment':
             fail('Not a valid NEED topology file, root is not <experiment>')
 
+        if 'boot' not in root.attrib:
+            fail('<experiment boot="?"> The experiment needs a valid boostrapper image name')
+
+        self.graph.bootstrapper = root.attrib['boot']
         services = None
         bridges = None
         links = None

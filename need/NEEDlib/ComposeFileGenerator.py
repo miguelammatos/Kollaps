@@ -15,7 +15,7 @@ class ComposeFileGenerator:
 
     def print_bootstrapper(self):
         print("  bootstrapper:")
-        print("    image: privilegedbootstrapper:1.3") #Full image name removed for anonymous submission
+        print("    image: " + self.graph.bootstrapper)
         print("    command: [\"" + self.experiment_UUID + "\", \"/opt/NEED/NEED.pex\"]")
         print("    deploy:")
         print("      mode: global")
