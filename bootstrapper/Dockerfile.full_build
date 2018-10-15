@@ -1,0 +1,42 @@
+FROM debian:8.11-slim
+
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    git \
+    ssh \
+    build-essential \
+    gcc \
+    musl \
+    musl-dev \
+    musl-tools \
+    curl \
+    linux-libc-dev \
+    && rm -rf /var/lib/apt/lists/*
+           
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py ;\
+    python3 get-pip.py ;\
+    pip install --upgrade pip; \
+    pip install docker pex
+
+WORKDIR /
+
+ADD ./bootstrapper.py /
+ADD ./config /root/.ssh/config
+ADD --chown=0 ./id_rsa.NEED /
+
+RUN chmod 400 /id_rsa.NEED ;\
+    git clone --branch wheel --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
+    cd NEED/need/TCAL ;\
+    rm libTCAL.so ;\
+    make -j4 ;\
+    ln -s /usr/include/x86_64-linux-gnu/asm /usr/include/x86_64-linux-musl/asm ;\
+    ln -s /usr/include/asm-generic /usr/include/x86_64-linux-musl/asm-generic ;\
+    mkdir -p /opt/NEED/ ;\
+    mkdir -p /opt/NEED_build/ ;\
+    cd / ;\
+    pip3 wheel --no-deps -w /NEED /NEED ;\
+    pex -o /opt/NEED_build/NEED.pex -f /NEED dnspython need --not-zip-safe --python-shebang="#!/usr/bin/env python3" -m need.emucore:main 
+
+
+ENTRYPOINT ["/usr/bin/python3", "/bootstrapper.py"]
