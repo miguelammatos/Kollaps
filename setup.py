@@ -8,7 +8,6 @@ setup(name='need',
       packages=['need', 'need.NEEDlib', 'need.TCAL'],
       install_requires=[
           'dnspython',
-          'flask',
       ],
       include_package_data=True,
       package_data={

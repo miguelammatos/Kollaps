@@ -1,27 +1,40 @@
-FROM base/archlinux:latest
+FROM debian:8.11-slim
 
 
-RUN pacman -Sy --noconfirm \
-    python \
+RUN apt-get update && apt-get install -y \
+    python3 \
     git \
-    openssh \
-    base-devel \
+    ssh \
+    build-essential \
+    pkg-config \
+    flex \
+    bison \
+    gcc \
     musl \
-    kernel-headers-musl \
-    linux-headers \
-    curl \ 
-    && pacman -Scc --noconfirm
+    musl-dev \
+    musl-tools \
+    curl \
+    wget \
+    tar \
+    linux-libc-dev \
+    && rm -rf /var/lib/apt/lists/*
            
-WORKDIR /
-
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py ;\
     python3 get-pip.py ;\
     pip install --upgrade pip; \
     pip install docker pex
 
+WORKDIR /
+
 ADD ./bootstrapper.py /
 ADD ./config /root/.ssh/config
 ADD --chown=0 ./id_rsa.NEED /
+
+# Get sanitized kernel headers suitable for musl
+RUN wget https://github.com/sabotage-linux/kernel-headers/archive/v3.12.6-6.tar.gz ;\
+    tar -xzf v3.12.6-6.tar.gz ;\
+    cd /kernel-headers-3.12.6-6 ;\
+    make ARCH=x86_64 -e includedir=/usr/include/x86_64-linux-musl/ install
 
 RUN chmod 400 /id_rsa.NEED ;\
     git clone --branch wheel --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
@@ -34,5 +47,7 @@ RUN chmod 400 /id_rsa.NEED ;\
     pip3 wheel --no-deps -w /NEED /NEED ;\
     pex -o /opt/NEED_build/NEED.pex -f /NEED dnspython need --not-zip-safe --python-shebang="#!/usr/bin/env python3" -m need.emucore:main 
 
+
+#Debian sucks! musl libc.a was not compiled with -fPIC !
 
 ENTRYPOINT ["/usr/bin/python3", "/bootstrapper.py"]
