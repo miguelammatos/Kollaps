@@ -1,13 +1,19 @@
 import docker
 from time import sleep
 from sys import argv
-from shutil import copyfile
+from subprocess import call
 
 label = argv[1]
 command = argv[2]
 
-#Make sure the volume version is up-to-date
-copyfile("/opt/NEED_build/NEED.pex", "/opt/NEED/NEED.pex")
+#create the chroot
+call(["mkdir", "-p" , "/opt/NEED/chroot"])
+call(["rm", "-rf", "/opt/NEED/*"])
+call(["rsync", "-aAHX", "--exclude-from=/exclude.txt", "/", "/opt/NEED/chroot/"])
+call(["chmod", "555", "/need_chroot.sh"])
+call(["rsync", "-aAX", "/need_chroot.sh", "/opt/NEED/"])
+#copyfile("/opt/NEED_build/NEED.pex", "/opt/NEED/NEED.pex")
+
 
 #Connect to the local docker daemon
 client = docker.DockerClient(base_url='unix://var/run/docker.sock')
