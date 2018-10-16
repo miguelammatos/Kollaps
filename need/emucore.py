@@ -7,7 +7,6 @@ from need.NEEDlib.utils import fail, ENVIRONMENT, int2ip
 
 import socket
 import sys
-from uuid import uuid4
 
 
 def get_own_ip(graph):
@@ -42,9 +41,8 @@ def main():
     # to copy it as a config file, this has happened with the 2k scale-free topology...
 
 
-    instance_UUID = str(uuid4())
     # Because of the bootstrapper hack we cant get output from the emucore through standard docker logs...
-    sys.stdout = open("/var/log/need_" + instance_UUID + ".log", "w")
+    sys.stdout = open("/var/log/need.log", "w")
     sys.stderr = sys.stdout
 
     graph = NetGraph()
