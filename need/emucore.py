@@ -1,8 +1,8 @@
 #! /usr/bin/python
-from NEED.NetGraph import NetGraph
-from NEED.XMLGraphParser import XMLGraphParser
-from NEED.EmulationManager import EmulationManager
-from NEED.utils import fail, ENVIRONMENT, int2ip
+from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.XMLGraphParser import XMLGraphParser
+from need.NEEDlib.EmulationManager import EmulationManager
+from need.NEEDlib.utils import fail, ENVIRONMENT, int2ip
 
 
 import socket

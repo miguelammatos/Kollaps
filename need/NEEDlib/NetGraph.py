@@ -1,4 +1,4 @@
-from NEED.utils import fail, ip2int
+from need.NEEDlib.utils import fail, ip2int
 from time import sleep
 from math import sqrt
 from os import environ
@@ -29,6 +29,7 @@ class NetGraph:
 
         self.reference_bandwidth = 0  # Maximum bandwidth on the topology, used for calculating link cost
         self.bandwidth_re = re.compile("([0-9]+)([KMG])bps")
+        self.bootstrapper = ""  # type: str
 
     class Node(object):
         def __init__(self, name, shared):

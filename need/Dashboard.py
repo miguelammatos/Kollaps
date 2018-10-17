@@ -7,10 +7,10 @@ from threading import Lock, Thread
 from time import sleep
 import socket
 
-from NEED.CommunicationsManager import CommunicationsManager
-from NEED.NetGraph import NetGraph
-from NEED.XMLGraphParser import XMLGraphParser
-from NEED.utils import int2ip, ip2int
+from need.NEEDlib.CommunicationsManager import CommunicationsManager
+from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.XMLGraphParser import XMLGraphParser
+from need.NEEDlib.utils import int2ip, ip2int
 
 import dns.resolver
 
@@ -44,7 +44,7 @@ class Host:
 
 
 @app.route('/')
-def main():
+def main_page():
     with DashboardState.lock:
         if DashboardState.graph is not None:
             answer = render_template('index.html', hosts=DashboardState.hosts, stopping=DashboardState.stopping,
@@ -57,12 +57,12 @@ def main():
 @app.route('/stop')
 def stop():
     Thread(target=stopExperiment, daemon=False).start()
-    return redirect(url_for('main'))
+    return redirect(url_for('main_page'))
 
 @app.route('/start')
 def start():
     Thread(target=startExperiment, daemon=False).start()
-    return redirect(url_for('main'))
+    return redirect(url_for('main_page'))
 
 @app.route('/flows')
 def flows():
@@ -254,7 +254,7 @@ def collect_flow(bandwidth, links):
     return True
 
 
-if __name__ == "__main__":
+def main():
     if len(sys.argv) != 2:
         topology_file = "/topology.xml"
     else:
@@ -279,3 +279,6 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8088)
 
 
+
+if __name__ == "__main__":
+    main()

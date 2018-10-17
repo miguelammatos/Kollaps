@@ -1,10 +1,10 @@
 #! /usr/bin/python
 import sys
 
-from NEED.NetGraph import NetGraph
-from NEED.XMLGraphParser import XMLGraphParser
-from NEED.ComposeFileGenerator import ComposeFileGenerator
-from NEED.utils import fail, SHORT_LIMIT
+from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.XMLGraphParser import XMLGraphParser
+from need.NEEDlib.ComposeFileGenerator import ComposeFileGenerator
+from need.NEEDlib.utils import fail, SHORT_LIMIT
 
 
 def main():
@@ -30,7 +30,9 @@ def main():
             fail("Path from " + path.links[0].source.name + " to " + path.links[-1].destination.name
                  + " is too long (over 249 hops)")
 
-    ComposeFileGenerator(topology_file, graph).generate()
+    generator = ComposeFileGenerator(topology_file, graph)
+    generator.generate()
+    print("Experiment UUID: " + generator.experiment_UUID, file=sys.stderr)
 
 
 if __name__ == '__main__':

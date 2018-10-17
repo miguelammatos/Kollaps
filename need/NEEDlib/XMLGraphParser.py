@@ -2,8 +2,8 @@ import xml.etree.ElementTree as ET
 from random import choice, randint
 from string import ascii_letters
 
-from NEED.utils import fail
-from NEED.NetGraph import NetGraph
+from need.NEEDlib.utils import fail
+from need.NEEDlib.NetGraph import NetGraph
 
 import sys
 if sys.version_info >= (3, 0):
@@ -156,6 +156,10 @@ class XMLGraphParser:
         if root.tag != 'experiment':
             fail('Not a valid NEED topology file, root is not <experiment>')
 
+        if 'boot' not in root.attrib:
+            fail('<experiment boot="?"> The experiment needs a valid boostrapper image name')
+
+        self.graph.bootstrapper = root.attrib['boot']
         services = None
         bridges = None
         links = None

@@ -1,4 +1,4 @@
-from NEED.NetGraph import NetGraph
+from need.NEEDlib.NetGraph import NetGraph
 from threading import Lock
 from ctypes import CDLL, c_float, CFUNCTYPE, c_voidp, c_int, c_ulong, c_uint
 from os import path

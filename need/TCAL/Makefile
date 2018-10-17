@@ -8,23 +8,20 @@ CC=musl-gcc
 #CC=gcc
 CFLAGS = -O3 -fPIC -I./libutc/include -I ./libutc/ip/  -I./libutc/include/uapi -I./libutc/tc/
 LDFLAGS= -shared -ldl -lm
-LDLIBS = ./libutc.a $(LIBNETLINK) $(LIBUTIL)
+LDLIBS = $(LIBUTC) $(LIBNETLINK) $(LIBUTIL)
 
-TCALOBJS= libutc.a libTCAL.so test
+all: libTCAL.so
 
-all: $(TCALOBJS)
-
-.PHONY: libutc.a
-libutc.a: 
+.PHONY: libutc
+libutc: 
 	cd ./libutc && ./configure
 	cd -
 	make -C ./libutc
-	cp $(LIBUTC) $@
-	#objcopy --strip-symbol=get_distribution $(LIBUTC) $@
 
-libTCAL.so: $(OBJS)
+libTCAL.so: libutc $(OBJS)
 	$(CC) -o $@ -shared -static $(OBJS) $(LDLIBS) -lc
 	objcopy --strip-all --keep-symbols=exported.sym $@ $@
+
 test: test.c
 	gcc -g -o $@ $^ -ldl
 

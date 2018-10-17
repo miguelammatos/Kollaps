@@ -1,8 +1,8 @@
 import random
 
-from NEED.NetGraph import NetGraph
-from NEED.utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error, int2ip
-import NEED.PathEmulation as PathEmulation
+from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error, int2ip
+import need.NEEDlib.PathEmulation as PathEmulation
 
 from threading import Thread, Lock
 from multiprocessing import Pool

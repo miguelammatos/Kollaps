@@ -1,10 +1,10 @@
 #! /usr/bin/python
-from NEED.NetGraph import NetGraph
-from NEED.XMLGraphParser import XMLGraphParser
-from NEED.EmulationManager import EmulationManager
-from NEED.utils import fail
-from NEED.CommunicationsManager import CommunicationsManager
-import NEED.PathEmulation as PathEmulation
+from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.XMLGraphParser import XMLGraphParser
+from need.NEEDlib.EmulationManager import EmulationManager
+from need.NEEDlib.utils import fail
+from need.NEEDlib.CommunicationsManager import CommunicationsManager
+import need.NEEDlib.PathEmulation as PathEmulation
 
 from random import randrange, seed, uniform
 

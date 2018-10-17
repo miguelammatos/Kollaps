@@ -2,9 +2,9 @@ from threading import Lock
 import time
 import json
 
-from NEED.CommunicationsManager import CommunicationsManager
-from NEED.NetGraph import NetGraph
-from NEED.XMLGraphParser import XMLGraphParser
+from need.NEEDlib.CommunicationsManager import CommunicationsManager
+from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.XMLGraphParser import XMLGraphParser
 
 import sys
 if sys.version_info >= (3, 0):
@@ -31,7 +31,7 @@ def collect_flow(bandwidth, links):
     return True
 
 
-if __name__ == "__main__":
+def main():
     if len(sys.argv) != 2:
         topology_file = "/topology.xml"
     else:
@@ -61,3 +61,6 @@ if __name__ == "__main__":
         output.clear()
         sleep_time = AVERAGE_INTERVAL - ((time.time() - starttime) % AVERAGE_INTERVAL)
         time.sleep(sleep_time)
+
+if __name__ == "__main__":
+    main()

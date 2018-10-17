@@ -5,10 +5,10 @@ from multiprocessing.pool import AsyncResult
 from os import environ
 from copy import copy
 
-from NEED.NetGraph import NetGraph
-import NEED.PathEmulation as PathEmulation
-from NEED.CommunicationsManager import CommunicationsManager
-from NEED.utils import ENVIRONMENT
+from need.NEEDlib.NetGraph import NetGraph
+import need.NEEDlib.PathEmulation as PathEmulation
+from need.NEEDlib.CommunicationsManager import CommunicationsManager
+from need.NEEDlib.utils import ENVIRONMENT
 
 import sys
 if sys.version_info >= (3, 0):
