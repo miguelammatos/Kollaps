@@ -1,13 +1,13 @@
 import docker
 from time import sleep
 from sys import argv
-from shutil import copyfile
+from shutil import copy
 
 label = argv[1]
 command = argv[2]
 
 #Make sure the volume version is up-to-date
-copyfile("/opt/NEED_build/NEED.pex", "/opt/NEED/NEED.pex")
+copy("/opt/NEED_build/NEED.pex", "/opt/NEED/NEED.pex")
 
 #Connect to the local docker daemon
 client = docker.DockerClient(base_url='unix://var/run/docker.sock')
