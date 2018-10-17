@@ -31,13 +31,17 @@ def main():
 
         instance_count = len(graph.hosts_by_ip)
         #create the chroot
-        call(["mkdir", "-p" , CHROOT_PATH])
-        call(["rm", "-rf", CHROOT_PATH+"/*"])
-        call(["rsync", "-aAHX", "--exclude-from=/exclude.txt", "/", CHROOT_PATH])
+        #call(["mkdir", "-p" , CHROOT_PATH])
+        #call(["rm", "-rf", CHROOT_PATH+"/*"])
+        #call(["rsync", "-aAHX", "--exclude-from=/exclude.txt", "/", CHROOT_PATH])
+        us = []
+        for c in client.containers.list():
+            if c.image == graph.bootstrapper:
+                us = [c.id]
         client.containers.run(image=graph.bootstrapper, entrypoint="/usr/bin/python3",
                    command=["/usr/bin/NEEDbootstrapper", "-g", label, command, instance_count],
                    privileged=True, pid_mode="host", remove=True,
-                   volumes={DOCKER_SOCK:{'bind':DOCKER_SOCK, 'mode':'rw'}})
+                   volumes_from=us)
 
         while True:
             sleep(500)
