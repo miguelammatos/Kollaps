@@ -32,9 +32,9 @@ def main():
 
         instance_count = len(graph.hosts_by_ip)
         #create the chroot
-        #call(["mkdir", "-p" , CHROOT_PATH])
-        #call(["rm", "-rf", CHROOT_PATH+"/*"])
-        #call(["rsync", "-aAHX", "--exclude-from=/exclude.txt", "/", CHROOT_PATH])
+        call(["mkdir", "-p" , CHROOT_PATH])
+        call(["rm", "-rf", CHROOT_PATH+"/*"])
+        call(["rsync", "-aAHX", "--exclude-from=/exclude.txt", "/", CHROOT_PATH])
         m = Mount(target=DOCKER_SOCK, source=DOCKER_SOCK, type='bind')
         client.containers.run(image=graph.bootstrapper, entrypoint="/usr/bin/python3",
                    command=["/usr/bin/NEEDbootstrapper", "-g", label, command, str(instance_count)],
