@@ -34,7 +34,7 @@ def main():
         call(["mkdir", "-p" , CHROOT_PATH])
         call(["rm", "-rf", CHROOT_PATH+"/*"])
         call(["rsync", "-aAHX", "--exclude-from=/exclude.txt", "/", CHROOT_PATH])
-        client.run(image=graph.bootstrapper, entrypoint="/usr/bin/python3",
+        client.containers.run(image=graph.bootstrapper, entrypoint="/usr/bin/python3",
                    command=["/usr/bin/NEEDbootstrapper", "-g", label, command, instance_count],
                    privileged=True, pid_mode="host", remove=True,
                    volumes={DOCKER_SOCK:{'bind':DOCKER_SOCK, 'mode':'rw'}})
