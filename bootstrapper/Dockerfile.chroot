@@ -11,7 +11,6 @@ RUN  pip3 --no-cache-dir install docker wheel
 
 WORKDIR /
 
-ADD ./bootstrapper.py /
 ADD ./exclude.txt /
 ADD ./need_chroot.sh /
 ADD ./config /root/.ssh/config
@@ -25,4 +24,4 @@ RUN rm -rf /NEED;\
     pip3 --no-cache-dir uninstall -y setuptools wheel pip ;\
     apk del --no-cache --purge git openssh
 
-ENTRYPOINT ["/usr/bin/python3", "/bootstrapper.py"]
+ENTRYPOINT ["/bin/sh", "NEEDbootstrapper"]
