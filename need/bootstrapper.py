@@ -2,6 +2,7 @@ from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
 
 import docker
+from docker.types import Mount
 from time import sleep
 from sys import argv
 from subprocess import call
@@ -34,14 +35,11 @@ def main():
         #call(["mkdir", "-p" , CHROOT_PATH])
         #call(["rm", "-rf", CHROOT_PATH+"/*"])
         #call(["rsync", "-aAHX", "--exclude-from=/exclude.txt", "/", CHROOT_PATH])
-        us = []
-        for c in client.containers.list():
-            if c.image == graph.bootstrapper:
-                us = [c.id]
+        m = Mount(target=DOCKER_SOCK, source=DOCKER_SOCK, type='bind')
         client.containers.run(image=graph.bootstrapper, entrypoint="/usr/bin/python3",
-                   command=["/usr/bin/NEEDbootstrapper", "-g", label, command, instance_count],
+                   command=["/usr/bin/NEEDbootstrapper", "-g", label, command, str(instance_count)],
                    privileged=True, pid_mode="host", remove=True,
-                   volumes_from=us)
+                   mounts=[m])
 
         while True:
             sleep(500)
