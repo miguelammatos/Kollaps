@@ -38,7 +38,7 @@ def main():
         m = Mount(target=DOCKER_SOCK, source=DOCKER_SOCK, type='bind')
         client.containers.run(image=graph.bootstrapper, entrypoint="/usr/bin/python3",
                    command=["/usr/bin/NEEDbootstrapper", "-g", label, command, str(instance_count)],
-                   privileged=True, pid_mode="host", remove=True,
+                   privileged=True, pid_mode="host", remove=False,
                    mounts=[m])
 
         while True:
@@ -60,12 +60,14 @@ def main():
                     inspect_result = LowLevelClient.inspect_container(id)
                     pid = inspect_result["State"]["Pid"]
                     print("Bootstrapping " + container.name + " ...")
-                    call(["nsenter", "-t", str(pid), "-a", "mount", "-o", "bind", "/var", CHROOT_PATH+"/var"])
-                    call(["nsenter", "-t", str(pid), "-a", "mount", "-o", "bind", "/run", CHROOT_PATH+"/run"])
-                    call(["nsenter", "-t", str(pid), "-a", "mount", "-o", "bind", "/tmp", CHROOT_PATH+"/tmp"])
-                    call(["nsenter", "-t", str(pid), "-a", "mount", "-o", "bind", "/sys", CHROOT_PATH+"/sys"])
-                    call(["nsenter", "-t", str(pid), "-a", "mount", "-t", "proc", "none", CHROOT_PATH+"/proc"])
-                    call(["nsenter", "-t", str(pid), "-a", "mount", "-o", "bind", "/dev", CHROOT_PATH+"/dev"])
+                    #nsenter is broken on busybox....
+                    #none of this works
+                    call(["nsenter", "-t", str(pid), "-m", "mount -o bind /var " + CHROOT_PATH+"/var"])
+                    call(["nsenter", "-t", str(pid), "-m", "mount -o bind /run " + CHROOT_PATH+"/run"])
+                    call(["nsenter", "-t", str(pid), "-m", "mount -o bind /tmp " + CHROOT_PATH+"/tmp"])
+                    call(["nsenter", "-t", str(pid), "-m", "mount -o bind /sys " + CHROOT_PATH+"/sys"])
+                    call(["nsenter", "-t", str(pid), "-m", "mount -o bind /dev " + CHROOT_PATH+"/dev"])
+                    call(["nsenter", "-t", str(pid), "-m", "mount -t proc none " + CHROOT_PATH+"/proc"])
                     container.exec_run(command, privileged=True, detach=True)
                     print("Done bootstrapping " + container.name)
                     already_bootstrapped[container.id] = True
