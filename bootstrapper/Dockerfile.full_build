@@ -42,7 +42,7 @@ ADD ./config /root/.ssh/config
 ADD --chown=0 ./id_rsa.NEED /
 
 RUN chmod 400 /id_rsa.NEED ;\
-    git clone --branch wheel --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
+    git clone --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
     cd NEED/need/TCAL ;\
     rm libTCAL.so ;\
     make -j4 ;\

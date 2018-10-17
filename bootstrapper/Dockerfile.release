@@ -17,7 +17,7 @@ ADD ./bootstrapper.py /
 ADD ./config /root/.ssh/config
 ADD --chown=0 ./id_rsa.NEED /
 
-RUN git clone --branch wheel --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
+RUN git clone --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
     mkdir -p /opt/NEED/ ;\
     mkdir -p /opt/NEED_build/ ;\
     pip3 wheel --no-deps -w /NEED /NEED ;\
