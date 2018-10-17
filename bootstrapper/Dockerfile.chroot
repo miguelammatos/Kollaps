@@ -24,4 +24,4 @@ RUN rm -rf /NEED;\
     pip3 --no-cache-dir uninstall -y setuptools wheel pip ;\
     apk del --no-cache --purge git openssh
 
-ENTRYPOINT ["/bin/sh", "NEEDbootstrapper"]
+ENTRYPOINT ["/usr/bin/python3", "/usr/bin/NEEDbootstrapper"]
