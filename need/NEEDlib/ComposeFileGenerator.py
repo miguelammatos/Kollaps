@@ -16,14 +16,24 @@ class ComposeFileGenerator:
     def print_bootstrapper(self):
         print("  bootstrapper:")
         print("    image: " + self.graph.bootstrapper)
-        print("    command: [\"" + self.experiment_UUID + "\", \"/opt/NEED/NEED.pex\"]")
+        print("    command: [\"-s\", \"" + self.experiment_UUID + "\"]")
         print("    deploy:")
         print("      mode: global")
+        print("    environment:")
+        print("      NEED_UUID: '" + self.experiment_UUID + "'")
+        print("    labels:")
+        print("      " + "boot"+self.experiment_UUID + ": \"true\"")
         print("    volumes:")
         print("      - type: bind")
         print("        source: /var/run/docker.sock")
         print("        target: /var/run/docker.sock")
-        print('      - "NEEDbin:/opt/NEED"')
+        print('      - "NEEDtopo:/opt/NEED"')
+        print("    configs:")
+        print("      - source: topology")
+        print("        target: /topology.xml")
+        print("        uid: '0'")
+        print("        gid: '0'")
+        print("        mode: 0555")
         print("    networks:")
         print("      - NEEDnet")
         print("")
@@ -31,6 +41,8 @@ class ComposeFileGenerator:
     def print_service(self, service_list):
         print("  " + service_list[0].name + "-" + self.experiment_UUID + ":")
         print("    image: " + service_list[0].image)
+        if not service_list[0].supervisor:
+            print('    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; /bin/sh -s < /tmp/NEED_hang; #"]')
         if service_list[0].command is not None:
             print("    command: " + service_list[0].command)
         if service_list[0].supervisor_port > 0:
@@ -46,15 +58,13 @@ class ComposeFileGenerator:
             print("      endpoint_mode: dnsrr")
         print("    environment:")
         print("      NEED_UUID: '" + self.experiment_UUID + "'")
-        print("    configs:")
-        print("      - source: topology")
-        print("        target: /topology.xml")
-        print("        uid: '0'")
-        print("        gid: '0'")
-        print("        mode: 0555")
-        print("    volumes:")
-        print('      - "NEEDbin:/opt/NEED:ro"')
-
+        if service_list[0].supervisor:
+            print("    configs:")
+            print("      - source: topology")
+            print("        target: /topology.xml")
+            print("        uid: '0'")
+            print("        gid: '0'")
+            print("        mode: 0555")
         print("    networks:")
         print("      - NEEDnet")
         if service_list[0].supervisor:
@@ -84,9 +94,9 @@ class ComposeFileGenerator:
 
     def print_volumes(self):
         print("volumes:")
-        print("  NEEDbin:")
+        print("  NEEDtopo:")
         print("    external:")
-        print("      name: need_bin")
+        print("      name: need_topo")
         print("")
 
     def generate(self):

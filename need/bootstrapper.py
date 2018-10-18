@@ -5,53 +5,80 @@ import docker
 from docker.types import Mount
 from time import sleep
 from sys import argv
-from subprocess import call
+from subprocess import Popen
+from shutil import copy
 
 
 def main():
-    CHROOT_PATH = "/opt/NEED/chroot"
     DOCKER_SOCK = "/var/run/docker.sock"
-    if len(argv) < 4:
+    TOPOLOGY_SRC = "/topology.xml"
+    TOPOLOGY = "/opt/NEED/topology.xml"
+
+    if len(argv) < 3:
         print("If you are calling " + argv[0] + " from your workstation stop.")
         print("This should only be used inside containers")
         return
 
     mode = argv[1]
     label = argv[2]
-    command = argv[3]
 
 
     #Connect to the local docker daemon
     client = docker.DockerClient(base_url='unix:/' + DOCKER_SOCK)
-    if mode == "-s":
-        topology_file = "/topology.xml"
-
-        graph = NetGraph()
-
-        XMLGraphParser(topology_file, graph).fill_graph()
-
-        instance_count = len(graph.hosts_by_ip)
-        #create the chroot
-        call(["mkdir", "-p" , CHROOT_PATH])
-        call(["rm", "-rf", CHROOT_PATH+"/*"])
-        call(["rsync", "-aAHX", "--exclude-from=/exclude.txt", "/", CHROOT_PATH])
-        m = Mount(target=DOCKER_SOCK, source=DOCKER_SOCK, type='bind')
-        client.containers.run(image=graph.bootstrapper, entrypoint="/usr/bin/python3",
-                   command=["/usr/bin/NEEDbootstrapper", "-g", label, command, str(instance_count)],
-                   privileged=True, pid_mode="host", remove=False,
-                   mounts=[m])
-
-        while True:
-            sleep(500)
-
-
-    instance_count = int(argv[4])
     LowLevelClient = docker.APIClient(base_url='unix:/' + DOCKER_SOCK)
-    print("Bootstrapping all local containers with label " + label + " with the command " + command)
+
+    #If we are bootstrapper:
+    if mode == "-s":
+        copy(TOPOLOGY_SRC, TOPOLOGY)
+        us = None
+        while not us:
+            containers = client.containers.list()
+            for container in containers:
+                if "boot"+label in container.labels:
+                    us = container
+            sleep(1)
+
+        boot_image = us.image
+
+        inspect_result = LowLevelClient.inspect_container(us.id)
+        env = inspect_result["Config"]["Env"]
+        client.containers.run(image=boot_image,
+                              entrypoint="/usr/bin/python3",
+                              command=["/usr/bin/NEEDbootstrapper", "-g", label, str(us.id)],
+                              privileged=True,
+                              pid_mode="host",
+                              remove=True,
+                              environment=env,
+                              volumes_from=[us.id],
+                              labels=["god"],
+                              detach=False,
+                              stderr=True,
+                              stdout=True)
+        return
+
+
+
+    # Next is GOD container code
+
+    bootstrapper_id = argv[3]
+    #figure out who we are
+    us = None
+    for container in client.containers.list():
+        if "god" in container.labels:
+            us = container
+            break
+
+
+    print("Bootstrapping all local containers with label " + label)
 
     already_bootstrapped = {}
+    emucore_instances = []
+    instance_count = 0
+    bootstrapper = None
 
-    while len(already_bootstrapped) < instance_count:
+    while True:
+        #check if containers need bootstrapping
+        bootstrapper = None
         containers = client.containers.list()
         for container in containers:
             if label in container.labels and container.id not in already_bootstrapped and container.status == "running":
@@ -60,20 +87,21 @@ def main():
                     inspect_result = LowLevelClient.inspect_container(id)
                     pid = inspect_result["State"]["Pid"]
                     print("Bootstrapping " + container.name + " ...")
-                    #nsenter is broken on busybox....
-                    #none of this works
-                    call(["nsenter", "-t", str(pid), "-m", "mount -o bind /var " + CHROOT_PATH+"/var"])
-                    call(["nsenter", "-t", str(pid), "-m", "mount -o bind /run " + CHROOT_PATH+"/run"])
-                    call(["nsenter", "-t", str(pid), "-m", "mount -o bind /tmp " + CHROOT_PATH+"/tmp"])
-                    call(["nsenter", "-t", str(pid), "-m", "mount -o bind /sys " + CHROOT_PATH+"/sys"])
-                    call(["nsenter", "-t", str(pid), "-m", "mount -o bind /dev " + CHROOT_PATH+"/dev"])
-                    call(["nsenter", "-t", str(pid), "-m", "mount -t proc none " + CHROOT_PATH+"/proc"])
-                    container.exec_run(command, privileged=True, detach=True)
+                    emucore_instances.append(Popen(
+                        ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(id)])
+                    )
+                    instance_count += 1
                     print("Done bootstrapping " + container.name)
                     already_bootstrapped[container.id] = True
                 except:
                     print("Bootstrapping failed... will try again.")
+            #Check for termination
+            if container.id == bootstrapper_id and container.status == "running":
+                bootstrapper = container
+        if bootstrapper is None:
+            us.stop()
         sleep(5)
+
 
 if __name__ == '__main__':
     main()

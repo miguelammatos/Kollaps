@@ -183,10 +183,10 @@ class CommunicationsManager:
                     command = struct.unpack("<1B", data)[0]
                     if command == CommunicationsManager.STOP_COMMAND:
                         connection.close()
-                        stop_experiment()
                         with self.stop_lock:
                             print("Stopping experiment")
                             PathEmulation.tearDown()
+                            stop_experiment()
                             self.broadcast_groups = []
 
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
