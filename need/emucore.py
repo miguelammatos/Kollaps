@@ -33,14 +33,14 @@ def get_own_ip(graph):
 
 
 def main():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         fail("Missing arguments. emucore <topology> <container id>")
     else:
         topology_file = sys.argv[1]
     # For future reference: This topology file must not exceed 512KB otherwise docker refuses
     # to copy it as a config file, this has happened with the 2k scale-free topology...
 
-    setup_container(sys.argv[2])
+    setup_container(sys.argv[2], sys.argv[3])
 
     # Because of the bootstrapper hack we cant get output from the emucore through standard docker logs...
     #sys.stdout = open("/var/log/need.log", "w")

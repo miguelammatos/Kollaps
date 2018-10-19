@@ -88,8 +88,9 @@ def main():
                     pid = inspect_result["State"]["Pid"]
                     print("Bootstrapping " + container.name + " ...")
                     emucore_instances.append(Popen(
-                        ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(id)])
-                    )
+                        ["nsenter", "-t", str(pid), "-n",
+                         "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(id), str(pid)]
+                    ))
                     instance_count += 1
                     print("Done bootstrapping " + container.name)
                     already_bootstrapped[container.id] = True

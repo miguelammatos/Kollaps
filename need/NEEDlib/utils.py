@@ -20,6 +20,7 @@ class ENVIRONMENT:
 
 class CONTAINER:
     id = None
+    pid = ""
     client = None  # type: docker.DockerClient
     ll = None  # type: docker.APIClient
     container = None
@@ -49,20 +50,26 @@ def start_experiment():
         command = ' '.join(entrypoint)
     else:
         command = ' '.join(entrypoint + cmd)
-    arg = ['/bin/sh'] + ['-c'] + [' '.join(['echo'] + ['"' + command + '"'] + ['>', '/tmp/NEED_hang'])]
-    CONTAINER.container.exec_run(arg)
+    arg = ['/bin/sh'] + ['-c'] + [command]
+    CONTAINER.container.exec_run(arg, detach=True)
 
 
 
 def stop_experiment():
     # Temporary hack to stop the experiment
     #subprocess.run('echo "done" > /tmp/donepipe', shell=True)
-    # CONTAINER.container.stop()
-    # cant just stop container, must kill processess
-    return 
+    #CONTAINER.container.exec_run(["/bin/sh", "-c", "kill -15 -1"], detach=True)
+    #CONTAINER.container.kill(signal=15)
+    #Popen(
+    #    ["nsenter", "-t", CONTAINER.pid, "-p", "/usr/bin/kill -15 -1"]
+    #)
+    #TODO Still trying to figure out a good way of doing this....
+    #TODO see https://www.fpcomplete.com/blog/2016/10/docker-demons-pid1-orphans-zombies-signals
+    return
 
-def setup_container(id):
+def setup_container(id, pid):
     CONTAINER.id = id
+    CONTAINER.pid = pid
     CONTAINER.client = docker.DockerClient(base_url='unix:/' + DOCKER_SOCK)
     CONTAINER.ll = docker.APIClient(base_url='unix:/' + DOCKER_SOCK)
     CONTAINER.container = CONTAINER.client.containers.get(id)
