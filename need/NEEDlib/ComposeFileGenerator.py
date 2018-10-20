@@ -27,7 +27,6 @@ class ComposeFileGenerator:
         print("      - type: bind")
         print("        source: /var/run/docker.sock")
         print("        target: /var/run/docker.sock")
-        print('      - "NEEDtopo:/opt/NEED"')
         print("    configs:")
         print("      - source: topology")
         print("        target: /topology.xml")
@@ -98,18 +97,11 @@ class ComposeFileGenerator:
         print("    driver: overlay")
         print("")
 
-    def print_volumes(self):
-        print("volumes:")
-        print("  NEEDtopo:")
-        print("    external:")
-        print("      name: need_topo")
-        print("")
 
     def generate(self):
         self.print_header()
         self.print_bootstrapper()
         for service in self.graph.services:
             self.print_service(self.graph.services[service])
-        self.print_volumes()
         self.print_configs()
         self.print_networks()

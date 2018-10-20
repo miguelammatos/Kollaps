@@ -1,4 +1,3 @@
-import random
 
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error, int2ip
@@ -10,7 +9,6 @@ from _thread import interrupt_main
 import socket
 import struct
 import ctypes
-import os
 
 import sys
 if sys.version_info >= (3, 0):
