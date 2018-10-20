@@ -185,9 +185,8 @@ class CommunicationsManager:
                         connection.close()
                         with self.stop_lock:
                             print("Stopping experiment")
-                            PathEmulation.tearDown()
-                            stop_experiment()
                             self.broadcast_groups = []
+                            #TODO Stop is now useless, probably best to just replace with shutdown
 
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
                         print("Received Shutdown command")
@@ -207,6 +206,8 @@ class CommunicationsManager:
                             self.dashboard_socket.close()
                             self.sock.close()
                             print("Shutting down")
+                            PathEmulation.tearDown()
+                            stop_experiment()
                             interrupt_main()
 
                     elif command == CommunicationsManager.READY_COMMAND:

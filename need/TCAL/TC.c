@@ -54,7 +54,7 @@ int oneline = 0;
 #define PROTOCOL_IP {ARG("protocol")ARG("ip")};
 #define PRINT { for(int i=0;i<argc;i++){printf("%s ", argv[i]);}printf("\n");}
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define NEED__MIN(a, b) ((a) < (b) ? (a) : (b))
 
 
 #define MAX_INT_CHAR_LEN 10
@@ -351,7 +351,7 @@ int update_class(const struct sockaddr_nl *who,
 
     if (tb[TCA_STATS]) {
         struct tc_stats st = {};
-        memcpy(&st, RTA_DATA(tb[TCA_STATS]), MIN(RTA_PAYLOAD(tb[TCA_STATS]), sizeof(st)));
+        memcpy(&st, RTA_DATA(tb[TCA_STATS]), NEED__MIN(RTA_PAYLOAD(tb[TCA_STATS]), sizeof(st)));
         unsigned int handle = TC_H_MIN(t->tcm_handle);
 
         Destination *d;

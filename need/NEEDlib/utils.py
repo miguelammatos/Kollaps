@@ -50,6 +50,7 @@ def start_experiment():
         command = ' '.join(entrypoint)
     else:
         command = ' '.join(entrypoint + cmd)
+    setsid_s = ["setsid"]
     arg = ['/bin/sh'] + ['-c'] + [command]
     CONTAINER.container.exec_run(arg, detach=True)
 
@@ -63,8 +64,9 @@ def stop_experiment():
     #Popen(
     #    ["nsenter", "-t", CONTAINER.pid, "-p", "/usr/bin/kill -15 -1"]
     #)
-    #TODO Still trying to figure out a good way of doing this....
-    #TODO see https://www.fpcomplete.com/blog/2016/10/docker-demons-pid1-orphans-zombies-signals
+    # No good way of doing this....
+    #see https://www.fpcomplete.com/blog/2016/10/docker-demons-pid1-orphans-zombies-signals
+    #For now we just disable the network
     return
 
 def setup_container(id, pid):

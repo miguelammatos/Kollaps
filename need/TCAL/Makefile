@@ -15,7 +15,7 @@ all: libTCAL.so
 .PHONY: libutc
 libutc: 
 	cd ./libutc && ./configure
-	cd -
+	cd ..
 	make -C ./libutc
 
 libTCAL.so: libutc $(OBJS)
