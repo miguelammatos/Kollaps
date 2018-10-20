@@ -298,7 +298,7 @@ void TC_initDestination(Destination *dest) {
 
 }
 
-void TC_destroy(unsigned int if_index) {
+void TC_destroy(unsigned int if_index, int disableNetwork) {
     char* netiface;
     rtnl_close(&rth_persistent);
 
@@ -313,7 +313,8 @@ void TC_destroy(unsigned int if_index) {
     do_qdisc(argc, argv);
     close_rtnl(&rth);
 
-    set_if_up(netiface, 0);
+    if(!disableNetwork)
+        set_if_up(netiface, 0);
     free(netiface);
 
 }

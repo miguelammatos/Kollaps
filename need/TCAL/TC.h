@@ -32,6 +32,6 @@ void TC_initDestination(Destination *dest);
 void TC_changeBandwidth(Destination *dest);
 void TC_updateUsage(unsigned int if_index);
 
-void TC_destroy(unsigned int if_index);
+void TC_destroy(unsigned int if_index, int disableNetwork);
 
 #endif //TC_H

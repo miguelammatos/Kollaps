@@ -30,7 +30,7 @@ int main(int argc, char** argv){
     void (*changeBandwidth)(unsigned int, int);
     void (*updateUsage)();
     void (*registerUsageCallback)(void(*callback)(unsigned int, unsigned long));
-    void (*tearDown)();
+    void (*tearDown)(int);
 
     void* handle;
     handle = dlopen("libTCAL.so", RTLD_LAZY);
@@ -64,6 +64,6 @@ int main(int argc, char** argv){
     if(n >= 5)
 	    break;
     }
-    tearDown();
+    tearDown(0);
     return 0;
 }

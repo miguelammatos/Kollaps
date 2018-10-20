@@ -62,7 +62,7 @@ void registerUsageCallback(void(*callback)(unsigned int, unsigned long)){
     usageCallback = callback;
 }
 
-void tearDown(){
+void tearDown(int disableNetwork){
     Destination *d, *tmp;
     HASH_ITER(hh_ip, hosts, d, tmp){
         HASH_DELETE(hh_ip, hosts, d);
@@ -72,7 +72,7 @@ void tearDown(){
 
     netif *ifelem, *iftmp;
     LL_FOREACH(interfaces, ifelem){
-        TC_destroy(ifelem->if_index);
+        TC_destroy(ifelem->if_index, disableNetwork);
     }
     LL_FOREACH_SAFE(interfaces,ifelem,iftmp) {
         LL_DELETE(interfaces,ifelem);
