@@ -195,7 +195,7 @@ class CommunicationsManager:
                             error("Bad ACK len:" + str(len(ack)))
                             connection.close()
                             continue
-                        if struct.unpack("<1B", ack) != CommunicationsManager.ACK:
+                        if struct.unpack("<1B", ack)[0] != CommunicationsManager.ACK:
                             error("Bad ACK, not and ACK" + str(struct.unpack("<1B", ack)))
                             connection.close()
                             continue
