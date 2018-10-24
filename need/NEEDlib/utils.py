@@ -29,10 +29,17 @@ class CONTAINER:
 def fail(message):
     print("An error occured, terminating!", file=sys.stderr)
     print("Error Message: " + message, file=sys.stderr)
+    sys.stderr.flush()
     exit(-1)
 
 def error(message):
     print("ERROR: " + message, file=sys.stderr)
+    sys.stderr.flush()
+
+def message(m):
+    print(m, file=sys.stdout)
+    sys.stdout.flush()
+
 
 def start_experiment():
     # Temporary hack to start the experiment

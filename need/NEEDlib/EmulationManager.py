@@ -8,7 +8,7 @@ from copy import copy
 from need.NEEDlib.NetGraph import NetGraph
 import need.NEEDlib.PathEmulation as PathEmulation
 from need.NEEDlib.CommunicationsManager import CommunicationsManager
-from need.NEEDlib.utils import ENVIRONMENT
+from need.NEEDlib.utils import ENVIRONMENT, message
 
 import sys
 if sys.version_info >= (3, 0):
@@ -135,19 +135,20 @@ class EmulationManager:
         self.active_paths_ids = [] # type: List[int]
         self.flow_accumulator = {}  # type: Dict[str, List[List[int], int]]
         self.state_lock = Lock()
-        self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
         EmulationManager.POOL_PERIOD = float(environ.get(ENVIRONMENT.POOL_PERIOD, str(EmulationManager.POOL_PERIOD)))
         EmulationManager.ITERATIONS_TO_INTEGRATE = int(environ.get(ENVIRONMENT.ITERATION_COUNT,
                                                                    str(EmulationManager.ITERATIONS_TO_INTEGRATE)))
-        print("Pool Period: " + str(EmulationManager.POOL_PERIOD))
-        print("Iteration Count: " + str(EmulationManager.ITERATIONS_TO_INTEGRATE))
+        message("Pool Period: " + str(EmulationManager.POOL_PERIOD))
+        message("Iteration Count: " + str(EmulationManager.ITERATIONS_TO_INTEGRATE))
         self.worker_process = Pool(processes=1, initializer=initialize_worker, initargs=(self.graph,))
 
         self.check_flows_time_delta = 0
         #We need to give the callback a reference to ourselves (kind of hackish...)
         global emuManager
         emuManager = self
+
+        self.comms = CommunicationsManager(self.collect_flow, self.graph, self.worker_process)
 
     def initialize(self):
         PathEmulation.init(CommunicationsManager.UDP_PORT)
