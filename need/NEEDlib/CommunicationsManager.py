@@ -215,6 +215,7 @@ class CommunicationsManager:
                             sys.stderr.flush()
                             stop_experiment()
                             interrupt_main()
+                            return
 
                     elif command == CommunicationsManager.READY_COMMAND:
                         connection.send(struct.pack("<1B", CommunicationsManager.ACK))

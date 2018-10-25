@@ -117,8 +117,15 @@ def main():
                 # Check for termination
                 if container.id == bootstrapper_id and container.status == "running":
                     bootstrapper = container
+            #Retrieve return codes
+            for key in already_bootstrapped:
+                already_bootstrapped[key].poll()
             #Clean up and stop
             if bootstrapper is None:
+                for key in already_bootstrapped:
+                    if already_bootstrapped[key].poll() is not None:
+                        already_bootstrapped[key].kill()
+                        already_bootstrapped[key].wait()
                 us.stop()
             sleep(5)
         except:

@@ -4,7 +4,7 @@ from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.EmulationManager import EmulationManager
 from need.NEEDlib.utils import fail, message, ENVIRONMENT, int2ip, ip2int, setup_container
 
-
+from signal import signal, SIGTERM
 import socket
 import sys
 
@@ -65,6 +65,8 @@ def main():
 
     message("Calculating shortest paths...")
     graph.calculate_shortest_paths()
+
+    signal(SIGTERM, lambda signum, frame: exit(0))
 
     message("Initializing network emulation...")
     manager = EmulationManager(graph)
