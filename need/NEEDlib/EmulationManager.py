@@ -8,7 +8,7 @@ from copy import copy
 from need.NEEDlib.NetGraph import NetGraph
 import need.NEEDlib.PathEmulation as PathEmulation
 from need.NEEDlib.CommunicationsManager import CommunicationsManager
-from need.NEEDlib.utils import ENVIRONMENT
+from need.NEEDlib.utils import ENVIRONMENT, message
 
 import sys
 if sys.version_info >= (3, 0):
@@ -135,19 +135,20 @@ class EmulationManager:
         self.active_paths_ids = [] # type: List[int]
         self.flow_accumulator = {}  # type: Dict[str, List[List[int], int]]
         self.state_lock = Lock()
-        self.comms = CommunicationsManager(self.collect_flow, self.graph)
         self.last_time = 0
         EmulationManager.POOL_PERIOD = float(environ.get(ENVIRONMENT.POOL_PERIOD, str(EmulationManager.POOL_PERIOD)))
         EmulationManager.ITERATIONS_TO_INTEGRATE = int(environ.get(ENVIRONMENT.ITERATION_COUNT,
                                                                    str(EmulationManager.ITERATIONS_TO_INTEGRATE)))
-        print("Pool Period: " + str(EmulationManager.POOL_PERIOD))
-        print("Iteration Count: " + str(EmulationManager.ITERATIONS_TO_INTEGRATE))
+        message("Pool Period: " + str(EmulationManager.POOL_PERIOD))
+        message("Iteration Count: " + str(EmulationManager.ITERATIONS_TO_INTEGRATE))
         self.worker_process = Pool(processes=1, initializer=initialize_worker, initargs=(self.graph,))
 
         self.check_flows_time_delta = 0
         #We need to give the callback a reference to ourselves (kind of hackish...)
         global emuManager
         emuManager = self
+
+        self.comms = CommunicationsManager(self.collect_flow, self.graph, self.worker_process)
 
     def initialize(self):
         PathEmulation.init(CommunicationsManager.UDP_PORT)
@@ -163,7 +164,11 @@ class EmulationManager:
         self.check_active_flows()  # to prevent bug where data has already passed through the filters before
         last_time = time()
         async_result = None  # type: AsyncResult
-        async_result = self.worker_process.apply_async(apply_bandwidth, ([], [], [],))  # needed to initialize result
+        try:
+            async_result = self.worker_process.apply_async(apply_bandwidth, ([], [], [],))  # needed to initialize result
+        except ValueError as e:
+            async_result = None
+
         while True:
             for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):
                 sleep_time = EmulationManager.POOL_PERIOD - (time() - last_time)
@@ -176,19 +181,23 @@ class EmulationManager:
                     self.check_active_flows()
                 self.comms.broadcast_flows(self.active_paths)
             with self.state_lock:
-                if async_result.ready():  # apply the changes and prepare for new calculations
-                    changes = async_result.get()
-                    for change in changes:
-                        PathEmulation.change_bandwidth(self.graph.links[change[0]].destination, change[1])
-                    our_flows = []
-                    for path in self.active_paths:
-                        our_flows.append(([l.index for l in path.links], path.used_bandwidth))
-                    # We need shallow copies otherwise the dict/list is emptied before being pickled!
-                    flow_accumulator_copy = copy(list(self.flow_accumulator.values()))
-                    active_paths_ids_copy = copy(self.active_paths_ids)
-                    async_result = self.worker_process.apply_async(apply_bandwidth, (our_flows,
-                                                                                     flow_accumulator_copy,
-                                                                                     active_paths_ids_copy,))
+                if async_result is not None:
+                    if async_result.ready():  # apply the changes and prepare for new calculations
+                        changes = async_result.get()
+                        for change in changes:
+                            PathEmulation.change_bandwidth(self.graph.links[change[0]].destination, change[1])
+                        our_flows = []
+                        for path in self.active_paths:
+                            our_flows.append(([l.index for l in path.links], path.used_bandwidth))
+                        # We need shallow copies otherwise the dict/list is emptied before being pickled!
+                        flow_accumulator_copy = copy(list(self.flow_accumulator.values()))
+                        active_paths_ids_copy = copy(self.active_paths_ids)
+                        try:
+                            async_result = self.worker_process.apply_async(apply_bandwidth, (our_flows,
+                                                                                             flow_accumulator_copy,
+                                                                                             active_paths_ids_copy,))
+                        except ValueError as e:
+                            async_result = None  # We might have killed the pool and are terminating this thread as well
                 self.flow_accumulator.clear()
 
     def check_active_flows(self):

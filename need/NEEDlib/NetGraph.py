@@ -13,6 +13,7 @@ if sys.version_info >= (3, 0):
 
 class NetGraph:
     def __init__(self):
+        # Note to future developers self.services can probably be completely replaced with self.hosts_by_ip
         self.services = {}  # type: Dict[str,List[NetGraph.Service]]
         self.hosts_by_ip = {} # type: Dict[int, NetGraph.Service]
         self.bridges = {}  # type: Dict[str,List[NetGraph.Service]]

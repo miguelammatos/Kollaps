@@ -137,6 +137,7 @@ def setup_mocking():
     PathEmulation.initialize_path = mock_initialize_path
     PathEmulation.update_usage = mock_update_usage
     PathEmulation.query_usage = mock_query_usage
+    PathEmulation.register_usage_callback = mock_register_callback
     mock_update_usage.last_time = time()
     mock_query_usage.sent_bytes = 0
     PathEmulation.change_bandwidth = mock_change_bandwidth

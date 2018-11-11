@@ -88,4 +88,4 @@ def tearDown():
     with PEState.PathLock:
         PEState.shutdown = True
         if PEState.TCAL:
-            PEState.TCAL.tearDown()
+            PEState.TCAL.tearDown(1)

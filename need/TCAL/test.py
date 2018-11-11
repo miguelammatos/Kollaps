@@ -31,4 +31,4 @@ if __name__ == '__main__':
     for i in range(20):
         TCAL.updateUsage()
         sleep(1)
-    TCAL.tearDown()
+    TCAL.tearDown(0)

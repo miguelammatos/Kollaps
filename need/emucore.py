@@ -2,9 +2,9 @@
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.EmulationManager import EmulationManager
-from need.NEEDlib.utils import fail, ENVIRONMENT, int2ip
+from need.NEEDlib.utils import fail, message, ENVIRONMENT, int2ip, ip2int, setup_container
 
-
+from signal import signal, SIGTERM
 import socket
 import sys
 
@@ -21,7 +21,7 @@ def get_own_ip(graph):
     # New way:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     last_ip = None
-    # Connect to at least 2 to avoid using our own ip
+    # Connect to at least 2 to avoid using our loopback ip
     for int_ip in graph.hosts_by_ip:
         s.connect((int2ip(int_ip),1))
         new_ip = s.getsockname()[0]
@@ -33,45 +33,45 @@ def get_own_ip(graph):
 
 
 def main():
-    if len(sys.argv) != 2:
-        topology_file = "/topology.xml"
+    if len(sys.argv) < 4:
+        fail("Missing arguments. emucore <topology> <container id>")
     else:
         topology_file = sys.argv[1]
     # For future reference: This topology file must not exceed 512KB otherwise docker refuses
     # to copy it as a config file, this has happened with the 2k scale-free topology...
 
+    setup_container(sys.argv[2], sys.argv[3])
 
     # Because of the bootstrapper hack we cant get output from the emucore through standard docker logs...
-    sys.stdout = open("/var/log/need.log", "w")
-    sys.stderr = open("/var/log/need_error.log", "w")
+    #sys.stdout = open("/var/log/need.log", "w")
+    #sys.stderr = sys.stdout
 
     graph = NetGraph()
 
     XMLGraphParser(topology_file, graph).fill_graph()
-    print("Done parsing topology")
+    message("Done parsing topology")
 
-    print("Resolving hostnames...")
+    message("Resolving hostnames...")
     graph.resolve_hostnames()
-    print("All hosts found!")
+    message("All hosts found!")
 
-    print("Determining the root of the tree...")
+    message("Determining the root of the tree...")
     # Get our own ip address and set the root of the "tree"
     ownIP = get_own_ip(graph)
-    currentServiceName = socket.gethostname()
-    for host in graph.services[currentServiceName]:
-        if int2ip(host.ip) == ownIP:
-            graph.root = host
+    graph.root = graph.hosts_by_ip[ip2int(ownIP)]
     if graph.root is None:
         fail("Failed to identify current service instance in topology!")
-    print("We are " + currentServiceName + "@" + ownIP)
+    message("We are " + graph.root.name + "@" + ownIP)
 
-    print("Calculating shortest paths...")
+    message("Calculating shortest paths...")
     graph.calculate_shortest_paths()
 
-    print("Initializing network emulation...")
+    signal(SIGTERM, lambda signum, frame: exit(0))
+
+    message("Initializing network emulation...")
     manager = EmulationManager(graph)
     manager.initialize()
-    print("Waiting for command to start experiment")
+    message("Waiting for command to start experiment")
     sys.stdout.flush()
     sys.stderr.flush()
 

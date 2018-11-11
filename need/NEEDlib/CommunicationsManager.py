@@ -1,7 +1,6 @@
-import random
 
 from need.NEEDlib.NetGraph import NetGraph
-from need.NEEDlib.utils import fail, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error, int2ip
+from need.NEEDlib.utils import fail, message, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error, int2ip
 import need.NEEDlib.PathEmulation as PathEmulation
 
 from threading import Thread, Lock
@@ -10,7 +9,6 @@ from _thread import interrupt_main
 import socket
 import struct
 import ctypes
-import os
 
 import sys
 if sys.version_info >= (3, 0):
@@ -56,11 +54,11 @@ class CommunicationsManager:
     SHUTDOWN_COMMAND = 2
     READY_COMMAND = 3
     START_COMMAND = 4
-    ACK = 250
+    ACK = 120
     i_SIZE = struct.calcsize("<1i")
     MAX_WORKERS = 10
 
-    def __init__(self, flow_collector, graph):
+    def __init__(self, flow_collector, graph, worker):
         self.graph = graph  # type: NetGraph
         self.flow_collector = flow_collector
         self.produced = 0
@@ -68,6 +66,7 @@ class CommunicationsManager:
         self.consumed = 0
         self.largest_produced_gap = -1
         self.stop_lock = Lock()
+        self.emulation_worker = worker  # type: Pool
 
         link_count = len(self.graph.links)
         if link_count <= BYTE_LIMIT:
@@ -183,31 +182,40 @@ class CommunicationsManager:
                     command = struct.unpack("<1B", data)[0]
                     if command == CommunicationsManager.STOP_COMMAND:
                         connection.close()
-                        stop_experiment()
                         with self.stop_lock:
-                            print("Stopping experiment")
-                            PathEmulation.tearDown()
+                            message("Stopping experiment")
                             self.broadcast_groups = []
+                            #TODO Stop is now useless, probably best to just replace with shutdown
 
                     elif command == CommunicationsManager.SHUTDOWN_COMMAND:
-                        print("Received Shutdown command")
+                        message("Received Shutdown command")
                         connection.send(struct.pack("<3Q", self.produced, 50, self.received))
                         ack = connection.recv(1)
                         if len(ack) != 1:
-                            error("Bad ACK")
+                            error("Bad ACK len:" + str(len(ack)))
                             connection.close()
                             continue
-                        if struct.unpack("<1B", ack) != CommunicationsManager.ACK:
-                            error("Bad ACK")
+                        if struct.unpack("<1B", ack)[0] != CommunicationsManager.ACK:
+                            error("Bad ACK, not and ACK" + str(struct.unpack("<1B", ack)))
                             connection.close()
                             continue
                         connection.close()
                         with self.stop_lock:
                             self.process_pool.terminate()
+                            self.process_pool.join()
+                            self.emulation_worker.terminate()
+                            self.emulation_worker.join()
                             self.dashboard_socket.close()
+                            for s in broadcast_sockets:
+                                s.close()
                             self.sock.close()
-                            print("Shutting down")
+                            PathEmulation.tearDown()
+                            message("Shutting down")
+                            sys.stdout.flush()
+                            sys.stderr.flush()
+                            stop_experiment()
                             interrupt_main()
+                            return
 
                     elif command == CommunicationsManager.READY_COMMAND:
                         connection.send(struct.pack("<1B", CommunicationsManager.ACK))
@@ -215,7 +223,7 @@ class CommunicationsManager:
 
                     elif command == CommunicationsManager.START_COMMAND:
                         connection.close()
-                        print("Starting Experiment!")
+                        message("Starting Experiment!")
                         start_experiment()
             except OSError as e:
                 continue  # Connection timed out (most likely)

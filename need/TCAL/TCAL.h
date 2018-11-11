@@ -15,6 +15,6 @@ void updateUsage();
 unsigned long queryUsage(unsigned int ip);
 void registerUsageCallback(void(*callback)(unsigned int, unsigned long));
 
-void tearDown();
+void tearDown(int disableNetwork);
 
 #endif

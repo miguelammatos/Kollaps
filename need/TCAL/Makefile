@@ -4,7 +4,7 @@ LIBUTIL=./libutc/lib/libutil.a
 LIBUTC=./libutc/tc/libutc.a
 
 
-CC=musl-gcc
+CC=gcc
 #CC=gcc
 CFLAGS = -O3 -fPIC -I./libutc/include -I ./libutc/ip/  -I./libutc/include/uapi -I./libutc/tc/
 LDFLAGS= -shared -ldl -lm
@@ -15,12 +15,12 @@ all: libTCAL.so
 .PHONY: libutc
 libutc: 
 	cd ./libutc && ./configure
-	cd -
+	cd ..
 	make -C ./libutc
 
 libTCAL.so: libutc $(OBJS)
-	$(CC) -o $@ -shared -static $(OBJS) $(LDLIBS) -lc
-	objcopy --strip-all --keep-symbols=exported.sym $@ $@
+	$(CC) -o $@ -shared $(OBJS) $(LDLIBS) -lm
+	#objcopy --strip-all --keep-symbols=exported.sym $@ $@
 
 test: test.c
 	gcc -g -o $@ $^ -ldl
@@ -31,6 +31,7 @@ test: test.c
 #######################################
 clean:
 	-rm $(OBJS)
+	-rm ./*.so
 	-rm ./*.o
 	-rm ./*.a
 	-rm ./test

@@ -40,7 +40,7 @@ def main():
     graph = NetGraph()
     XMLGraphParser(topology_file, graph).fill_graph()
 
-    LoggerState.comms = CommunicationsManager(collect_flow, graph)
+    LoggerState.comms = CommunicationsManager(collect_flow, graph, None)
 
     LoggerState.graph = graph
 
