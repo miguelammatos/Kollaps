@@ -57,9 +57,12 @@ def start_experiment():
         command = ' '.join(entrypoint)
     else:
         command = ' '.join(entrypoint + cmd)
-    setsid_s = ["setsid"]
-    arg = ['/bin/sh'] + ['-c'] + [command]
-    CONTAINER.container.exec_run(arg, detach=True)
+    #arg = ['/bin/sh'] + ['-c'] + [command]
+    command.replace('"', '\\"')
+    command.replace("'", "\\'")
+    arg = ['echo ' + command + ' > /tmp/NEED_hang']
+    message(arg[0])
+    CONTAINER.container.exec_run(['/bin/sh'] + ['-c'] + arg, detach=True)
 
 
 

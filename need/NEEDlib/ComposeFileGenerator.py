@@ -41,13 +41,7 @@ class ComposeFileGenerator:
         print("  " + service_list[0].name + "-" + self.experiment_UUID + ":")
         print("    image: " + service_list[0].image)
         if not service_list[0].supervisor:
-            #print('    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; /bin/sh -s < /tmp/NEED_hang; #"]')
-            # See explaination at the bottom
-            mkfifo = "mkfifo /tmp/NEED_s /tmp/NEED_k /tmp/NEED_h;"
-            setsid = 'setsid /bin/sh -c \\"/bin/sh -s < /tmp/NEED_s & cat /tmp/NEED_k;kill -9 0\\";'
-            hang = '/bin/sh -s < /tmp/NEED_h & '
-            #print('    entrypoint: ["/bin/sh", "-c", "' + mkfifo + hang + setsid + '"]')
-            print('    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec < /tmp/NEED_hang #"]')
+            print('    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]')
         if service_list[0].command is not None:
             print("    command: " + service_list[0].command)
         if service_list[0].supervisor_port > 0:
