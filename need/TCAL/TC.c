@@ -60,9 +60,9 @@ int oneline = 0;
 #define MAX_INT_CHAR_LEN 10
 
 
-short freePort = 0;
+unsigned short freePort = 0;
 
-void TC_init(short controllPort) {
+void TC_init(unsigned short controllPort) {
     freePort = controllPort;
     fillNormalDist();
     tc_core_init();

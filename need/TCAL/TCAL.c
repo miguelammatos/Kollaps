@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "Destination.h"
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
@@ -13,12 +14,14 @@
 Destination* hosts = NULL;
 Destination* hostsByHandle = NULL;
 netif* interfaces = NULL;
+unsigned short needControllPort = 0;
 
 unsigned int handleCounter = 5;
 void (*usageCallback)(unsigned int, unsigned long) = NULL;
 
 
-void init(short controllPort){
+void init(unsigned short controllPort){
+    needControllPort = controllPort;
     TC_init(controllPort);
 }
 
@@ -64,9 +67,21 @@ void registerUsageCallback(void(*callback)(unsigned int, unsigned long)){
 }
 
 void disconnect(){
+    char rule_max[] = "iptables -I OUTPUT -p tcp --dport 65535 -j ACCEPT";
+    size_t max_size = strlen(rule_max);
+    char* accept_rule = calloc(max_size, sizeof(char));
+
+
     system("iptables -F");
     system("iptables -I INPUT -j DROP");
+    snprintf(accept_rule, max_size, "iptables -I INPUT -p tcp --dport %hu -j ACCEPT", needControllPort);
+    system(accept_rule);
+
     system("iptables -I OUTPUT -j DROP");
+    snprintf(accept_rule, max_size, "iptables -I OUTPUT -p tcp --sport %hu -j ACCEPT", needControllPort);
+    system(accept_rule);
+
+    free(accept_rule);
 }
 
 void reconnect(){
