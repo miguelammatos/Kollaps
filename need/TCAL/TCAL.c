@@ -7,6 +7,7 @@
 #include "TC.h"
 #include "TCAL.h"
 
+//TODO now that we controll the environment in NEED we no longer need libutc, so we can go back to calling tc directly
 
 
 Destination* hosts = NULL;
@@ -60,6 +61,16 @@ unsigned long queryUsage(unsigned int ip){
 
 void registerUsageCallback(void(*callback)(unsigned int, unsigned long)){
     usageCallback = callback;
+}
+
+void disconnect(){
+    system("iptables -F");
+    system("iptables -I INPUT -j DROP");
+    system("iptables -I OUTPUT -j DROP");
+}
+
+void reconnect(){
+    system("iptables -F");
 }
 
 void tearDown(int disableNetwork){

@@ -85,6 +85,14 @@ def register_usage_callback(callback):
             PEState.TCAL.registerUsageCallback(c_callback)
 
 
+def disconnect():
+    with PEState.PathLock:
+        PEState.TCAL.disconnect()
+
+def reconnect():
+    with PEState.PathLock:
+        PEState.TCAL.reconnect()
+
 def tearDown():
     with PEState.PathLock:
         PEState.shutdown = True

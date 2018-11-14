@@ -13,8 +13,9 @@ RUN pacman -Sy --noconfirm \
     flex \
     bison \
     pkgconf \
+    iptables \
     gcc &&\
-    make -C /NEED/need/TCAL -j16 &&\
+    make -C /NEED/need/TCAL -j8 &&\
     pip3 --no-cache-dir install dnspython docker wheel &&\
     pip3 --no-cache-dir wheel --no-deps -w /NEED /NEED &&\
     pip3 --no-cache-dir install /NEED/need-1.1-py3-none-any.whl &&\
