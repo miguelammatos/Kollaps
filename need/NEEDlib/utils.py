@@ -67,16 +67,10 @@ def start_experiment():
 
 
 def stop_experiment():
-    # Temporary hack to stop the experiment
-    #subprocess.run('echo "done" > /tmp/donepipe', shell=True)
-    #CONTAINER.container.exec_run(["/bin/sh", "-c", "kill -15 -1"], detach=True)
-    #CONTAINER.container.kill(signal=15)
-    #Popen(
-    #    ["nsenter", "-t", CONTAINER.pid, "-p", "/usr/bin/kill -15 -1"]
-    #)
-    # No good way of doing this....
-    #see https://www.fpcomplete.com/blog/2016/10/docker-demons-pid1-orphans-zombies-signals
-    #For now we just disable the network
+    # kill all but pid 1 (this might create zombies)
+    Popen(
+        ["nsenter", "-t", str(CONTAINER.pid), "-p", "-m", "/bin/sh", "-c", "kill -9 -1"]
+    ).wait()
     return
 
 def setup_container(id, pid):

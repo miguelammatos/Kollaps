@@ -71,6 +71,7 @@ def change_bandwidth(service, new_bandwidth):
         if not PEState.shutdown and PEState.TCAL:
             PEState.TCAL.changeBandwidth(service.ip, int(new_bandwidth/1000))
 
+
 def register_usage_callback(callback):
     """
     :param callback: func
@@ -88,4 +89,4 @@ def tearDown():
     with PEState.PathLock:
         PEState.shutdown = True
         if PEState.TCAL:
-            PEState.TCAL.tearDown(1)
+            PEState.TCAL.tearDown(0)
