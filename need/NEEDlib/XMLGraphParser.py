@@ -4,6 +4,7 @@ from string import ascii_letters
 
 from need.NEEDlib.utils import fail
 from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.EventScheduler import EventScheduler
 
 import sys
 if sys.version_info >= (3, 0):
@@ -176,6 +177,8 @@ class XMLGraphParser:
                 if links is not None:
                     fail("Only one <links> block is allowed.")
                 links = child
+            elif child.tag == 'dynamic':
+                pass
             else:
                 fail('Unknown tag: ' + child.tag)
 
@@ -191,3 +194,82 @@ class XMLGraphParser:
 
         for service in self.supervisors:
             self.graph.set_supervisor(service)
+
+    def parse_schedule(self, service):
+        """
+        :param service: NetGraph.Service
+        :return:
+        """
+        XMLtree = ET.parse(self.file)
+        root = XMLtree.getroot()
+        if root.tag != 'experiment':
+            fail('Not a valid NEED topology file, root is not <experiment>')
+
+        dynamic = None
+
+        for child in root:
+            if child.tag == 'services':
+                pass
+            elif child.tag == 'bridges':
+                pass
+            elif child.tag == 'links':
+                pass
+            elif child.tag == 'dynamic':
+                if dynamic is not None:
+                    fail("Only one <dynamic> block is allowed.")
+                dynamic = child
+            else:
+                fail('Unknown tag: ' + child.tag)
+
+        scheduler = EventScheduler()
+        first_join = 0.0
+        first_leave = 0.0
+
+        # if there is no dynamic block than this instance joins straight away
+        if dynamic is None:
+            scheduler.schedule_join(0.0)
+            return scheduler
+
+        # there is a dynamic block, so check if there is anything scheduled for us
+        for event in dynamic:
+            if event.tag != 'schedule':
+                fail("Only <schedule> is allowed inside <dynamic>")
+            if 'name' in event.attrib and 'time' in event.attrib and 'action' in event.attrib:
+                # parse name of service
+                if event.attrib['name'] != service.name:
+                    continue
+
+                # parse time of event
+                time = 0.0
+                try:
+                    time = float(event.attrib['time'])
+                    if time < 0.0:
+                        fail("time attribute must be a positive number")
+                except ValueError as e:
+                    fail("time attribute must be a valid real number")
+
+                # parse action
+                if event.attrib['action'] == 'join':
+                    scheduler.schedule_join(time)
+                    if first_join == 0.0:
+                        first_join = time
+                elif event.attrib['action'] == 'leave':
+                    scheduler.schedule_leave(time)
+                    if first_leave == 0.0:
+                        first_leave = time
+                elif event.attrib['action'] == 'reconnect':
+                    scheduler.schedule_reconnect(time)
+                elif event.attrib['action'] == 'disconnect':
+                    scheduler.schedule_disconnect(time)
+                else:
+                    fail("Unrecognized action: " + event.attrib['action'] +
+                         " , allowed actions are join, leave, disconnect, reconnect")
+
+                # deal with auto join
+                if first_join == 0.0 or (first_leave < first_join):
+                    scheduler.schedule_join(0.0)
+
+            else:
+                fail('<schedule> must have name, time and action attributes')
+
+        return scheduler

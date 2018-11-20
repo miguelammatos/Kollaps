@@ -1,0 +1,113 @@
+version: "3.3"
+services:
+  bootstrapper:
+    image: need:1.1
+    command: ["-s", "ca838ae3-ec0e-4ccb-99bc-67a797baa2cc"]
+    deploy:
+      mode: global
+    environment:
+      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+    labels:
+      bootca838ae3-ec0e-4ccb-99bc-67a797baa2cc: "true"
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  dashboard-ca838ae3-ec0e-4ccb-99bc-67a797baa2cc:
+    image: warpenguin.no-ip.org/dashboard:1.0
+    ports:
+      - "8088:8088"
+    hostname: dashboard
+    deploy:
+      replicas: 1
+    environment:
+      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+      - outside
+
+  client1-ca838ae3-ec0e-4ccb-99bc-67a797baa2cc:
+    image: warpenguin.no-ip.org/alpineclient:1.0
+    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]
+    command: ['server', '0', '0']
+    hostname: client1
+    labels:
+      ca838ae3-ec0e-4ccb-99bc-67a797baa2cc: "true"
+    deploy:
+      replicas: 1
+      endpoint_mode: dnsrr
+    environment:
+      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+    networks:
+      - NEEDnet
+
+  client2-ca838ae3-ec0e-4ccb-99bc-67a797baa2cc:
+    image: warpenguin.no-ip.org/alpineclient:1.0
+    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]
+    command: ['server', '0', '0']
+    hostname: client2
+    labels:
+      ca838ae3-ec0e-4ccb-99bc-67a797baa2cc: "true"
+    deploy:
+      replicas: 1
+      endpoint_mode: dnsrr
+    environment:
+      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+    networks:
+      - NEEDnet
+
+  client3-ca838ae3-ec0e-4ccb-99bc-67a797baa2cc:
+    image: warpenguin.no-ip.org/alpineclient:1.0
+    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]
+    command: ['server', '0', '0']
+    hostname: client3
+    labels:
+      ca838ae3-ec0e-4ccb-99bc-67a797baa2cc: "true"
+    deploy:
+      replicas: 1
+      endpoint_mode: dnsrr
+    environment:
+      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+    networks:
+      - NEEDnet
+
+  server-ca838ae3-ec0e-4ccb-99bc-67a797baa2cc:
+    image: warpenguin.no-ip.org/alpineserver:1.0
+    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]
+    hostname: server
+    labels:
+      ca838ae3-ec0e-4ccb-99bc-67a797baa2cc: "true"
+    deploy:
+      replicas: 3
+      endpoint_mode: dnsrr
+    environment:
+      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+    networks:
+      - NEEDnet
+
+configs:
+  topology:
+    file: topology5.xml
+
+networks:
+  NEEDnet:
+    external:
+      name: test_overlay
+  outside:
+    driver: overlay
+
