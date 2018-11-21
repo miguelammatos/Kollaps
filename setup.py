@@ -12,7 +12,7 @@ setup(name='need',
       include_package_data=True,
       package_data={
           'need.TCAL':['libTCAL.so'],
-          'need':['static/*', 'templates/*.html'],
+          'need':['static/css/*', 'static/js/*',  'templates/*.html'],
       },
       entry_points = {
           'console_scripts': ['NEEDdeploymentGenerator=need.deploymentGenerator:main',
