@@ -81,6 +81,11 @@ void disconnect(){
     snprintf(accept_rule, max_size, "iptables -I OUTPUT -p tcp --sport %hu -j ACCEPT", needControllPort);
     system(accept_rule);
 
+    //TODO For now we need to also allow metadata to flow out
+    //TODO @PAULO when/if emucores no longer use network to share metadata this can/should be removed
+    snprintf(accept_rule, max_size, "iptables -I OUTPUT -p udp --sport %hu -j ACCEPT", needControllPort);
+    system(accept_rule);
+
     free(accept_rule);
 }
 
