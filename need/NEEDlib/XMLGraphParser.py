@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from random import choice, randint
 from string import ascii_letters
 
-from need.NEEDlib.utils import fail
+from need.NEEDlib.utils import fail, message
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.EventScheduler import EventScheduler
 
@@ -251,25 +251,31 @@ class XMLGraphParser:
                 # parse action
                 if event.attrib['action'] == 'join':
                     scheduler.schedule_join(time)
+                    message(service.name + " scheduled to join at " + str(time))
                     if first_join < 0.0:
                         first_join = time
                 elif event.attrib['action'] == 'leave':
+                    message(service.name + " scheduled to leave at " + str(time))
                     scheduler.schedule_leave(time)
                     if first_leave > time:
                         first_leave = time
                 elif event.attrib['action'] == 'reconnect':
+                    message(service.name + " scheduled to reconnect at " + str(time))
                     scheduler.schedule_reconnect(time)
                 elif event.attrib['action'] == 'disconnect':
+                    message(service.name + " scheduled to disconnect at " + str(time))
                     scheduler.schedule_disconnect(time)
                 else:
                     fail("Unrecognized action: " + event.attrib['action'] +
                          " , allowed actions are join, leave, disconnect, reconnect")
 
-                # deal with auto join
-                if first_join < 0.0 or (first_leave < first_join):
-                    scheduler.schedule_join(0.0)
 
             else:
                 fail('<schedule> must have name, time and action attributes')
+
+        # deal with auto join
+        if first_join < 0.0 or (first_leave < first_join):
+            message(service.name + " scheduled to join at " + str(0.0))
+            scheduler.schedule_join(0.0)
 
         return scheduler

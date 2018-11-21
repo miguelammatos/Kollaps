@@ -2,13 +2,13 @@ version: "3.3"
 services:
   bootstrapper:
     image: need:1.1
-    command: ["-s", "ca838ae3-ec0e-4ccb-99bc-67a797baa2cc"]
+    command: ["-s", "00cec1d4-035e-4f7f-ba40-7e156f0aae5b"]
     deploy:
       mode: global
     environment:
-      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+      NEED_UUID: '00cec1d4-035e-4f7f-ba40-7e156f0aae5b'
     labels:
-      bootca838ae3-ec0e-4ccb-99bc-67a797baa2cc: "true"
+      boot00cec1d4-035e-4f7f-ba40-7e156f0aae5b: "true"
     volumes:
       - type: bind
         source: /var/run/docker.sock
@@ -22,7 +22,7 @@ services:
     networks:
       - NEEDnet
 
-  dashboard-ca838ae3-ec0e-4ccb-99bc-67a797baa2cc:
+  dashboard-00cec1d4-035e-4f7f-ba40-7e156f0aae5b:
     image: warpenguin.no-ip.org/dashboard:1.0
     ports:
       - "8088:8088"
@@ -30,7 +30,7 @@ services:
     deploy:
       replicas: 1
     environment:
-      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+      NEED_UUID: '00cec1d4-035e-4f7f-ba40-7e156f0aae5b'
     configs:
       - source: topology
         target: /topology.xml
@@ -41,62 +41,81 @@ services:
       - NEEDnet
       - outside
 
-  client1-ca838ae3-ec0e-4ccb-99bc-67a797baa2cc:
+  logger-00cec1d4-035e-4f7f-ba40-7e156f0aae5b:
+    image: warpenguin.no-ip.org/logger:1.0
+    hostname: logger
+    deploy:
+      replicas: 1
+    environment:
+      NEED_UUID: '00cec1d4-035e-4f7f-ba40-7e156f0aae5b'
+    volumes:
+      - "/home/joao/Desktop:/var/log"
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+      - outside
+
+  client1-00cec1d4-035e-4f7f-ba40-7e156f0aae5b:
     image: warpenguin.no-ip.org/alpineclient:1.0
     entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]
     command: ['server', '0', '0']
     hostname: client1
     labels:
-      ca838ae3-ec0e-4ccb-99bc-67a797baa2cc: "true"
+      00cec1d4-035e-4f7f-ba40-7e156f0aae5b: "true"
     deploy:
       replicas: 1
       endpoint_mode: dnsrr
     environment:
-      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+      NEED_UUID: '00cec1d4-035e-4f7f-ba40-7e156f0aae5b'
     networks:
       - NEEDnet
 
-  client2-ca838ae3-ec0e-4ccb-99bc-67a797baa2cc:
+  client2-00cec1d4-035e-4f7f-ba40-7e156f0aae5b:
     image: warpenguin.no-ip.org/alpineclient:1.0
     entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]
     command: ['server', '0', '0']
     hostname: client2
     labels:
-      ca838ae3-ec0e-4ccb-99bc-67a797baa2cc: "true"
+      00cec1d4-035e-4f7f-ba40-7e156f0aae5b: "true"
     deploy:
       replicas: 1
       endpoint_mode: dnsrr
     environment:
-      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+      NEED_UUID: '00cec1d4-035e-4f7f-ba40-7e156f0aae5b'
     networks:
       - NEEDnet
 
-  client3-ca838ae3-ec0e-4ccb-99bc-67a797baa2cc:
+  client3-00cec1d4-035e-4f7f-ba40-7e156f0aae5b:
     image: warpenguin.no-ip.org/alpineclient:1.0
     entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]
     command: ['server', '0', '0']
     hostname: client3
     labels:
-      ca838ae3-ec0e-4ccb-99bc-67a797baa2cc: "true"
+      00cec1d4-035e-4f7f-ba40-7e156f0aae5b: "true"
     deploy:
       replicas: 1
       endpoint_mode: dnsrr
     environment:
-      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+      NEED_UUID: '00cec1d4-035e-4f7f-ba40-7e156f0aae5b'
     networks:
       - NEEDnet
 
-  server-ca838ae3-ec0e-4ccb-99bc-67a797baa2cc:
+  server-00cec1d4-035e-4f7f-ba40-7e156f0aae5b:
     image: warpenguin.no-ip.org/alpineserver:1.0
     entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]
     hostname: server
     labels:
-      ca838ae3-ec0e-4ccb-99bc-67a797baa2cc: "true"
+      00cec1d4-035e-4f7f-ba40-7e156f0aae5b: "true"
     deploy:
       replicas: 3
       endpoint_mode: dnsrr
     environment:
-      NEED_UUID: 'ca838ae3-ec0e-4ccb-99bc-67a797baa2cc'
+      NEED_UUID: '00cec1d4-035e-4f7f-ba40-7e156f0aae5b'
     networks:
       - NEEDnet
 
