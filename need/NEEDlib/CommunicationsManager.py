@@ -2,6 +2,7 @@
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.utils import fail, message, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error, int2ip
 import need.NEEDlib.PathEmulation as PathEmulation
+from need.NEEDlib.EventScheduler import EventScheduler
 
 from threading import Thread, Lock
 from multiprocessing import Pool
@@ -58,8 +59,9 @@ class CommunicationsManager:
     i_SIZE = struct.calcsize("<1i")
     MAX_WORKERS = 10
 
-    def __init__(self, flow_collector, graph, worker):
+    def __init__(self, flow_collector, graph, event_scheduler, worker):
         self.graph = graph  # type: NetGraph
+        self.scheduler = event_scheduler  # type: EventScheduler
         self.flow_collector = flow_collector
         self.produced = 0
         self.received = 0
@@ -224,6 +226,6 @@ class CommunicationsManager:
                     elif command == CommunicationsManager.START_COMMAND:
                         connection.close()
                         message("Starting Experiment!")
-                        start_experiment()
+                        self.scheduler.start()
             except OSError as e:
                 continue  # Connection timed out (most likely)

@@ -48,7 +48,8 @@ def main():
 
     graph = NetGraph()
 
-    XMLGraphParser(topology_file, graph).fill_graph()
+    parser = XMLGraphParser(topology_file, graph)
+    parser.fill_graph()
     message("Done parsing topology")
 
     message("Resolving hostnames...")
@@ -63,13 +64,17 @@ def main():
         fail("Failed to identify current service instance in topology!")
     message("We are " + graph.root.name + "@" + ownIP)
 
+    message("Parsing dynamic event schedule...")
+    scheduler = parser.parse_schedule(graph.root)
+
+
     message("Calculating shortest paths...")
     graph.calculate_shortest_paths()
 
     signal(SIGTERM, lambda signum, frame: exit(0))
 
     message("Initializing network emulation...")
-    manager = EmulationManager(graph)
+    manager = EmulationManager(graph, scheduler)
     manager.initialize()
     message("Waiting for command to start experiment")
     sys.stdout.flush()

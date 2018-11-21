@@ -9,6 +9,7 @@ from need.NEEDlib.NetGraph import NetGraph
 import need.NEEDlib.PathEmulation as PathEmulation
 from need.NEEDlib.CommunicationsManager import CommunicationsManager
 from need.NEEDlib.utils import ENVIRONMENT, message
+from need.NEEDlib.EventScheduler import EventScheduler
 
 import sys
 if sys.version_info >= (3, 0):
@@ -129,8 +130,9 @@ class EmulationManager:
     ALPHA = 0.25
     ONE_MINUS_ALPHA = 1-ALPHA
 
-    def __init__(self, netgraph):
-        self.graph = netgraph  # type: NetGraph
+    def __init__(self, net_graph, event_scheduler):
+        self.graph = net_graph  # type: NetGraph
+        self.scheduler = event_scheduler  # type: EventScheduler
         self.active_paths = []  # type: List[NetGraph.Path]
         self.active_paths_ids = [] # type: List[int]
         self.flow_accumulator = {}  # type: Dict[str, List[List[int], int]]
@@ -148,7 +150,7 @@ class EmulationManager:
         global emuManager
         emuManager = self
 
-        self.comms = CommunicationsManager(self.collect_flow, self.graph, self.worker_process)
+        self.comms = CommunicationsManager(self.collect_flow, self.graph, self.scheduler, self.worker_process)
 
     def initialize(self):
         PathEmulation.init(CommunicationsManager.UDP_PORT)

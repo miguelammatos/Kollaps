@@ -222,8 +222,8 @@ class XMLGraphParser:
                 fail('Unknown tag: ' + child.tag)
 
         scheduler = EventScheduler()
-        first_join = 0.0
-        first_leave = 0.0
+        first_join = -1.0
+        first_leave = float('inf')
 
         # if there is no dynamic block than this instance joins straight away
         if dynamic is None:
@@ -251,11 +251,11 @@ class XMLGraphParser:
                 # parse action
                 if event.attrib['action'] == 'join':
                     scheduler.schedule_join(time)
-                    if first_join == 0.0:
+                    if first_join < 0.0:
                         first_join = time
                 elif event.attrib['action'] == 'leave':
                     scheduler.schedule_leave(time)
-                    if first_leave == 0.0:
+                    if first_leave > time:
                         first_leave = time
                 elif event.attrib['action'] == 'reconnect':
                     scheduler.schedule_reconnect(time)
@@ -266,7 +266,7 @@ class XMLGraphParser:
                          " , allowed actions are join, leave, disconnect, reconnect")
 
                 # deal with auto join
-                if first_join == 0.0 or (first_leave < first_join):
+                if first_join < 0.0 or (first_leave < first_join):
                     scheduler.schedule_join(0.0)
 
             else:

@@ -215,7 +215,7 @@ def resolve_hostnames():
                 DashboardState.hosts[host].status = 'Pending'
 
     # We can only instantiate the CommunicationsManager after the graphs root has been set
-    DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None)
+    DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None, None)
 
 def query_until_ready():
     resolve_hostnames()

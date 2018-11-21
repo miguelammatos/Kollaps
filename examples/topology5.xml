@@ -2,7 +2,7 @@
 <experiment boot="need:1.1">
 	<services>
 		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:1.0" supervisor="true" port="8088"/>
-		<!-- <service name="logger"  image="wtflogger:1.0" supervisor="true" />  -->
+		<service name="logger"  image="warpenguin.no-ip.org/logger:1.0" supervisor="true" />
 		<service name="client1" image="warpenguin.no-ip.org/alpineclient:1.0" command="['server', '0', '0']"/>
 		<service name="client2" image="warpenguin.no-ip.org/alpineclient:1.0" command="['server', '0', '0']"/>
 		<service name="client3" image="warpenguin.no-ip.org/alpineclient:1.0" command="['server', '0', '0']"/>
