@@ -1,6 +1,7 @@
 from threading import Lock
 import time
 import json
+from os import environ
 
 from need.NEEDlib.CommunicationsManager import CommunicationsManager
 from need.NEEDlib.NetGraph import NetGraph
@@ -11,7 +12,7 @@ if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
 
 LOG_FILE = "/var/log/NEED_LOG.json"
-AVERAGE_INTERVAL = 1.0
+DEFAULT_INTERVAL = 1.0
 
 class LoggerState:
     graph = None  # type: NetGraph
@@ -36,6 +37,8 @@ def main():
         topology_file = "/topology.xml"
     else:
         topology_file = sys.argv[1]
+
+    AVERAGE_INTERVAL = float(environ.get("AVERAGE_INTERVAL", str(DEFAULT_INTERVAL)))
 
     graph = NetGraph()
     XMLGraphParser(topology_file, graph).fill_graph()
