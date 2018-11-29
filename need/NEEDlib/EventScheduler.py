@@ -1,4 +1,4 @@
-from need.NEEDlib.utils import start_experiment, stop_experiment
+from need.NEEDlib.utils import start_experiment, stop_experiment, crash_experiment
 from need.NEEDlib.PathEmulation import disconnect, reconnect
 
 from threading import Timer
@@ -21,6 +21,9 @@ class EventScheduler:
 
     def schedule_leave(self, time):
         self.events.append(Timer(time, stop_experiment))
+
+    def schedule_crash(self, time):
+        self.events.append(Timer(time, crash_experiment))
 
     def schedule_disconnect(self, time):
         self.events.append(Timer(time, disconnect))

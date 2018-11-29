@@ -86,7 +86,7 @@ def main():
             sleep(5)
             continue
 
-    # We are finnally ready to proceed
+    # We are finally ready to proceed
     print("Bootstrapping all local containers with label " + label)
 
     already_bootstrapped = {}

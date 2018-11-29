@@ -76,6 +76,10 @@ void disconnect(){
     system("iptables -I INPUT -j DROP");
     snprintf(accept_rule, max_size, "iptables -I INPUT -p tcp --dport %hu -j ACCEPT", needControllPort);
     system(accept_rule);
+    //TODO For now we also allow metadata to flow out so that the dashboard doesnt report losses
+    //TODO @PAULO when/if emucores no longer use network to share metadata this can/should be removed
+    snprintf(accept_rule, max_size, "iptables -I INPUT -p udp --dport %hu -j ACCEPT", needControllPort);
+    system(accept_rule);
 
     system("iptables -I OUTPUT -j DROP");
     snprintf(accept_rule, max_size, "iptables -I OUTPUT -p tcp --sport %hu -j ACCEPT", needControllPort);
@@ -83,7 +87,7 @@ void disconnect(){
 
     //TODO For now we need to also allow metadata to flow out
     //TODO @PAULO when/if emucores no longer use network to share metadata this can/should be removed
-    snprintf(accept_rule, max_size, "iptables -I OUTPUT -p udp --sport %hu -j ACCEPT", needControllPort);
+    snprintf(accept_rule, max_size, "iptables -I OUTPUT -p udp --dport %hu -j ACCEPT", needControllPort);
     system(accept_rule);
 
     free(accept_rule);

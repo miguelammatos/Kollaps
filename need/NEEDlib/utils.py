@@ -69,6 +69,13 @@ def start_experiment():
 def stop_experiment():
     # kill all but pid 1 (this might create zombies)
     Popen(
+        ["nsenter", "-t", str(CONTAINER.pid), "-p", "-m", "/bin/sh", "-c", "kill -15 -1"]
+    ).wait()
+    return
+
+def crash_experiment():
+    # kill all but pid 1 (this might create zombies)
+    Popen(
         ["nsenter", "-t", str(CONTAINER.pid), "-p", "-m", "/bin/sh", "-c", "kill -9 -1"]
     ).wait()
     return

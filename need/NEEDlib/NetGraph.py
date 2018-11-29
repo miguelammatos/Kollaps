@@ -44,7 +44,7 @@ class NetGraph:
             self.network = link.network
 
     class Service(Node):
-        def __init__(self, name, image, command, shared):
+        def __init__(self, name, image, command, shared, reuse):
             super(NetGraph.Service, self).__init__(name, shared)
             self.image = image
             self.command = command
@@ -52,6 +52,7 @@ class NetGraph:
             self.last_bytes = 0  # number of bytes sent to this service
             self.supervisor = False
             self.supervisor_port = 0
+            self.reuse_ip = reuse
 
     class Bridge(Node):
         def __init__(self, name):
@@ -122,8 +123,8 @@ class NetGraph:
         else:
             return []
 
-    def new_service(self, name, image, command, shared):
-        service = NetGraph.Service(name, image, command, shared)
+    def new_service(self, name, image, command, shared, reuse):
+        service = NetGraph.Service(name, image, command, shared, reuse)
         if len(self.get_nodes(name)) == 0:
             self.services[name] = [service]
         else:

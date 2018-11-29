@@ -8,7 +8,7 @@ from need.NEEDlib.EventScheduler import EventScheduler
 
 import sys
 if sys.version_info >= (3, 0):
-    from typing import Dict, List
+    from typing import Dict, List, Tuple
 
 class XMLGraphParser:
     def __init__(self, file, graph):
@@ -16,8 +16,8 @@ class XMLGraphParser:
         self.graph = graph  # type: NetGraph
         self.supervisors = []  # type: List[NetGraph.Service]
 
-    def parse_services(self, root):
-        for service in root:
+    def parse_services(self, experiment, services):
+        for service in services:
             if service.tag != 'service':
                 fail('Invalid tag inside <services>: ' + service.tag)
             if 'name' not in service.attrib or 'image' not in service.attrib:
@@ -31,6 +31,7 @@ class XMLGraphParser:
                     replicas = int(service.attrib['replicas'])
                 except:
                     fail('replicas attribute must be a valid integer.')
+            replicas = self.calulate_required_replicas_reuse(service.attrib['name'], replicas, experiment)
 
             command = None
             if 'command' in service.attrib:
@@ -47,8 +48,13 @@ class XMLGraphParser:
                 if 'port' in service.attrib:
                     supervisor_port =  int(service.attrib['port'])
 
+            reuse = True
+            if 'reuse' in service.attrib:
+                reuse = (service.attrib['reuse'] == "true")
+
             for i in range(replicas):
-                    srv = self.graph.new_service(service.attrib['name'], service.attrib['image'], command, shared)
+                    srv = self.graph.new_service(
+                        service.attrib['name'], service.attrib['image'], command, shared, reuse)
                     if supervisor:
                         self.supervisors.append(srv)
                         srv.supervisor_port = supervisor_port
@@ -151,6 +157,73 @@ class XMLGraphParser:
                     self.graph.new_link(link.attrib['dest'], link.attrib['origin'], link.attrib['latency'],
                                 jitter, drop, link.attrib['download'], link.attrib['network'])
 
+    def calulate_required_replicas_reuse(self, service, hardcoded_count, root):
+        dynamic = None
+        for child in root:
+            if child.tag == 'dynamic':
+                if dynamic is not None:
+                    fail("Only one <dynamic> block is allowed.")
+                dynamic = child
+
+        if dynamic is None:
+            return hardcoded_count
+
+        # first we collect the join/leave/crash events so we can later sort them and calculate the required replicas
+        join_leave_events = []  # type: List[Tuple[float, int]]
+
+        has_joins = False
+
+        for event in dynamic:
+            if event.tag != 'schedule':
+                fail("Only <schedule> is allowed inside <dynamic>")
+            if 'name' in event.attrib and 'time' in event.attrib and 'action' in event.attrib:
+                # parse name of service
+                if event.attrib['name'] != service:
+                    continue
+
+                # parse time of event
+                time = 0.0
+                try:
+                    time = float(event.attrib['time'])
+                    if time < 0.0:
+                        fail("time attribute must be a positive number")
+                except ValueError as e:
+                    fail("time attribute must be a valid real number")
+
+                # parse amount
+                amount = 1
+                if 'amount' in event.attrib:
+                   try:
+                       amount = int(event.attrib['amount'])
+                       if amount < 1:
+                           fail("amount attribute must be an integer >= 1")
+                   except ValueError as e:
+                       fail("amount attribute must be an integer >= 1")
+
+                # parse action
+                if event.attrib['action'] == 'join':
+                   has_joins = True
+                   join_leave_events.append((time, amount))
+                elif event.attrib['action'] == 'leave':
+                    join_leave_events.append((time, -amount))
+                elif event.attrib['action'] == 'crash':
+                    join_leave_events.append((time, -amount))
+
+        if not has_joins:
+            return hardcoded_count
+
+        join_leave_events.sort(key=lambda event: event[0])
+        max_replicas = 0
+        current_replicas = 0
+        for event in join_leave_events:
+            current_replicas += event[1]
+            if current_replicas < 0:
+                fail("Dynamic section for " + service + " causes a negative number of replicas at second " + str(event[0]))
+            if current_replicas > max_replicas:
+                max_replicas = current_replicas
+
+        return max_replicas
+
     def fill_graph(self):
         XMLtree = ET.parse(self.file)
         root = XMLtree.getroot()
@@ -185,7 +258,7 @@ class XMLGraphParser:
         # Links must be parsed last
         if services is None:
             fail("No services declared in topology description")
-        self.parse_services(services)
+        self.parse_services(root, services)
         if bridges is not None:
             self.parse_bridges(bridges)
         if links is None:
@@ -259,6 +332,11 @@ class XMLGraphParser:
                     scheduler.schedule_leave(time)
                     if first_leave > time:
                         first_leave = time
+                elif event.attrib['action'] == 'crash':
+                    message(service.name + " scheduled to crash at " + str(time))
+                    scheduler.schedule_crash(time)
+                    if first_leave > time:
+                        first_leave = time
                 elif event.attrib['action'] == 'reconnect':
                     message(service.name + " scheduled to reconnect at " + str(time))
                     scheduler.schedule_reconnect(time)
@@ -274,8 +352,10 @@ class XMLGraphParser:
                 fail('<schedule> must have name, time and action attributes')
 
         # deal with auto join
-        if first_join < 0.0 or (first_leave < first_join):
+        if first_join < 0.0:
             message(service.name + " scheduled to join at " + str(0.0))
             scheduler.schedule_join(0.0)
+        if(first_leave < first_join):
+            fail("Dynamic: service " + service.name + " leaves before having joined")
 
         return scheduler

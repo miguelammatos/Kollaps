@@ -21,7 +21,7 @@ def main():
     for hosts in graph.services:
         for host in graph.services[hosts]:
             service_count += 1
-    print("      has " + str(service_count) + " services.", file=sys.stderr)
+    print("      has " + str(service_count) + " hosts.", file=sys.stderr)
 
     if len(graph.links) > SHORT_LIMIT:
         fail("Topology has too many links: " + str(len(graph.links)))
