@@ -1,6 +1,12 @@
 # NEED
 Decentralized container based network emulator
 
+Clone this repo with:
+```
+git clone --branch master --depth 1 --recurse-submodules https://github.com/joaoneves792/NEED.git
+```
+
+
 ## Install instructions
 ```
 $pip wheel --no-deps . .
