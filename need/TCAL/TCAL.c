@@ -67,34 +67,34 @@ void registerUsageCallback(void(*callback)(unsigned int, unsigned long)){
 }
 
 void disconnect(){
-    char rule_max[] = "iptables -I OUTPUT -p tcp --dport 65535 -j ACCEPT";
+    char rule_max[] = "iptables -w -I OUTPUT -p tcp --dport 65535 -j ACCEPT";
     size_t max_size = strlen(rule_max);
     char* accept_rule = calloc(max_size, sizeof(char));
 
 
-    system("iptables -F");
-    system("iptables -I INPUT -j DROP");
-    snprintf(accept_rule, max_size, "iptables -I INPUT -p tcp --dport %hu -j ACCEPT", needControllPort);
+    system("iptables -w -F");
+    system("iptables -w -I INPUT -j DROP");
+    snprintf(accept_rule, max_size, "iptables -w -I INPUT -p tcp --dport %hu -j ACCEPT", needControllPort);
     system(accept_rule);
     //TODO For now we also allow metadata to flow out so that the dashboard doesnt report losses
     //TODO @PAULO when/if emucores no longer use network to share metadata this can/should be removed
-    snprintf(accept_rule, max_size, "iptables -I INPUT -p udp --dport %hu -j ACCEPT", needControllPort);
+    snprintf(accept_rule, max_size, "iptables -w -I INPUT -p udp --dport %hu -j ACCEPT", needControllPort);
     system(accept_rule);
 
-    system("iptables -I OUTPUT -j DROP");
-    snprintf(accept_rule, max_size, "iptables -I OUTPUT -p tcp --sport %hu -j ACCEPT", needControllPort);
+    system("iptables -w -I OUTPUT -j DROP");
+    snprintf(accept_rule, max_size, "iptables -w -I OUTPUT -p tcp --sport %hu -j ACCEPT", needControllPort);
     system(accept_rule);
 
     //TODO For now we need to also allow metadata to flow out
     //TODO @PAULO when/if emucores no longer use network to share metadata this can/should be removed
-    snprintf(accept_rule, max_size, "iptables -I OUTPUT -p udp --dport %hu -j ACCEPT", needControllPort);
+    snprintf(accept_rule, max_size, "iptables -w -I OUTPUT -p udp --dport %hu -j ACCEPT", needControllPort);
     system(accept_rule);
 
     free(accept_rule);
 }
 
 void reconnect(){
-    system("iptables -F");
+    system("iptables -w -F");
 }
 
 void tearDown(int disableNetwork){
