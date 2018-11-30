@@ -303,6 +303,9 @@ class XMLGraphParser:
             scheduler.schedule_join(0.0)
             return scheduler
 
+        active_replica_count = 0
+        disconnected_replica_count = 0
+
         # there is a dynamic block, so check if there is anything scheduled for us
         for event in dynamic:
             if event.tag != 'schedule':
@@ -321,32 +324,49 @@ class XMLGraphParser:
                 except ValueError as e:
                     fail("time attribute must be a valid real number")
 
+                # parse amount of replicas affected
+                amount = 1
+                if 'amount' in event.attrib:
+                    amount = int(event.attrib['amount'])
+
                 # parse action
                 if event.attrib['action'] == 'join':
-                    scheduler.schedule_join(time)
-                    message(service.name + " scheduled to join at " + str(time))
+                    prev_replica_count = active_replica_count
+                    active_replica_count += amount
+                    if service.replica_id < active_replica_count and service.replica_id >= prev_replica_count:
+                        scheduler.schedule_join(time)
+                        message(service.name + " replica " + str(service.replica_id) + " scheduled to join at " + str(time))
                     if first_join < 0.0:
                         first_join = time
-                elif event.attrib['action'] == 'leave':
-                    message(service.name + " scheduled to leave at " + str(time))
-                    scheduler.schedule_leave(time)
-                    if first_leave > time:
-                        first_leave = time
-                elif event.attrib['action'] == 'crash':
-                    message(service.name + " scheduled to crash at " + str(time))
-                    scheduler.schedule_crash(time)
+                elif event.attrib['action'] == 'leave' or event.attrib['action'] == 'crash':
+                    prev_replica_count = active_replica_count
+                    active_replica_count -= amount
+                    if service.replica_id >= active_replica_count and service.replica_id < prev_replica_count:
+                        if event.attrib['action'] == 'leave':
+                            scheduler.schedule_leave(time)
+                            message(service.name + " replica " + str(service.replica_id) +
+                                    " scheduled to leave at " + str(time))
+                        elif event.attrib['action'] == 'crash':
+                            scheduler.schedule_crash(time)
+                            message(service.name + " replica " + str(service.replica_id) +
+                                    " scheduled to crash at " + str(time))
                     if first_leave > time:
                         first_leave = time
                 elif event.attrib['action'] == 'reconnect':
-                    message(service.name + " scheduled to reconnect at " + str(time))
-                    scheduler.schedule_reconnect(time)
+                    prev_disconnected_count = disconnected_replica_count
+                    disconnected_replica_count -= amount
+                    if service.replica_id >= disconnected_replica_count and \
+                            service.replica_id < prev_disconnected_count:
+                        message(service.name + " scheduled to reconnect at " + str(time))
+                        scheduler.schedule_reconnect(time)
                 elif event.attrib['action'] == 'disconnect':
-                    message(service.name + " scheduled to disconnect at " + str(time))
-                    scheduler.schedule_disconnect(time)
+                    disconnected_replica_count += amount
+                    if service.replica_id < disconnected_replica_count:
+                        message(service.name + " replica " + str(service.replica_id) + " scheduled to disconnect at " + str(time))
+                        scheduler.schedule_disconnect(time)
                 else:
                     fail("Unrecognized action: " + event.attrib['action'] +
-                         " , allowed actions are join, leave, disconnect, reconnect")
-
+                         " , allowed actions are join, leave, crash, disconnect, reconnect")
 
             else:
                 fail('<schedule> must have name, time and action attributes')

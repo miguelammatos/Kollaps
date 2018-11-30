@@ -35,7 +35,7 @@ class NetGraph:
     class Node(object):
         def __init__(self, name, shared):
             self.name = name
-            self.network = ""  # maybe in the future support multiple networks? (TCAL doesnt allow that for now)
+            self.network = ""  # maybe in the future support multiple networks?
             self.links = []
             self.shared_link = shared
 
@@ -49,6 +49,7 @@ class NetGraph:
             self.image = image
             self.command = command
             self.ip = 167772161  # to be filled in later (this is just a value that can safely be converted to an IP)
+            self.replica_id = 0 # to be filled in later (after we sort by ip)
             self.last_bytes = 0  # number of bytes sent to this service
             self.supervisor = False
             self.supervisor_port = 0
@@ -200,6 +201,7 @@ class NetGraph:
             for i in range(len(hosts)):
                 int_ip = ip2int(ips[i])
                 hosts[i].ip = int_ip
+                hosts[i].replica_id = i
                 self.hosts_by_ip[int_ip] = hosts[i]
 
     def calculate_shortest_paths(self):

@@ -1,0 +1,83 @@
+version: "3.3"
+services:
+  bootstrapper:
+    image: need:1.1
+    command: ["-s", "c5bba1bb-5245-4a11-83df-52cdab5797ee"]
+    deploy:
+      mode: global
+    environment:
+      NEED_UUID: 'c5bba1bb-5245-4a11-83df-52cdab5797ee'
+    labels:
+      bootc5bba1bb-5245-4a11-83df-52cdab5797ee: "true"
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+
+  dashboard-c5bba1bb-5245-4a11-83df-52cdab5797ee:
+    image: warpenguin.no-ip.org/dashboard:1.0
+    ports:
+      - "8088:8088"
+    hostname: dashboard
+    deploy:
+      replicas: 1
+    environment:
+      NEED_UUID: 'c5bba1bb-5245-4a11-83df-52cdab5797ee'
+    configs:
+      - source: topology
+        target: /topology.xml
+        uid: '0'
+        gid: '0'
+        mode: 0555
+    networks:
+      - NEEDnet
+      - outside
+
+  client-c5bba1bb-5245-4a11-83df-52cdab5797ee:
+    image: warpenguin.no-ip.org/alpineclient:1.0
+    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]
+    command: ['server', '0', '0']
+    hostname: client
+    labels:
+      c5bba1bb-5245-4a11-83df-52cdab5797ee: "true"
+    deploy:
+      replicas: 10
+      endpoint_mode: dnsrr
+    environment:
+      NEED_UUID: 'c5bba1bb-5245-4a11-83df-52cdab5797ee'
+    networks:
+      - NEEDnet
+
+  server-c5bba1bb-5245-4a11-83df-52cdab5797ee:
+    image: warpenguin.no-ip.org/alpineserver:1.0
+    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]
+    hostname: server
+    labels:
+      c5bba1bb-5245-4a11-83df-52cdab5797ee: "true"
+    deploy:
+      replicas: 10
+      endpoint_mode: dnsrr
+    environment:
+      NEED_UUID: 'c5bba1bb-5245-4a11-83df-52cdab5797ee'
+    networks:
+      - NEEDnet
+
+configs:
+  topology:
+    file: topology_dynamic_replicas.xml
+
+networks:
+  NEEDnet:
+    external:
+      name: test_overlay
+  outside:
+    driver: overlay
+

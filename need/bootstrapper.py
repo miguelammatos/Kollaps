@@ -121,6 +121,9 @@ def main():
             for key in already_bootstrapped:
                 already_bootstrapped[key].poll()
             #Clean up and stop
+            # TODO We need to handle "ragnarok" better
+            # TODO for example if we stack rm without stopping the experiment there will be lots of zombies
+            # TODO and the gods will refuse to die cleanly
             if bootstrapper is None:
                 for key in already_bootstrapped:
                     if already_bootstrapped[key].poll() is not None:
