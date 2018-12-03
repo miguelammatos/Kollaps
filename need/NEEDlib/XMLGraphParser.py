@@ -402,7 +402,7 @@ class XMLGraphParser:
 
                 elif event.attrib['action'] == 'disconnect':
                     disconnected_replica_count += amount
-                    if lowest_active_replica < service.replica_id < disconnected_replica_count + lowest_active_replica:
+                    if lowest_active_replica <= service.replica_id < disconnected_replica_count + lowest_active_replica:
                         message(service.name + " replica " + str(service.replica_id) +
                                 " scheduled to disconnect at " + str(time))
                         scheduler.schedule_disconnect(time)
