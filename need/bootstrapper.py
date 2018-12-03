@@ -1,6 +1,9 @@
+#! /usr/bin/python3
+
 import docker
 # from docker.types import Mount
 from time import sleep
+from signal import pause
 from sys import argv
 from subprocess import Popen
 # from shutil import copy
@@ -40,20 +43,22 @@ def main():
                 inspect_result = LowLevelClient.inspect_container(us.id)
                 env = inspect_result["Config"]["Env"]
 
-                # create a "God" container that is in the host's Pid namespace, and our network namespace
+                # create a "God" container that is in the host's Pid namespace
                 client.containers.run(image=boot_image,
-                                      entrypoint="/usr/bin/python3",
-                                      command=["/usr/bin/NEEDbootstrapper", "-g", label, str(us.id)],
+                                      entrypoint=["/bin/sh"],
+                                      command=["-c", "/usr/bin/NEEDbootstrapper -g " + label + " " + str(us.id)],
                                       privileged=True,
                                       pid_mode="host",
                                       remove=True,
                                       environment=env,
-                                      volumes_from=[us.id],
-                                      network_mode="container:"+us.id,  # share the network stack with this container
+                                      volumes={DOCKER_SOCK: {'bind': DOCKER_SOCK, 'mode': 'rw'}},
+                                      # volumes_from=[us.id],
+                                      # network_mode="container:"+us.id,  # share the network stack with this container
                                       labels=["god"+label],
-                                      detach=False,
-                                      stderr=True,
-                                      stdout=True)
+                                      detach=True)
+                                      #stderr=True,
+                                      #stdout=True)
+                pause()
                 return
             except:
                 sleep(5)
@@ -69,7 +74,8 @@ def main():
                   "nsenter -t " + str(bootstrapper_pid) + " -m cat " + TOPOLOGY + " | cat > " + TOPOLOGY]
                   ).wait()
             break
-        except:
+        except Exception as e:
+            print(e)
             sleep(5)
             continue
 
@@ -82,7 +88,8 @@ def main():
                     us = container
                     break
             break
-        except:
+        except Exception as e:
+            print(e)
             sleep(5)
             continue
 
@@ -131,7 +138,8 @@ def main():
                         already_bootstrapped[key].wait()
                 us.stop()
             sleep(5)
-        except:
+        except Exception as e:
+            print(e)
             sleep(5)
             continue
 

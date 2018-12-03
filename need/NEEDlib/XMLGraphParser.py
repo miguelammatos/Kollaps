@@ -25,13 +25,6 @@ class XMLGraphParser:
             if not service.attrib['name'] or not service.attrib['image']:
                 fail('A service needs a name and an image attribute.')
 
-            replicas = 1
-            if 'replicas' in service.attrib:
-                try:
-                    replicas = int(service.attrib['replicas'])
-                except:
-                    fail('replicas attribute must be a valid integer.')
-            replicas = self.calulate_required_replicas_reuse(service.attrib['name'], replicas, experiment)
 
             command = None
             if 'command' in service.attrib:
@@ -51,6 +44,14 @@ class XMLGraphParser:
             reuse = True
             if 'reuse' in service.attrib:
                 reuse = (service.attrib['reuse'] == "true")
+
+            replicas = 1
+            if 'replicas' in service.attrib:
+                try:
+                    replicas = int(service.attrib['replicas'])
+                except:
+                    fail('replicas attribute must be a valid integer.')
+            replicas = self.calulate_required_replicas(service.attrib['name'], replicas, experiment, reuse)
 
             for i in range(replicas):
                     srv = self.graph.new_service(
@@ -157,7 +158,7 @@ class XMLGraphParser:
                     self.graph.new_link(link.attrib['dest'], link.attrib['origin'], link.attrib['latency'],
                                 jitter, drop, link.attrib['download'], link.attrib['network'])
 
-    def calulate_required_replicas_reuse(self, service, hardcoded_count, root):
+    def calulate_required_replicas(self, service, hardcoded_count, root, reuse):
         dynamic = None
         for child in root:
             if child.tag == 'dynamic':
@@ -214,15 +215,24 @@ class XMLGraphParser:
 
         join_leave_events.sort(key=lambda event: event[0])
         max_replicas = 0
-        current_replicas = 0
-        for event in join_leave_events:
-            current_replicas += event[1]
-            if current_replicas < 0:
-                fail("Dynamic section for " + service + " causes a negative number of replicas at second " + str(event[0]))
-            if current_replicas > max_replicas:
-                max_replicas = current_replicas
 
-        return max_replicas
+        if reuse:
+            # If we reuse ips, then calculate the maximum number of concurrently active replicas
+            current_replicas = 0
+            for event in join_leave_events:
+                current_replicas += event[1]
+                if current_replicas < 0:
+                    fail("Dynamic section for " + service + " causes a negative number of replicas at second " + str(event[0]))
+                if current_replicas > max_replicas:
+                    max_replicas = current_replicas
+
+            return max_replicas
+        else:
+            # If we do not reuse ips then calculate how many replicas join
+            for event in join_leave_events:
+                if event[1] > 0:  # if event is a join
+                    max_replicas += event[1]
+            return max_replicas
 
     def fill_graph(self):
         XMLtree = ET.parse(self.file)
@@ -303,8 +313,12 @@ class XMLGraphParser:
             scheduler.schedule_join(0.0)
             return scheduler
 
-        active_replica_count = 0
-        disconnected_replica_count = 0
+        active_replica_count = 0  # counts active replicas for reuse ip case
+        used_replica_count = 0  # counts replicas that have joined (left replicas will not be subtracted)
+        left_replica_count = 0  # counts number of replicas that have left
+        disconnected_replica_count = 0  # counts the number of replicas that are currently disconnected
+
+        lowest_active_replica = 0  # keeps track of the lowest active replica (should always be 0 if reuse == True)
 
         # there is a dynamic block, so check if there is anything scheduled for us
         for event in dynamic:
@@ -330,18 +344,40 @@ class XMLGraphParser:
                     amount = int(event.attrib['amount'])
 
                 # parse action
+                # join always adds to the end of active replicas
                 if event.attrib['action'] == 'join':
-                    prev_replica_count = active_replica_count
-                    active_replica_count += amount
-                    if service.replica_id < active_replica_count and service.replica_id >= prev_replica_count:
+                    if service.reuse_ip:
+                        lower_threshold = active_replica_count
+                        active_replica_count += amount
+                        upper_threshold = active_replica_count
+                        highest_active_replica = active_replica_count
+                    else:
+                        lower_threshold = used_replica_count
+                        used_replica_count += amount
+                        upper_threshold = used_replica_count
+                        highest_active_replica = used_replica_count
+
+                    if lower_threshold <= service.replica_id < upper_threshold:
                         scheduler.schedule_join(time)
                         message(service.name + " replica " + str(service.replica_id) + " scheduled to join at " + str(time))
                     if first_join < 0.0:
                         first_join = time
+
+                # leave leaves from the end if reusing and from beginning if not reusing
                 elif event.attrib['action'] == 'leave' or event.attrib['action'] == 'crash':
-                    prev_replica_count = active_replica_count
-                    active_replica_count -= amount
-                    if service.replica_id >= active_replica_count and service.replica_id < prev_replica_count:
+                    if service.reuse_ip:
+                        upper_threshold = active_replica_count
+                        active_replica_count -= amount
+                        left_replica_count += amount
+                        lower_threshold = active_replica_count
+                        highest_active_replica = active_replica_count
+                    else:
+                        lower_threshold = left_replica_count
+                        left_replica_count += amount
+                        upper_threshold = left_replica_count
+                        lowest_active_replica = left_replica_count
+
+                    if upper_threshold > service.replica_id >= lower_threshold:
                         if event.attrib['action'] == 'leave':
                             scheduler.schedule_leave(time)
                             message(service.name + " replica " + str(service.replica_id) +
@@ -352,17 +388,23 @@ class XMLGraphParser:
                                     " scheduled to crash at " + str(time))
                     if first_leave > time:
                         first_leave = time
+
+                # Disconnect/Reconnect always does so from the beginning of active replicas
                 elif event.attrib['action'] == 'reconnect':
                     prev_disconnected_count = disconnected_replica_count
                     disconnected_replica_count -= amount
-                    if service.replica_id >= disconnected_replica_count and \
-                            service.replica_id < prev_disconnected_count:
-                        message(service.name + " scheduled to reconnect at " + str(time))
+                    if prev_disconnected_count + lowest_active_replica > \
+                            service.replica_id \
+                            >= disconnected_replica_count + lowest_active_replica:
+                        message(service.name + " replica " + str(service.replica_id) +
+                                " scheduled to reconnect at " + str(time))
                         scheduler.schedule_reconnect(time)
+
                 elif event.attrib['action'] == 'disconnect':
                     disconnected_replica_count += amount
-                    if service.replica_id < disconnected_replica_count:
-                        message(service.name + " replica " + str(service.replica_id) + " scheduled to disconnect at " + str(time))
+                    if lowest_active_replica < service.replica_id < disconnected_replica_count + lowest_active_replica:
+                        message(service.name + " replica " + str(service.replica_id) +
+                                " scheduled to disconnect at " + str(time))
                         scheduler.schedule_disconnect(time)
                 else:
                     fail("Unrecognized action: " + event.attrib['action'] +
