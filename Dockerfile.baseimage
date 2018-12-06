@@ -1,0 +1,40 @@
+#######################
+#WARNING
+#DO NOT USE THIS
+#BAD THINGS WILL HAPPEN WHEN THIS SPAWNS IN THE HOST'S PID NAMESPACE
+#!!!!!!!!!!!!!!!!!!!!!!
+
+
+FROM phusion/baseimage:0.11
+
+
+WORKDIR /
+
+
+#RUN git clone --branch master --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    make \
+    flex \
+    bison \
+    pkgconf \
+    iptables \
+    gcc && \
+    apt-get clean &&\
+    rm -rf /var/lib/apt/lists/*
+
+ADD ./ /NEED/
+
+RUN make -C /NEED/need/TCAL -j8 &&\
+    pip3 --no-cache-dir install dnspython docker wheel &&\
+    pip3 --no-cache-dir wheel --no-deps -w /NEED /NEED &&\
+    pip3 --no-cache-dir install /NEED/need-1.1-py3-none-any.whl &&\
+    rm -rf /NEED &&\
+    pip3 --no-cache-dir uninstall -y setuptools wheel pip &&\
+    apt-get remove --purge -y make gcc flex bison pkgconf &&\
+    apt-get clean &&\
+    rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT ["/sbin/my_init", "--", "/usr/bin/python3", "/usr/local/bin/NEEDbootstrapper"]
