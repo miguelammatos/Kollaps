@@ -4,7 +4,7 @@ import docker
 # from docker.types import Mount
 from time import sleep
 from signal import pause
-from sys import argv
+from sys import argv, stdout, stderr
 from subprocess import Popen
 # from shutil import copy
 
@@ -20,7 +20,6 @@ def main():
 
     mode = argv[1]
     label = argv[2]
-
 
     #Connect to the local docker daemon
     client = docker.DockerClient(base_url='unix:/' + DOCKER_SOCK)
@@ -45,14 +44,13 @@ def main():
 
                 # create a "God" container that is in the host's Pid namespace
                 client.containers.run(image=boot_image,
-                                      entrypoint=["/bin/sh"],
-                                      command=["-c", "/usr/bin/NEEDbootstrapper -g " + label + " " + str(us.id)],
+                                      command=["-g", label, str(us.id)],
                                       privileged=True,
                                       pid_mode="host",
                                       remove=True,
                                       environment=env,
-                                      volumes={DOCKER_SOCK: {'bind': DOCKER_SOCK, 'mode': 'rw'}},
-                                      # volumes_from=[us.id],
+                                      # volumes={DOCKER_SOCK: {'bind': DOCKER_SOCK, 'mode': 'rw'}},
+                                      volumes_from=[us.id],
                                       # network_mode="container:"+us.id,  # share the network stack with this container
                                       labels=["god"+label],
                                       detach=True)
@@ -60,9 +58,10 @@ def main():
                                       #stdout=True)
                 pause()
                 return
-            except:
+            except Exception as e:
+                print(e)
                 sleep(5)
-                continue #If we get any exceptions try again
+                continue  # If we get any exceptions try again
 
     # We are the god container
     # First thing to do is copy over the topology
@@ -76,70 +75,68 @@ def main():
             break
         except Exception as e:
             print(e)
-            sleep(5)
-            continue
-
-    # Figure out who we are
-    us = None
-    while True:
-        try:
-            for container in client.containers.list():
-                if "god"+label in container.labels:
-                    us = container
-                    break
-            break
-        except Exception as e:
-            print(e)
+            stdout.flush()
+            stderr.flush()
             sleep(5)
             continue
 
     # We are finally ready to proceed
     print("Bootstrapping all local containers with label " + label)
+    stdout.flush()
 
     already_bootstrapped = {}
     instance_count = 0
 
     while True:
         try:
+            running = 0  # running container counter, we stop the god if there are 0 same experiment containers running
+
             # check if containers need bootstrapping
-            bootstrapper = None
             containers = client.containers.list()
             for container in containers:
+                if label in container.labels:
+                    running += 1
                 if label in container.labels and container.id not in already_bootstrapped and container.status == "running":
                     try:
                         id = container.id
                         inspect_result = LowLevelClient.inspect_container(id)
                         pid = inspect_result["State"]["Pid"]
                         print("Bootstrapping " + container.name + " ...")
+                        stdout.flush()
+
                         emucore_instance = Popen(
                             ["nsenter", "-t", str(pid), "-n",
                              "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(id), str(pid)]
                         )
                         instance_count += 1
                         print("Done bootstrapping " + container.name)
+                        stdout.flush()
                         already_bootstrapped[container.id] = emucore_instance
                     except:
                         print("Bootstrapping failed... will try again.")
+                        stdout.flush()
+                        stderr.flush()
 
-                # Check for termination
+                # Check for bootstrapper termination
                 if container.id == bootstrapper_id and container.status == "running":
-                    bootstrapper = container
-            #Retrieve return codes
+                    running += 1
+            # Do some reaping
             for key in already_bootstrapped:
                 already_bootstrapped[key].poll()
-            #Clean up and stop
-            # TODO We need to handle "ragnarok" better
-            # TODO for example if we stack rm without stopping the experiment there will be lots of zombies
-            # TODO and the gods will refuse to die cleanly
-            if bootstrapper is None:
+
+            # Clean up and stop
+            if running == 0:
                 for key in already_bootstrapped:
                     if already_bootstrapped[key].poll() is not None:
                         already_bootstrapped[key].kill()
                         already_bootstrapped[key].wait()
-                us.stop()
+                print("God terminating")
+                return
             sleep(5)
         except Exception as e:
             print(e)
+            stdout.flush()
+            stderr.flush()
             sleep(5)
             continue
 
