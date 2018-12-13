@@ -10,7 +10,7 @@
 /*PID1
  *Special init process for NEED
  *Required to prevent "ragnarok" events from leaving behind zombie containers
- *The main functionality is launching the GOD and reaping all children upon its death
+ *The main purpose is launching the GOD and reaping all children upon its death
  */
 
 int main(int argc, char** argv){
@@ -22,9 +22,9 @@ int main(int argc, char** argv){
 
 	pid_t forked_pid;
 	if(!(forked_pid = fork())){
+		setpgid(0, 0); // Place the forked process in a new group
 		execv(argv[1], argv+1);
 	}
-	setpgid(forked_pid, 0); // Place the forked process in a new group
 
 	int returnStatus = -1;
 	pid_t pid = waitpid(forked_pid, &returnStatus, 0);
