@@ -15,6 +15,7 @@ RUN pacman -Sy --noconfirm \
     bison \
     pkgconf \
     iptables \
+    iproute2 \
     gcc
 
 #RUN git clone --branch master --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
