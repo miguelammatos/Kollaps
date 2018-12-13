@@ -7,6 +7,11 @@ FROM base/archlinux:latest
 
 WORKDIR /
 
+#Location of netem distribution files on archlinux
+ENV TC_LIB_DIR "/usr/share/tc/"
+
+RUN pacman -Sy --noconfirm \
+    archlinux-keyring 
 RUN pacman -Sy --noconfirm \
     python \
     python-pip \
