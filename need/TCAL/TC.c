@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -28,7 +29,7 @@
 extern void (*usageCallback)(unsigned int, unsigned long);
 extern Destination* hostsByHandle;
 
-struct rtnl_handle rth;  //handle used by calls to tc
+struct rtnl_handle rth;  //handle used by initialization calls to tc
 struct rtnl_handle rth_persistent; //handle kept throughout emulation
 
 int hz = 0;
@@ -64,7 +65,6 @@ unsigned short freePort = 0;
 
 void TC_init(unsigned short controllPort) {
     freePort = controllPort;
-    fillNormalDist();
     tc_core_init();
     open_rtnl(&rth_persistent);
     hz = get_hz();
@@ -215,11 +215,11 @@ void TC_initDestination(Destination *dest) {
     char* loss = NULL;
     char* jitter = NULL;
     //Create the netem qdisc for emulating latency and attach it to the previous htb class
+    //Warning, if we use new netem features, double check that TC_changePacketLoss() still works (might need changes)
     ADD_DEV
     PARENT ARG(htb_class_handle)ARG("handle")ARG(netem_qdisc_handle)
     ARG("netem")ARG("delay")ARG(latency)
     if(dest->jitter > 0){
-        //TODO we have to generate the normal table ourselves and change the qdisc to include it!
         size = snprintf(NULL, 0, "%0.6fms", dest->jitter);
         jitter = (char*)malloc(sizeof(char)*(size+1));
         snprintf(jitter, size+1, "%0.6fms", dest->jitter);
@@ -387,7 +387,7 @@ void TC_updateUsage(unsigned int if_index) {
 
 void TC_changeBandwidth(Destination *dest) {
     /*Use rtnetlink to communicate with the kernel directly
-     * this should be a more efficient than calling tc
+     * this should be more efficient than calling tc
      * altough the API is not very well documented
      */
     struct {
@@ -428,7 +428,7 @@ void TC_changeBandwidth(Destination *dest) {
     opt.ceil.rate = (__u32)((ceil64 >= (1ULL << 32)) ? ~0U : ceil64);
 
     /* compute minimal allowed burst from rate; mtu is added here to make
-       sute that buffer is larger than mtu and to have some safeguard space */
+       sure that buffer is larger than mtu and to have some safeguard space */
     unsigned int mtu = 1600; /* eth packet len */
     unsigned long buffer = rate64 / hz + mtu;
     unsigned long cbuffer = ceil64 / hz + mtu;
@@ -460,6 +460,42 @@ void TC_changeBandwidth(Destination *dest) {
     addattr_l(&req.n, 3024, TCA_HTB_RTAB, rtab, 1024);
     addattr_l(&req.n, 4024, TCA_HTB_CTAB, ctab, 1024);
     tail->rta_len = (unsigned short) ((char*)NLMSG_TAIL(&req.n) - (char*)tail);
+
+    if (rtnl_talk(&rth_persistent, &req.n, NULL) < 0)
+        printf("failed to comunicate with tc\n");
+    return;
+}
+
+void TC_changePacketLoss(Destination *dest){
+    struct {
+        struct nlmsghdr	n;
+        struct tcmsg t;
+        char buf[4096];
+    } req = {};
+
+    req.n.nlmsg_len = NLMSG_LENGTH(sizeof(struct tcmsg)),
+    req.n.nlmsg_flags = NLM_F_REQUEST,
+    req.n.nlmsg_type = RTM_NEWQDISC,
+    req.t.tcm_family = AF_UNSPEC,
+    req.t.tcm_ifindex = dest->if_index;
+
+    unsigned int parent_handle = (4 << 16) | dest->handle;
+    req.t.tcm_parent = parent_handle;
+    req.t.tcm_handle = dest->handle << 16;
+
+    struct rtattr *tail = NLMSG_TAIL(&req.n);
+
+    struct tc_netem_qopt opt = { .limit = 1000 };
+    opt.loss = rint(dest->packetLossRate * UINT32_MAX);
+    //Since we are updating the opt structure, we have to fill in latency and jitter as well
+    // (distribution is not necessary however)
+    opt.latency = tc_core_time2tick(dest->latency*(TIME_UNITS_PER_SEC/1000));
+    opt.jitter = tc_core_time2tick(dest->jitter*(TIME_UNITS_PER_SEC/1000));
+
+    if (addattr_l(&req.n, 1024, TCA_OPTIONS, &opt, sizeof(opt)) < 0)
+        return;
+
+    tail->rta_len = (void *) NLMSG_TAIL(&req.n) - (void *) tail;
 
     if (rtnl_talk(&rth_persistent, &req.n, NULL) < 0)
         printf("failed to comunicate with tc\n");

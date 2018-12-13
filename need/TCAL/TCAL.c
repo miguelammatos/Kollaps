@@ -49,6 +49,13 @@ void changeBandwidth(unsigned int ip, int bandwidth){
     TC_changeBandwidth(dest);
 }
 
+void changeLoss(unsigned int ip, float packetLoss){
+    Destination* dest;
+    HASH_FIND(hh_ip, hosts, &ip, sizeof(int), dest);
+    dest->packetLossRate = packetLoss;
+    TC_changePacketLoss(dest);
+}
+
 void updateUsage(){
     netif* ifelem;
     LL_FOREACH(interfaces, ifelem){

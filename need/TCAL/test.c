@@ -28,6 +28,7 @@ int main(int argc, char** argv){
     void (*init)(short);
     void (*initDestination)(unsigned int, int, int, float, float);
     void (*changeBandwidth)(unsigned int, int);
+    void (*changeLoss)(unsigned int, float);
     void (*updateUsage)();
     void (*registerUsageCallback)(void(*callback)(unsigned int, unsigned long));
     void (*tearDown)(int);
@@ -44,6 +45,7 @@ int main(int argc, char** argv){
     *(void **) (&init)  = dlsym(handle, "init");
     *(void **) (&initDestination)  = dlsym(handle, "initDestination");
     *(void **) (&changeBandwidth)  = dlsym(handle, "changeBandwidth");
+    *(void **) (&changeLoss)  = dlsym(handle, "changeLoss");
     *(void **) (&updateUsage)  = dlsym(handle, "updateUsage");
     *(void **) (&registerUsageCallback)  = dlsym(handle, "registerUsageCallback");
     *(void **) (&tearDown)  = dlsym(handle, "tearDown");
@@ -53,15 +55,16 @@ int main(int argc, char** argv){
     int original_ip = ip;
     for(int i=0; i<5; i++){
 	ip++;
-    	initDestination(ip, 100000, 10, 0.0f, 0.0f);
+    	initDestination(ip, 100000, 10, 1.0f, 0.0f);
+	changeLoss(ip, 0.5);
     	changeBandwidth(ip, 200000);
     }
     int n = 0;
     while(1){
     	updateUsage();
-	sleep(1);
+	sleep(2);
 	n++;
-    if(n >= 5)
+    	if(n >= 15)
 	    break;
     }
     tearDown(0);
