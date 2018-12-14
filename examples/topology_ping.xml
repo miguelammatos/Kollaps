@@ -13,7 +13,7 @@
         <links>
                 <link origin="client1" dest="s1" latency="0" upload="100Mbps" download="100Mbps" network="test_overlay"/>
                 <link origin="client2" dest="s1" latency="0" upload="100Mbps" download="100Mbps" network="test_overlay"/>
-                <link origin="s1" dest="s2" latency="10" upload="50Mbps" download="50Mbps" network="test_overlay"/>
+                <link origin="s1" dest="s2" latency="10" upload="50Mbps" download="50Mbps" drop="0.5" network="test_overlay"/>
                 <link origin="s2" dest="client3" latency="0" upload="100Mbps" download="100Mbps" network="test_overlay"/>
 	</links>
 	<dynamic>
@@ -21,8 +21,8 @@
 		<schedule name="client2" time="0.0" action="join"/>
 		<schedule name="client3"  time="0.0" action="join"/>
 		
-		<schedule name="client1" time="60.0" action="leave"/>
-		<schedule name="client2" time="60.0" action="leave"/>
-		<schedule name="client3"  time="60.0" action="leave"/>
+		<schedule name="client1" time="600.0" action="leave"/>
+		<schedule name="client2" time="600.0" action="leave"/>
+		<schedule name="client3"  time="600.0" action="leave"/>
 	</dynamic>
 </experiment>

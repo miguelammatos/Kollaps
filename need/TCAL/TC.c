@@ -230,6 +230,15 @@ void TC_initDestination(Destination *dest) {
         loss = (char*)malloc(sizeof(char)*(size+1));
         snprintf(loss, size+1, "%0.6f%%", dest->packetLossRate*100);
         ARG("loss")ARG("random")ARG(loss)
+        /*char p[] = "0.00001%";
+        char r[] = "0.00001%";
+        ARG("loss")ARG("gemodel")ARG(p)ARG(r)
+         FOR FUTURE REFERENCE (regarding NEED):
+         If you want to get loss behaviour like real-world buffers filling,
+         than Gilbert model is not enough, it has to be coordinated with bw throttling.
+         TCP reacts to loss by reducing throughput, but it will always try to be on the edge of packet loss
+         if there is no loss, it will rapidly scale up again, simply using p and r will result in a lot of variation
+         but fluctuations will be very fast, (and not over long periods of time like in real life)*/
     }
     PRINT
     open_rtnl(&rth);
