@@ -49,6 +49,8 @@ def start_experiment():
     image = inspect['Image']
     image_inspect = CONTAINER.ll.inspect_image(image)
     entrypoint = image_inspect['Config']['Entrypoint']
+    if entrypoint is None:
+        entrypoint = [""]
     if cmd is None:
         cmd = image_inspect['Config']['Cmd']
     elif len(cmd) == 0:
