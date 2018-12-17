@@ -44,12 +44,13 @@ class NetGraph:
             self.network = link.network
 
     class Service(Node):
-        def __init__(self, name, image, command, shared, reuse):
+        def __init__(self, name, image, command, shared, reuse, count):
             super(NetGraph.Service, self).__init__(name, shared)
             self.image = image
             self.command = command
             self.ip = 167772161  # to be filled in later (this is just a value that can safely be converted to an IP)
             self.replica_id = 0 # to be filled in later (after we sort by ip)
+            self.replica_count = count
             self.last_bytes = 0  # number of bytes sent to this service
             self.supervisor = False
             self.supervisor_port = 0
@@ -124,8 +125,8 @@ class NetGraph:
         else:
             return []
 
-    def new_service(self, name, image, command, shared, reuse):
-        service = NetGraph.Service(name, image, command, shared, reuse)
+    def new_service(self, name, image, command, shared, reuse, count):
+        service = NetGraph.Service(name, image, command, shared, reuse, count)
         if len(self.get_nodes(name)) == 0:
             self.services[name] = [service]
         else:

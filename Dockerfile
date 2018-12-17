@@ -11,8 +11,8 @@ WORKDIR /
 ENV TC_LIB_DIR "/usr/share/tc/"
 
 RUN pacman -Sy --noconfirm \
-    archlinux-keyring 
-RUN pacman -Sy --noconfirm \
+    archlinux-keyring  && \
+    pacman -Sy --noconfirm \
     python \
     python-pip \
     make \
