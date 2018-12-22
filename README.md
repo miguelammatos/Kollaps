@@ -3,7 +3,7 @@ Decentralized container based network emulator
 
 Clone this repo with:
 ```
-git clone --branch master --depth 1 --recurse-submodules https://github.com/joaoneves792/NEED.git
+$git clone --branch master --depth 1 --recurse-submodules https://github.com/joaoneves792/NEED.git
 ```
 ## Pre-requisites
 You need a machine running Linux with a recent version of Docker installed, and python 3.
@@ -12,7 +12,7 @@ Also this machine has to be part of a Docker Swarm.
 
 To create a Swarm of 1 machine execute:
 ```
-docker swarm init
+$docker swarm init
 ```
 
 ## Install instructions
@@ -24,7 +24,7 @@ Installing the python package will give you access to the NEEDdeploymentGenerato
 
 You also need to build the need docker image, to do so execute on this folder:
 ```
-docker build --rm -t need:1.1 .
+$docker build --rm -t need:1.1 .
 ```
 
 ## How to use
@@ -45,19 +45,19 @@ To avoid changing the xml example files the images should be built with the foll
 
 to build each image cd into its respective folder and execute:
 ```
-docker build -t <Tag> .
+$docker build -t <Tag> .
 ```
 
 Experiments are described as xml files that can be converted into Docker Swarm Compose files with the NEEDdeploymentGenerator command.
 
 Example:
 ```
-NEEDdeploymentGenerator topology5.xml > topology5.yaml
+$NEEDdeploymentGenerator topology5.xml > topology5.yaml
 ```
 
 The experiment can then be deployed to the Swarm with:
 ```
-docker stack deploy -c topology5.yaml 5
+$docker stack deploy -c topology5.yaml 5
 ```
 
 (Where 5 is an arbitrary name for the stack you are deploying)
@@ -77,7 +77,7 @@ Stopping an experiment will stop the applications and ensure a clean shutdown of
 
 After stopping an experiment you can remove the containers with:
 ```
-docker stack rm 5
+$docker stack rm 5
 ```
 
 ## Note
