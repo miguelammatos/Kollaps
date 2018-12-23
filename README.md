@@ -3,7 +3,7 @@ Decentralized container based network emulator
 
 Clone this repo with:
 ```
-$git clone --branch master --depth 1 --recurse-submodules https://github.com/joaoneves792/NEED.git
+$git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/NEED.git
 ```
 ## Pre-requisites
 You need a machine running Linux with a recent version of Docker installed, and python 3.
