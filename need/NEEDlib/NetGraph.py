@@ -2,6 +2,7 @@ from need.NEEDlib.utils import fail, ip2int
 from time import sleep
 from math import sqrt
 from os import environ
+from threading import Lock
 import re
 
 import dns.resolver
@@ -28,7 +29,6 @@ class NetGraph:
         self.paths = {}  # type: Dict[NetGraph.Node,NetGraph.Path]
         self.paths_by_id = {} # type: Dict[int, NetGraph.Path]
 
-        self.reference_bandwidth = 0  # Maximum bandwidth on the topology, used for calculating link cost
         self.bandwidth_re = re.compile("([0-9]+)([KMG])bps")
         self.bootstrapper = ""  # type: str
 
@@ -64,6 +64,7 @@ class NetGraph:
     class Link:
         # Links are unidirectional
         def __init__(self, source, destination, latency, jitter, drop, bandwidth, bps, network):
+            self.lock = Lock()
             self.index = 0
             self.source = source  # type: NetGraph.Node
             self.destination = destination  # type: NetGraph.Node
@@ -86,36 +87,42 @@ class NetGraph:
         def __init__(self, links, id, used_bandwidth=0):
             self.links = links  # type: List[NetGraph.Link]
             self.id = id
-            total_latency = 0
+            self.lock = Lock()
+            self.latency = 0
+            self.RTT = 0
+            self.drop = 0.0
+            self.max_bandwidth = None
+            self.jitter = 0
+            self.used_bandwidth = used_bandwidth
+
+            self.calculate_end_to_end_properties()
+            self.current_bandwidth = self.max_bandwidth
+
+        def calculate_end_to_end_properties(self):
             total_not_drop_probability = 1.0
-            max_bandwidth = None
-            jitter = 0
             for link in self.links:
                 try:
-                    if max_bandwidth is None:
-                        max_bandwidth = link.bandwidth_bps
-                    if link.bandwidth_bps < max_bandwidth:
-                        max_bandwidth = link.bandwidth_bps
+                    #Pick the smallest bandwidth
+                    if self.max_bandwidth is None:
+                        self.max_bandwidth = link.bandwidth_bps
+                    if link.bandwidth_bps < self.max_bandwidth:
+                        self.max_bandwidth = link.bandwidth_bps
                     # Accumulate jitter by summing the variances
-                    jitter = sqrt( (jitter*jitter)+(link.jitter*link.jitter))
-                    total_latency += int(link.latency)
+                    self.jitter = sqrt( (self.jitter*self.jitter)+(link.jitter*link.jitter))
+                    # Latency is just a sum
+                    self.latency += int(link.latency)
+                    # Drop is product of reverse probabilities reversed
+                    # basically calculate the probability of not dropping across the entire path
+                    # and then invert it
+                    # Problem is similar to probability of getting at least one 6 in multiple dice rolls
                     total_not_drop_probability *= (1.0-float(link.drop))
                 except:
                     fail("Provided link data is not valid: "
                          + str(link.latency) + "ms "
                          + str(link.drop) + "drop rate "
                          + link.bandwidth)
-            self.max_bandwidth = max_bandwidth  # in bps
-            self.current_bandwidth = max_bandwidth
-            self.latency = total_latency
-            self.jitter = jitter
             self.RTT = self.latency*2
-            # Product of reverse probabilities reversed
-            # basically calculate the probability of not dropping across the entire path
-            # and then invert it
-            # Problem is similar to probability of getting at least one 6 in multiple dice rolls
             self.drop = (1.0-total_not_drop_probability)
-            self.used_bandwidth = used_bandwidth
 
     def get_nodes(self, name):
         if name in self.services:
@@ -153,8 +160,6 @@ class NetGraph:
         for node in source_nodes:
             for dest in destination_nodes:
                 bandwidth_bps = self.bandwidth_in_bps(bandwidth)
-                if self.reference_bandwidth < bandwidth_bps:
-                    self.reference_bandwidth = bandwidth_bps
                 link = NetGraph.Link(node, dest, latency, jitter, drop, bandwidth, bandwidth_bps, network)
                 link.index = self.link_counter
                 self.link_counter += 1
@@ -207,9 +212,11 @@ class NetGraph:
 
     def calculate_shortest_paths(self):
         # Dijkstra's shortest path implementation
+        # Distance is number of hops
         if self.root is None:
             fail("Root of the tree has not been defined.")
 
+        inf = float("inf")
         dist = {}
         Q = []
         for service in self.services:
@@ -217,14 +224,14 @@ class NetGraph:
             for host in hosts:
                 distance = 0
                 if host != self.root:
-                    distance = self.reference_bandwidth
+                    distance = inf
                 entry = [distance, host]
                 Q.append(entry)
                 dist[host] = distance
         for bridge in self.bridges:
             b = self.bridges[bridge][0]
-            Q.append([self.reference_bandwidth, b])
-            dist[b] = self.reference_bandwidth
+            Q.append([inf, b])
+            dist[b] = inf
 
         self.paths[self.root] = NetGraph.Path([], self.path_counter)
         self.paths_by_id[self.path_counter] = self.paths[self.root]
@@ -233,7 +240,7 @@ class NetGraph:
             Q.sort(key=lambda ls: ls[0])
             u = Q.pop(0)[1]  # type: NetGraph.Node
             for link in u.links:
-                alt = dist[u] + (self.reference_bandwidth/link.bandwidth_bps)
+                alt = dist[u] + 1
                 if alt < dist[link.destination]:
                     node = link.destination
                     dist[node] = alt

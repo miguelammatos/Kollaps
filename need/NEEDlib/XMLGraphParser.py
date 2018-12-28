@@ -305,7 +305,7 @@ class XMLGraphParser:
         for service in self.supervisors:
             self.graph.set_supervisor(service)
 
-    def parse_schedule(self, service):
+    def parse_schedule(self, service, graph):
         """
         :param service: NetGraph.Service
         :return:

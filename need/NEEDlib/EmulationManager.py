@@ -35,7 +35,8 @@ def apply_flow(flow, g):
     rtt = 0
     for index in link_indices:
         link = graph.links[index]
-        rtt += (link.latency*2)
+        with link.lock:
+            rtt += (link.latency*2)
     # Add it to the link's flows
     for index in link_indices:
         graph.links[index].flows.append((rtt, bandwidth))

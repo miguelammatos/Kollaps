@@ -71,6 +71,27 @@ def change_bandwidth(service, new_bandwidth):
         if not PEState.shutdown and PEState.TCAL:
             PEState.TCAL.changeBandwidth(service.ip, int(new_bandwidth/1000))
 
+def change_loss(service, new_loss):
+    """
+    :param service: NetGraph.Service
+    :param new_loss: float
+    :return:
+    """
+    with PEState.PathLock:
+        if not PEState.shutdown and PEState.TCAL:
+            PEState.TCAL.changeLoss(service.ip, c_float(new_loss))
+
+def change_latency(service, latency, jitter):
+    """
+    :param service:
+    :param latency:
+    :param jitter:
+    :return:
+    """
+    pass
+    #with PEState.PathLock:
+    #    if not PEState.shutdown and PEState.TCAL:
+    #        PEState.TCAL.changeLatency(service.ip, latency, c_float(jitter))
 
 def register_usage_callback(callback):
     """

@@ -64,12 +64,11 @@ def main():
         fail("Failed to identify current service instance in topology!")
     message("We are " + graph.root.name + "@" + ownIP)
 
-    message("Parsing dynamic event schedule...")
-    scheduler = parser.parse_schedule(graph.root)
-
-
     message("Calculating shortest paths...")
     graph.calculate_shortest_paths()
+
+    message("Parsing dynamic event schedule...")
+    scheduler = parser.parse_schedule(graph.root, graph)
 
     signal(SIGTERM, lambda signum, frame: exit(0))
 
