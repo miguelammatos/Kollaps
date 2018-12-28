@@ -100,9 +100,10 @@ class NetGraph:
 
         def calculate_end_to_end_properties(self):
             total_not_drop_probability = 1.0
+            self.max_bandwidth = None
             for link in self.links:
                 try:
-                    #Pick the smallest bandwidth
+                    # Pick the smallest bandwidth
                     if self.max_bandwidth is None:
                         self.max_bandwidth = link.bandwidth_bps
                     if link.bandwidth_bps < self.max_bandwidth:

@@ -1,4 +1,4 @@
-from need.NEEDlib.utils import start_experiment, stop_experiment, crash_experiment
+from need.NEEDlib.utils import start_experiment, stop_experiment, crash_experiment, message
 from need.NEEDlib.PathEmulation import disconnect, reconnect, change_latency, change_loss
 from need.NEEDlib.NetGraph import NetGraph
 
@@ -36,27 +36,35 @@ class EventScheduler:
         links = []
         paths = []
         for l in graph.links:
-            if l.source == origin and l.destination == destination:
+            if l.source.name == origin and l.destination.name == destination:
                 links.append(l)
 
-        for path in graph.paths:
+        for key in graph.paths:
+            if not isinstance(key, NetGraph.Service): # If we get a path to a bridge, ignore
+                continue
+            path = graph.paths[key]
             for link in links:
                 for l in path.links:
                     if l == link:
                         paths.append(path)  # There wont be duplicated paths since there cant be multiple changed links
                         break               # in the same path (replicated links must be on different paths)
 
+        for link in links:
+            message("Link " + link.source.name + ":" + link.destination.name + " scheduled to change at " + str(time) + " bw" + str(bandwidth))
+        for path in paths:
+            message("Path to" + path.links[-1].destination.name + " scheduled to change at " + str(time))
+
         self.events.append(Timer(time, link_change,
-                                 [links, paths, graph.bandwidth_in_bps(bandwidth), latency, jitter, drop]))
+                                 [links, paths, bandwidth, latency, jitter, drop]))
 
 
 def link_change(links, paths, bandwidth_bps, latency, jitter, drop):
     for l in links:
         with l.lock:
-            l.bandwidth_bps = bandwidth_bps
-            l.latency = int(latency)
-            l.jitter = float(jitter)
-            l.drop = float(drop)
+            l.bandwidth_bps = bandwidth_bps if bandwidth_bps >= 0 else l.bandwidth_bps
+            l.latency = int(latency) if latency >= 0 else l.latency
+            l.jitter = float(jitter) if jitter >= 0 else l.jitter
+            l.drop = float(drop) if drop >= 0 else l.drop
 
     for path in paths:
         with path.lock:

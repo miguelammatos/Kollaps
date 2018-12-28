@@ -75,7 +75,7 @@ def mock_change_bandwidth(service, new_bandwidth):
 
 
 class MockFlowDisseminator:
-    def __init__(self, flow_collector, graph):
+    def __init__(self, flow_collector, graph, event_scheduler, worker):
         self.graph = graph  # type: NetGraph
         self.flow_collector = flow_collector
 
@@ -132,6 +132,9 @@ class MockFlowDisseminator:
         #if self.concurrency_timer > 0:
         Timer(0.05 + uniform(-0.005, 0.005), self.receive_flows, args=([],)).start()
 
+def mock_register_callback(callback):
+    pass
+
 def setup_mocking():
     PathEmulation.init = mock_init
     PathEmulation.initialize_path = mock_initialize_path
@@ -154,7 +157,8 @@ def main():
 
     graph = NetGraph()
 
-    XMLGraphParser(topology_file, graph).fill_graph()
+    parser = XMLGraphParser(topology_file, graph)
+    parser.fill_graph()
     print("Done parsing topology")
 
     #__debug_print_paths(graph)
@@ -204,7 +208,10 @@ def main():
             print("   " + link.source.name + " hop " + link.destination.name + " i:" + str(link.index))
 
     print("Initializing network emulation conditions...")
-    manager = EmulationManager(graph)
+
+    scheduler = parser.parse_schedule(graph.root, graph)
+
+    manager = EmulationManager(graph, scheduler)
     manager.initialize()
 
     print("Starting experiment!")

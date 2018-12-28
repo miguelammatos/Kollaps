@@ -59,7 +59,7 @@ class CommunicationsManager:
     i_SIZE = struct.calcsize("<1i")
     MAX_WORKERS = 10
 
-    def __init__(self, flow_collector, graph, event_scheduler, worker):
+    def __init__(self, flow_collector, graph, event_scheduler):
         self.graph = graph  # type: NetGraph
         self.scheduler = event_scheduler  # type: EventScheduler
         self.flow_collector = flow_collector
@@ -68,7 +68,6 @@ class CommunicationsManager:
         self.consumed = 0
         self.largest_produced_gap = -1
         self.stop_lock = Lock()
-        self.emulation_worker = worker  # type: Pool
 
         link_count = len(self.graph.links)
         if link_count <= BYTE_LIMIT:
@@ -205,8 +204,6 @@ class CommunicationsManager:
                         with self.stop_lock:
                             self.process_pool.terminate()
                             self.process_pool.join()
-                            self.emulation_worker.terminate()
-                            self.emulation_worker.join()
                             self.dashboard_socket.close()
                             for s in broadcast_sockets:
                                 s.close()

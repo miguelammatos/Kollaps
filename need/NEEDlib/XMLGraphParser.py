@@ -456,8 +456,37 @@ class XMLGraphParser:
                     fail("Unrecognized action: " + event.attrib['action'] +
                          " , allowed actions are join, leave, crash, disconnect, reconnect")
 
+            elif 'origin' in event.attrib and 'dest' in event.attrib and 'time' in event.attrib:
+                # parse time of event
+                time = 0.0
+                try:
+                    time = float(event.attrib['time'])
+                    if time < 0.0:
+                        fail("time attribute must be a positive number")
+                except ValueError as e:
+                    fail("time attribute must be a valid real number")
+
+                origin = event.attrib['origin']
+                destination = event.attrib['dest']
+                bandwidth = -1
+                if 'upload' in event.attrib:
+                    bandwidth = graph.bandwidth_in_bps(event.attrib['upload'])
+                latency = -1
+                if 'latency' in event.attrib:
+                    latency = int(event.attrib['latency'])
+                drop = -1
+                if 'drop' in event.attrib:
+                    drop = float(event.attrib['drop'])
+                jitter = -1
+                if 'jitter' in event.attrib:
+                    jitter = float(event.attrib['jitter'])
+
+                scheduler.schedule_link_change(time, graph, origin, destination, bandwidth, latency, jitter, drop)
+
             else:
-                fail('<schedule> must have name, time and action attributes')
+                fail(
+                    '<schedule> must have either name, time and action attributes,' +
+                    ' or link origin dest and properties attributes')
 
         # deal with auto join
         if first_join < 0.0:
