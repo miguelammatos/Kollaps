@@ -25,9 +25,9 @@
 		<schedule name="client3" time="0.0" action="join"/>
 		<schedule name="server"  time="0.0" action="join" amount="3"/>
 		
-		<schedule name="client1" time="10.0" action="crash"/>
-		<schedule name="client2" time="10.0" action="crash"/>
-		<schedule name="client3" time="10.0" action="crash"/>
-		<schedule name="server"  time="10.0" action="leave" amount="3"/>
+		<schedule name="client1" time="30.0" action="crash"/>
+		<schedule name="client2" time="30.0" action="crash"/>
+		<schedule name="client3" time="30.0" action="crash"/>
+		<schedule name="server"  time="30.0" action="leave" amount="3"/>
 	</dynamic>
 </experiment>

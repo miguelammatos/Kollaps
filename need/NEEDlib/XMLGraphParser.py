@@ -366,7 +366,6 @@ class XMLGraphParser:
                     amount = int(event.attrib['amount'])
 
                 # parse action
-                # join always adds to the end of active replicas
                 if event.attrib['action'] == 'join':
                     for i in range(amount):
                         available = False
@@ -390,7 +389,6 @@ class XMLGraphParser:
                         if first_join < 0.0:
                             first_join = time
 
-                # leave leaves from the end if reusing and from beginning if not reusing
                 elif event.attrib['action'] == 'leave' or event.attrib['action'] == 'crash':
                     for i in range(amount):
                         up = False
@@ -416,7 +414,6 @@ class XMLGraphParser:
                         if first_leave > time:
                             first_leave = time
 
-                # Disconnect/Reconnect always does so from the beginning of active replicas
                 elif event.attrib['action'] == 'reconnect':
                     for i in range(amount):
                         disconnected = False
