@@ -144,7 +144,7 @@ class EmulationManager:
 
                     spare_bw -= flow[BW]
                     # Check if a flow is "hungry" (wants more than its allocated share)
-                    if flow[BW] > max_bandwidth_on_link[i] - max_bandwidth_on_link[i]*EmulationManager.ERROR_MARGIN:
+                    if flow[BW] > max_bandwidth_on_link[i]:
                         hungry_usage_sum += flow[BW]/link.bandwidth_bps
 
                 # 2nd try to use that spare bw
