@@ -55,6 +55,17 @@ Example:
 $NEEDdeploymentGenerator topology5.xml > topology5.yaml
 ```
 
+This experiment requires that a network named "test_overlay" exists.
+To create it run:
+```
+docker network create --driver=overlay --subnet=10.1.0.0/24 test_overlay
+```
+
+This example uses the overlay driver, but ipvlan/macvlan networks are also supported.
+
+Make sure to define a subnet that does not collide with other networks on your setup.
+
+
 The experiment can then be deployed to the Swarm with:
 ```
 $docker stack deploy -c topology5.yaml 5
