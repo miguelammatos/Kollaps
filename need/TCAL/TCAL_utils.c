@@ -30,7 +30,7 @@ struct qdisc_util;
 //Get the pointers to the tc parsing functions
 extern struct qdisc_util prio_qdisc_util;
 extern struct qdisc_util htb_qdisc_util;
-extern struct qdisct_util netem_qdisc_util;
+extern struct qdisc_util netem_qdisc_util;
 extern struct filter_util u32_filter_util;
 
 #define QDISC_COUNT 3
