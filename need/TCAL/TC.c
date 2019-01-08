@@ -475,7 +475,7 @@ void TC_changeBandwidth(Destination *dest) {
     return;
 }
 
-void TC_changePacketLoss(Destination *dest){
+void TC_changeNetem(Destination *dest){
     struct {
         struct nlmsghdr	n;
         struct tcmsg t;

@@ -53,7 +53,15 @@ void changeLoss(unsigned int ip, float packetLoss){
     Destination* dest;
     HASH_FIND(hh_ip, hosts, &ip, sizeof(int), dest);
     dest->packetLossRate = packetLoss;
-    TC_changePacketLoss(dest);
+    TC_changeNetem(dest);
+}
+
+void changeLatency(unsigned int ip, int latency, float jitter){
+    Destination* dest;
+    HASH_FIND(hh_ip, hosts, &ip, sizeof(int), dest);
+    dest->latency = latency;
+    dest->jitter = jitter;
+    TC_changeNetem(dest);
 }
 
 void updateUsage(){

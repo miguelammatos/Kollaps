@@ -89,9 +89,9 @@ def change_latency(service, latency, jitter):
     :return:
     """
     pass
-    #with PEState.PathLock:
-    #    if not PEState.shutdown and PEState.TCAL:
-    #        PEState.TCAL.changeLatency(service.ip, latency, c_float(jitter))
+    with PEState.PathLock:
+        if not PEState.shutdown and PEState.TCAL:
+            PEState.TCAL.changeLatency(service.ip, latency, c_float(jitter))
 
 def register_usage_callback(callback):
     """

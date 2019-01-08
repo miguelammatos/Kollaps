@@ -45,7 +45,7 @@ class EventScheduler:
             path = graph.paths[key]
             for link in links:
                 for l in path.links:
-                    if l == link:
+                    if l.index == link.index:
                         paths.append(path)  # There wont be duplicated paths since there cant be multiple changed links
                         break               # in the same path (replicated links must be on different paths)
 
@@ -75,4 +75,9 @@ def link_change(links, paths, bandwidth_bps, latency, jitter, drop):
             change_latency(service, path.latency, path.jitter)
             # We dont explicitely change bandwidth, the emulation manager will handle that for us
 
+            '''
+            message("Path " + path.links[0].source.name + " to " + path.links[-1].destination.name +
+                    " changed to bw:" + str(path.max_bandwidth) + " rtt:"+str(path.RTT)
+                    + " j:" + str(path.jitter) + " l:" + str(path.drop))
+            '''
 

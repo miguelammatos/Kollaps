@@ -27,8 +27,12 @@
 		<!--<schedule origin="s1" dest="s2" time="5.0" drop="0.9999"/>
 		  <schedule origin="s1" dest="s2" time="10.0" drop="0.0"/>-->
 
-		<schedule origin="client3" dest="s1" time="30.0" upload="100Mbps"/>
-
+		<schedule origin="client3" dest="s1" time="10.0" upload="100Mbps"/>
+		<schedule origin="client3" dest="s1" time="20.0" upload="10Mbps"/>
+		
+		<schedule origin="client2" dest="s1" time="20.0" latency="10"/>
+		<schedule origin="s1" dest="client2" time="20.0" latency="10"/>
+		
 		<schedule name="client1" time="60.0" action="crash"/>
 		<schedule name="client2" time="60.0" action="crash"/> 
 		<schedule name="client3" time="60.0" action="crash"/>

@@ -131,32 +131,28 @@ class EmulationManager:
                 # calculate our bandwidth
                 max_bandwidth_on_link.append(((1.0/link.flows[0][RTT])/rtt_reverse_sum)*link.bandwidth_bps)
 
-                # Maximize link utilization
-                maximized_bw = max_bandwidth_on_link[0]
+                # Maximize link utilization to 100%
                 spare_bw = link.bandwidth_bps - max_bandwidth_on_link[0]
-                our_share = max_bandwidth_on_link[0]/link.bandwidth_bps
+                our_share = max_bandwidth_on_link[0] / link.bandwidth_bps
                 hungry_usage_sum = our_share  # We must be before the loop to avoid division by zero
-                # 1st calculate spare bw
                 for i in range(1, len(link.flows)):
                     flow = link.flows[i]
                     # calculate the bandwidth for everyone
-                    max_bandwidth_on_link.append(((1.0/flow[RTT])/rtt_reverse_sum)*link.bandwidth_bps)
+                    max_bandwidth_on_link.append(((1.0 / flow[RTT]) / rtt_reverse_sum) * link.bandwidth_bps)
 
-                    spare_bw -= flow[BW]
                     # Check if a flow is "hungry" (wants more than its allocated share)
                     if flow[BW] > max_bandwidth_on_link[i]:
-                        hungry_usage_sum += flow[BW]/link.bandwidth_bps
+                        spare_bw -= max_bandwidth_on_link[i]
+                        hungry_usage_sum += max_bandwidth_on_link[i] / link.bandwidth_bps
+                    else:
+                        spare_bw -= flow[BW]
 
-                # 2nd try to use that spare bw
-                normalized_share = our_share/hungry_usage_sum  # we get a share of the spare proportional to our RTT
-                maximized_bw += (normalized_share*spare_bw)
-                spare_bw -= (normalized_share*spare_bw)
-                if spare_bw < -link.bandwidth_bps*EmulationManager.ERROR_MARGIN:
-                    maximized_bw = max_bandwidth_on_link[0]
+                normalized_share = our_share / hungry_usage_sum  # we get a share of the spare proportional to our RTT
+                max_bandwidth_on_link[0] += (normalized_share * spare_bw)
 
                 # If this link restricts us more than previously try to assume this bandwidth as the max
-                if maximized_bw < max_bandwidth:
-                    max_bandwidth = maximized_bw
+                if max_bandwidth_on_link[0] < max_bandwidth:
+                    max_bandwidth = max_bandwidth_on_link[0]
 
             # Apply the new bandwidth on this path
             if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
