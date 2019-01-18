@@ -5,6 +5,9 @@ Clone this repo with:
 ```
 $git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/NEED.git
 ```
+
+This readme is a quick introduction to get NEED running, for further reference see the [NEED Wiki](https://github.com/miguelammatos/NEED/wiki)
+
 ## Pre-requisites
 You need a machine running Linux with a recent version of Docker installed, and python 3.
 
