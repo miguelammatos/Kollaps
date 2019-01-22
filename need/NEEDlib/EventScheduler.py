@@ -3,6 +3,7 @@ from need.NEEDlib.PathEmulation import disconnect, reconnect, change_latency, ch
 from need.NEEDlib.NetGraph import NetGraph
 
 from threading import Timer
+from copy import copy
 
 import sys
 if sys.version_info >= (3, 0):
@@ -35,6 +36,7 @@ class EventScheduler:
     def schedule_link_change(self, time, graph, origin, destination, bandwidth, latency, jitter, drop):
         links = []
         paths = []
+        new_paths = []
         for l in graph.links:
             if l.source.name == origin and l.destination.name == destination:
                 links.append(l)
@@ -44,10 +46,24 @@ class EventScheduler:
                 continue
             path = graph.paths[key]
             for link in links:
-                for l in path.links:
+                for i, l in enumerate(path.links):
                     if l.index == link.index:
                         paths.append(path)  # There wont be duplicated paths since there cant be multiple changed links
-                        break               # in the same path (replicated links must be on different paths)
+                        new_path = copy(path) # in the same path (replicated links must be on different paths)
+
+                        # Pre-compute the path properties
+                        new_path.links = copy(path.links)
+                        new_path.links[i] = copy(l)
+
+                        new_l = new_path.links[i]
+                        new_l.bandwidth_bps = bandwidth if bandwidth >= 0 else new_l.bandwidth_bps
+                        new_l.latency = int(latency) if latency >= 0 else new_l.latency
+                        new_l.jitter = float(jitter) if jitter >= 0 else new_l.jitter
+                        new_l.drop = float(drop) if drop >= 0 else new_l.drop
+                        new_path.calculate_end_to_end_properties()
+                        new_paths.append(new_path)
+                        break
+
 
         for link in links:
             message("Link " + link.source.name + ":" + link.destination.name + " scheduled to change at " + str(time) + " bw" + str(bandwidth))
@@ -55,10 +71,10 @@ class EventScheduler:
             message("Path to" + path.links[-1].destination.name + " scheduled to change at " + str(time))
 
         self.events.append(Timer(time, link_change,
-                                 [links, paths, bandwidth, latency, jitter, drop]))
+                                 [links, paths, new_paths, bandwidth, latency, jitter, drop]))
 
 
-def link_change(links, paths, bandwidth_bps, latency, jitter, drop):
+def link_change(links, paths, new_paths, bandwidth_bps, latency, jitter, drop):
     for l in links:
         with l.lock:
             l.bandwidth_bps = bandwidth_bps if bandwidth_bps >= 0 else l.bandwidth_bps
@@ -66,9 +82,14 @@ def link_change(links, paths, bandwidth_bps, latency, jitter, drop):
             l.jitter = float(jitter) if jitter >= 0 else l.jitter
             l.drop = float(drop) if drop >= 0 else l.drop
 
-    for path in paths:
+    for i, path in enumerate(paths):
         with path.lock:
-            path.calculate_end_to_end_properties()
+            # Apply the precomputed path properties
+            path.jitter = new_paths[i].jitter
+            path.latency = new_paths[i].latency
+            path.drop = new_paths[i].drop
+            path.RTT = new_paths[i].RTT
+            path.max_bandwidth = new_paths[i].max_bandwidth
 
             service = path.links[-1].destination
             change_loss(service, path.drop)
@@ -80,4 +101,5 @@ def link_change(links, paths, bandwidth_bps, latency, jitter, drop):
                     " changed to bw:" + str(path.max_bandwidth) + " rtt:"+str(path.RTT)
                     + " j:" + str(path.jitter) + " l:" + str(path.drop))
             '''
+
 
