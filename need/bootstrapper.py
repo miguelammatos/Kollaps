@@ -35,13 +35,14 @@ def main():
                     for container in containers:
                         if "boot"+label in container.labels:
                             us = container
+                            print("[bootstrapper] us: " + str(us))
                     sleep(1)
 
                 boot_image = us.image
 
                 inspect_result = LowLevelClient.inspect_container(us.id)
                 env = inspect_result["Config"]["Env"]
-
+                print("[bootstrapper] env: " + str(env))
                 # create a "God" container that is in the host's Pid namespace
                 client.containers.run(image=boot_image,
                                       command=["-g", label, str(us.id)],
@@ -68,6 +69,7 @@ def main():
     while True:
         try:
             bootstrapper_id = argv[3]
+            print("[god] bootstrapper_id: " + argv[3]) #[god] bootstrapper_id: 1c532f0685be20a4f7e108497f75d75ed7bdebff7e0cc3bb45fb9f00baaf5aa6
             bootstrapper_pid = LowLevelClient.inspect_container(bootstrapper_id)["State"]["Pid"]
             Popen(["/bin/sh", "-c",
                   "nsenter -t " + str(bootstrapper_pid) + " -m cat " + TOPOLOGY + " | cat > " + TOPOLOGY]
@@ -101,6 +103,7 @@ def main():
                         id = container.id
                         inspect_result = LowLevelClient.inspect_container(id)
                         pid = inspect_result["State"]["Pid"]
+                        print("[god] container with id  " + str(id) + " has PID " + str(pid)) #[god] container with id  85ffcc44b2fc45ced4f596dba4af14ae18d3e8cd71da771a7c5b743faa0bb143 has PID 3137
                         print("Bootstrapping " + container.name + " ...")
                         stdout.flush()
 
