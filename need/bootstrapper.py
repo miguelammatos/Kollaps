@@ -1,13 +1,12 @@
 #! /usr/bin/python3
 
-import docker
-# from docker.types import Mount
+from docker import APIClient
+from kubernetes import client, config
 from time import sleep
 from signal import pause
 from sys import argv, stdout, stderr
 from subprocess import Popen
 # from shutil import copy
-
 
 def main():
     DOCKER_SOCK = "/var/run/docker.sock"
@@ -20,67 +19,23 @@ def main():
 
     mode = argv[1]
     label = argv[2]
+    god_id = None #get this, it will be argv[3]
 
     #Connect to the local docker daemon
-    client = docker.DockerClient(base_url='unix:/' + DOCKER_SOCK)
-    LowLevelClient = docker.APIClient(base_url='unix:/' + DOCKER_SOCK)
+    config.load_kube_config()
+    kubeAPIInstance = client.CoreV1Api()
+    LowLevelClient = APIClient(base_url='unix:/' + DOCKER_SOCK)
 
-    if mode == "-s":
-        while True:
-            try:
-                #If we are bootstrapper:
-                us = None
-                while not us:
-                    containers = client.containers.list()
-                    for container in containers:
-                        if "boot"+label in container.labels:
-                            us = container
-                            print("[bootstrapper] us: " + str(us))
-                    sleep(1)
-
-                boot_image = us.image
-
-                inspect_result = LowLevelClient.inspect_container(us.id)
-                env = inspect_result["Config"]["Env"]
-                print("[bootstrapper] env: " + str(env))
-                # create a "God" container that is in the host's Pid namespace
-                client.containers.run(image=boot_image,
-                                      command=["-g", label, str(us.id)],
-                                      privileged=True,
-                                      pid_mode="host",
-                                      remove=True,
-                                      environment=env,
-                                      # volumes={DOCKER_SOCK: {'bind': DOCKER_SOCK, 'mode': 'rw'}},
-                                      volumes_from=[us.id],
-                                      # network_mode="container:"+us.id,  # share the network stack with this container
-                                      labels=["god"+label],
-                                      detach=True)
-                                      #stderr=True,
-                                      #stdout=True)
-                pause()
-                return
-            except Exception as e:
-                print(e)
-                sleep(5)
-                continue  # If we get any exceptions try again
-
-    # We are the god container
-    # First thing to do is copy over the topology
-    while True:
-        try:
-            bootstrapper_id = argv[3]
-            print("[god] bootstrapper_id: " + argv[3]) #[god] bootstrapper_id: 1c532f0685be20a4f7e108497f75d75ed7bdebff7e0cc3bb45fb9f00baaf5aa6
-            bootstrapper_pid = LowLevelClient.inspect_container(bootstrapper_id)["State"]["Pid"]
-            Popen(["/bin/sh", "-c",
-                  "nsenter -t " + str(bootstrapper_pid) + " -m cat " + TOPOLOGY + " | cat > " + TOPOLOGY]
-                  ).wait()
-            break
-        except Exception as e:
-            print(e)
-            stdout.flush()
-            stderr.flush()
-            sleep(5)
-            continue
+    try:
+        while not god_id:
+            need_pods = kubeAPIInstance.list_namespaced_pod('default')
+            for pod in need_pods.items:
+                if "boot"+label in pod.metadata.labels:
+                    god_id = pod.status.container_statuses[0].container_id[9:]
+    except Exception as e:
+        print(e)
+        stdout.flush()
+        stderr.flush()
 
     # We are finally ready to proceed
     print("Bootstrapping all local containers with label " + label)
@@ -94,34 +49,29 @@ def main():
             running = 0  # running container counter, we stop the god if there are 0 same experiment containers running
 
             # check if containers need bootstrapping
-            containers = client.containers.list()
-            for container in containers:
-                if label in container.labels:
+            need_pods = kubeAPIInstance.list_namespaced_pod('default')
+            for pod in need_pods.items:
+                container_id = pod.status.container_statuses[0].container_id[9:]
+                if label in pod.metadata.labels:
                     running += 1
-                if label in container.labels and container.id not in already_bootstrapped and container.status == "running":
+                if label in pod.metadata.labels and container_id not in already_bootstrapped and pod.status.container_statuses[0].state.running != None:
                     try:
-                        id = container.id
-                        inspect_result = LowLevelClient.inspect_container(id)
-                        pid = inspect_result["State"]["Pid"]
-                        print("[god] container with id  " + str(id) + " has PID " + str(pid)) #[god] container with id  85ffcc44b2fc45ced4f596dba4af14ae18d3e8cd71da771a7c5b743faa0bb143 has PID 3137
-                        print("Bootstrapping " + container.name + " ...")
-                        stdout.flush()
-
+                        container_pid = LowLevelClient.inspect_container(container_id)["State"]["Pid"]
                         emucore_instance = Popen(
-                            ["nsenter", "-t", str(pid), "-n",
-                             "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(id), str(pid)]
+                            ["nsenter", "-t", str(container_pid), "-n",
+                             "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(container_id), str(container_pid)]
                         )
                         instance_count += 1
-                        print("Done bootstrapping " + container.name)
+                        print("Done bootstrapping " + pod.metadata.name)
+                        already_bootstrapped[container_pid] = emucore_instance
                         stdout.flush()
-                        already_bootstrapped[container.id] = emucore_instance
-                    except:
+                    except Exception as e:
                         print("Bootstrapping failed... will try again.")
                         stdout.flush()
                         stderr.flush()
 
                 # Check for bootstrapper termination
-                if container.id == bootstrapper_id and container.status == "running":
+                if container_id == god_id and pod.status.container_statuses[0].state.running != None:
                     running += 1
             # Do some reaping
             for key in already_bootstrapped:
@@ -142,7 +92,6 @@ def main():
             stderr.flush()
             sleep(5)
             continue
-
 
 if __name__ == '__main__':
     main()
