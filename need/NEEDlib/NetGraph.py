@@ -1,11 +1,10 @@
+from kubernetes import client, config
 from need.NEEDlib.utils import fail, ip2int
 from time import sleep
 from math import sqrt
 from os import environ
 from threading import Lock
 import re
-
-import dns.resolver
 
 import sys
 if sys.version_info >= (3, 0):
@@ -183,28 +182,27 @@ class NetGraph:
             return int(base) * 1000 * 1000 * 1000
 
     def resolve_hostnames(self):
-        # python's built in address resolver looks in /etc/hosts first
-        # this is a problem since services with multiple replicas (same hostname)
-        # will only have ONE entry in /etc/hosts, so the other hosts will never be found...
-        # Solution: forcefully use dns queries that skip /etc/hosts (this pulls the dnspython dependency...)
-
-        # Moreover, in some scenarios the /etc/resolv.conf is broken inside the containers
-        # So to get the names to resolve properly we need to force to use dockers internal nameserver
-        # 127.0.0.11
+        # kubernetes version
+        # we are only talking to the kubernetes API
 
         experimentUUID = environ.get('NEED_UUID', '')
-        docker_resolver = dns.resolver.Resolver(configure=False)
-        docker_resolver.nameservers = ['127.0.0.11']
+        config.load_kube_config()
+        kubeAPIInstance = client.CoreV1Api()
+        need_pods = kubeAPIInstance.list_namespaced_pod('default')
         for service in self.services:
             hosts = self.services[service]
+            answers = []
             ips = []
             while len(ips) != len(hosts):
                 try:
-                    answers = docker_resolver.query(service + "-" + experimentUUID, 'A')
+                    for pod in need_pods.items: #loop through pods - much less elegant than using a DNS service
+                        if pod.metadata.name.startswith(service + "-" + experimentUUID):
+                            answers.append(pod.status.pod_ip)
                     ips = [str(ip) for ip in answers]
                     if len(ips) != len(hosts):
+                        answers = []
                         sleep(3)
-                except:
+                except Exception as e:
                     sleep(3)
             ips.sort()  # needed for deterministic behaviour
             for i in range(len(hosts)):
@@ -256,4 +254,3 @@ class NetGraph:
                     for e in Q:  # find the node in Q and change its priority
                         if e[1] == node:
                             e[0] = alt
-

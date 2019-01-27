@@ -6,13 +6,14 @@ from flask import Flask, render_template, request, flash, redirect, url_for, jso
 from threading import Lock, Thread
 from time import sleep
 import socket
+import logging #LL
 
 from need.NEEDlib.CommunicationsManager import CommunicationsManager
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.utils import int2ip, ip2int
 
-import dns.resolver
+from kubernetes import client, config
 
 import sys
 if sys.version_info >= (3, 0):
@@ -175,40 +176,37 @@ def startExperiment():
 
 
 def resolve_hostnames():
-    # See comments in NetGraph.py
+    # kubernetes version
 
+    logging.info("inside resolve_hostnames") #LL
+    sys.stdout.flush()
     experimentUUID = environ.get('NEED_UUID', '')
-    docker_resolver = dns.resolver.Resolver(configure=False)
-    docker_resolver.nameservers = ['127.0.0.11']
-
-    # We need to save our own ips for setting the root of the graph
-    # Check the comment in CommunicationsManager.init for why this code is commented
-    # own_ips = []
-    # for interface in netifaces.interfaces():
-    #     try:
-    #         own_ips.append(netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'])
-    #     except KeyError:
-    #         pass
-
+    config.load_kube_config()
+    kubeAPIInstance = client.CoreV1Api()
+    need_pods = kubeAPIInstance.list_namespaced_pod('default')
     for service in DashboardState.graph.services:
         service_instances = DashboardState.graph.services[service]
+        answers = []
         ips = []
-        while len(ips) != len(service_instances):
+        while len(ips) != len(hosts):
             try:
-                answers = docker_resolver.query(service + "-" + experimentUUID, 'A')
+                for pod in need_pods.items: #loop through pods - much less elegant than using a DNS service
+                    if pod.metadata.name.startswith(service + "-" + experimentUUID):
+                        answers.append(pod.status.pod_ip)
                 ips = [str(ip) for ip in answers]
-                if len(ips) != len(service_instances):
+                if len(ips) != len(hosts):
+                    answers = []
                     sleep(3)
-            except:
+            except Exception as e:
+                print(e)
+                sys.stdout.flush()
+                sys.stderr.flush()
                 sleep(3)
         ips.sort()  # needed for deterministic behaviour
         for i in range(len(service_instances)):
                 service_instances[i].ip = ip2int(ips[i])
         for i, host in enumerate(service_instances):
             if host.supervisor:
-                # for ip in own_ips:
-                #     if ip == host.ip:
-                #         DashboardState.graph.root = host
                 continue
             with DashboardState.lock:
                 DashboardState.hosts[host].ip = ips[i]
@@ -218,7 +216,12 @@ def resolve_hostnames():
     DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None)
 
 def query_until_ready():
+    logging.info("Dashboard: going to resolve host names") #LL
+    sys.stdout.flush() #LL
     resolve_hostnames()
+    logging.info("Dashboard: resolved all host names") #LL
+    sys.stderr.flush() #LL
+    sys.stdout.flush() #LL
     pending_nodes = []
     for node in DashboardState.hosts:
         host = DashboardState.hosts[node]
@@ -245,6 +248,8 @@ def query_until_ready():
             sleep(0.5)
 
     with DashboardState.lock:
+        logging.info("Dashboard: ready!") #LL
+        sys.stdout.flush() #LL
         DashboardState.ready = True
 
 def collect_flow(bandwidth, links):
@@ -260,6 +265,11 @@ def main():
     else:
         topology_file = sys.argv[1]
 
+    print("hello from main; printing to stderr", file=sys.stdout) #LL
+    logging.info("hello from main; using standard logging") #LL
+    app.logger.info("hello from main; using a logger") #LL
+    sys.stdout.flush() #LL
+    sys.stderr.flush() #LL
     graph = NetGraph()
     XMLGraphParser(topology_file, graph).fill_graph()
 
@@ -272,7 +282,8 @@ def main():
 
 
     DashboardState.graph = graph
-
+    logging.info("going to query_until_ready soon") #LL
+    sys.stdout.flush() #LL
     startupThread = Thread(target=query_until_ready)
     startupThread.daemon = True
     startupThread.start()
