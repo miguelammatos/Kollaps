@@ -26,8 +26,11 @@
 #include "Destination.h"
 
 
-extern void (*usageCallback)(unsigned int, unsigned long);
+extern void (*usageCallback)(unsigned int, unsigned long, unsigned int);
 extern Destination* hostsByHandle;
+
+
+int txqueuelen = 0; //This is set by init
 
 struct rtnl_handle rth;  //handle used by initialization calls to tc
 struct rtnl_handle rth_persistent; //handle kept throughout emulation
@@ -63,11 +66,12 @@ int oneline = 0;
 
 unsigned short freePort = 0;
 
-void TC_init(unsigned short controllPort) {
+void TC_init(unsigned short controllPort, int txqlen) {
     freePort = controllPort;
     tc_core_init();
     open_rtnl(&rth_persistent);
     hz = get_hz();
+    txqueuelen = txqlen;
 }
 
 void init_interface(unsigned int if_index){
@@ -88,7 +92,7 @@ void init_interface(unsigned int if_index){
      */
 
 
-    set_txqueuelen(netiface, TXQUEUELEN);
+    set_txqueuelen(netiface, txqueuelen);
 
 
     //Create the prio qdisc
@@ -193,6 +197,9 @@ void TC_initDestination(Destination *dest) {
     char latency[MAX_INT_CHAR_LEN+2];
     snprintf(latency, MAX_INT_CHAR_LEN+2, "%ums", dest->latency);
 
+    char txqlen[MAX_INT_CHAR_LEN];
+    snprintf(txqlen, MAX_INT_CHAR_LEN, "%u", txqueuelen);
+
     float q = dest->bandwidth/(dest->bandwidth/10.0f);
     size_t size = snprintf(NULL, 0, "%f", q);
     char *quantum = (char*)malloc(sizeof(char)*(size+1));
@@ -218,7 +225,7 @@ void TC_initDestination(Destination *dest) {
     //Warning, if we use new netem features, double check that TC_changePacketLoss() still works (might need changes)
     ADD_DEV
     PARENT ARG(htb_class_handle)ARG("handle")ARG(netem_qdisc_handle)
-    ARG("netem")ARG("delay")ARG(latency)
+    ARG("netem")ARG("limit")ARG(txqlen)ARG("delay")ARG(latency)
     if(dest->jitter > 0){
         size = snprintf(NULL, 0, "%0.6fms", dest->jitter);
         jitter = (char*)malloc(sizeof(char)*(size+1));
@@ -322,8 +329,10 @@ void TC_destroy(unsigned int if_index, int disableNetwork) {
     do_qdisc(argc, argv);
     close_rtnl(&rth);
 
-    if(!disableNetwork)
+    if(!disableNetwork) {
+        sleep(1); //This is necessary on fast machines, otherwise the interface stays down (maybe do a loop and check?)
         set_if_up(netiface, 0);
+    }
     free(netiface);
 
 }
@@ -365,10 +374,11 @@ int update_class(const struct sockaddr_nl *who,
 
         Destination *d;
         HASH_FIND(hh_h, hostsByHandle, &handle, sizeof(int), d);
-        if(d->usage != st.bytes) {
+        if(d->usage != st.bytes || d->queuelen != st.qlen) {
             d->usage = st.bytes;
+            d->queuelen = st.qlen;
             if(usageCallback)
-                usageCallback(d->ipv4, st.bytes);
+                usageCallback(d->ipv4, st.bytes, st.qlen);
         }
     }
     return 0;
@@ -392,7 +402,6 @@ void TC_updateUsage(unsigned int if_index) {
         return;
     }
 }
-
 
 void TC_changeBandwidth(Destination *dest) {
     /*Use rtnetlink to communicate with the kernel directly
@@ -494,7 +503,7 @@ void TC_changeNetem(Destination *dest){
 
     struct rtattr *tail = NLMSG_TAIL(&req.n);
 
-    struct tc_netem_qopt opt = { .limit = 1000 };
+    struct tc_netem_qopt opt = { .limit = txqueuelen };
     opt.loss = rint(dest->packetLossRate * UINT32_MAX);
     //Since we are updating the opt structure, we have to fill in latency and jitter as well
     // (distribution is not necessary however)

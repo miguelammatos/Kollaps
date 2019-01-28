@@ -27,7 +27,7 @@ struct qdisc_util;
 
 
 
-void TC_init(unsigned short controllPort);
+void TC_init(unsigned short controllPort, int txqlen);
 void TC_initDestination(Destination *dest);
 void TC_changeBandwidth(Destination *dest);
 void TC_changeNetem(Destination *dest);

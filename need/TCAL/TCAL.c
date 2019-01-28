@@ -17,12 +17,12 @@ netif* interfaces = NULL;
 unsigned short needControllPort = 0;
 
 unsigned int handleCounter = 5;
-void (*usageCallback)(unsigned int, unsigned long) = NULL;
+void (*usageCallback)(unsigned int, unsigned long, unsigned int) = NULL;
 
 
-void init(unsigned short controllPort){
+void init(unsigned short controllPort, int txqueuelen){
     needControllPort = controllPort;
-    TC_init(controllPort);
+    TC_init(controllPort, txqueuelen);
 }
 
 void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, float packetLoss){
@@ -77,7 +77,7 @@ unsigned long queryUsage(unsigned int ip){
     return dest->usage;
 }
 
-void registerUsageCallback(void(*callback)(unsigned int, unsigned long)){
+void registerUsageCallback(void(*callback)(unsigned int, unsigned long, unsigned int)){
     usageCallback = callback;
 }
 

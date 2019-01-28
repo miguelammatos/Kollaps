@@ -7,8 +7,6 @@
 
 
 
-#define TXQUEUELEN 1000
-
 #define MAX_DIST	(16*1024)
 #define NORMAL_SIZE  (4*1024)
 #define NEXT_IS_NUMBER() (NEXT_ARG_OK() && isdigit(argv[1][0]))

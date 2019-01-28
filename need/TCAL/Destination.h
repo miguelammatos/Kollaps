@@ -17,6 +17,7 @@ typedef struct {
     unsigned int handle;
     unsigned long usage;
     unsigned int if_index; //Index of the interface this destination is reachable on
+    unsigned int queuelen;
     UT_hash_handle hh_ip;
     UT_hash_handle hh_h;
 }Destination;

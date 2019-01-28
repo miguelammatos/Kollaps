@@ -22,7 +22,7 @@ def init(controll_port):
             tcalPath = folderpath + "/TCAL/libTCAL.so"
 
             PEState.TCAL = CDLL(tcalPath)
-            PEState.TCAL.init(controll_port)
+            PEState.TCAL.init(controll_port, 1000)  # 1000 is the txquelen (unit is packets)
 
 
 def initialize_path(path):
@@ -98,7 +98,7 @@ def register_usage_callback(callback):
     :param callback: func
     :return:
     """
-    CALLBACKTYPE = CFUNCTYPE(c_voidp, c_uint, c_ulong)
+    CALLBACKTYPE = CFUNCTYPE(c_voidp, c_uint, c_ulong, c_uint)
     c_callback = CALLBACKTYPE(callback)
     PEState.callback = c_callback
     with PEState.PathLock:

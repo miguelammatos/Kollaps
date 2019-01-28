@@ -16,7 +16,7 @@ if sys.version_info >= (3, 0):
 emuManager = None  # type: EmulationManager
 
 
-def collect_usage(ip, sent_bytes):
+def collect_usage(ip, sent_bytes, qlen):  # qlen: number of packets in the qdisc, max is txqueuelen
     emuManager.collect_own_flow(ip, sent_bytes)
 
 class EmulationManager:
