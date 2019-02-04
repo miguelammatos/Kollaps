@@ -6,7 +6,6 @@ from flask import Flask, render_template, request, flash, redirect, url_for, jso
 from threading import Lock, Thread
 from time import sleep
 import socket
-import logging #LL
 
 from need.NEEDlib.CommunicationsManager import CommunicationsManager
 from need.NEEDlib.NetGraph import NetGraph
@@ -177,26 +176,25 @@ def startExperiment():
 
 def resolve_hostnames():
     # kubernetes version
-
-    logging.info("inside resolve_hostnames") #LL
-    sys.stdout.flush()
     experimentUUID = environ.get('NEED_UUID', '')
-    config.load_kube_config()
+    config.load_incluster_config()
     kubeAPIInstance = client.CoreV1Api()
     need_pods = kubeAPIInstance.list_namespaced_pod('default')
     for service in DashboardState.graph.services:
         service_instances = DashboardState.graph.services[service]
         answers = []
         ips = []
-        while len(ips) != len(hosts):
+        while len(ips) != len(service_instances):
             try:
-                for pod in need_pods.items: #loop through pods - much less elegant than using a DNS service
+                for pod in need_pods.items:
                     if pod.metadata.name.startswith(service + "-" + experimentUUID):
-                        answers.append(pod.status.pod_ip)
+                        if pod.status.pod_ip is not None: #LL
+                            answers.append(pod.status.pod_ip)
                 ips = [str(ip) for ip in answers]
-                if len(ips) != len(hosts):
+                if len(ips) != len(service_instances):
                     answers = []
                     sleep(3)
+                    need_pods = kubeAPIInstance.list_namespaced_pod('default')
             except Exception as e:
                 print(e)
                 sys.stdout.flush()
@@ -216,12 +214,7 @@ def resolve_hostnames():
     DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None)
 
 def query_until_ready():
-    logging.info("Dashboard: going to resolve host names") #LL
-    sys.stdout.flush() #LL
     resolve_hostnames()
-    logging.info("Dashboard: resolved all host names") #LL
-    sys.stderr.flush() #LL
-    sys.stdout.flush() #LL
     pending_nodes = []
     for node in DashboardState.hosts:
         host = DashboardState.hosts[node]
@@ -244,11 +237,12 @@ def query_until_ready():
                 continue
         except OSError as e:
             print(e)
+            sys.stdout.flush()
             pending_nodes.insert(0, host)
             sleep(0.5)
 
     with DashboardState.lock:
-        logging.info("Dashboard: ready!") #LL
+        print("Dashboard: ready!", file=sys.stdout) #LL
         sys.stdout.flush() #LL
         DashboardState.ready = True
 
@@ -265,11 +259,6 @@ def main():
     else:
         topology_file = sys.argv[1]
 
-    print("hello from main; printing to stderr", file=sys.stdout) #LL
-    logging.info("hello from main; using standard logging") #LL
-    app.logger.info("hello from main; using a logger") #LL
-    sys.stdout.flush() #LL
-    sys.stderr.flush() #LL
     graph = NetGraph()
     XMLGraphParser(topology_file, graph).fill_graph()
 
@@ -282,8 +271,6 @@ def main():
 
 
     DashboardState.graph = graph
-    logging.info("going to query_until_ready soon") #LL
-    sys.stdout.flush() #LL
     startupThread = Thread(target=query_until_ready)
     startupThread.daemon = True
     startupThread.start()
