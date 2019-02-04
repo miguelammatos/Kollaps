@@ -203,7 +203,7 @@ class NetGraph:
                     if len(ips) != len(hosts):
                         answers = []
                         sleep(3)
-                except:
+                except Exception as e:
                     sleep(3)
             ips.sort()  # needed for deterministic behaviour
             for i in range(len(hosts)):

@@ -44,6 +44,7 @@ def main():
     already_bootstrapped = {}
     instance_count = 0
 
+    i = 0
     while True:
         try:
             running = 0  # running container counter, we stop the god if there are 0 same experiment containers running
