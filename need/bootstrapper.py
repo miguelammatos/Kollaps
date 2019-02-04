@@ -44,7 +44,6 @@ def main():
     already_bootstrapped = {}
     instance_count = 0
 
-    i = 0
     while True:
         try:
             running = 0  # running container counter, we stop the god if there are 0 same experiment containers running
@@ -60,7 +59,7 @@ def main():
                         container_pid = LowLevelClient.inspect_container(container_id)["State"]["Pid"]
                         emucore_instance = Popen(
                             ["nsenter", "-t", str(container_pid), "-n",
-                             "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(container_id), str(container_pid), pod.metadata.name]  ##LL
+                             "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(container_id), str(container_pid)]
                         )
                         instance_count += 1
                         already_bootstrapped[container_id] = emucore_instance
