@@ -237,7 +237,6 @@ def query_until_ready():
                 continue
         except OSError as e:
             print(e)
-            sys.stdout.flush()
             pending_nodes.insert(0, host)
             sleep(0.5)
 

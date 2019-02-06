@@ -186,7 +186,7 @@ class NetGraph:
         # we are only talking to the kubernetes API
 
         experimentUUID = environ.get('NEED_UUID', '')
-        config.load_kube_config()
+        config.load_incluster_config()
         kubeAPIInstance = client.CoreV1Api()
         need_pods = kubeAPIInstance.list_namespaced_pod('default')
         for service in self.services:

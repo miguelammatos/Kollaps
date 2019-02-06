@@ -22,7 +22,7 @@ def main():
     god_id = None #get this, it will be argv[3]
 
     #Connect to the local docker daemon
-    config.load_kube_config()
+    config.load_incluster_config()
     kubeAPIInstance = client.CoreV1Api()
     LowLevelClient = APIClient(base_url='unix:/' + DOCKER_SOCK)
 
