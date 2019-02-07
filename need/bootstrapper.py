@@ -25,17 +25,18 @@ def main():
     config.load_incluster_config()
     kubeAPIInstance = client.CoreV1Api()
     LowLevelClient = APIClient(base_url='unix:/' + DOCKER_SOCK)
+    need_pods = kubeAPIInstance.list_namespaced_pod('default')
 
-    try:
-        while not god_id:
-            need_pods = kubeAPIInstance.list_namespaced_pod('default')
+    while not god_id:
+        need_pods = kubeAPIInstance.list_namespaced_pod('default')
+        try:
             for pod in need_pods.items:
                 if "boot"+label in pod.metadata.labels:
                     god_id = pod.status.container_statuses[0].container_id[9:]
-    except Exception as e:
-        print(e)
-        stdout.flush()
-        stderr.flush()
+        except Exception as e:
+            print (e)
+            stdout.flush()
+            sleep(1) #wait for the Kubernetes API
 
     # We are finally ready to proceed
     print("Bootstrapping all local containers with label " + label)
@@ -44,13 +45,12 @@ def main():
     already_bootstrapped = {}
     instance_count = 0
 
-    i = 0
     while True:
         try:
+            need_pods = kubeAPIInstance.list_namespaced_pod('default')
             running = 0  # running container counter, we stop the god if there are 0 same experiment containers running
 
             # check if containers need bootstrapping
-            need_pods = kubeAPIInstance.list_namespaced_pod('default')
             for pod in need_pods.items:
                 container_id = pod.status.container_statuses[0].container_id[9:]
                 if label in pod.metadata.labels:
@@ -86,11 +86,9 @@ def main():
                 return
             sleep(5)
         except Exception as e:
-            print(e)
+            print (e)
             stdout.flush()
-            stderr.flush()
-            sleep(5)
-            continue
+            sleep(1)
 
 if __name__ == '__main__':
     main()

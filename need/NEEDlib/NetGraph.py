@@ -194,15 +194,14 @@ class NetGraph:
             answers = []
             ips = []
             while len(ips) != len(hosts):
+                answers = []
+                need_pods = kubeAPIInstance.list_namespaced_pod('default')
                 try:
                     for pod in need_pods.items: #loop through pods - much less elegant than using a DNS service
                         if pod.metadata.name.startswith(service + "-" + experimentUUID):
                             if pod.status.pod_ip is not None: #LL
                                 answers.append(pod.status.pod_ip)
                     ips = [str(ip) for ip in answers]
-                    if len(ips) != len(hosts):
-                        answers = []
-                        sleep(3)
                 except Exception as e:
                     sleep(3)
             ips.sort()  # needed for deterministic behaviour
