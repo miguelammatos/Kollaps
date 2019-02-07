@@ -236,9 +236,8 @@ def query_until_ready():
                 host.status = 'Ready'
                 continue
         except OSError as e:
-            print(e)
             pending_nodes.insert(0, host)
-            sleep(0.5)
+            sleep(1)
 
     with DashboardState.lock:
         print("Dashboard: ready!", file=sys.stdout) #LL
