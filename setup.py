@@ -1,20 +1,20 @@
 from setuptools import setup
 
 setup(name='need',
-      version='1.1',
+      version='2.0',
       description='Decentralized network emulator',
-      url='https://github.com/joaoneves792/NEED',
-      author='Joao Neves',
+      url='https://github.com/miguelammatos/NEED.git',
+      author='Joao Neves, Paulo Gouveia',
       packages=['need', 'need.NEEDlib', 'need.TCAL'],
       install_requires=[
           'dnspython',
       ],
       include_package_data=True,
       package_data={
-          'need.TCAL':['libTCAL.so'],
-          'need':['static/css/*', 'static/js/*',  'templates/*.html'],
+          'need.TCAL': ['libTCAL.so'],
+          'need': ['static/css/*', 'static/js/*',  'templates/*.html'],
       },
-      entry_points = {
+      entry_points={
           'console_scripts': ['NEEDdeploymentGenerator=need.deploymentGenerator:main',
                               'NEEDDashboard=need.Dashboard:main',
                               'NEEDemucore=need.emucore:main',

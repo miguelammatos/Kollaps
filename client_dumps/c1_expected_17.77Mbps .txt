@@ -1,0 +1,27 @@
+Connecting to host 10.1.0.20, port 5201
+[  5] local 10.1.0.27 port 47106 connected to 10.1.0.20 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  3.33 MBytes  28.0 Mbits/sec    0    472 KBytes       
+[  5]   1.00-2.00   sec  2.33 MBytes  19.5 Mbits/sec    0    575 KBytes       
+[  5]   2.00-3.00   sec  2.09 MBytes  17.5 Mbits/sec    0    679 KBytes       
+[  5]   3.00-4.00   sec  2.39 MBytes  20.1 Mbits/sec    0    781 KBytes       
+[  5]   4.00-5.00   sec  1.78 MBytes  14.9 Mbits/sec    0    885 KBytes       
+[  5]   5.00-6.00   sec  3.07 MBytes  25.7 Mbits/sec    0    987 KBytes       
+[  5]   6.00-7.00   sec  2.27 MBytes  19.0 Mbits/sec    0   1.07 MBytes       
+[  5]   7.00-8.00   sec  1.23 MBytes  10.3 Mbits/sec    0   1.17 MBytes       
+[  5]   8.00-9.00   sec  2.50 MBytes  21.0 Mbits/sec    0   1.27 MBytes       
+[  5]   9.00-10.00  sec  2.50 MBytes  21.0 Mbits/sec    0   1.37 MBytes       
+[  5]  10.00-11.00  sec  1.25 MBytes  10.5 Mbits/sec    0   1.47 MBytes       
+[  5]  11.00-12.00  sec  2.50 MBytes  21.0 Mbits/sec    0   1.57 MBytes       
+[  5]  12.00-13.00  sec  1.25 MBytes  10.5 Mbits/sec    0   1.67 MBytes       
+[  5]  13.00-14.00  sec  2.50 MBytes  21.0 Mbits/sec    0   1.77 MBytes       
+[  5]  14.00-15.00  sec  2.50 MBytes  21.0 Mbits/sec    0   1.89 MBytes       
+[  5]  15.00-16.00  sec  1.24 MBytes  10.4 Mbits/sec    0   2.15 MBytes       
+[  5]  16.00-17.00  sec  2.28 MBytes  19.1 Mbits/sec    0   2.47 MBytes       
+[  5]  17.00-18.00  sec  1.94 MBytes  16.3 Mbits/sec    0   2.59 MBytes       
+[  5]  18.00-19.00  sec  2.50 MBytes  21.0 Mbits/sec    0   1.83 MBytes       
+[  5]  19.00-20.00  sec  1.25 MBytes  10.5 Mbits/sec    0   2.00 MBytes       
+[  5]  20.00-21.00  sec  2.43 MBytes  20.4 Mbits/sec    0   2.14 MBytes       
+[  5]  21.00-22.00  sec  2.33 MBytes  19.6 Mbits/sec    0   2.28 MBytes       
+[  5]  22.00-23.00  sec  1.12 MBytes  9.42 Mbits/sec    0   2.40 MBytes       
+[  5]  23.00-24.00  sec  2.13 MBytes  17.9 Mbits/sec    0   2.50 MBytes       

@@ -1,0 +1,8 @@
+#! /bin/sh
+
+g++ -I /home/daedalus/Documents/aeron/aeron-client/src/main/cpp/ -o aeronlib.so -shared -fPIC aeronlib.cpp
+
+python3 main.py
+
+
+

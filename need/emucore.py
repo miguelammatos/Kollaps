@@ -31,7 +31,6 @@ def get_own_ip(graph):
     return last_ip
 
 
-
 def main():
     if len(sys.argv) < 4:
         fail("Missing arguments. emucore <topology> <container id>")
