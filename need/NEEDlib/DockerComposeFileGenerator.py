@@ -3,7 +3,7 @@ from need.NEEDlib.utils import fail
 from uuid import uuid4
 
 
-class ComposeFileGenerator:
+class DockerComposeFileGenerator:
     def __init__(self, topology_file, graph):
         self.graph = graph  # type: NetGraph
         self.topology_file = topology_file
