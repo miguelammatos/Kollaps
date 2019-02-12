@@ -157,6 +157,8 @@ class KubernetesManifestGenerator:
             print("        - name: NEED_UUID")
             print("          value: "+self.experiment_UUID)
             print("        command: [\"/bin/sh\", \"-c\", \"mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #\"]")
+            if service_list[0].command is not None:
+                print("        args: "+service_list[0].command)
 
 
     def print_topology(self):
