@@ -1,4 +1,4 @@
-FROM base/archlinux:latest
+FROM archlinux/base:latest
 #Yes we are using archlinux
 #Crazy right? Why not debian or ubuntu or alpine?
 #1st pacman is a lot faster than all the others, so faster image builds
@@ -26,10 +26,11 @@ RUN pacman -Sy --noconfirm \
 #RUN git clone --branch master --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
 ADD ./ /NEED/
 
+#LL: only added kubernetes in l.33
 RUN make -C /NEED/pid1 &&\
     cp /NEED/pid1/pid1 /usr/bin/pid1 &&\
     make -C /NEED/need/TCAL -j8 &&\
-    pip3 --no-cache-dir install dnspython docker wheel &&\
+    pip3 --no-cache-dir install dnspython docker wheel kubernetes &&\
     pip3 --no-cache-dir wheel --no-deps -w /NEED /NEED &&\
     pip3 --no-cache-dir install /NEED/need-1.1-py3-none-any.whl &&\
     rm -rf /NEED &&\

@@ -1,6 +1,6 @@
 import struct
 from collections import OrderedDict
-from os import environ
+from os import environ, getenv
 
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, json
 from threading import Lock, Thread
@@ -13,6 +13,7 @@ from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.utils import int2ip, ip2int
 
 import dns.resolver
+from kubernetes import client, config
 
 import sys
 if sys.version_info >= (3, 0):
@@ -20,6 +21,7 @@ if sys.version_info >= (3, 0):
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'sdjh234hj23409ea9[u-ad=12-eqhkdjaadj23jaksldj23objadskjalskdj-1=1dadsd;akdaldm11pnf'
+
 
 class DashboardState:
     graph = None  # type: NetGraph
@@ -33,6 +35,7 @@ class DashboardState:
     stopping = False
     ready = False
     running = False
+
 
 class Host:
     def __init__(self, hostname, name):
@@ -52,7 +55,6 @@ def main_page():
                                      max_gap_avg=DashboardState.largest_produced_gap_average,
                                      lost_packets=DashboardState.lost_packets)
             return answer
-
 
 @app.route('/stop')
 def stop():
@@ -74,6 +76,7 @@ def flows():
 @app.route('/graph')
 def graph():
     return render_template('graph.html', graph=DashboardState.graph)
+
 
 def stopExperiment():
     with DashboardState.lock:
@@ -142,6 +145,7 @@ def stopExperiment():
             DashboardState.lost_packets = 0
         DashboardState.stopping = False
 
+
 def startExperiment():
     with DashboardState.lock:
         if DashboardState.stopping or not DashboardState.ready:
@@ -175,47 +179,80 @@ def startExperiment():
 
 
 def resolve_hostnames():
-    # See comments in NetGraph.py
-
+    
     experimentUUID = environ.get('NEED_UUID', '')
-    docker_resolver = dns.resolver.Resolver(configure=False)
-    docker_resolver.nameservers = ['127.0.0.11']
-
-    # We need to save our own ips for setting the root of the graph
-    # Check the comment in CommunicationsManager.init for why this code is commented
-    # own_ips = []
-    # for interface in netifaces.interfaces():
-    #     try:
-    #         own_ips.append(netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'])
-    #     except KeyError:
-    #         pass
-
-    for service in DashboardState.graph.services:
-        service_instances = DashboardState.graph.services[service]
-        ips = []
-        while len(ips) != len(service_instances):
-            try:
-                answers = docker_resolver.query(service + "-" + experimentUUID, 'A')
-                ips = [str(ip) for ip in answers]
-                if len(ips) != len(service_instances):
+    
+    orchestrator = getenv('NEED_ORCHESTRATOR', 'swarm')
+    if orchestrator == 'kubernetes':
+        config.load_incluster_config()
+        kubeAPIInstance = client.CoreV1Api()
+        need_pods = kubeAPIInstance.list_namespaced_pod('default')
+        for service in DashboardState.graph.services:
+            service_instances = DashboardState.graph.services[service]
+            answers = []
+            ips = []
+            while len(ips) != len(service_instances):
+                try:
+                    for pod in need_pods.items:
+                        if pod.metadata.name.startswith(service + "-" + experimentUUID):
+                            if pod.status.pod_ip is not None:  # LL
+                                answers.append(pod.status.pod_ip)
+                    ips = [str(ip) for ip in answers]
+                    if len(ips) != len(service_instances):
+                        answers = []
+                        sleep(3)
+                        need_pods = kubeAPIInstance.list_namespaced_pod('default')
+                except Exception as e:
+                    print(e)
+                    sys.stdout.flush()
+                    sys.stderr.flush()
                     sleep(3)
-            except:
-                sleep(3)
-        ips.sort()  # needed for deterministic behaviour
-        for i in range(len(service_instances)):
+            ips.sort()  # needed for deterministic behaviour
+            for i in range(len(service_instances)):
                 service_instances[i].ip = ip2int(ips[i])
-        for i, host in enumerate(service_instances):
-            if host.supervisor:
-                # for ip in own_ips:
-                #     if ip == host.ip:
-                #         DashboardState.graph.root = host
-                continue
-            with DashboardState.lock:
-                DashboardState.hosts[host].ip = ips[i]
-                DashboardState.hosts[host].status = 'Pending'
-
+            for i, host in enumerate(service_instances):
+                if host.supervisor:
+                    continue
+                with DashboardState.lock:
+                    DashboardState.hosts[host].ip = ips[i]
+                    DashboardState.hosts[host].status = 'Pending'
+    
+    else:
+        if orchestrator != 'swarm':
+            print("Unrecognized orchestrator. Using default docker swarm.")
+        
+        docker_resolver = dns.resolver.Resolver(configure=False)
+        docker_resolver.nameservers = ['127.0.0.11']
+        
+        for service in DashboardState.graph.services:
+            service_instances = DashboardState.graph.services[service]
+            ips = []
+            
+            while len(ips) != len(service_instances):
+                try:
+                    answers = docker_resolver.query(service + "-" + experimentUUID, 'A')
+                    ips = [str(ip) for ip in answers]
+                    if len(ips) != len(service_instances):
+                        sleep(3)
+                
+                except:
+                    sleep(3)
+            
+            ips.sort()  # needed for deterministic behaviour
+            for i in range(len(service_instances)):
+                service_instances[i].ip = ip2int(ips[i])
+            
+            for i, host in enumerate(service_instances):
+                if host.supervisor:
+                    continue
+                
+                with DashboardState.lock:
+                    DashboardState.hosts[host].ip = ips[i]
+                    DashboardState.hosts[host].status = 'Pending'
+    
     # We can only instantiate the CommunicationsManager after the graphs root has been set
     DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None)
+
 
 def query_until_ready():
     resolve_hostnames()
@@ -240,12 +277,14 @@ def query_until_ready():
                 host.status = 'Ready'
                 continue
         except OSError as e:
-            print(e)
             pending_nodes.insert(0, host)
-            sleep(0.5)
+            sleep(1)
 
     with DashboardState.lock:
+        print("Dashboard: ready!", file=sys.stdout) #LL
+        sys.stdout.flush() #LL
         DashboardState.ready = True
+
 
 def collect_flow(bandwidth, links):
     key = str(links[0]) + ":" + str(links[-1])
@@ -272,7 +311,6 @@ def main():
 
 
     DashboardState.graph = graph
-
     startupThread = Thread(target=query_until_ready)
     startupThread.daemon = True
     startupThread.start()
