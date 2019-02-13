@@ -178,11 +178,13 @@ def startExperiment():
 
 def resolve_hostnames():
     
+    experimentUUID = environ.get('NEED_UUID', '')
+    
     orchestrator = getenv('NEED_ORCHESTRATOR', 'swarm')
     print("orchestrator: " + orchestrator)
+    sys.stdout.flush()
     
     if orchestrator == 'kubernetes':
-        experimentUUID = environ.get('NEED_UUID', '')
         config.load_incluster_config()
         kubeAPIInstance = client.CoreV1Api()
         need_pods = kubeAPIInstance.list_namespaced_pod('default')
@@ -194,7 +196,7 @@ def resolve_hostnames():
                 try:
                     for pod in need_pods.items:
                         if pod.metadata.name.startswith(service + "-" + experimentUUID):
-                            if pod.status.pod_ip is not None: #LL
+                            if pod.status.pod_ip is not None:  # LL
                                 answers.append(pod.status.pod_ip)
                     ips = [str(ip) for ip in answers]
                     if len(ips) != len(service_instances):
@@ -208,22 +210,21 @@ def resolve_hostnames():
                     sleep(3)
             ips.sort()  # needed for deterministic behaviour
             for i in range(len(service_instances)):
-                    service_instances[i].ip = ip2int(ips[i])
+                service_instances[i].ip = ip2int(ips[i])
             for i, host in enumerate(service_instances):
                 if host.supervisor:
                     continue
                 with DashboardState.lock:
                     DashboardState.hosts[host].ip = ips[i]
                     DashboardState.hosts[host].status = 'Pending'
-              
+    
     else:
         if orchestrator != 'swarm':
             print("Unrecognized orchestrator. Using default docker swarm.")
-            
-        experimentUUID = environ.get('NEED_UUID', '')
+        
         docker_resolver = dns.resolver.Resolver(configure=False)
         docker_resolver.nameservers = ['127.0.0.11']
-    
+        
         for service in DashboardState.graph.services:
             service_instances = DashboardState.graph.services[service]
             ips = []
@@ -234,22 +235,22 @@ def resolve_hostnames():
                     ips = [str(ip) for ip in answers]
                     if len(ips) != len(service_instances):
                         sleep(3)
-                        
+                
                 except:
                     sleep(3)
-                    
+            
             ips.sort()  # needed for deterministic behaviour
             for i in range(len(service_instances)):
                 service_instances[i].ip = ip2int(ips[i])
-                
+            
             for i, host in enumerate(service_instances):
                 if host.supervisor:
                     continue
-                    
+                
                 with DashboardState.lock:
                     DashboardState.hosts[host].ip = ips[i]
                     DashboardState.hosts[host].status = 'Pending'
-
+    
     # We can only instantiate the CommunicationsManager after the graphs root has been set
     DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None)
 
