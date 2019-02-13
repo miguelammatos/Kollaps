@@ -1,4 +1,4 @@
-FROM base/archlinux:latest
+FROM archlinux/base:latest
 #Yes we are using archlinux
 #Crazy right? Why not debian or ubuntu or alpine?
 #1st pacman is a lot faster than all the others, so faster image builds
@@ -9,6 +9,8 @@ WORKDIR /
 
 #Location of netem distribution files on archlinux
 ENV TC_LIB_DIR "/usr/share/tc/"
+ENV NEED_ORCHESTRATOR "swarm"
+# ENV NEED_ORCHESTRATOR "kubernetes" # Good container isn't necessary with kubernetes
 
 RUN pacman -Sy --noconfirm \
     archlinux-keyring  && \

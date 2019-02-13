@@ -106,3 +106,7 @@ ENV/
 
 # compose files
 *.yaml
+
+# wheels
+*.whl
+
