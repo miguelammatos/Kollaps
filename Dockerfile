@@ -9,8 +9,6 @@ WORKDIR /
 
 #Location of netem distribution files on archlinux
 ENV TC_LIB_DIR "/usr/share/tc/"
-ENV NEED_ORCHESTRATOR "swarm"
-# ENV NEED_ORCHESTRATOR "kubernetes" # Good container isn't necessary with kubernetes
 
 RUN pacman -Sy --noconfirm \
     archlinux-keyring  && \

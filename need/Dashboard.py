@@ -1,6 +1,6 @@
 import struct
 from collections import OrderedDict
-from os import environ
+from os import environ, getenv
 
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, json
 from threading import Lock, Thread
@@ -12,6 +12,7 @@ from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.utils import int2ip, ip2int
 
+import dns.resolver
 from kubernetes import client, config
 
 import sys
@@ -142,6 +143,7 @@ def stopExperiment():
             DashboardState.lost_packets = 0
         DashboardState.stopping = False
 
+
 def startExperiment():
     with DashboardState.lock:
         if DashboardState.stopping or not DashboardState.ready:
@@ -175,40 +177,78 @@ def startExperiment():
 
 
 def resolve_hostnames():
-    # kubernetes version
-    experimentUUID = environ.get('NEED_UUID', '')
-    config.load_incluster_config()
-    kubeAPIInstance = client.CoreV1Api()
-    need_pods = kubeAPIInstance.list_namespaced_pod('default')
-    for service in DashboardState.graph.services:
-        service_instances = DashboardState.graph.services[service]
-        answers = []
-        ips = []
-        while len(ips) != len(service_instances):
-            try:
-                for pod in need_pods.items:
-                    if pod.metadata.name.startswith(service + "-" + experimentUUID):
-                        if pod.status.pod_ip is not None: #LL
-                            answers.append(pod.status.pod_ip)
-                ips = [str(ip) for ip in answers]
-                if len(ips) != len(service_instances):
-                    answers = []
+    
+    orchestrator = getenv('NEED_ORCHESTRATOR', 'swarm')
+    print("orchestrator: " + orchestrator)
+    
+    if orchestrator == 'kubernetes':
+        experimentUUID = environ.get('NEED_UUID', '')
+        config.load_incluster_config()
+        kubeAPIInstance = client.CoreV1Api()
+        need_pods = kubeAPIInstance.list_namespaced_pod('default')
+        for service in DashboardState.graph.services:
+            service_instances = DashboardState.graph.services[service]
+            answers = []
+            ips = []
+            while len(ips) != len(service_instances):
+                try:
+                    for pod in need_pods.items:
+                        if pod.metadata.name.startswith(service + "-" + experimentUUID):
+                            if pod.status.pod_ip is not None: #LL
+                                answers.append(pod.status.pod_ip)
+                    ips = [str(ip) for ip in answers]
+                    if len(ips) != len(service_instances):
+                        answers = []
+                        sleep(3)
+                        need_pods = kubeAPIInstance.list_namespaced_pod('default')
+                except Exception as e:
+                    print(e)
+                    sys.stdout.flush()
+                    sys.stderr.flush()
                     sleep(3)
-                    need_pods = kubeAPIInstance.list_namespaced_pod('default')
-            except Exception as e:
-                print(e)
-                sys.stdout.flush()
-                sys.stderr.flush()
-                sleep(3)
-        ips.sort()  # needed for deterministic behaviour
-        for i in range(len(service_instances)):
+            ips.sort()  # needed for deterministic behaviour
+            for i in range(len(service_instances)):
+                    service_instances[i].ip = ip2int(ips[i])
+            for i, host in enumerate(service_instances):
+                if host.supervisor:
+                    continue
+                with DashboardState.lock:
+                    DashboardState.hosts[host].ip = ips[i]
+                    DashboardState.hosts[host].status = 'Pending'
+              
+    else:
+        if orchestrator != 'swarm':
+            print("Unrecognized orchestrator. Using default docker swarm.")
+            
+        experimentUUID = environ.get('NEED_UUID', '')
+        docker_resolver = dns.resolver.Resolver(configure=False)
+        docker_resolver.nameservers = ['127.0.0.11']
+    
+        for service in DashboardState.graph.services:
+            service_instances = DashboardState.graph.services[service]
+            ips = []
+            
+            while len(ips) != len(service_instances):
+                try:
+                    answers = docker_resolver.query(service + "-" + experimentUUID, 'A')
+                    ips = [str(ip) for ip in answers]
+                    if len(ips) != len(service_instances):
+                        sleep(3)
+                        
+                except:
+                    sleep(3)
+                    
+            ips.sort()  # needed for deterministic behaviour
+            for i in range(len(service_instances)):
                 service_instances[i].ip = ip2int(ips[i])
-        for i, host in enumerate(service_instances):
-            if host.supervisor:
-                continue
-            with DashboardState.lock:
-                DashboardState.hosts[host].ip = ips[i]
-                DashboardState.hosts[host].status = 'Pending'
+                
+            for i, host in enumerate(service_instances):
+                if host.supervisor:
+                    continue
+                    
+                with DashboardState.lock:
+                    DashboardState.hosts[host].ip = ips[i]
+                    DashboardState.hosts[host].status = 'Pending'
 
     # We can only instantiate the CommunicationsManager after the graphs root has been set
     DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None)

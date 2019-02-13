@@ -21,6 +21,7 @@ class DockerComposeFileGenerator:
 		print("      mode: global")
 		print("    environment:")
 		print("      NEED_UUID: '" + self.experiment_UUID + "'")
+		print("      NEED_ORCHESTRATOR: swarm")
 		print("    labels:")
 		print("      " + "boot"+self.experiment_UUID + ": \"true\"")
 		print("    volumes:")
