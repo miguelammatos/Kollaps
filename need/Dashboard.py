@@ -22,6 +22,7 @@ if sys.version_info >= (3, 0):
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'sdjh234hj23409ea9[u-ad=12-eqhkdjaadj23jaksldj23objadskjalskdj-1=1dadsd;akdaldm11pnf'
 
+
 class DashboardState:
     graph = None  # type: NetGraph
     lock = Lock()
@@ -34,6 +35,7 @@ class DashboardState:
     stopping = False
     ready = False
     running = False
+
 
 class Host:
     def __init__(self, hostname, name):
@@ -53,7 +55,6 @@ def main_page():
                                      max_gap_avg=DashboardState.largest_produced_gap_average,
                                      lost_packets=DashboardState.lost_packets)
             return answer
-
 
 @app.route('/stop')
 def stop():
@@ -75,6 +76,7 @@ def flows():
 @app.route('/graph')
 def graph():
     return render_template('graph.html', graph=DashboardState.graph)
+
 
 def stopExperiment():
     with DashboardState.lock:
@@ -181,9 +183,6 @@ def resolve_hostnames():
     experimentUUID = environ.get('NEED_UUID', '')
     
     orchestrator = getenv('NEED_ORCHESTRATOR', 'swarm')
-    print("orchestrator: " + orchestrator)
-    sys.stdout.flush()
-    
     if orchestrator == 'kubernetes':
         config.load_incluster_config()
         kubeAPIInstance = client.CoreV1Api()
@@ -254,6 +253,7 @@ def resolve_hostnames():
     # We can only instantiate the CommunicationsManager after the graphs root has been set
     DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None)
 
+
 def query_until_ready():
     resolve_hostnames()
     pending_nodes = []
@@ -284,6 +284,7 @@ def query_until_ready():
         print("Dashboard: ready!", file=sys.stdout) #LL
         sys.stdout.flush() #LL
         DashboardState.ready = True
+
 
 def collect_flow(bandwidth, links):
     key = str(links[0]) + ":" + str(links[-1])
