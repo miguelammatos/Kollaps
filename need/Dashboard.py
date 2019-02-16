@@ -9,7 +9,7 @@ from time import sleep
 import socket
 
 # from need.NEEDlib.CommunicationsManager import CommunicationsManager
-from need.NEEDlib.GeneralCommunications import CommunicationsManager
+from need.NEEDlib.GeneralCommunicator import CommunicationsManager
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.utils import int2ip, ip2int
