@@ -110,3 +110,8 @@ ENV/
 # wheels
 *.whl
 
+
+# other
+rebuild.sh
+
+
