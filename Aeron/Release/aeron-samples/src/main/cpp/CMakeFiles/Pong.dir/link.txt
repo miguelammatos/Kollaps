@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG -fPIC -DDISABLE_BOUNDS_CHECKS  -rdynamic CMakeFiles/Pong.dir/Pong.cpp.o  -o ../../../../binaries/Pong ../../../../lib/libaeron_client.a -lpthread 

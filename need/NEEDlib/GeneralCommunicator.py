@@ -10,6 +10,7 @@ from _thread import interrupt_main
 from ctypes import CFUNCTYPE, POINTER, c_voidp, c_int
 import socket
 import struct
+import json, pprint
 import ctypes
 
 import sys
@@ -19,7 +20,8 @@ if sys.version_info >= (3, 0):
 
 # FIXME solve lib folder because compilation with cmake nonsense
 AERON_LIB_PATH = "/home/daedalus/Documents/aeron4need/cppbuild/Release/lib/libaeronlib.so"
-
+LOCAL_IPS_FILE = "/local_ips.txt"
+REMOTE_IPS_FILE = "/remote_ips.txt"
 
 # Global variable used within the process pool(so we dont need to create new ones all the time)
 broadcast_sockets = {}  # type: Dict[socket.socket]
@@ -58,7 +60,6 @@ class CommunicationsManager:
 	MAX_WORKERS = 10
 	
 	
-	
 	def __init__(self, flow_collector, graph, event_scheduler):
 		self.graph = graph  # type: NetGraph
 		self.scheduler = event_scheduler  # type: EventScheduler
@@ -72,6 +73,9 @@ class CommunicationsManager:
 		self.aeron_lib = None
 		self.aeron_id = None
 		self.aeron_sub_list = None
+		self.local_ips = {}
+		self.remote_ips = {}
+
 
 		link_count = len(self.graph.links)
 		if link_count <= BYTE_LIMIT:
@@ -105,12 +109,25 @@ class CommunicationsManager:
 		
 		# setup python callback
 		self.aeron_lib = ctypes.CDLL(AERON_LIB_PATH)
-		self.aeron_lib.init(self.aeron_id, len(self.aeron_sub_list), (c_int * len(self.aeron_sub_list))(*self.aeron_sub_list))
+		# self.aeron_lib.init(self.aeron_id, len(self.aeron_sub_list), (c_int * len(self.aeron_sub_list))(*self.aeron_sub_list))
+		self.aeron_lib.init(self.aeron_id)
 		CALLBACKTYPE = CFUNCTYPE(c_voidp, c_int, c_int, POINTER(c_int))
 		c_callback = CALLBACKTYPE(self.receive_flow)
 		self.callback = c_callback  # keep reference so it does not get garbage collected
 		self.aeron_lib.registerCallback(self.callback)
-
+		
+		with open(LOCAL_IPS_FILE, 'r') as file:
+			self.local_ips = json.load(file)
+			for key, value in self.local_ips.items():
+				self.aeron_lib.addLocalSubs(int(key), len(value), (c_int * len(value))(*value))
+		
+		with open(REMOTE_IPS_FILE, 'r') as file:
+			self.remote_ips = json.load(file)
+			for key, value in self.remote_ips.items():
+				self.aeron_lib.addRemoteSubs(int(key), len(value), (c_int * len(value))(*value))
+		
+		self.aeron_lib.startPolling()
+		
 		# broadcast_group = []
 		# for service in self.graph.services:
 		# 	hosts = self.graph.services[service]
@@ -148,7 +165,7 @@ class CommunicationsManager:
 
 
 	def receive_flow(self, bandwidth, link_count, link_list):
-		print("Python: throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]), end="")
+		print("[Py] throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]), end="")
 		print()
 		sys.stdout.flush()
 		self.flow_collector(bandwidth, link_list[:link_count])
@@ -170,7 +187,7 @@ class CommunicationsManager:
 		
 	
 	def shutdown(self):
-		self.aeron_lib.shutdown()
+		self.aeron_lib.teardown()
 	
 	
 	def receive_dashboard_commands(self):

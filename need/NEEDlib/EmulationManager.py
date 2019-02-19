@@ -5,7 +5,7 @@ from os import environ
 from need.NEEDlib.NetGraph import NetGraph
 import need.NEEDlib.PathEmulation as PathEmulation
 # from need.NEEDlib.CommunicationsManager import CommunicationsManager
-from need.NEEDlib.GeneralCommunications import CommunicationsManager
+from need.NEEDlib.GeneralCommunicator import CommunicationsManager
 from need.NEEDlib.utils import ENVIRONMENT, message
 from need.NEEDlib.EventScheduler import EventScheduler
 

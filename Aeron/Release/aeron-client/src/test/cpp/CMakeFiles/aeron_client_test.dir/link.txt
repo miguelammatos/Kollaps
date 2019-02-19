@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../../../lib/libaeron_client_test.a  CMakeFiles/aeron_client_test.dir/ClientConductorFixture.cpp.o CMakeFiles/aeron_client_test.dir/concurrent/MockAtomicBuffer.cpp.o
+/usr/bin/ranlib ../../../../lib/libaeron_client_test.a

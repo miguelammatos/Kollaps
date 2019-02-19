@@ -4,18 +4,10 @@ Decentralized container based network emulator
 
 ## What's new
 
-The aeron_lib_example/ folder contains a standalone simplified example of the c++/Python library being used. 
-Which I just realised only works on my computer because cmake used to compile aeron installs and uses libraries from all over the place. 
-This is a serious problem. 
-OK, the docker example should be working fine. It mimics my file system and copies all the required files. 
-The library example probably doesnt work though. 
+ipc + udp
 
-All the required libraries were place in the need/Aeron/ folder and their suposed paths can be seen in the Dockerfile file.
+git is ignoring executables and .so -> extract Aeron.tar.gz and override for necessary files.
 
-CommunicationsManager.py was partialy replaced with GeneralCommunications.py that is using shared memory within the God container.
-
-It broke the Dashboard's reporting of flows. 
-However, the flows are correctly shared as seen in the logs from the God container and the client dumps in the client_dumps/ folder.
 
 
 

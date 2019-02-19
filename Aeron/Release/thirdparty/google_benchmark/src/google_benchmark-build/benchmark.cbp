@@ -1,0 +1,1475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="benchmark"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\cmake\;CMake Files\src\;CMake Files\test\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/strip">
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 install/strip"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="list_install_components">
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 list_install_components"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test">
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/local">
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 install/local"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install">
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 install"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="benchmark_main">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/libbenchmark_main.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 benchmark_main"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="benchmark_main/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/libbenchmark_main.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 benchmark_main/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="benchmark">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/libbenchmark.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 benchmark"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="benchmark/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/libbenchmark.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 benchmark/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="complexity_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/complexity_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 complexity_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="complexity_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/complexity_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 complexity_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="cxx03_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/cxx03_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 cxx03_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="cxx03_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/cxx03_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 cxx03_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="diagnostics_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/diagnostics_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 diagnostics_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="diagnostics_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/diagnostics_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 diagnostics_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="filter_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/filter_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 filter_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="filter_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/filter_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 filter_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="basic_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/basic_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 basic_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="basic_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/basic_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 basic_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="options_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/options_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 options_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="options_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/options_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 options_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="output_test_helper">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/liboutput_test_helper.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 output_test_helper"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="output_test_helper/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/liboutput_test_helper.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 output_test_helper/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="user_counters_tabular_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/user_counters_tabular_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 user_counters_tabular_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="user_counters_tabular_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/user_counters_tabular_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 user_counters_tabular_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="templated_fixture_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/templated_fixture_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 templated_fixture_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="templated_fixture_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/templated_fixture_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 templated_fixture_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="benchmark_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/benchmark_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 benchmark_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="benchmark_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/benchmark_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 benchmark_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="skip_with_error_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/skip_with_error_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 skip_with_error_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="skip_with_error_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/skip_with_error_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 skip_with_error_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="multiple_ranges_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/multiple_ranges_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 multiple_ranges_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="multiple_ranges_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/multiple_ranges_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 multiple_ranges_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="register_benchmark_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/register_benchmark_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 register_benchmark_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="register_benchmark_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/register_benchmark_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 register_benchmark_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="donotoptimize_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/donotoptimize_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 donotoptimize_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="donotoptimize_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/donotoptimize_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 donotoptimize_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="map_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/map_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 map_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="map_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/map_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 map_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="fixture_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/fixture_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 fixture_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="fixture_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/fixture_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 fixture_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="link_main_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/link_main_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 link_main_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="link_main_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/link_main_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 link_main_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="reporter_output_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/reporter_output_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 reporter_output_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="reporter_output_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/reporter_output_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 reporter_output_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="user_counters_test">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/user_counters_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 user_counters_test"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="user_counters_test/fast">
+				<Option output="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/user_counters_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHAVE_STD_REGEX"/>
+					<Add option="-DHAVE_POSIX_REGEX"/>
+					<Add option="-DHAVE_STEADY_CLOCK"/>
+					<Add option="-DTEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include"/>
+					<Add directory="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/../include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../include/c++/8.2.1/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 user_counters_test/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include/benchmark/benchmark.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/arraysize.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/benchmark.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/benchmark_api_internal.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/benchmark_main.cc">
+			<Option target="benchmark_main"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/benchmark_register.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/benchmark_register.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/check.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/colorprint.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/colorprint.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/commandlineflags.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/commandlineflags.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/complexity.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/complexity.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/console_reporter.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/counter.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/counter.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/csv_reporter.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/cycleclock.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/internal_macros.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/json_reporter.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/log.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/mutex.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/re.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/reporter.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/sleep.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/sleep.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/statistics.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/statistics.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/string_util.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/string_util.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/sysinfo.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/thread_manager.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/thread_timer.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/timers.cc">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/timers.h">
+			<Option target="benchmark"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/basic_test.cc">
+			<Option target="basic_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/benchmark_test.cc">
+			<Option target="benchmark_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/complexity_test.cc">
+			<Option target="complexity_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/cxx03_test.cc">
+			<Option target="cxx03_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/diagnostics_test.cc">
+			<Option target="diagnostics_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/donotoptimize_test.cc">
+			<Option target="donotoptimize_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/filter_test.cc">
+			<Option target="filter_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/fixture_test.cc">
+			<Option target="fixture_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/link_main_test.cc">
+			<Option target="link_main_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/map_test.cc">
+			<Option target="map_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/multiple_ranges_test.cc">
+			<Option target="multiple_ranges_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/options_test.cc">
+			<Option target="options_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/output_test.h">
+			<Option target="complexity_test"/>
+			<Option target="output_test_helper"/>
+			<Option target="user_counters_tabular_test"/>
+			<Option target="templated_fixture_test"/>
+			<Option target="reporter_output_test"/>
+			<Option target="user_counters_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/output_test_helper.cc">
+			<Option target="output_test_helper"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/register_benchmark_test.cc">
+			<Option target="register_benchmark_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/reporter_output_test.cc">
+			<Option target="reporter_output_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/skip_with_error_test.cc">
+			<Option target="skip_with_error_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/templated_fixture_test.cc">
+			<Option target="templated_fixture_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/user_counters_tabular_test.cc">
+			<Option target="user_counters_tabular_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/user_counters_test.cc">
+			<Option target="user_counters_test"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/cmake/AddCXXCompilerFlag.cmake">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/cmake/CXXFeatureCheck.cmake">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/cmake/Config.cmake.in">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/cmake/GetGitVersion.cmake">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/cmake/benchmark.pc.in">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/cmake/gnu_posix_regex.cpp">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/cmake/posix_regex.cpp">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/cmake/std_regex.cpp">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/cmake/steady_clock.cpp">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+		<Unit filename="/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\test\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

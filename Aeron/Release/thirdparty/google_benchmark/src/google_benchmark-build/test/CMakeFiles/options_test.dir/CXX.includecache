@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/include/benchmark/benchmark.h
+stdint.h
+-
+algorithm
+-
+cassert
+-
+cstddef
+-
+iosfwd
+-
+string
+-
+vector
+-
+map
+-
+set
+-
+type_traits
+-
+initializer_list
+-
+utility
+-
+intrin.h
+-
+
+/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/options_test.cc
+benchmark/benchmark.h
+/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark/test/benchmark/benchmark.h
+chrono
+-
+thread
+-
+cassert
+-
+

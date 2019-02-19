@@ -1,0 +1,3 @@
+repository='external project URL'
+module='/home/daedalus/Documents/aeron4need/cppbuild/benchmark-1.4.1.zip'
+tag='MD5=619674faa0d878e239eaf6766259718b'

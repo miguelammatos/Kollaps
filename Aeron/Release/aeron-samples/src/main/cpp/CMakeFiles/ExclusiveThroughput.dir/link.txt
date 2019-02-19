@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG -fPIC -DDISABLE_BOUNDS_CHECKS  -rdynamic CMakeFiles/ExclusiveThroughput.dir/ExclusiveThroughput.cpp.o  -o ../../../../binaries/ExclusiveThroughput ../../../../lib/libaeron_client.a -lpthread 

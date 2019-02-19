@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/daedalus/Documents/aeron4need/cppbuild/Release/CMakeFiles/google_benchmark"
+		},
+		{
+			"file" : "/home/daedalus/Documents/aeron4need/cppbuild/Release/CMakeFiles/google_benchmark.rule"
+		},
+		{
+			"file" : "/home/daedalus/Documents/aeron4need/cppbuild/Release/CMakeFiles/google_benchmark-complete.rule"
+		},
+		{
+			"file" : "/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-stamp/google_benchmark-install.rule"
+		},
+		{
+			"file" : "/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-stamp/google_benchmark-mkdir.rule"
+		},
+		{
+			"file" : "/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-stamp/google_benchmark-download.rule"
+		},
+		{
+			"file" : "/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-stamp/google_benchmark-update.rule"
+		},
+		{
+			"file" : "/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-stamp/google_benchmark-patch.rule"
+		},
+		{
+			"file" : "/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-stamp/google_benchmark-configure.rule"
+		},
+		{
+			"file" : "/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-stamp/google_benchmark-build.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"google_benchmark"
+		],
+		"name" : "google_benchmark"
+	}
+}

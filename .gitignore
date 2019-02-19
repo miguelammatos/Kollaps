@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # C extensions
+Aeron/*
 *.so
 *.o
 
@@ -109,3 +110,4 @@ ENV/
 
 # compose files
 *.yaml
+

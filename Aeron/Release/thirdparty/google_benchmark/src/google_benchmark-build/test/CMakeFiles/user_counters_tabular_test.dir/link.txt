@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing  -rdynamic CMakeFiles/user_counters_tabular_test.dir/user_counters_tabular_test.cc.o  -o user_counters_tabular_test liboutput_test_helper.a ../src/libbenchmark.a -lpthread -lrt 

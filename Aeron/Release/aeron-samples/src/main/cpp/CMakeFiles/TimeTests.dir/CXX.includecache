@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/daedalus/Documents/aeron4need/aeron-samples/src/main/cpp/raw/TimeTests.cpp
+iostream
+-
+thread
+-
+

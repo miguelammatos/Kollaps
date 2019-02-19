@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -Wno-unknown-pragmas -Wextra -Wshadow -Winit-self -Wmissing-prototypes -Wpedantic -D_GNU_SOURCE -std=gnu89  -rdynamic CMakeFiles/hdr_atomic_test.dir/hdr_atomic_test.c.o CMakeFiles/hdr_atomic_test.dir/minunit.c.o  -o hdr_atomic_test -lz 

@@ -12,6 +12,10 @@ SHORT_LIMIT = 65535
 # INT_LIMIT = 4294967296
 DOCKER_SOCK = "/var/run/docker.sock"
 
+TOPOLOGY = "/topology.xml"
+IPS_FILE = "/ips_file.txt"
+
+
 
 class ENVIRONMENT:
     NETWORK_INTERFACE = 'NETWORK_INTERFACE'

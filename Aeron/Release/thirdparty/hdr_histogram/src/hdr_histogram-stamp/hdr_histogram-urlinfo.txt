@@ -1,0 +1,3 @@
+repository='external project URL'
+module='/home/daedalus/Documents/aeron4need/cppbuild/HdrHistogram_c-0.9.8.zip'
+tag='MD5=2f38e8fea8484bf51ce895cd22ca9775'

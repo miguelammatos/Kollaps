@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG -fPIC -DDISABLE_BOUNDS_CHECKS  -rdynamic CMakeFiles/BasicPublisher.dir/BasicPublisher.cpp.o  -o ../../../../binaries/BasicPublisher ../../../../lib/libaeron_client.a -lpthread 

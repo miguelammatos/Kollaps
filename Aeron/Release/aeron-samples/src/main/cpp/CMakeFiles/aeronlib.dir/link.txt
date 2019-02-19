@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -DNDEBUG -fPIC -DDISABLE_BOUNDS_CHECKS  -shared -Wl,-soname,libaeronlib.so -o ../../../../lib/libaeronlib.so CMakeFiles/aeronlib.dir/aeronlib.cpp.o ../../../../lib/libaeron_client.a -lpthread 

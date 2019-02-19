@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/hdr_histogram/src/hdr_histogram/src/hdr_histogram.h
+stdint.h
+-
+stdbool.h
+-
+stdio.h
+-
+
+/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/hdr_histogram/src/hdr_histogram/src/hdr_time.h
+math.h
+-
+time.h
+-
+
+/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/hdr_histogram/src/hdr_histogram/test/hdr_histogram_perf.c
+stdint.h
+-
+stdlib.h
+-
+stdio.h
+-
+hdr_histogram.h
+-
+string.h
+-
+hdr_time.h
+/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/hdr_histogram/src/hdr_histogram/test/hdr_time.h
+windows.h
+-
+

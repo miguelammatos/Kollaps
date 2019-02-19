@@ -1,0 +1,2 @@
+/usr/bin/ar qc libhdr_histogram_static.a  CMakeFiles/hdr_histogram_static.dir/hdr_encoding.c.o CMakeFiles/hdr_histogram_static.dir/hdr_histogram.c.o CMakeFiles/hdr_histogram_static.dir/hdr_histogram_log.c.o CMakeFiles/hdr_histogram_static.dir/hdr_interval_recorder.c.o CMakeFiles/hdr_histogram_static.dir/hdr_thread.c.o CMakeFiles/hdr_histogram_static.dir/hdr_time.c.o CMakeFiles/hdr_histogram_static.dir/hdr_writer_reader_phaser.c.o
+/usr/bin/ranlib libhdr_histogram_static.a
