@@ -26,7 +26,8 @@ RUN pacman -Sy --noconfirm \
     iptables \
     iproute2 \
     gcc \
-    grep
+    grep \
+    tcpdump
 
 #RUN git clone --branch master --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\
 ADD ./ /NEED/

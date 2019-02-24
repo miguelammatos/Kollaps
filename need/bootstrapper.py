@@ -15,31 +15,54 @@ from need.NEEDlib.utils import int2ip, ip2int
 UDP_PORT = 55555
 BUFFER_LEN = 512
 
+gods = {}
+ready_gods = {}
 
-def broadcast_ips(local_ips_list):
+
+def broadcast_ips(local_ips_list, number_of_gods):
+	global ready_gods
 	
 	sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	sender.bind(('', UDP_PORT+1))
+	sender.bind(('', UDP_PORT + 1))
 	
 	# msg = "JOIN " + str(socket.gethostbyname(socket.gethostname()))
 	msg = ' '.join(local_ips_list)
 	
 	tries = 0
-	while tries < 4:
+	# while tries < 0:
+	# while len(ready_gods) < number_of_gods:
+	while True:
 		for i in range(1, 254):
-			sender.sendto(bytes(msg, encoding='utf8'), ('10.1.0.'+str(i), UDP_PORT))
-			# sender.sendto(bytes(msg, encoding='utf8'), ('172.12.42.'+str(i), UDP_PORT))
-
+			sender.sendto(bytes(msg, encoding='utf8'), ('10.1.0.' + str(i), UDP_PORT))
+		# sender.sendto(bytes(msg, encoding='utf8'), ('172.12.42.'+str(i), UDP_PORT))
+		
 		sleep(0.5)
 		tries += 1
+		
+		
+def broadcast_ready(number_of_gods):
+	global ready_gods
+	
+	sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	sender.bind(('', UDP_PORT + 2))
+	
+	# while len(ready_gods) < number_of_gods:
+	while True:
+		for i in range(1, 254):
+			sender.sendto(bytes("READY", encoding='utf8'), ('10.1.0.' + str(i), UDP_PORT))
+		
+		sleep(0.5)
+
+
 
 
 def resolve_ips(docker_client, low_level_client):
 	LOCAL_IPS_FILE = "/local_ips.txt"
 	REMOTE_IPS_FILE = "/remote_ips.txt"
+	global gods
+	global ready_gods
 
 	try:
-		gods = {}
 		number_of_gods = len(low_level_client.nodes())
 		local_ips_list = []
 		own_ip = socket.gethostbyname(socket.gethostname())
@@ -58,8 +81,8 @@ def resolve_ips(docker_client, low_level_client):
 					local_ips_list.append(container_ip)
 		
 		local_ips_list.remove(own_ip)
-					
-		ip_broadcast = Process(target=broadcast_ips, args=(local_ips_list,))
+
+		ip_broadcast = Process(target=broadcast_ips, args=(local_ips_list, number_of_gods, ))
 		ip_broadcast.start()
 		
 		receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -68,15 +91,38 @@ def resolve_ips(docker_client, low_level_client):
 		
 		while len(gods) < number_of_gods:
 			data, addr = receiver.recvfrom(BUFFER_LEN)
+			god_ip = int(ip2int(addr[0]))
 			
-			if (addr not in gods):
-				gods[int(ip2int(addr[0]))] = [ip2int(ip) for ip in data.decode("utf-8").split()]
-				# ips_as_ints = map(ip2int, data.decode("utf-8").split())
-				
-				
+			if not data.startswith(b"READY"):
+				list_of_ips = [ip2int(ip) for ip in data.decode("utf-8").split()]
+	
+				if god_ip not in gods:
+					gods[god_ip] = list_of_ips
+					print(f"[Py (god)] {addr[0]} :: {data}")
+					stdout.flush()
+			
+			else:
+				ready_gods[god_ip] = "READY"
+				print(f"[Py (god)] {addr[0]} :: READY")
 		
+		ready_broadcast = Process(target=broadcast_ready, args=(number_of_gods,))
+		ready_broadcast.start()
+		
+		while len(ready_gods) < number_of_gods:
+			data, addr = receiver.recvfrom(BUFFER_LEN)
+			god_ip = int(ip2int(addr[0]))
+			
+			# if data.split()[0] == "READY":
+			if data.startswith(b"READY"):
+				ready_gods[god_ip] = "READY"
+				print(f"[Py (god)] {addr[0]} :: READY")
+		
+		ip_broadcast.terminate()
+		ready_broadcast.terminate()
 		ip_broadcast.join()
+		ready_broadcast.join()
 		
+
 		
 		own_ip = ip2int(own_ip)
 		
@@ -150,6 +196,7 @@ def main():
 				env = inspect_result["Config"]["Env"]
 				
 				print("[Py (bootstrapper)] ip: " + str(socket.gethostbyname(socket.gethostname())))
+				stdout.flush()
 				
 				# create a "God" container that is in the host's Pid namespace
 				client.containers.run(image=boot_image,
