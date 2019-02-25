@@ -4,9 +4,24 @@ Decentralized container based network emulator
 
 ## What's new
 
+results at https://docs.google.com/spreadsheets/d/1HCqgmRbKzrXZOFQ4hgkLVoschj0qp_HApocrE-B0hBo/edit?usp=sharing
+
+network captures https://github.com/paulojlgouveia/benches/tree/master/1.1_vs_2.0
+
+
+
+## changes for 2.0
+
 ipc + udp
 
 git is ignoring executables and .so -> extract Aeron.tar.gz and override for necessary files.
+
+
+aeron is using about half packets as expected
+
+but is using much more bandwidth, it looks that the entire buffer (256 bytes) is always sent regardless of message size
+
+might be a bug in my code, looking into it
 
 
 
