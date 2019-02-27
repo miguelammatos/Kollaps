@@ -7,7 +7,7 @@ setup(name='need',
       author='Joao Neves',
       packages=['need', 'need.NEEDlib', 'need.TCAL'],
       install_requires=[
-          'dnspython',
+          'dnspython','kubernetes'
       ],
       include_package_data=True,
       package_data={

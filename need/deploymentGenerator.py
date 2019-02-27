@@ -11,8 +11,8 @@ from need.NEEDlib.utils import fail, SHORT_LIMIT
 
 def main():
     if(len(sys.argv) != 3):
-        print("Usage: deploymentGenerator.py <input topology> <orchestrator> > <output compose file>")
-        print("<orchestrator> can be -s for Docker Swarm or -k for Kubernetes")
+        print("Usage: deploymentGenerator.py <input topology> <orchestrator> > <output compose file>", file=sys.stderr)
+        print("<orchestrator> can be -s for Docker Swarm or -k for Kubernetes", file=sys.stderr)
         exit(-1)
 
     topology_file = sys.argv[1]

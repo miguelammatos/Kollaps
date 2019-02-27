@@ -11,12 +11,12 @@
                 <bridge name="s1"/>
                 <bridge name="s2"/>
 	</bridges>
-        <links>
-                <link origin="client1" dest="s1" latency="10" upload="100Mbps" download="100Mbps" network="test_overlay"/>
-                <link origin="client2" dest="s1" latency="5" upload="100Mbps" download="100Mbps" network="test_overlay"/>
-                <link origin="client3" dest="s1" latency="5" upload="10Mbps" download="10Mbps" network="test_overlay"/>
-                <link origin="s1" dest="s2" latency="10" upload="50Mbps" download="50Mbps" network="test_overlay"/>
-                <link origin="s2" dest="server" latency="5" upload="100Mbps" download="100Mbps" network="test_overlay"/>
+	<links>
+			<link origin="client1" dest="s1" latency="10" upload="100Mbps" download="100Mbps" network="test_overlay"/>
+			<link origin="client2" dest="s1" latency="5" upload="100Mbps" download="100Mbps" network="test_overlay"/>
+			<link origin="client3" dest="s1" latency="5" upload="10Mbps" download="10Mbps" network="test_overlay"/>
+			<link origin="s1" dest="s2" latency="10" upload="50Mbps" download="50Mbps" network="test_overlay"/>
+			<link origin="s2" dest="server" latency="5" upload="100Mbps" download="100Mbps" network="test_overlay"/>
 	</links>
 	<dynamic>
 		<schedule name="client1" time="0.0" action="join"/>
