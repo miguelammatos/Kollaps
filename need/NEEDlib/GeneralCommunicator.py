@@ -7,7 +7,7 @@ from need.NEEDlib.EventScheduler import EventScheduler
 from threading import Thread, Lock
 from multiprocessing import Pool
 from _thread import interrupt_main
-from ctypes import CFUNCTYPE, POINTER, c_voidp, c_int
+from ctypes import CFUNCTYPE, POINTER, c_voidp, c_int, c_uint, c_ulong, c_ushort
 import socket
 import struct
 import json, pprint
@@ -111,7 +111,7 @@ class CommunicationsManager:
 		self.aeron_lib = ctypes.CDLL(AERON_LIB_PATH)
 		# self.aeron_lib.init(self.aeron_id, len(self.aeron_sub_list), (c_int * len(self.aeron_sub_list))(*self.aeron_sub_list))
 		self.aeron_lib.init(self.aeron_id)
-		CALLBACKTYPE = CFUNCTYPE(c_voidp, c_int, c_int, POINTER(c_int))
+		CALLBACKTYPE = CFUNCTYPE(c_voidp, c_ulong, c_uint, POINTER(c_ushort))
 		c_callback = CALLBACKTYPE(self.receive_flow)
 		self.callback = c_callback  # keep reference so it does not get garbage collected
 		self.aeron_lib.registerCallback(self.callback)
@@ -161,14 +161,14 @@ class CommunicationsManager:
 
 
 	def add_flow(self, throughput, link_list):
-		self.aeron_lib.addFlow(int(throughput), len(link_list), (c_int * len(link_list))(*link_list))
+		self.aeron_lib.addFlow(throughput, len(link_list), (c_ushort * len(link_list))(*link_list))
 
 
 	def receive_flow(self, bandwidth, link_count, link_list):
 		#print("[Py] throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]), end="")
 		#print()
 		sys.stdout.flush()
-		self.flow_collector(bandwidth, link_list[:link_count])
+		self.flow_collector(bandwidth, link_list[0:link_count])
 		self.received += 1
 
 
@@ -181,7 +181,7 @@ class CommunicationsManager:
 		# FIXME add_flow directly in EmulationManager.py
 		for path in active_paths:
 			links = [link.index for link in path.links]
-			self.aeron_lib.addFlow(int(path.used_bandwidth), len(links), (c_int * len(links))(*links))
+			self.aeron_lib.addFlow(path.used_bandwidth, len(links), (c_ushort * len(links))(*links))
 			
 		self.aeron_lib.flush()
 		
