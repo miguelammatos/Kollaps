@@ -98,7 +98,7 @@ $ NEEDdeploymentGenerator topology5.xml > topology5.yaml
 This experiment requires that a network named "test_overlay" exists.
 To create it run:
 ```
-$ docker network create --driver=overlay --subnet=10.1.0.0/24 test_overlay
+$ docker network create --attachable --driver=overlay --subnet=10.1.0.0/24 test_overlay
 ```
 
 This example uses the overlay driver, but ipvlan/macvlan networks are also supported.

@@ -811,8 +811,8 @@ clean: test/CMakeFiles/fixture_test.dir/clean
 # Target rules for target test/CMakeFiles/link_main_test.dir
 
 # All Build rule for target.
-test/CMakeFiles/link_main_test.dir/all: src/CMakeFiles/benchmark_main.dir/all
 test/CMakeFiles/link_main_test.dir/all: src/CMakeFiles/benchmark.dir/all
+test/CMakeFiles/link_main_test.dir/all: src/CMakeFiles/benchmark_main.dir/all
 	$(MAKE) -f test/CMakeFiles/link_main_test.dir/build.make test/CMakeFiles/link_main_test.dir/depend
 	$(MAKE) -f test/CMakeFiles/link_main_test.dir/build.make test/CMakeFiles/link_main_test.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles --progress-num=35,36 "Built target link_main_test"

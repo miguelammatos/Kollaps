@@ -1,4 +1,4 @@
-The system is: Linux - 4.19.20-1-MANJARO - x86_64
+The system is: Linux - 4.19.24-1-MANJARO - x86_64
 Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
 Compiler: /usr/bin/cc 
 Build flags: 
@@ -28,15 +28,15 @@ The CXX compiler identification is GNU, found in "/home/daedalus/Documents/aeron
 Determining if the C compiler works passed with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_51996/fast"
+Run Build Command:"/usr/bin/make" "cmTC_19fbb/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_51996.dir/build.make CMakeFiles/cmTC_51996.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_19fbb.dir/build.make CMakeFiles/cmTC_19fbb.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_51996.dir/testCCompiler.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_51996.dir/testCCompiler.c.o   -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTC_51996
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_51996.dir/link.txt --verbose=1
-/usr/bin/cc      -rdynamic CMakeFiles/cmTC_51996.dir/testCCompiler.c.o  -o cmTC_51996 
+Building C object CMakeFiles/cmTC_19fbb.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_19fbb.dir/testCCompiler.c.o   -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_19fbb
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_19fbb.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_19fbb.dir/testCCompiler.c.o  -o cmTC_19fbb 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -44,15 +44,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_232cd/fast"
+Run Build Command:"/usr/bin/make" "cmTC_36ea7/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_232cd.dir/build.make CMakeFiles/cmTC_232cd.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_36ea7.dir/build.make CMakeFiles/cmTC_36ea7.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_232cd.dir/CMakeCCompilerABI.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_232cd.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.13/Modules/CMakeCCompilerABI.c
-Linking C executable cmTC_232cd
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_232cd.dir/link.txt --verbose=1
-/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_232cd.dir/CMakeCCompilerABI.c.o  -o cmTC_232cd 
+Building C object CMakeFiles/cmTC_36ea7.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_36ea7.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.13/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_36ea7
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_36ea7.dir/link.txt --verbose=1
+/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_36ea7.dir/CMakeCCompilerABI.c.o  -o cmTC_36ea7 
 Using built-in specs.
 COLLECT_GCC=/usr/bin/cc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper
@@ -62,9 +62,9 @@ Thread model: posix
 gcc version 8.2.1 20181127 (GCC) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_232cd' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/collect2 -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccRiGjEj.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_232cd /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../.. CMakeFiles/cmTC_232cd.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crtn.o
-COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_232cd' '-mtune=generic' '-march=x86-64'
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_36ea7' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/collect2 -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccXwUfYU.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_36ea7 /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../.. CMakeFiles/cmTC_36ea7.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_36ea7' '-mtune=generic' '-march=x86-64'
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -73,15 +73,15 @@ Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_232cd/fast"]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_36ea7/fast"]
   ignore line: [make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_232cd.dir/build.make CMakeFiles/cmTC_232cd.dir/build]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_36ea7.dir/build.make CMakeFiles/cmTC_36ea7.dir/build]
   ignore line: [make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp']
-  ignore line: [Building C object CMakeFiles/cmTC_232cd.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_232cd.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.13/Modules/CMakeCCompilerABI.c]
-  ignore line: [Linking C executable cmTC_232cd]
-  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_232cd.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_232cd.dir/CMakeCCompilerABI.c.o  -o cmTC_232cd ]
+  ignore line: [Building C object CMakeFiles/cmTC_36ea7.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_36ea7.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.13/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_36ea7]
+  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_36ea7.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_36ea7.dir/CMakeCCompilerABI.c.o  -o cmTC_36ea7 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/cc]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper]
@@ -91,13 +91,13 @@ Parsed C implicit link information from above output:
   ignore line: [gcc version 8.2.1 20181127 (GCC) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_232cd' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/collect2 -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccRiGjEj.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_232cd /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../.. CMakeFiles/cmTC_232cd.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_36ea7' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/collect2 -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccXwUfYU.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_36ea7 /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../.. CMakeFiles/cmTC_36ea7.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crtn.o]
     arg [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccRiGjEj.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccXwUfYU.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -113,7 +113,7 @@ Parsed C implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-pie] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_232cd] ==> ignore
+    arg [cmTC_36ea7] ==> ignore
     arg [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/Scrt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtbeginS.o] ==> ignore
@@ -122,7 +122,7 @@ Parsed C implicit link information from above output:
     arg [-L/lib/../lib] ==> dir [/lib/../lib]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../..] ==> dir [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../..]
-    arg [CMakeFiles/cmTC_232cd.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTC_36ea7.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-lgcc] ==> lib [gcc]
     arg [--as-needed] ==> ignore
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -149,15 +149,15 @@ Parsed C implicit link information from above output:
 Detecting C [-std=c11] compiler features compiled with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_5f845/fast"
+Run Build Command:"/usr/bin/make" "cmTC_956b0/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_5f845.dir/build.make CMakeFiles/cmTC_5f845.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_956b0.dir/build.make CMakeFiles/cmTC_956b0.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_5f845.dir/feature_tests.c.o
-/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_5f845.dir/feature_tests.c.o   -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_5f845
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5f845.dir/link.txt --verbose=1
-/usr/bin/cc      -rdynamic CMakeFiles/cmTC_5f845.dir/feature_tests.c.o  -o cmTC_5f845 
+Building C object CMakeFiles/cmTC_956b0.dir/feature_tests.c.o
+/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_956b0.dir/feature_tests.c.o   -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_956b0
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_956b0.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_956b0.dir/feature_tests.c.o  -o cmTC_956b0 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -171,15 +171,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Detecting C [-std=c99] compiler features compiled with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_a8d7d/fast"
+Run Build Command:"/usr/bin/make" "cmTC_f33da/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_a8d7d.dir/build.make CMakeFiles/cmTC_a8d7d.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_f33da.dir/build.make CMakeFiles/cmTC_f33da.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_a8d7d.dir/feature_tests.c.o
-/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_a8d7d.dir/feature_tests.c.o   -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_a8d7d
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a8d7d.dir/link.txt --verbose=1
-/usr/bin/cc      -rdynamic CMakeFiles/cmTC_a8d7d.dir/feature_tests.c.o  -o cmTC_a8d7d 
+Building C object CMakeFiles/cmTC_f33da.dir/feature_tests.c.o
+/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_f33da.dir/feature_tests.c.o   -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_f33da
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f33da.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_f33da.dir/feature_tests.c.o  -o cmTC_f33da 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -193,15 +193,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Detecting C [-std=c90] compiler features compiled with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_2f920/fast"
+Run Build Command:"/usr/bin/make" "cmTC_4d940/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_2f920.dir/build.make CMakeFiles/cmTC_2f920.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_4d940.dir/build.make CMakeFiles/cmTC_4d940.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_2f920.dir/feature_tests.c.o
-/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_2f920.dir/feature_tests.c.o   -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_2f920
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2f920.dir/link.txt --verbose=1
-/usr/bin/cc      -rdynamic CMakeFiles/cmTC_2f920.dir/feature_tests.c.o  -o cmTC_2f920 
+Building C object CMakeFiles/cmTC_4d940.dir/feature_tests.c.o
+/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_4d940.dir/feature_tests.c.o   -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_4d940
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4d940.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_4d940.dir/feature_tests.c.o  -o cmTC_4d940 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -213,15 +213,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Determining if the CXX compiler works passed with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_8bb0b/fast"
+Run Build Command:"/usr/bin/make" "cmTC_f08b6/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_8bb0b.dir/build.make CMakeFiles/cmTC_8bb0b.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_f08b6.dir/build.make CMakeFiles/cmTC_f08b6.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_8bb0b.dir/testCXXCompiler.cxx.o
-/usr/bin/c++     -o CMakeFiles/cmTC_8bb0b.dir/testCXXCompiler.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
-Linking CXX executable cmTC_8bb0b
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8bb0b.dir/link.txt --verbose=1
-/usr/bin/c++       -rdynamic CMakeFiles/cmTC_8bb0b.dir/testCXXCompiler.cxx.o  -o cmTC_8bb0b 
+Building CXX object CMakeFiles/cmTC_f08b6.dir/testCXXCompiler.cxx.o
+/usr/bin/c++     -o CMakeFiles/cmTC_f08b6.dir/testCXXCompiler.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_f08b6
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f08b6.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_f08b6.dir/testCXXCompiler.cxx.o  -o cmTC_f08b6 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -229,15 +229,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_f010b/fast"
+Run Build Command:"/usr/bin/make" "cmTC_d1a12/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_f010b.dir/build.make CMakeFiles/cmTC_f010b.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_d1a12.dir/build.make CMakeFiles/cmTC_d1a12.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_f010b.dir/CMakeCXXCompilerABI.cpp.o
-/usr/bin/c++     -o CMakeFiles/cmTC_f010b.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.13/Modules/CMakeCXXCompilerABI.cpp
-Linking CXX executable cmTC_f010b
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f010b.dir/link.txt --verbose=1
-/usr/bin/c++      -v -rdynamic CMakeFiles/cmTC_f010b.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_f010b 
+Building CXX object CMakeFiles/cmTC_d1a12.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++     -o CMakeFiles/cmTC_d1a12.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.13/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_d1a12
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d1a12.dir/link.txt --verbose=1
+/usr/bin/c++      -v -rdynamic CMakeFiles/cmTC_d1a12.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_d1a12 
 Using built-in specs.
 COLLECT_GCC=/usr/bin/c++
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper
@@ -247,9 +247,9 @@ Thread model: posix
 gcc version 8.2.1 20181127 (GCC) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_f010b' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/collect2 -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccD8PatU.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_f010b /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../.. CMakeFiles/cmTC_f010b.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crtn.o
-COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_f010b' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_d1a12' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/collect2 -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccOhs5iW.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_d1a12 /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../.. CMakeFiles/cmTC_d1a12.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_d1a12' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -258,15 +258,15 @@ Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_f010b/fast"]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_d1a12/fast"]
   ignore line: [make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_f010b.dir/build.make CMakeFiles/cmTC_f010b.dir/build]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_d1a12.dir/build.make CMakeFiles/cmTC_d1a12.dir/build]
   ignore line: [make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp']
-  ignore line: [Building CXX object CMakeFiles/cmTC_f010b.dir/CMakeCXXCompilerABI.cpp.o]
-  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTC_f010b.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.13/Modules/CMakeCXXCompilerABI.cpp]
-  ignore line: [Linking CXX executable cmTC_f010b]
-  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f010b.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/c++      -v -rdynamic CMakeFiles/cmTC_f010b.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_f010b ]
+  ignore line: [Building CXX object CMakeFiles/cmTC_d1a12.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTC_d1a12.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.13/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_d1a12]
+  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d1a12.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++      -v -rdynamic CMakeFiles/cmTC_d1a12.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_d1a12 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/c++]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper]
@@ -276,13 +276,13 @@ Parsed CXX implicit link information from above output:
   ignore line: [gcc version 8.2.1 20181127 (GCC) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_f010b' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/collect2 -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccD8PatU.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_f010b /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../.. CMakeFiles/cmTC_f010b.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_d1a12' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/collect2 -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccOhs5iW.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_d1a12 /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../.. CMakeFiles/cmTC_d1a12.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crtn.o]
     arg [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccD8PatU.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccOhs5iW.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -298,7 +298,7 @@ Parsed CXX implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-pie] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_f010b] ==> ignore
+    arg [cmTC_d1a12] ==> ignore
     arg [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/Scrt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../../../lib/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/crtbeginS.o] ==> ignore
@@ -307,7 +307,7 @@ Parsed CXX implicit link information from above output:
     arg [-L/lib/../lib] ==> dir [/lib/../lib]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../..] ==> dir [/usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/../../..]
-    arg [CMakeFiles/cmTC_f010b.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [CMakeFiles/cmTC_d1a12.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
     arg [-lstdc++] ==> lib [stdc++]
     arg [-lm] ==> lib [m]
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -332,15 +332,15 @@ Parsed CXX implicit link information from above output:
 Detecting CXX [-std=c++2a] compiler features compiled with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_223f4/fast"
+Run Build Command:"/usr/bin/make" "cmTC_27e51/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_223f4.dir/build.make CMakeFiles/cmTC_223f4.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_27e51.dir/build.make CMakeFiles/cmTC_27e51.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_223f4.dir/feature_tests.cxx.o
-/usr/bin/c++    -std=c++2a -o CMakeFiles/cmTC_223f4.dir/feature_tests.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_223f4
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_223f4.dir/link.txt --verbose=1
-/usr/bin/c++       -rdynamic CMakeFiles/cmTC_223f4.dir/feature_tests.cxx.o  -o cmTC_223f4 
+Building CXX object CMakeFiles/cmTC_27e51.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++2a -o CMakeFiles/cmTC_27e51.dir/feature_tests.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_27e51
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_27e51.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_27e51.dir/feature_tests.cxx.o  -o cmTC_27e51 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -407,15 +407,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Detecting CXX [-std=c++17] compiler features compiled with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_97223/fast"
+Run Build Command:"/usr/bin/make" "cmTC_0d3c0/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_97223.dir/build.make CMakeFiles/cmTC_97223.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_0d3c0.dir/build.make CMakeFiles/cmTC_0d3c0.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_97223.dir/feature_tests.cxx.o
-/usr/bin/c++    -std=c++17 -o CMakeFiles/cmTC_97223.dir/feature_tests.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_97223
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_97223.dir/link.txt --verbose=1
-/usr/bin/c++       -rdynamic CMakeFiles/cmTC_97223.dir/feature_tests.cxx.o  -o cmTC_97223 
+Building CXX object CMakeFiles/cmTC_0d3c0.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++17 -o CMakeFiles/cmTC_0d3c0.dir/feature_tests.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_0d3c0
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0d3c0.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_0d3c0.dir/feature_tests.cxx.o  -o cmTC_0d3c0 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -482,15 +482,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Detecting CXX [-std=c++14] compiler features compiled with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_8c477/fast"
+Run Build Command:"/usr/bin/make" "cmTC_023f1/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_8c477.dir/build.make CMakeFiles/cmTC_8c477.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_023f1.dir/build.make CMakeFiles/cmTC_023f1.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_8c477.dir/feature_tests.cxx.o
-/usr/bin/c++    -std=c++14 -o CMakeFiles/cmTC_8c477.dir/feature_tests.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_8c477
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8c477.dir/link.txt --verbose=1
-/usr/bin/c++       -rdynamic CMakeFiles/cmTC_8c477.dir/feature_tests.cxx.o  -o cmTC_8c477 
+Building CXX object CMakeFiles/cmTC_023f1.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++14 -o CMakeFiles/cmTC_023f1.dir/feature_tests.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_023f1
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_023f1.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_023f1.dir/feature_tests.cxx.o  -o cmTC_023f1 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -557,15 +557,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Detecting CXX [-std=c++11] compiler features compiled with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_ffa59/fast"
+Run Build Command:"/usr/bin/make" "cmTC_23b9f/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_ffa59.dir/build.make CMakeFiles/cmTC_ffa59.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_23b9f.dir/build.make CMakeFiles/cmTC_23b9f.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_ffa59.dir/feature_tests.cxx.o
-/usr/bin/c++    -std=c++11 -o CMakeFiles/cmTC_ffa59.dir/feature_tests.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_ffa59
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ffa59.dir/link.txt --verbose=1
-/usr/bin/c++       -rdynamic CMakeFiles/cmTC_ffa59.dir/feature_tests.cxx.o  -o cmTC_ffa59 
+Building CXX object CMakeFiles/cmTC_23b9f.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++11 -o CMakeFiles/cmTC_23b9f.dir/feature_tests.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_23b9f
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_23b9f.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_23b9f.dir/feature_tests.cxx.o  -o cmTC_23b9f 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -632,15 +632,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Detecting CXX [-std=c++98] compiler features compiled with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_bf3dc/fast"
+Run Build Command:"/usr/bin/make" "cmTC_5913c/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_bf3dc.dir/build.make CMakeFiles/cmTC_bf3dc.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_5913c.dir/build.make CMakeFiles/cmTC_5913c.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_bf3dc.dir/feature_tests.cxx.o
-/usr/bin/c++    -std=c++98 -o CMakeFiles/cmTC_bf3dc.dir/feature_tests.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_bf3dc
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bf3dc.dir/link.txt --verbose=1
-/usr/bin/c++       -rdynamic CMakeFiles/cmTC_bf3dc.dir/feature_tests.cxx.o  -o cmTC_bf3dc 
+Building CXX object CMakeFiles/cmTC_5913c.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++98 -o CMakeFiles/cmTC_5913c.dir/feature_tests.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_5913c
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5913c.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_5913c.dir/feature_tests.cxx.o  -o cmTC_5913c 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -705,15 +705,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_STD_CXX11 succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_7aecd/fast"
+Run Build Command:"/usr/bin/make" "cmTC_ec2ee/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_7aecd.dir/build.make CMakeFiles/cmTC_7aecd.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_ec2ee.dir/build.make CMakeFiles/cmTC_ec2ee.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_7aecd.dir/src.cxx.o
-/usr/bin/c++    -DHAVE_CXX_FLAG_STD_CXX11  -std=c++11   -std=c++11 -o CMakeFiles/cmTC_7aecd.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_7aecd
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7aecd.dir/link.txt --verbose=1
-/usr/bin/c++   -DHAVE_CXX_FLAG_STD_CXX11  -std=c++11    -rdynamic CMakeFiles/cmTC_7aecd.dir/src.cxx.o  -o cmTC_7aecd 
+Building CXX object CMakeFiles/cmTC_ec2ee.dir/src.cxx.o
+/usr/bin/c++    -DHAVE_CXX_FLAG_STD_CXX11  -std=c++11   -std=c++11 -o CMakeFiles/cmTC_ec2ee.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_ec2ee
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ec2ee.dir/link.txt --verbose=1
+/usr/bin/c++   -DHAVE_CXX_FLAG_STD_CXX11  -std=c++11    -rdynamic CMakeFiles/cmTC_ec2ee.dir/src.cxx.o  -o cmTC_ec2ee 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -722,15 +722,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_WALL succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_fb680/fast"
+Run Build Command:"/usr/bin/make" "cmTC_0fa1e/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_fb680.dir/build.make CMakeFiles/cmTC_fb680.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_0fa1e.dir/build.make CMakeFiles/cmTC_0fa1e.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_fb680.dir/src.cxx.o
-/usr/bin/c++    -std=c++11 -DHAVE_CXX_FLAG_WALL  -Wall   -Wall -o CMakeFiles/cmTC_fb680.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_fb680
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fb680.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11 -DHAVE_CXX_FLAG_WALL  -Wall    -rdynamic CMakeFiles/cmTC_fb680.dir/src.cxx.o  -o cmTC_fb680 
+Building CXX object CMakeFiles/cmTC_0fa1e.dir/src.cxx.o
+/usr/bin/c++    -std=c++11 -DHAVE_CXX_FLAG_WALL  -Wall   -Wall -o CMakeFiles/cmTC_0fa1e.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_0fa1e
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0fa1e.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11 -DHAVE_CXX_FLAG_WALL  -Wall    -rdynamic CMakeFiles/cmTC_0fa1e.dir/src.cxx.o  -o cmTC_0fa1e 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -739,15 +739,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_WEXTRA succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_53c09/fast"
+Run Build Command:"/usr/bin/make" "cmTC_75af1/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_53c09.dir/build.make CMakeFiles/cmTC_53c09.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_75af1.dir/build.make CMakeFiles/cmTC_75af1.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_53c09.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall -DHAVE_CXX_FLAG_WEXTRA  -Wextra   -Wextra -o CMakeFiles/cmTC_53c09.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_53c09
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_53c09.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall -DHAVE_CXX_FLAG_WEXTRA  -Wextra    -rdynamic CMakeFiles/cmTC_53c09.dir/src.cxx.o  -o cmTC_53c09 
+Building CXX object CMakeFiles/cmTC_75af1.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall -DHAVE_CXX_FLAG_WEXTRA  -Wextra   -Wextra -o CMakeFiles/cmTC_75af1.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_75af1
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_75af1.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall -DHAVE_CXX_FLAG_WEXTRA  -Wextra    -rdynamic CMakeFiles/cmTC_75af1.dir/src.cxx.o  -o cmTC_75af1 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -756,15 +756,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_WSHADOW succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_1fbed/fast"
+Run Build Command:"/usr/bin/make" "cmTC_de798/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_1fbed.dir/build.make CMakeFiles/cmTC_1fbed.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_de798.dir/build.make CMakeFiles/cmTC_de798.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_1fbed.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra -DHAVE_CXX_FLAG_WSHADOW  -Wshadow   -Wshadow -o CMakeFiles/cmTC_1fbed.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_1fbed
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1fbed.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra -DHAVE_CXX_FLAG_WSHADOW  -Wshadow    -rdynamic CMakeFiles/cmTC_1fbed.dir/src.cxx.o  -o cmTC_1fbed 
+Building CXX object CMakeFiles/cmTC_de798.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra -DHAVE_CXX_FLAG_WSHADOW  -Wshadow   -Wshadow -o CMakeFiles/cmTC_de798.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_de798
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_de798.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra -DHAVE_CXX_FLAG_WSHADOW  -Wshadow    -rdynamic CMakeFiles/cmTC_de798.dir/src.cxx.o  -o cmTC_de798 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -773,15 +773,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_WERROR succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_d93a0/fast"
+Run Build Command:"/usr/bin/make" "cmTC_cde9e/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_d93a0.dir/build.make CMakeFiles/cmTC_d93a0.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_cde9e.dir/build.make CMakeFiles/cmTC_cde9e.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_d93a0.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow -DHAVE_CXX_FLAG_WERROR  -Werror   -Werror -o CMakeFiles/cmTC_d93a0.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_d93a0
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d93a0.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow -DHAVE_CXX_FLAG_WERROR  -Werror    -rdynamic CMakeFiles/cmTC_d93a0.dir/src.cxx.o  -o cmTC_d93a0 
+Building CXX object CMakeFiles/cmTC_cde9e.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow -DHAVE_CXX_FLAG_WERROR  -Werror   -Werror -o CMakeFiles/cmTC_cde9e.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_cde9e
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cde9e.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow -DHAVE_CXX_FLAG_WERROR  -Werror    -rdynamic CMakeFiles/cmTC_cde9e.dir/src.cxx.o  -o cmTC_cde9e 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -790,15 +790,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_PEDANTIC succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_a2fdc/fast"
+Run Build Command:"/usr/bin/make" "cmTC_7013f/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_a2fdc.dir/build.make CMakeFiles/cmTC_a2fdc.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_7013f.dir/build.make CMakeFiles/cmTC_7013f.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_a2fdc.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow -DHAVE_CXX_FLAG_PEDANTIC  -pedantic   -pedantic -o CMakeFiles/cmTC_a2fdc.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_a2fdc
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a2fdc.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow -DHAVE_CXX_FLAG_PEDANTIC  -pedantic    -rdynamic CMakeFiles/cmTC_a2fdc.dir/src.cxx.o  -o cmTC_a2fdc 
+Building CXX object CMakeFiles/cmTC_7013f.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow -DHAVE_CXX_FLAG_PEDANTIC  -pedantic   -pedantic -o CMakeFiles/cmTC_7013f.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_7013f
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7013f.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow -DHAVE_CXX_FLAG_PEDANTIC  -pedantic    -rdynamic CMakeFiles/cmTC_7013f.dir/src.cxx.o  -o cmTC_7013f 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -807,15 +807,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_PEDANTIC_ERRORS succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_a6caf/fast"
+Run Build Command:"/usr/bin/make" "cmTC_5b617/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_a6caf.dir/build.make CMakeFiles/cmTC_a6caf.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_5b617.dir/build.make CMakeFiles/cmTC_5b617.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_a6caf.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic -DHAVE_CXX_FLAG_PEDANTIC_ERRORS  -pedantic-errors   -pedantic-errors -o CMakeFiles/cmTC_a6caf.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_a6caf
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a6caf.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic -DHAVE_CXX_FLAG_PEDANTIC_ERRORS  -pedantic-errors    -rdynamic CMakeFiles/cmTC_a6caf.dir/src.cxx.o  -o cmTC_a6caf 
+Building CXX object CMakeFiles/cmTC_5b617.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic -DHAVE_CXX_FLAG_PEDANTIC_ERRORS  -pedantic-errors   -pedantic-errors -o CMakeFiles/cmTC_5b617.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_5b617
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5b617.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic -DHAVE_CXX_FLAG_PEDANTIC_ERRORS  -pedantic-errors    -rdynamic CMakeFiles/cmTC_5b617.dir/src.cxx.o  -o cmTC_5b617 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -824,15 +824,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_WFLOAT_EQUAL succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_cb61e/fast"
+Run Build Command:"/usr/bin/make" "cmTC_55ae2/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_cb61e.dir/build.make CMakeFiles/cmTC_cb61e.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_55ae2.dir/build.make CMakeFiles/cmTC_55ae2.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_cb61e.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors -DHAVE_CXX_FLAG_WFLOAT_EQUAL  -Wfloat-equal   -Wfloat-equal -o CMakeFiles/cmTC_cb61e.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_cb61e
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cb61e.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors -DHAVE_CXX_FLAG_WFLOAT_EQUAL  -Wfloat-equal    -rdynamic CMakeFiles/cmTC_cb61e.dir/src.cxx.o  -o cmTC_cb61e 
+Building CXX object CMakeFiles/cmTC_55ae2.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors -DHAVE_CXX_FLAG_WFLOAT_EQUAL  -Wfloat-equal   -Wfloat-equal -o CMakeFiles/cmTC_55ae2.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_55ae2
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_55ae2.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors -DHAVE_CXX_FLAG_WFLOAT_EQUAL  -Wfloat-equal    -rdynamic CMakeFiles/cmTC_55ae2.dir/src.cxx.o  -o cmTC_55ae2 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -841,15 +841,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_FSTRICT_ALIASING succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_86702/fast"
+Run Build Command:"/usr/bin/make" "cmTC_ffcdc/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_86702.dir/build.make CMakeFiles/cmTC_86702.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_ffcdc.dir/build.make CMakeFiles/cmTC_ffcdc.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_86702.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal -DHAVE_CXX_FLAG_FSTRICT_ALIASING  -fstrict-aliasing   -fstrict-aliasing -o CMakeFiles/cmTC_86702.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_86702
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_86702.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal -DHAVE_CXX_FLAG_FSTRICT_ALIASING  -fstrict-aliasing    -rdynamic CMakeFiles/cmTC_86702.dir/src.cxx.o  -o cmTC_86702 
+Building CXX object CMakeFiles/cmTC_ffcdc.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal -DHAVE_CXX_FLAG_FSTRICT_ALIASING  -fstrict-aliasing   -fstrict-aliasing -o CMakeFiles/cmTC_ffcdc.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_ffcdc
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ffcdc.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal -DHAVE_CXX_FLAG_FSTRICT_ALIASING  -fstrict-aliasing    -rdynamic CMakeFiles/cmTC_ffcdc.dir/src.cxx.o  -o cmTC_ffcdc 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -858,15 +858,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_WSTRICT_ALIASING succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_43adc/fast"
+Run Build Command:"/usr/bin/make" "cmTC_1d04a/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_43adc.dir/build.make CMakeFiles/cmTC_43adc.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_1d04a.dir/build.make CMakeFiles/cmTC_1d04a.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_43adc.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing -DHAVE_CXX_FLAG_WSTRICT_ALIASING  -Wstrict-aliasing   -Wstrict-aliasing -o CMakeFiles/cmTC_43adc.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_43adc
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_43adc.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing -DHAVE_CXX_FLAG_WSTRICT_ALIASING  -Wstrict-aliasing    -rdynamic CMakeFiles/cmTC_43adc.dir/src.cxx.o  -o cmTC_43adc 
+Building CXX object CMakeFiles/cmTC_1d04a.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing -DHAVE_CXX_FLAG_WSTRICT_ALIASING  -Wstrict-aliasing   -Wstrict-aliasing -o CMakeFiles/cmTC_1d04a.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_1d04a
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1d04a.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing -DHAVE_CXX_FLAG_WSTRICT_ALIASING  -Wstrict-aliasing    -rdynamic CMakeFiles/cmTC_1d04a.dir/src.cxx.o  -o cmTC_1d04a 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -875,15 +875,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_COVERAGE succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_36a61/fast"
+Run Build Command:"/usr/bin/make" "cmTC_f1249/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_36a61.dir/build.make CMakeFiles/cmTC_36a61.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_f1249.dir/build.make CMakeFiles/cmTC_f1249.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_36a61.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DHAVE_CXX_FLAG_COVERAGE  --coverage   --coverage -o CMakeFiles/cmTC_36a61.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_36a61
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_36a61.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DHAVE_CXX_FLAG_COVERAGE  --coverage    -rdynamic CMakeFiles/cmTC_36a61.dir/src.cxx.o  -o cmTC_36a61 
+Building CXX object CMakeFiles/cmTC_f1249.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DHAVE_CXX_FLAG_COVERAGE  --coverage   --coverage -o CMakeFiles/cmTC_f1249.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_f1249
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f1249.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DHAVE_CXX_FLAG_COVERAGE  --coverage    -rdynamic CMakeFiles/cmTC_f1249.dir/src.cxx.o  -o cmTC_f1249 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -892,15 +892,15 @@ int main() { return 0; }
 Determining if the include file pthread.h exists passed with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_e1734/fast"
+Run Build Command:"/usr/bin/make" "cmTC_671d3/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_e1734.dir/build.make CMakeFiles/cmTC_e1734.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_671d3.dir/build.make CMakeFiles/cmTC_671d3.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_e1734.dir/CheckIncludeFile.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_e1734.dir/CheckIncludeFile.c.o   -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
-Linking C executable cmTC_e1734
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e1734.dir/link.txt --verbose=1
-/usr/bin/cc      -rdynamic CMakeFiles/cmTC_e1734.dir/CheckIncludeFile.c.o  -o cmTC_e1734 
+Building C object CMakeFiles/cmTC_671d3.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_671d3.dir/CheckIncludeFile.c.o   -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_671d3
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_671d3.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_671d3.dir/CheckIncludeFile.c.o  -o cmTC_671d3 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -908,15 +908,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Determining if the function pthread_create exists in the pthread passed with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_0d9aa/fast"
+Run Build Command:"/usr/bin/make" "cmTC_cbfcd/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_0d9aa.dir/build.make CMakeFiles/cmTC_0d9aa.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_cbfcd.dir/build.make CMakeFiles/cmTC_cbfcd.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_0d9aa.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_0d9aa.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.13/Modules/CheckFunctionExists.c
-Linking C executable cmTC_0d9aa
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0d9aa.dir/link.txt --verbose=1
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_0d9aa.dir/CheckFunctionExists.c.o  -o cmTC_0d9aa -lpthread 
+Building C object CMakeFiles/cmTC_cbfcd.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_cbfcd.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.13/Modules/CheckFunctionExists.c
+Linking C executable cmTC_cbfcd
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cbfcd.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_cbfcd.dir/CheckFunctionExists.c.o  -o cmTC_cbfcd -lpthread 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -924,15 +924,15 @@ make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release
 Performing C++ SOURCE FILE Test BENCHMARK_HAS_O3_FLAG succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_20e68/fast"
+Run Build Command:"/usr/bin/make" "cmTC_79482/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_20e68.dir/build.make CMakeFiles/cmTC_20e68.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_79482.dir/build.make CMakeFiles/cmTC_79482.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_20e68.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_O3_FLAG   -O3 -o CMakeFiles/cmTC_20e68.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_20e68
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_20e68.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_O3_FLAG    -rdynamic CMakeFiles/cmTC_20e68.dir/src.cxx.o  -o cmTC_20e68 
+Building CXX object CMakeFiles/cmTC_79482.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_O3_FLAG   -O3 -o CMakeFiles/cmTC_79482.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_79482
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_79482.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_O3_FLAG    -rdynamic CMakeFiles/cmTC_79482.dir/src.cxx.o  -o cmTC_79482 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -941,15 +941,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test BENCHMARK_HAS_CXX03_FLAG succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_0dbb4/fast"
+Run Build Command:"/usr/bin/make" "cmTC_228e9/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_0dbb4.dir/build.make CMakeFiles/cmTC_0dbb4.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_228e9.dir/build.make CMakeFiles/cmTC_228e9.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_0dbb4.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_CXX03_FLAG   -std=c++03 -o CMakeFiles/cmTC_0dbb4.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_0dbb4
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0dbb4.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_CXX03_FLAG    -rdynamic CMakeFiles/cmTC_0dbb4.dir/src.cxx.o  -o cmTC_0dbb4 
+Building CXX object CMakeFiles/cmTC_228e9.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_CXX03_FLAG   -std=c++03 -o CMakeFiles/cmTC_228e9.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_228e9
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_228e9.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_CXX03_FLAG    -rdynamic CMakeFiles/cmTC_228e9.dir/src.cxx.o  -o cmTC_228e9 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 
@@ -958,15 +958,15 @@ int main() { return 0; }
 Performing C++ SOURCE FILE Test BENCHMARK_HAS_WNO_ODR succeeded with the following output:
 Change Dir: /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_c9f78/fast"
+Run Build Command:"/usr/bin/make" "cmTC_d8d05/fast"
 make[3]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_c9f78.dir/build.make CMakeFiles/cmTC_c9f78.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_d8d05.dir/build.make CMakeFiles/cmTC_d8d05.dir/build
 make[4]: Entering directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_c9f78.dir/src.cxx.o
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_WNO_ODR   -Wno-odr -o CMakeFiles/cmTC_c9f78.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_c9f78
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c9f78.dir/link.txt --verbose=1
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_WNO_ODR    -rdynamic CMakeFiles/cmTC_c9f78.dir/src.cxx.o  -o cmTC_c9f78 
+Building CXX object CMakeFiles/cmTC_d8d05.dir/src.cxx.o
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_WNO_ODR   -Wno-odr -o CMakeFiles/cmTC_d8d05.dir/src.cxx.o -c /home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_d8d05
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d8d05.dir/link.txt --verbose=1
+/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing -DBENCHMARK_HAS_WNO_ODR    -rdynamic CMakeFiles/cmTC_d8d05.dir/src.cxx.o  -o cmTC_d8d05 
 make[4]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/google_benchmark/src/google_benchmark-build/CMakeFiles/CMakeTmp'
 

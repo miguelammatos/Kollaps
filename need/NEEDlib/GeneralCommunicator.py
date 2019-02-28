@@ -161,12 +161,12 @@ class CommunicationsManager:
 
 
 	def add_flow(self, throughput, link_list):
-		self.aeron_lib.addFlow(throughput, len(link_list), (c_int * len(link_list))(*link_list))
+		self.aeron_lib.addFlow(int(throughput), len(link_list), (c_int * len(link_list))(*link_list))
 
 
 	def receive_flow(self, bandwidth, link_count, link_list):
-		print("[Py] throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]), end="")
-		print()
+		#print("[Py] throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]), end="")
+		#print()
 		sys.stdout.flush()
 		self.flow_collector(bandwidth, link_list[:link_count])
 		self.received += 1

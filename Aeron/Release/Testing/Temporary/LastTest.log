@@ -1,10 +1,10 @@
-Start testing: Feb 19 07:44 WET
+Start testing: Feb 28 05:52 WET
 ----------------------------------------------------------
 2/43 Testing: publicationTest
 2/43 Test: publicationTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/publicationTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"publicationTest" start time: Feb 19 07:44 WET
+"publicationTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -16,11 +16,11 @@ Running main() from gmock_main.cc
 [ RUN      ] PublicationTest.shouldReportMaxMessageLength
 [       OK ] PublicationTest.shouldReportMaxMessageLength (1 ms)
 [ RUN      ] PublicationTest.shouldReportCorrectTermBufferLength
-[       OK ] PublicationTest.shouldReportCorrectTermBufferLength (0 ms)
+[       OK ] PublicationTest.shouldReportCorrectTermBufferLength (1 ms)
 [ RUN      ] PublicationTest.shouldReportThatPublicationHasNotBeenConnectedYet
-[       OK ] PublicationTest.shouldReportThatPublicationHasNotBeenConnectedYet (1 ms)
+[       OK ] PublicationTest.shouldReportThatPublicationHasNotBeenConnectedYet (0 ms)
 [ RUN      ] PublicationTest.shouldReportThatPublicationHasBeenConnectedYet
-[       OK ] PublicationTest.shouldReportThatPublicationHasBeenConnectedYet (0 ms)
+[       OK ] PublicationTest.shouldReportThatPublicationHasBeenConnectedYet (1 ms)
 [ RUN      ] PublicationTest.shouldEnsureThePublicationIsOpenBeforeReadingPosition
 [       OK ] PublicationTest.shouldEnsureThePublicationIsOpenBeforeReadingPosition (0 ms)
 [ RUN      ] PublicationTest.shouldEnsureThePublicationIsOpenBeforeOffer
@@ -28,25 +28,25 @@ Running main() from gmock_main.cc
 [ RUN      ] PublicationTest.shouldEnsureThePublicationIsOpenBeforeClaim
 [       OK ] PublicationTest.shouldEnsureThePublicationIsOpenBeforeClaim (0 ms)
 [ RUN      ] PublicationTest.shouldOfferAMessageUponConstruction
-[       OK ] PublicationTest.shouldOfferAMessageUponConstruction (0 ms)
+[       OK ] PublicationTest.shouldOfferAMessageUponConstruction (1 ms)
 [ RUN      ] PublicationTest.shouldFailToOfferAMessageWhenLimited
 [       OK ] PublicationTest.shouldFailToOfferAMessageWhenLimited (0 ms)
 [ RUN      ] PublicationTest.shouldFailToOfferWhenAppendFails
-[       OK ] PublicationTest.shouldFailToOfferWhenAppendFails (1 ms)
+[       OK ] PublicationTest.shouldFailToOfferWhenAppendFails (0 ms)
 [ RUN      ] PublicationTest.shouldRotateWhenAppendTrips
 [       OK ] PublicationTest.shouldRotateWhenAppendTrips (0 ms)
 [ RUN      ] PublicationTest.shouldRotateWhenClaimTrips
 [       OK ] PublicationTest.shouldRotateWhenClaimTrips (0 ms)
-[----------] 13 tests from PublicationTest (4 ms total)
+[----------] 13 tests from PublicationTest (5 ms total)
 
 [----------] Global test environment tear-down
-[==========] 13 tests from 1 test case ran. (4 ms total)
+[==========] 13 tests from 1 test case ran. (5 ms total)
 [  PASSED  ] 13 tests.
 <end of output>
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"publicationTest" end time: Feb 19 07:44 WET
+"publicationTest" end time: Feb 28 05:52 WET
 "publicationTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -54,7 +54,7 @@ Test Passed.
 3/43 Test: exclusivePublicationTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/exclusivePublicationTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"exclusivePublicationTest" start time: Feb 19 07:44 WET
+"exclusivePublicationTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -64,7 +64,7 @@ Running main() from gmock_main.cc
 [ RUN      ] ExclusivePublicationTest.shouldReportInitialPosition
 [       OK ] ExclusivePublicationTest.shouldReportInitialPosition (1 ms)
 [ RUN      ] ExclusivePublicationTest.shouldReportMaxMessageLength
-[       OK ] ExclusivePublicationTest.shouldReportMaxMessageLength (1 ms)
+[       OK ] ExclusivePublicationTest.shouldReportMaxMessageLength (2 ms)
 [ RUN      ] ExclusivePublicationTest.shouldReportCorrectTermBufferLength
 [       OK ] ExclusivePublicationTest.shouldReportCorrectTermBufferLength (0 ms)
 [ RUN      ] ExclusivePublicationTest.shouldReportThatPublicationHasNotBeenConnectedYet
@@ -72,13 +72,13 @@ Running main() from gmock_main.cc
 [ RUN      ] ExclusivePublicationTest.shouldReportThatPublicationHasBeenConnectedYet
 [       OK ] ExclusivePublicationTest.shouldReportThatPublicationHasBeenConnectedYet (0 ms)
 [ RUN      ] ExclusivePublicationTest.shouldEnsureThePublicationIsOpenBeforeReadingPosition
-[       OK ] ExclusivePublicationTest.shouldEnsureThePublicationIsOpenBeforeReadingPosition (0 ms)
+[       OK ] ExclusivePublicationTest.shouldEnsureThePublicationIsOpenBeforeReadingPosition (1 ms)
 [ RUN      ] ExclusivePublicationTest.shouldEnsureThePublicationIsOpenBeforeOffer
 [       OK ] ExclusivePublicationTest.shouldEnsureThePublicationIsOpenBeforeOffer (0 ms)
 [ RUN      ] ExclusivePublicationTest.shouldEnsureThePublicationIsOpenBeforeClaim
 [       OK ] ExclusivePublicationTest.shouldEnsureThePublicationIsOpenBeforeClaim (0 ms)
 [ RUN      ] ExclusivePublicationTest.shouldOfferAMessageUponConstruction
-[       OK ] ExclusivePublicationTest.shouldOfferAMessageUponConstruction (1 ms)
+[       OK ] ExclusivePublicationTest.shouldOfferAMessageUponConstruction (0 ms)
 [ RUN      ] ExclusivePublicationTest.shouldFailToOfferAMessageWhenLimited
 [       OK ] ExclusivePublicationTest.shouldFailToOfferAMessageWhenLimited (0 ms)
 [ RUN      ] ExclusivePublicationTest.shouldFailToOfferWhenAppendFails
@@ -86,17 +86,17 @@ Running main() from gmock_main.cc
 [ RUN      ] ExclusivePublicationTest.shouldRotateWhenAppendTrips
 [       OK ] ExclusivePublicationTest.shouldRotateWhenAppendTrips (0 ms)
 [ RUN      ] ExclusivePublicationTest.shouldRotateWhenClaimTrips
-[       OK ] ExclusivePublicationTest.shouldRotateWhenClaimTrips (0 ms)
-[----------] 13 tests from ExclusivePublicationTest (3 ms total)
+[       OK ] ExclusivePublicationTest.shouldRotateWhenClaimTrips (1 ms)
+[----------] 13 tests from ExclusivePublicationTest (5 ms total)
 
 [----------] Global test environment tear-down
-[==========] 13 tests from 1 test case ran. (3 ms total)
+[==========] 13 tests from 1 test case ran. (5 ms total)
 [  PASSED  ] 13 tests.
 <end of output>
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"exclusivePublicationTest" end time: Feb 19 07:44 WET
+"exclusivePublicationTest" end time: Feb 28 05:52 WET
 "exclusivePublicationTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -104,7 +104,7 @@ Test Passed.
 5/43 Test: fragmentAssemblyTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/fragmentAssemblyTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"fragmentAssemblyTest" start time: Feb 19 07:44 WET
+"fragmentAssemblyTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -130,7 +130,7 @@ Running main() from gmock_main.cc
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"fragmentAssemblyTest" end time: Feb 19 07:44 WET
+"fragmentAssemblyTest" end time: Feb 28 05:52 WET
 "fragmentAssemblyTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -138,7 +138,7 @@ Test Passed.
 6/43 Test: commandTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/commandTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"commandTest" start time: Feb 19 07:44 WET
+"commandTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -162,75 +162,15 @@ Running main() from gmock_main.cc
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"commandTest" end time: Feb 19 07:44 WET
+"commandTest" end time: Feb 28 05:52 WET
 "commandTest" time elapsed: 00:00:00
-----------------------------------------------------------
-
-4/43 Testing: imageTest
-4/43 Test: imageTest
-Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/imageTest"
-Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"imageTest" start time: Feb 19 07:44 WET
-Output:
-----------------------------------------------------------
-Running main() from gmock_main.cc
-[==========] Running 18 tests from 1 test case.
-[----------] Global test environment set-up.
-[----------] 18 tests from ImageTest
-[ RUN      ] ImageTest.shouldReportCorrectInitialTermId
-[       OK ] ImageTest.shouldReportCorrectInitialTermId (0 ms)
-[ RUN      ] ImageTest.shouldReportCorrectTermBufferLength
-[       OK ] ImageTest.shouldReportCorrectTermBufferLength (2 ms)
-[ RUN      ] ImageTest.shouldReportCorrectPositionOnReception
-[       OK ] ImageTest.shouldReportCorrectPositionOnReception (0 ms)
-[ RUN      ] ImageTest.shouldReportCorrectPositionOnReceptionWithNonZeroPositionInInitialTermId
-[       OK ] ImageTest.shouldReportCorrectPositionOnReceptionWithNonZeroPositionInInitialTermId (0 ms)
-[ RUN      ] ImageTest.shouldReportCorrectPositionOnReceptionWithNonZeroPositionInNonInitialTermId
-[       OK ] ImageTest.shouldReportCorrectPositionOnReceptionWithNonZeroPositionInNonInitialTermId (0 ms)
-[ RUN      ] ImageTest.shouldEnsureImageIsOpenBeforeReadingPosition
-[       OK ] ImageTest.shouldEnsureImageIsOpenBeforeReadingPosition (0 ms)
-[ RUN      ] ImageTest.shouldEnsureImageIsOpenBeforePoll
-[       OK ] ImageTest.shouldEnsureImageIsOpenBeforePoll (1 ms)
-[ RUN      ] ImageTest.shouldPollNoFragmentsToControlledFragmentHandler
-[       OK ] ImageTest.shouldPollNoFragmentsToControlledFragmentHandler (0 ms)
-[ RUN      ] ImageTest.shouldPollOneFragmentToControlledFragmentHandlerOnContinue
-[       OK ] ImageTest.shouldPollOneFragmentToControlledFragmentHandlerOnContinue (0 ms)
-[ RUN      ] ImageTest.shouldNotPollOneFragmentToControlledFragmentHandlerOnAbort
-[       OK ] ImageTest.shouldNotPollOneFragmentToControlledFragmentHandlerOnAbort (0 ms)
-[ RUN      ] ImageTest.shouldPollOneFragmentToControlledFragmentHandlerOnBreak
-[       OK ] ImageTest.shouldPollOneFragmentToControlledFragmentHandlerOnBreak (0 ms)
-[ RUN      ] ImageTest.shouldPollFragmentsToControlledFragmentHandlerOnCommit
-[       OK ] ImageTest.shouldPollFragmentsToControlledFragmentHandlerOnCommit (0 ms)
-[ RUN      ] ImageTest.shouldPollFragmentsToControlledFragmentHandlerOnContinue
-[       OK ] ImageTest.shouldPollFragmentsToControlledFragmentHandlerOnContinue (0 ms)
-[ RUN      ] ImageTest.shouldPollNoFragmentsToBoundedControlledFragmentHandlerWithMaxPositionBeforeInitialPosition
-[       OK ] ImageTest.shouldPollNoFragmentsToBoundedControlledFragmentHandlerWithMaxPositionBeforeInitialPosition (0 ms)
-[ RUN      ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithInitialOffsetNotZero
-[       OK ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithInitialOffsetNotZero (0 ms)
-[ RUN      ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionBeforeNextMessage
-[       OK ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionBeforeNextMessage (0 ms)
-[ RUN      ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionAfterEndOfTerm
-[       OK ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionAfterEndOfTerm (1 ms)
-[ RUN      ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionAboveIntMaxValue
-[       OK ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionAboveIntMaxValue (0 ms)
-[----------] 18 tests from ImageTest (4 ms total)
-
-[----------] Global test environment tear-down
-[==========] 18 tests from 1 test case ran. (5 ms total)
-[  PASSED  ] 18 tests.
-<end of output>
-Test time =   0.01 sec
-----------------------------------------------------------
-Test Passed.
-"imageTest" end time: Feb 19 07:44 WET
-"imageTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
 7/43 Testing: utilTest
 7/43 Test: utilTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/utilTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"utilTest" start time: Feb 19 07:44 WET
+"utilTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -264,15 +204,75 @@ Running main() from gmock_main.cc
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"utilTest" end time: Feb 19 07:44 WET
+"utilTest" end time: Feb 28 05:52 WET
 "utilTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/43 Testing: imageTest
+4/43 Test: imageTest
+Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/imageTest"
+Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
+"imageTest" start time: Feb 28 05:52 WET
+Output:
+----------------------------------------------------------
+Running main() from gmock_main.cc
+[==========] Running 18 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 18 tests from ImageTest
+[ RUN      ] ImageTest.shouldReportCorrectInitialTermId
+[       OK ] ImageTest.shouldReportCorrectInitialTermId (2 ms)
+[ RUN      ] ImageTest.shouldReportCorrectTermBufferLength
+[       OK ] ImageTest.shouldReportCorrectTermBufferLength (2 ms)
+[ RUN      ] ImageTest.shouldReportCorrectPositionOnReception
+[       OK ] ImageTest.shouldReportCorrectPositionOnReception (0 ms)
+[ RUN      ] ImageTest.shouldReportCorrectPositionOnReceptionWithNonZeroPositionInInitialTermId
+[       OK ] ImageTest.shouldReportCorrectPositionOnReceptionWithNonZeroPositionInInitialTermId (1 ms)
+[ RUN      ] ImageTest.shouldReportCorrectPositionOnReceptionWithNonZeroPositionInNonInitialTermId
+[       OK ] ImageTest.shouldReportCorrectPositionOnReceptionWithNonZeroPositionInNonInitialTermId (0 ms)
+[ RUN      ] ImageTest.shouldEnsureImageIsOpenBeforeReadingPosition
+[       OK ] ImageTest.shouldEnsureImageIsOpenBeforeReadingPosition (0 ms)
+[ RUN      ] ImageTest.shouldEnsureImageIsOpenBeforePoll
+[       OK ] ImageTest.shouldEnsureImageIsOpenBeforePoll (0 ms)
+[ RUN      ] ImageTest.shouldPollNoFragmentsToControlledFragmentHandler
+[       OK ] ImageTest.shouldPollNoFragmentsToControlledFragmentHandler (0 ms)
+[ RUN      ] ImageTest.shouldPollOneFragmentToControlledFragmentHandlerOnContinue
+[       OK ] ImageTest.shouldPollOneFragmentToControlledFragmentHandlerOnContinue (1 ms)
+[ RUN      ] ImageTest.shouldNotPollOneFragmentToControlledFragmentHandlerOnAbort
+[       OK ] ImageTest.shouldNotPollOneFragmentToControlledFragmentHandlerOnAbort (0 ms)
+[ RUN      ] ImageTest.shouldPollOneFragmentToControlledFragmentHandlerOnBreak
+[       OK ] ImageTest.shouldPollOneFragmentToControlledFragmentHandlerOnBreak (0 ms)
+[ RUN      ] ImageTest.shouldPollFragmentsToControlledFragmentHandlerOnCommit
+[       OK ] ImageTest.shouldPollFragmentsToControlledFragmentHandlerOnCommit (0 ms)
+[ RUN      ] ImageTest.shouldPollFragmentsToControlledFragmentHandlerOnContinue
+[       OK ] ImageTest.shouldPollFragmentsToControlledFragmentHandlerOnContinue (0 ms)
+[ RUN      ] ImageTest.shouldPollNoFragmentsToBoundedControlledFragmentHandlerWithMaxPositionBeforeInitialPosition
+[       OK ] ImageTest.shouldPollNoFragmentsToBoundedControlledFragmentHandlerWithMaxPositionBeforeInitialPosition (0 ms)
+[ RUN      ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithInitialOffsetNotZero
+[       OK ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithInitialOffsetNotZero (0 ms)
+[ RUN      ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionBeforeNextMessage
+[       OK ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionBeforeNextMessage (1 ms)
+[ RUN      ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionAfterEndOfTerm
+[       OK ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionAfterEndOfTerm (0 ms)
+[ RUN      ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionAboveIntMaxValue
+[       OK ] ImageTest.shouldPollFragmentsToBoundedControlledFragmentHandlerWithMaxPositionAboveIntMaxValue (0 ms)
+[----------] 18 tests from ImageTest (7 ms total)
+
+[----------] Global test environment tear-down
+[==========] 18 tests from 1 test case ran. (7 ms total)
+[  PASSED  ] 18 tests.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"imageTest" end time: Feb 28 05:52 WET
+"imageTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
 8/43 Testing: memoryMappedFileTest
 8/43 Test: memoryMappedFileTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/memoryMappedFileTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"memoryMappedFileTest" start time: Feb 19 07:44 WET
+"memoryMappedFileTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -294,7 +294,7 @@ Running main() from gmock_main.cc
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"memoryMappedFileTest" end time: Feb 19 07:44 WET
+"memoryMappedFileTest" end time: Feb 28 05:52 WET
 "memoryMappedFileTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -302,7 +302,7 @@ Test Passed.
 9/43 Test: broadcastReceiverTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/broadcastReceiverTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"broadcastReceiverTest" start time: Feb 19 07:44 WET
+"broadcastReceiverTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -380,175 +380,25 @@ Uninteresting mock function call - returning default value.
     Function call: getInt64(1040)
           Returns: 0
 NOTE: You can safely ignore the above warning unless this call should not happen.  Do not suppress it by blindly adding an EXPECT_CALL() if you don't mean to enforce the call.  See https://github.com/google/googletest/blob/master/googlemock/docs/CookBook.md#knowing-when-to-expect for details.
-[       OK ] BroadcastReceiverTest.shouldDealWithRecordBecomingInvalidDueToOverwrite (1 ms)
-[----------] 9 tests from BroadcastReceiverTest (1 ms total)
+[       OK ] BroadcastReceiverTest.shouldDealWithRecordBecomingInvalidDueToOverwrite (0 ms)
+[----------] 9 tests from BroadcastReceiverTest (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 9 tests from 1 test case ran. (1 ms total)
+[==========] 9 tests from 1 test case ran. (0 ms total)
 [  PASSED  ] 9 tests.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"broadcastReceiverTest" end time: Feb 19 07:44 WET
+"broadcastReceiverTest" end time: Feb 28 05:52 WET
 "broadcastReceiverTest" time elapsed: 00:00:00
-----------------------------------------------------------
-
-1/43 Testing: clientConductorTest
-1/43 Test: clientConductorTest
-Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/clientConductorTest"
-Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"clientConductorTest" start time: Feb 19 07:44 WET
-Output:
-----------------------------------------------------------
-Running main() from gmock_main.cc
-[==========] Running 63 tests from 1 test case.
-[----------] Global test environment set-up.
-[----------] 63 tests from ClientConductorTest
-[ RUN      ] ClientConductorTest.shouldReturnNullForUnknownPublication
-[       OK ] ClientConductorTest.shouldReturnNullForUnknownPublication (1 ms)
-[ RUN      ] ClientConductorTest.shouldReturnNullForPublicationWithoutLogBuffers
-[       OK ] ClientConductorTest.shouldReturnNullForPublicationWithoutLogBuffers (1 ms)
-[ RUN      ] ClientConductorTest.shouldSendAddPublicationToDriver
-[       OK ] ClientConductorTest.shouldSendAddPublicationToDriver (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnPublicationAfterLogBuffersCreated
-[       OK ] ClientConductorTest.shouldReturnPublicationAfterLogBuffersCreated (1 ms)
-[ RUN      ] ClientConductorTest.shouldReleasePublicationAfterGoingOutOfScope
-[       OK ] ClientConductorTest.shouldReleasePublicationAfterGoingOutOfScope (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnSameIdForDuplicateAddPublication
-[       OK ] ClientConductorTest.shouldReturnSameIdForDuplicateAddPublication (1 ms)
-[ RUN      ] ClientConductorTest.shouldReturnSamePublicationAfterLogBuffersCreated
-[       OK ] ClientConductorTest.shouldReturnSamePublicationAfterLogBuffersCreated (0 ms)
-[ RUN      ] ClientConductorTest.shouldIgnorePublicationReadyForUnknownCorrelationId
-[       OK ] ClientConductorTest.shouldIgnorePublicationReadyForUnknownCorrelationId (1 ms)
-[ RUN      ] ClientConductorTest.shouldTimeoutAddPublicationWithoutPublicationReady
-[       OK ] ClientConductorTest.shouldTimeoutAddPublicationWithoutPublicationReady (0 ms)
-[ RUN      ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddPublication
-[       OK ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddPublication (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnNullForUnknownExclusivePublication
-[       OK ] ClientConductorTest.shouldReturnNullForUnknownExclusivePublication (1 ms)
-[ RUN      ] ClientConductorTest.shouldReturnNullForExclusivePublicationWithoutLogBuffers
-[       OK ] ClientConductorTest.shouldReturnNullForExclusivePublicationWithoutLogBuffers (0 ms)
-[ RUN      ] ClientConductorTest.shouldSendAddExclusivePublicationToDriver
-[       OK ] ClientConductorTest.shouldSendAddExclusivePublicationToDriver (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnExclusivePublicationAfterLogBuffersCreated
-[       OK ] ClientConductorTest.shouldReturnExclusivePublicationAfterLogBuffersCreated (1 ms)
-[ RUN      ] ClientConductorTest.shouldReleaseExclusivePublicationAfterGoingOutOfScope
-[       OK ] ClientConductorTest.shouldReleaseExclusivePublicationAfterGoingOutOfScope (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnDifferentIdForDuplicateAddExclusivePublication
-[       OK ] ClientConductorTest.shouldReturnDifferentIdForDuplicateAddExclusivePublication (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnSameExclusivePublicationAfterLogBuffersCreated
-[       OK ] ClientConductorTest.shouldReturnSameExclusivePublicationAfterLogBuffersCreated (0 ms)
-[ RUN      ] ClientConductorTest.shouldIgnoreExclusivePublicationReadyForUnknownCorrelationId
-[       OK ] ClientConductorTest.shouldIgnoreExclusivePublicationReadyForUnknownCorrelationId (1 ms)
-[ RUN      ] ClientConductorTest.shouldTimeoutAddExclusivePublicationWithoutPublicationReady
-[       OK ] ClientConductorTest.shouldTimeoutAddExclusivePublicationWithoutPublicationReady (0 ms)
-[ RUN      ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddExclusivePublication
-[       OK ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddExclusivePublication (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnNullForUnknownSubscription
-[       OK ] ClientConductorTest.shouldReturnNullForUnknownSubscription (1 ms)
-[ RUN      ] ClientConductorTest.shouldReturnNullForSubscriptionWithoutOperationSuccess
-[       OK ] ClientConductorTest.shouldReturnNullForSubscriptionWithoutOperationSuccess (0 ms)
-[ RUN      ] ClientConductorTest.shouldSendAddSubscriptionToDriver
-[       OK ] ClientConductorTest.shouldSendAddSubscriptionToDriver (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnSubscriptionAfterOperationSuccess
-[       OK ] ClientConductorTest.shouldReturnSubscriptionAfterOperationSuccess (0 ms)
-[ RUN      ] ClientConductorTest.shouldReleaseSubscriptionAfterGoingOutOfScope
-[       OK ] ClientConductorTest.shouldReleaseSubscriptionAfterGoingOutOfScope (1 ms)
-[ RUN      ] ClientConductorTest.shouldReturnDifferentIdsForDuplicateAddSubscription
-[       OK ] ClientConductorTest.shouldReturnDifferentIdsForDuplicateAddSubscription (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnSameFindSubscriptionAfterOperationSuccess
-[       OK ] ClientConductorTest.shouldReturnSameFindSubscriptionAfterOperationSuccess (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnDifferentSubscriptionAfterOperationSuccess
-[       OK ] ClientConductorTest.shouldReturnDifferentSubscriptionAfterOperationSuccess (0 ms)
-[ RUN      ] ClientConductorTest.shouldIgnoreOperationSuccessForUnknownCorrelationId
-[       OK ] ClientConductorTest.shouldIgnoreOperationSuccessForUnknownCorrelationId (0 ms)
-[ RUN      ] ClientConductorTest.shouldTimeoutAddSubscriptionWithoutOperationSuccess
-[       OK ] ClientConductorTest.shouldTimeoutAddSubscriptionWithoutOperationSuccess (1 ms)
-[ RUN      ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddSubscription
-[       OK ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddSubscription (0 ms)
-[ RUN      ] ClientConductorTest.shouldCallErrorHandlerWhenInterServiceTimeoutExceeded
-[       OK ] ClientConductorTest.shouldCallErrorHandlerWhenInterServiceTimeoutExceeded (0 ms)
-[ RUN      ] ClientConductorTest.shouldCallErrorHandlerWhenDriverInactiveOnIdle
-[       OK ] ClientConductorTest.shouldCallErrorHandlerWhenDriverInactiveOnIdle (1 ms)
-[ RUN      ] ClientConductorTest.shouldExceptionWhenAddPublicationAfterDriverInactive
-[       OK ] ClientConductorTest.shouldExceptionWhenAddPublicationAfterDriverInactive (0 ms)
-[ RUN      ] ClientConductorTest.shouldExceptionWhenReleasePublicationAfterDriverInactive
-[       OK ] ClientConductorTest.shouldExceptionWhenReleasePublicationAfterDriverInactive (0 ms)
-[ RUN      ] ClientConductorTest.shouldExceptionWhenAddSubscriptionAfterDriverInactive
-[       OK ] ClientConductorTest.shouldExceptionWhenAddSubscriptionAfterDriverInactive (0 ms)
-[ RUN      ] ClientConductorTest.shouldExceptionWhenReleaseSubscriptionAfterDriverInactive
-[       OK ] ClientConductorTest.shouldExceptionWhenReleaseSubscriptionAfterDriverInactive (0 ms)
-[ RUN      ] ClientConductorTest.shouldCallOnNewPubAfterLogBuffersCreated
-[       OK ] ClientConductorTest.shouldCallOnNewPubAfterLogBuffersCreated (1 ms)
-[ RUN      ] ClientConductorTest.shouldCallOnNewSubAfterOperationSuccess
-[       OK ] ClientConductorTest.shouldCallOnNewSubAfterOperationSuccess (0 ms)
-[ RUN      ] ClientConductorTest.shouldCallNewConnectionAfterOnNewConnection
-[       OK ] ClientConductorTest.shouldCallNewConnectionAfterOnNewConnection (0 ms)
-[ RUN      ] ClientConductorTest.shouldNotCallNewConnectionIfNoOperationSuccess
-[       OK ] ClientConductorTest.shouldNotCallNewConnectionIfNoOperationSuccess (0 ms)
-[ RUN      ] ClientConductorTest.shouldNotCallNewConnectionIfUninterestingRegistrationId
-[       OK ] ClientConductorTest.shouldNotCallNewConnectionIfUninterestingRegistrationId (1 ms)
-[ RUN      ] ClientConductorTest.shouldCallInactiveConnecitonAfterInactiveConnection
-[       OK ] ClientConductorTest.shouldCallInactiveConnecitonAfterInactiveConnection (0 ms)
-[ RUN      ] ClientConductorTest.shouldNotCallInactiveConnectionIfNoOperationSuccess
-[       OK ] ClientConductorTest.shouldNotCallInactiveConnectionIfNoOperationSuccess (0 ms)
-[ RUN      ] ClientConductorTest.shouldNotCallInactiveConnectionIfUninterestingConnectionCorrelationId
-[       OK ] ClientConductorTest.shouldNotCallInactiveConnectionIfUninterestingConnectionCorrelationId (0 ms)
-[ RUN      ] ClientConductorTest.shouldCallUnavailableImageIfSubscriptionReleased
-[       OK ] ClientConductorTest.shouldCallUnavailableImageIfSubscriptionReleased (1 ms)
-[ RUN      ] ClientConductorTest.shouldClosePublicationOnInterServiceTimeout
-[       OK ] ClientConductorTest.shouldClosePublicationOnInterServiceTimeout (0 ms)
-[ RUN      ] ClientConductorTest.shouldCloseExclusivePublicationOnInterServiceTimeout
-[       OK ] ClientConductorTest.shouldCloseExclusivePublicationOnInterServiceTimeout (0 ms)
-[ RUN      ] ClientConductorTest.shouldCloseSubscriptionOnInterServiceTimeout
-[       OK ] ClientConductorTest.shouldCloseSubscriptionOnInterServiceTimeout (0 ms)
-[ RUN      ] ClientConductorTest.shouldCloseAllPublicationsAndSubscriptionsOnInterServiceTimeout
-[       OK ] ClientConductorTest.shouldCloseAllPublicationsAndSubscriptionsOnInterServiceTimeout (0 ms)
-[ RUN      ] ClientConductorTest.shouldRemoveImageOnInterServiceTimeout
-[       OK ] ClientConductorTest.shouldRemoveImageOnInterServiceTimeout (1 ms)
-[ RUN      ] ClientConductorTest.shouldReturnNullForUnknownCounter
-[       OK ] ClientConductorTest.shouldReturnNullForUnknownCounter (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnNullForCounterWithoutOnAvailableCounter
-[       OK ] ClientConductorTest.shouldReturnNullForCounterWithoutOnAvailableCounter (0 ms)
-[ RUN      ] ClientConductorTest.shouldSendAddCounterToDriver
-[       OK ] ClientConductorTest.shouldSendAddCounterToDriver (1 ms)
-[ RUN      ] ClientConductorTest.shouldReturnCounterAfterOnAvailableCounter
-[       OK ] ClientConductorTest.shouldReturnCounterAfterOnAvailableCounter (0 ms)
-[ RUN      ] ClientConductorTest.shouldReleaseCounterAfterGoingOutOfScope
-[       OK ] ClientConductorTest.shouldReleaseCounterAfterGoingOutOfScope (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnDifferentIdsForDuplicateAddCounter
-[       OK ] ClientConductorTest.shouldReturnDifferentIdsForDuplicateAddCounter (0 ms)
-[ RUN      ] ClientConductorTest.shouldReturnSameFindCounterAfterOnAvailableCounter
-[       OK ] ClientConductorTest.shouldReturnSameFindCounterAfterOnAvailableCounter (1 ms)
-[ RUN      ] ClientConductorTest.shouldReturnDifferentCounterAfterOnAvailableCounter
-[       OK ] ClientConductorTest.shouldReturnDifferentCounterAfterOnAvailableCounter (0 ms)
-[ RUN      ] ClientConductorTest.shouldNotFindCounterOnAvailableCounterForUnknownCorrelationId
-[       OK ] ClientConductorTest.shouldNotFindCounterOnAvailableCounterForUnknownCorrelationId (0 ms)
-[ RUN      ] ClientConductorTest.shouldTimeoutAddCounterWithoutOnAvailableCounter
-[       OK ] ClientConductorTest.shouldTimeoutAddCounterWithoutOnAvailableCounter (1 ms)
-[ RUN      ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddCounter
-[       OK ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddCounter (0 ms)
-[ RUN      ] ClientConductorTest.shouldCallOnUnavailableCounter
-[       OK ] ClientConductorTest.shouldCallOnUnavailableCounter (0 ms)
-[----------] 63 tests from ClientConductorTest (19 ms total)
-
-[----------] Global test environment tear-down
-[==========] 63 tests from 1 test case ran. (19 ms total)
-[  PASSED  ] 63 tests.
-<end of output>
-Test time =   0.04 sec
-----------------------------------------------------------
-Test Passed.
-"clientConductorTest" end time: Feb 19 07:44 WET
-"clientConductorTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
 10/43 Testing: broadcastTransmitterTest
 10/43 Test: broadcastTransmitterTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/broadcastTransmitterTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"broadcastTransmitterTest" start time: Feb 19 07:44 WET
+"broadcastTransmitterTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -558,7 +408,7 @@ Running main() from gmock_main.cc
 [ RUN      ] BroadcastTransmitterTest.shouldCalculateCapacityForBuffer
 [       OK ] BroadcastTransmitterTest.shouldCalculateCapacityForBuffer (0 ms)
 [ RUN      ] BroadcastTransmitterTest.shouldThrowExceptionForCapacityThatIsNotPowerOfTwo
-[       OK ] BroadcastTransmitterTest.shouldThrowExceptionForCapacityThatIsNotPowerOfTwo (1 ms)
+[       OK ] BroadcastTransmitterTest.shouldThrowExceptionForCapacityThatIsNotPowerOfTwo (0 ms)
 [ RUN      ] BroadcastTransmitterTest.shouldThrowExceptionWhenMaxMessageLengthExceeded
 [       OK ] BroadcastTransmitterTest.shouldThrowExceptionWhenMaxMessageLengthExceeded (0 ms)
 [ RUN      ] BroadcastTransmitterTest.shouldThrowExceptionWhenMessageTypeIdInvalid
@@ -566,7 +416,7 @@ Running main() from gmock_main.cc
 [ RUN      ] BroadcastTransmitterTest.shouldTransmitIntoEmptyBuffer
 [       OK ] BroadcastTransmitterTest.shouldTransmitIntoEmptyBuffer (0 ms)
 [ RUN      ] BroadcastTransmitterTest.shouldTransmitIntoUsedBuffer
-[       OK ] BroadcastTransmitterTest.shouldTransmitIntoUsedBuffer (0 ms)
+[       OK ] BroadcastTransmitterTest.shouldTransmitIntoUsedBuffer (1 ms)
 [ RUN      ] BroadcastTransmitterTest.shouldTransmitIntoEndOfBuffer
 [       OK ] BroadcastTransmitterTest.shouldTransmitIntoEndOfBuffer (0 ms)
 [ RUN      ] BroadcastTransmitterTest.shouldApplyPaddingWhenInsufficientSpaceAtEndOfBuffer
@@ -577,10 +427,10 @@ Running main() from gmock_main.cc
 [==========] 8 tests from 1 test case ran. (1 ms total)
 [  PASSED  ] 8 tests.
 <end of output>
-Test time =   0.03 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"broadcastTransmitterTest" end time: Feb 19 07:44 WET
+"broadcastTransmitterTest" end time: Feb 28 05:52 WET
 "broadcastTransmitterTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -588,7 +438,7 @@ Test Passed.
 12/43 Test: countersManagerTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/countersManagerTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"countersManagerTest" start time: Feb 19 07:44 WET
+"countersManagerTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -598,7 +448,7 @@ Running main() from gmock_main.cc
 [ RUN      ] CountersManagerTest.checkEmpty
 [       OK ] CountersManagerTest.checkEmpty (0 ms)
 [ RUN      ] CountersManagerTest.checkOverflow
-[       OK ] CountersManagerTest.checkOverflow (0 ms)
+[       OK ] CountersManagerTest.checkOverflow (1 ms)
 [ RUN      ] CountersManagerTest.checkAlloc
 [       OK ] CountersManagerTest.checkAlloc (0 ms)
 [ RUN      ] CountersManagerTest.checkRecycle
@@ -615,16 +465,16 @@ Running main() from gmock_main.cc
 [       OK ] CountersManagerTest.shouldStoreMetaData (0 ms)
 [ RUN      ] CountersManagerTest.shouldStoreAndLoadValue
 [       OK ] CountersManagerTest.shouldStoreAndLoadValue (0 ms)
-[----------] 10 tests from CountersManagerTest (0 ms total)
+[----------] 10 tests from CountersManagerTest (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 10 tests from 1 test case ran. (0 ms total)
+[==========] 10 tests from 1 test case ran. (1 ms total)
 [  PASSED  ] 10 tests.
 <end of output>
-Test time =   0.03 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"countersManagerTest" end time: Feb 19 07:44 WET
+"countersManagerTest" end time: Feb 28 05:52 WET
 "countersManagerTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -632,7 +482,7 @@ Test Passed.
 13/43 Test: termAppenderTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/termAppenderTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"termAppenderTest" start time: Feb 19 07:44 WET
+"termAppenderTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -642,7 +492,7 @@ Running main() from gmock_main.cc
 [ RUN      ] TermAppenderTest.shouldReportCapacity
 [       OK ] TermAppenderTest.shouldReportCapacity (0 ms)
 [ RUN      ] TermAppenderTest.shouldAppendFrameToEmptyLog
-[       OK ] TermAppenderTest.shouldAppendFrameToEmptyLog (0 ms)
+[       OK ] TermAppenderTest.shouldAppendFrameToEmptyLog (1 ms)
 [ RUN      ] TermAppenderTest.shouldAppendFrameTwiceToLog
 [       OK ] TermAppenderTest.shouldAppendFrameTwiceToLog (0 ms)
 [ RUN      ] TermAppenderTest.shouldPadLogWhenAppendingWithInsufficientRemainingCapacity
@@ -651,16 +501,16 @@ Running main() from gmock_main.cc
 [       OK ] TermAppenderTest.shouldFragmentMessageOverTwoFrames (0 ms)
 [ RUN      ] TermAppenderTest.shouldClaimRegionForZeroCopyEncoding
 [       OK ] TermAppenderTest.shouldClaimRegionForZeroCopyEncoding (0 ms)
-[----------] 6 tests from TermAppenderTest (0 ms total)
+[----------] 6 tests from TermAppenderTest (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 6 tests from 1 test case ran. (0 ms total)
+[==========] 6 tests from 1 test case ran. (1 ms total)
 [  PASSED  ] 6 tests.
 <end of output>
-Test time =   0.03 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"termAppenderTest" end time: Feb 19 07:44 WET
+"termAppenderTest" end time: Feb 28 05:52 WET
 "termAppenderTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -668,7 +518,7 @@ Test Passed.
 14/43 Test: termReaderTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/termReaderTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"termReaderTest" start time: Feb 19 07:44 WET
+"termReaderTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -693,10 +543,10 @@ Running main() from gmock_main.cc
 [==========] 6 tests from 1 test case ran. (0 ms total)
 [  PASSED  ] 6 tests.
 <end of output>
-Test time =   0.03 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"termReaderTest" end time: Feb 19 07:44 WET
+"termReaderTest" end time: Feb 28 05:52 WET
 "termReaderTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -704,7 +554,7 @@ Test Passed.
 15/43 Test: termBlockScannerTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/termBlockScannerTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"termBlockScannerTest" start time: Feb 19 07:44 WET
+"termBlockScannerTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -726,17 +576,17 @@ Running main() from gmock_main.cc
 [ RUN      ] TermBlockScannerTest.shouldReadOneMessageOnLimit
 [       OK ] TermBlockScannerTest.shouldReadOneMessageOnLimit (0 ms)
 [ RUN      ] TermBlockScannerTest.shouldReadBlockOfOneMessageThenPadding
-[       OK ] TermBlockScannerTest.shouldReadBlockOfOneMessageThenPadding (1 ms)
+[       OK ] TermBlockScannerTest.shouldReadBlockOfOneMessageThenPadding (0 ms)
 [----------] 8 tests from TermBlockScannerTest (1 ms total)
 
 [----------] Global test environment tear-down
 [==========] 8 tests from 1 test case ran. (1 ms total)
 [  PASSED  ] 8 tests.
 <end of output>
-Test time =   0.03 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"termBlockScannerTest" end time: Feb 19 07:44 WET
+"termBlockScannerTest" end time: Feb 28 05:52 WET
 "termBlockScannerTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -744,7 +594,7 @@ Test Passed.
 16/43 Test: termGapScannerTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/termGapScannerTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"termGapScannerTest" start time: Feb 19 07:44 WET
+"termGapScannerTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -752,31 +602,181 @@ Running main() from gmock_main.cc
 [----------] Global test environment set-up.
 [----------] 4 tests from TermGapScannerTest
 [ RUN      ] TermGapScannerTest.shouldReportGapAtBeginningOfBuffer
-[       OK ] TermGapScannerTest.shouldReportGapAtBeginningOfBuffer (1 ms)
+[       OK ] TermGapScannerTest.shouldReportGapAtBeginningOfBuffer (0 ms)
 [ RUN      ] TermGapScannerTest.shouldReportSingleGapWhenBufferNotFull
 [       OK ] TermGapScannerTest.shouldReportSingleGapWhenBufferNotFull (0 ms)
 [ RUN      ] TermGapScannerTest.shouldReportSingleGapWhenBufferIsFull
 [       OK ] TermGapScannerTest.shouldReportSingleGapWhenBufferIsFull (0 ms)
 [ RUN      ] TermGapScannerTest.shouldReportNoGapWhenHwmIsInPadding
 [       OK ] TermGapScannerTest.shouldReportNoGapWhenHwmIsInPadding (0 ms)
-[----------] 4 tests from TermGapScannerTest (1 ms total)
+[----------] 4 tests from TermGapScannerTest (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 4 tests from 1 test case ran. (1 ms total)
+[==========] 4 tests from 1 test case ran. (0 ms total)
 [  PASSED  ] 4 tests.
 <end of output>
-Test time =   0.17 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"termGapScannerTest" end time: Feb 19 07:44 WET
+"termGapScannerTest" end time: Feb 28 05:52 WET
 "termGapScannerTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1/43 Testing: clientConductorTest
+1/43 Test: clientConductorTest
+Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/clientConductorTest"
+Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
+"clientConductorTest" start time: Feb 28 05:52 WET
+Output:
+----------------------------------------------------------
+Running main() from gmock_main.cc
+[==========] Running 63 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 63 tests from ClientConductorTest
+[ RUN      ] ClientConductorTest.shouldReturnNullForUnknownPublication
+[       OK ] ClientConductorTest.shouldReturnNullForUnknownPublication (1 ms)
+[ RUN      ] ClientConductorTest.shouldReturnNullForPublicationWithoutLogBuffers
+[       OK ] ClientConductorTest.shouldReturnNullForPublicationWithoutLogBuffers (1 ms)
+[ RUN      ] ClientConductorTest.shouldSendAddPublicationToDriver
+[       OK ] ClientConductorTest.shouldSendAddPublicationToDriver (1 ms)
+[ RUN      ] ClientConductorTest.shouldReturnPublicationAfterLogBuffersCreated
+[       OK ] ClientConductorTest.shouldReturnPublicationAfterLogBuffersCreated (1 ms)
+[ RUN      ] ClientConductorTest.shouldReleasePublicationAfterGoingOutOfScope
+[       OK ] ClientConductorTest.shouldReleasePublicationAfterGoingOutOfScope (1 ms)
+[ RUN      ] ClientConductorTest.shouldReturnSameIdForDuplicateAddPublication
+[       OK ] ClientConductorTest.shouldReturnSameIdForDuplicateAddPublication (1 ms)
+[ RUN      ] ClientConductorTest.shouldReturnSamePublicationAfterLogBuffersCreated
+[       OK ] ClientConductorTest.shouldReturnSamePublicationAfterLogBuffersCreated (0 ms)
+[ RUN      ] ClientConductorTest.shouldIgnorePublicationReadyForUnknownCorrelationId
+[       OK ] ClientConductorTest.shouldIgnorePublicationReadyForUnknownCorrelationId (1 ms)
+[ RUN      ] ClientConductorTest.shouldTimeoutAddPublicationWithoutPublicationReady
+[       OK ] ClientConductorTest.shouldTimeoutAddPublicationWithoutPublicationReady (0 ms)
+[ RUN      ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddPublication
+[       OK ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddPublication (1 ms)
+[ RUN      ] ClientConductorTest.shouldReturnNullForUnknownExclusivePublication
+[       OK ] ClientConductorTest.shouldReturnNullForUnknownExclusivePublication (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnNullForExclusivePublicationWithoutLogBuffers
+[       OK ] ClientConductorTest.shouldReturnNullForExclusivePublicationWithoutLogBuffers (0 ms)
+[ RUN      ] ClientConductorTest.shouldSendAddExclusivePublicationToDriver
+[       OK ] ClientConductorTest.shouldSendAddExclusivePublicationToDriver (1 ms)
+[ RUN      ] ClientConductorTest.shouldReturnExclusivePublicationAfterLogBuffersCreated
+[       OK ] ClientConductorTest.shouldReturnExclusivePublicationAfterLogBuffersCreated (0 ms)
+[ RUN      ] ClientConductorTest.shouldReleaseExclusivePublicationAfterGoingOutOfScope
+[       OK ] ClientConductorTest.shouldReleaseExclusivePublicationAfterGoingOutOfScope (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnDifferentIdForDuplicateAddExclusivePublication
+[       OK ] ClientConductorTest.shouldReturnDifferentIdForDuplicateAddExclusivePublication (1 ms)
+[ RUN      ] ClientConductorTest.shouldReturnSameExclusivePublicationAfterLogBuffersCreated
+[       OK ] ClientConductorTest.shouldReturnSameExclusivePublicationAfterLogBuffersCreated (0 ms)
+[ RUN      ] ClientConductorTest.shouldIgnoreExclusivePublicationReadyForUnknownCorrelationId
+[       OK ] ClientConductorTest.shouldIgnoreExclusivePublicationReadyForUnknownCorrelationId (0 ms)
+[ RUN      ] ClientConductorTest.shouldTimeoutAddExclusivePublicationWithoutPublicationReady
+[       OK ] ClientConductorTest.shouldTimeoutAddExclusivePublicationWithoutPublicationReady (0 ms)
+[ RUN      ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddExclusivePublication
+[       OK ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddExclusivePublication (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnNullForUnknownSubscription
+[       OK ] ClientConductorTest.shouldReturnNullForUnknownSubscription (1 ms)
+[ RUN      ] ClientConductorTest.shouldReturnNullForSubscriptionWithoutOperationSuccess
+[       OK ] ClientConductorTest.shouldReturnNullForSubscriptionWithoutOperationSuccess (0 ms)
+[ RUN      ] ClientConductorTest.shouldSendAddSubscriptionToDriver
+[       OK ] ClientConductorTest.shouldSendAddSubscriptionToDriver (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnSubscriptionAfterOperationSuccess
+[       OK ] ClientConductorTest.shouldReturnSubscriptionAfterOperationSuccess (0 ms)
+[ RUN      ] ClientConductorTest.shouldReleaseSubscriptionAfterGoingOutOfScope
+[       OK ] ClientConductorTest.shouldReleaseSubscriptionAfterGoingOutOfScope (1 ms)
+[ RUN      ] ClientConductorTest.shouldReturnDifferentIdsForDuplicateAddSubscription
+[       OK ] ClientConductorTest.shouldReturnDifferentIdsForDuplicateAddSubscription (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnSameFindSubscriptionAfterOperationSuccess
+[       OK ] ClientConductorTest.shouldReturnSameFindSubscriptionAfterOperationSuccess (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnDifferentSubscriptionAfterOperationSuccess
+[       OK ] ClientConductorTest.shouldReturnDifferentSubscriptionAfterOperationSuccess (1 ms)
+[ RUN      ] ClientConductorTest.shouldIgnoreOperationSuccessForUnknownCorrelationId
+[       OK ] ClientConductorTest.shouldIgnoreOperationSuccessForUnknownCorrelationId (0 ms)
+[ RUN      ] ClientConductorTest.shouldTimeoutAddSubscriptionWithoutOperationSuccess
+[       OK ] ClientConductorTest.shouldTimeoutAddSubscriptionWithoutOperationSuccess (0 ms)
+[ RUN      ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddSubscription
+[       OK ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddSubscription (1 ms)
+[ RUN      ] ClientConductorTest.shouldCallErrorHandlerWhenInterServiceTimeoutExceeded
+[       OK ] ClientConductorTest.shouldCallErrorHandlerWhenInterServiceTimeoutExceeded (0 ms)
+[ RUN      ] ClientConductorTest.shouldCallErrorHandlerWhenDriverInactiveOnIdle
+[       OK ] ClientConductorTest.shouldCallErrorHandlerWhenDriverInactiveOnIdle (0 ms)
+[ RUN      ] ClientConductorTest.shouldExceptionWhenAddPublicationAfterDriverInactive
+[       OK ] ClientConductorTest.shouldExceptionWhenAddPublicationAfterDriverInactive (0 ms)
+[ RUN      ] ClientConductorTest.shouldExceptionWhenReleasePublicationAfterDriverInactive
+[       OK ] ClientConductorTest.shouldExceptionWhenReleasePublicationAfterDriverInactive (1 ms)
+[ RUN      ] ClientConductorTest.shouldExceptionWhenAddSubscriptionAfterDriverInactive
+[       OK ] ClientConductorTest.shouldExceptionWhenAddSubscriptionAfterDriverInactive (0 ms)
+[ RUN      ] ClientConductorTest.shouldExceptionWhenReleaseSubscriptionAfterDriverInactive
+[       OK ] ClientConductorTest.shouldExceptionWhenReleaseSubscriptionAfterDriverInactive (0 ms)
+[ RUN      ] ClientConductorTest.shouldCallOnNewPubAfterLogBuffersCreated
+[       OK ] ClientConductorTest.shouldCallOnNewPubAfterLogBuffersCreated (1 ms)
+[ RUN      ] ClientConductorTest.shouldCallOnNewSubAfterOperationSuccess
+[       OK ] ClientConductorTest.shouldCallOnNewSubAfterOperationSuccess (0 ms)
+[ RUN      ] ClientConductorTest.shouldCallNewConnectionAfterOnNewConnection
+[       OK ] ClientConductorTest.shouldCallNewConnectionAfterOnNewConnection (0 ms)
+[ RUN      ] ClientConductorTest.shouldNotCallNewConnectionIfNoOperationSuccess
+[       OK ] ClientConductorTest.shouldNotCallNewConnectionIfNoOperationSuccess (1 ms)
+[ RUN      ] ClientConductorTest.shouldNotCallNewConnectionIfUninterestingRegistrationId
+[       OK ] ClientConductorTest.shouldNotCallNewConnectionIfUninterestingRegistrationId (0 ms)
+[ RUN      ] ClientConductorTest.shouldCallInactiveConnecitonAfterInactiveConnection
+[       OK ] ClientConductorTest.shouldCallInactiveConnecitonAfterInactiveConnection (0 ms)
+[ RUN      ] ClientConductorTest.shouldNotCallInactiveConnectionIfNoOperationSuccess
+[       OK ] ClientConductorTest.shouldNotCallInactiveConnectionIfNoOperationSuccess (1 ms)
+[ RUN      ] ClientConductorTest.shouldNotCallInactiveConnectionIfUninterestingConnectionCorrelationId
+[       OK ] ClientConductorTest.shouldNotCallInactiveConnectionIfUninterestingConnectionCorrelationId (0 ms)
+[ RUN      ] ClientConductorTest.shouldCallUnavailableImageIfSubscriptionReleased
+[       OK ] ClientConductorTest.shouldCallUnavailableImageIfSubscriptionReleased (0 ms)
+[ RUN      ] ClientConductorTest.shouldClosePublicationOnInterServiceTimeout
+[       OK ] ClientConductorTest.shouldClosePublicationOnInterServiceTimeout (1 ms)
+[ RUN      ] ClientConductorTest.shouldCloseExclusivePublicationOnInterServiceTimeout
+[       OK ] ClientConductorTest.shouldCloseExclusivePublicationOnInterServiceTimeout (0 ms)
+[ RUN      ] ClientConductorTest.shouldCloseSubscriptionOnInterServiceTimeout
+[       OK ] ClientConductorTest.shouldCloseSubscriptionOnInterServiceTimeout (0 ms)
+[ RUN      ] ClientConductorTest.shouldCloseAllPublicationsAndSubscriptionsOnInterServiceTimeout
+[       OK ] ClientConductorTest.shouldCloseAllPublicationsAndSubscriptionsOnInterServiceTimeout (1 ms)
+[ RUN      ] ClientConductorTest.shouldRemoveImageOnInterServiceTimeout
+[       OK ] ClientConductorTest.shouldRemoveImageOnInterServiceTimeout (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnNullForUnknownCounter
+[       OK ] ClientConductorTest.shouldReturnNullForUnknownCounter (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnNullForCounterWithoutOnAvailableCounter
+[       OK ] ClientConductorTest.shouldReturnNullForCounterWithoutOnAvailableCounter (1 ms)
+[ RUN      ] ClientConductorTest.shouldSendAddCounterToDriver
+[       OK ] ClientConductorTest.shouldSendAddCounterToDriver (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnCounterAfterOnAvailableCounter
+[       OK ] ClientConductorTest.shouldReturnCounterAfterOnAvailableCounter (0 ms)
+[ RUN      ] ClientConductorTest.shouldReleaseCounterAfterGoingOutOfScope
+[       OK ] ClientConductorTest.shouldReleaseCounterAfterGoingOutOfScope (1 ms)
+[ RUN      ] ClientConductorTest.shouldReturnDifferentIdsForDuplicateAddCounter
+[       OK ] ClientConductorTest.shouldReturnDifferentIdsForDuplicateAddCounter (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnSameFindCounterAfterOnAvailableCounter
+[       OK ] ClientConductorTest.shouldReturnSameFindCounterAfterOnAvailableCounter (0 ms)
+[ RUN      ] ClientConductorTest.shouldReturnDifferentCounterAfterOnAvailableCounter
+[       OK ] ClientConductorTest.shouldReturnDifferentCounterAfterOnAvailableCounter (0 ms)
+[ RUN      ] ClientConductorTest.shouldNotFindCounterOnAvailableCounterForUnknownCorrelationId
+[       OK ] ClientConductorTest.shouldNotFindCounterOnAvailableCounterForUnknownCorrelationId (1 ms)
+[ RUN      ] ClientConductorTest.shouldTimeoutAddCounterWithoutOnAvailableCounter
+[       OK ] ClientConductorTest.shouldTimeoutAddCounterWithoutOnAvailableCounter (0 ms)
+[ RUN      ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddCounter
+[       OK ] ClientConductorTest.shouldExceptionOnFindWhenReceivingErrorResponseOnAddCounter (0 ms)
+[ RUN      ] ClientConductorTest.shouldCallOnUnavailableCounter
+[       OK ] ClientConductorTest.shouldCallOnUnavailableCounter (0 ms)
+[----------] 63 tests from ClientConductorTest (24 ms total)
+
+[----------] Global test environment tear-down
+[==========] 63 tests from 1 test case ran. (24 ms total)
+[  PASSED  ] 63 tests.
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"clientConductorTest" end time: Feb 28 05:52 WET
+"clientConductorTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
 17/43 Testing: termScannerTest
 17/43 Test: termScannerTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/termScannerTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"termScannerTest" start time: Feb 19 07:44 WET
+"termScannerTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -788,7 +788,7 @@ Running main() from gmock_main.cc
 [ RUN      ] TermScannerTest.shouldScanSingleMessage
 [       OK ] TermScannerTest.shouldScanSingleMessage (0 ms)
 [ RUN      ] TermScannerTest.shouldFailToScanMessageLargerThanMaxLength
-[       OK ] TermScannerTest.shouldFailToScanMessageLargerThanMaxLength (0 ms)
+[       OK ] TermScannerTest.shouldFailToScanMessageLargerThanMaxLength (1 ms)
 [ RUN      ] TermScannerTest.shouldScanTwoMessagesThatFitInSingleMtu
 [       OK ] TermScannerTest.shouldScanTwoMessagesThatFitInSingleMtu (0 ms)
 [ RUN      ] TermScannerTest.shouldScanTwoMessagesAndStopAtMtuBoundary
@@ -800,17 +800,17 @@ Running main() from gmock_main.cc
 [ RUN      ] TermScannerTest.shouldScanLastMessageInBufferPlusPadding
 [       OK ] TermScannerTest.shouldScanLastMessageInBufferPlusPadding (0 ms)
 [ RUN      ] TermScannerTest.shouldScanLastMessageInBufferMinusPaddingLimitedByMtu
-[       OK ] TermScannerTest.shouldScanLastMessageInBufferMinusPaddingLimitedByMtu (1 ms)
+[       OK ] TermScannerTest.shouldScanLastMessageInBufferMinusPaddingLimitedByMtu (0 ms)
 [----------] 9 tests from TermScannerTest (1 ms total)
 
 [----------] Global test environment tear-down
 [==========] 9 tests from 1 test case ran. (1 ms total)
 [  PASSED  ] 9 tests.
 <end of output>
-Test time =   0.16 sec
+Test time =   0.04 sec
 ----------------------------------------------------------
 Test Passed.
-"termScannerTest" end time: Feb 19 07:44 WET
+"termScannerTest" end time: Feb 28 05:52 WET
 "termScannerTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -818,7 +818,7 @@ Test Passed.
 19/43 Test: distinctErrorLogTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/distinctErrorLogTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"distinctErrorLogTest" start time: Feb 19 07:44 WET
+"distinctErrorLogTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -830,19 +830,19 @@ Running main() from gmock_main.cc
 [ RUN      ] DistinctErrorLogTest.shouldRecordFirstObservation
 [       OK ] DistinctErrorLogTest.shouldRecordFirstObservation (0 ms)
 [ RUN      ] DistinctErrorLogTest.shouldSummariseObservations
-[       OK ] DistinctErrorLogTest.shouldSummariseObservations (1 ms)
+[       OK ] DistinctErrorLogTest.shouldSummariseObservations (0 ms)
 [ RUN      ] DistinctErrorLogTest.shouldRecordTwoDistinctObservations
-[       OK ] DistinctErrorLogTest.shouldRecordTwoDistinctObservations (0 ms)
+[       OK ] DistinctErrorLogTest.shouldRecordTwoDistinctObservations (1 ms)
 [----------] 4 tests from DistinctErrorLogTest (1 ms total)
 
 [----------] Global test environment tear-down
 [==========] 4 tests from 1 test case ran. (1 ms total)
 [  PASSED  ] 4 tests.
 <end of output>
-Test time =   0.13 sec
+Test time =   0.05 sec
 ----------------------------------------------------------
 Test Passed.
-"distinctErrorLogTest" end time: Feb 19 07:44 WET
+"distinctErrorLogTest" end time: Feb 28 05:52 WET
 "distinctErrorLogTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -850,7 +850,7 @@ Test Passed.
 20/43 Test: errorLogReaderTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/errorLogReaderTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"errorLogReaderTest" start time: Feb 19 07:44 WET
+"errorLogReaderTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -866,17 +866,17 @@ Running main() from gmock_main.cc
 [ RUN      ] ErrorLogReaderTest.shouldReadTwoDistinctObservations
 [       OK ] ErrorLogReaderTest.shouldReadTwoDistinctObservations (0 ms)
 [ RUN      ] ErrorLogReaderTest.shouldReadOneObservationSinceTimestamp
-[       OK ] ErrorLogReaderTest.shouldReadOneObservationSinceTimestamp (0 ms)
-[----------] 5 tests from ErrorLogReaderTest (0 ms total)
+[       OK ] ErrorLogReaderTest.shouldReadOneObservationSinceTimestamp (1 ms)
+[----------] 5 tests from ErrorLogReaderTest (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 5 tests from 1 test case ran. (0 ms total)
+[==========] 5 tests from 1 test case ran. (1 ms total)
 [  PASSED  ] 5 tests.
 <end of output>
-Test time =   0.11 sec
+Test time =   0.06 sec
 ----------------------------------------------------------
 Test Passed.
-"errorLogReaderTest" end time: Feb 19 07:44 WET
+"errorLogReaderTest" end time: Feb 28 05:52 WET
 "errorLogReaderTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -884,7 +884,7 @@ Test Passed.
 24/43 Test: broadcast_transmitter_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/broadcast_transmitter_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"broadcast_transmitter_test" start time: Feb 19 07:44 WET
+"broadcast_transmitter_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -913,10 +913,10 @@ Running main() from gmock_main.cc
 [==========] 8 tests from 1 test case ran. (0 ms total)
 [  PASSED  ] 8 tests.
 <end of output>
-Test time =   0.04 sec
+Test time =   0.05 sec
 ----------------------------------------------------------
 Test Passed.
-"broadcast_transmitter_test" end time: Feb 19 07:44 WET
+"broadcast_transmitter_test" end time: Feb 28 05:52 WET
 "broadcast_transmitter_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -924,7 +924,7 @@ Test Passed.
 25/43 Test: counters_manager_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/counters_manager_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"counters_manager_test" start time: Feb 19 07:44 WET
+"counters_manager_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -955,10 +955,10 @@ Running main() from gmock_main.cc
 [==========] 9 tests from 1 test case ran. (0 ms total)
 [  PASSED  ] 9 tests.
 <end of output>
-Test time =   0.02 sec
+Test time =   0.04 sec
 ----------------------------------------------------------
 Test Passed.
-"counters_manager_test" end time: Feb 19 07:44 WET
+"counters_manager_test" end time: Feb 28 05:52 WET
 "counters_manager_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -966,7 +966,7 @@ Test Passed.
 26/43 Test: distinct_error_log_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/distinct_error_log_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"distinct_error_log_test" start time: Feb 19 07:44 WET
+"distinct_error_log_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1001,7 +1001,7 @@ Running main() from gmock_main.cc
 Test time =   0.07 sec
 ----------------------------------------------------------
 Test Passed.
-"distinct_error_log_test" end time: Feb 19 07:44 WET
+"distinct_error_log_test" end time: Feb 28 05:52 WET
 "distinct_error_log_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1009,7 +1009,7 @@ Test Passed.
 27/43 Test: driver_conductor_ipc_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/driver_conductor_ipc_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"driver_conductor_ipc_test" start time: Feb 19 07:44 WET
+"driver_conductor_ipc_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1021,15 +1021,15 @@ Running main() from gmock_main.cc
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToAddAndRemoveSingleIpcPublication
 [       OK ] DriverConductorIpcTest.shouldBeAbleToAddAndRemoveSingleIpcPublication (3 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToAddSingleIpcSubscription
-[       OK ] DriverConductorIpcTest.shouldBeAbleToAddSingleIpcSubscription (1 ms)
+[       OK ] DriverConductorIpcTest.shouldBeAbleToAddSingleIpcSubscription (0 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToAddAndRemoveSingleIpcSubscription
-[       OK ] DriverConductorIpcTest.shouldBeAbleToAddAndRemoveSingleIpcSubscription (0 ms)
+[       OK ] DriverConductorIpcTest.shouldBeAbleToAddAndRemoveSingleIpcSubscription (1 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToAddMultipleIpcPublications
-[       OK ] DriverConductorIpcTest.shouldBeAbleToAddMultipleIpcPublications (1 ms)
+[       OK ] DriverConductorIpcTest.shouldBeAbleToAddMultipleIpcPublications (0 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToAddAndRemoveMultipleIpcPublicationsToSameStreamId
-[       OK ] DriverConductorIpcTest.shouldBeAbleToAddAndRemoveMultipleIpcPublicationsToSameStreamId (0 ms)
+[       OK ] DriverConductorIpcTest.shouldBeAbleToAddAndRemoveMultipleIpcPublicationsToSameStreamId (1 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToAddMultipleExclusiveIpcPublicationsWithSameStreamId
-[       OK ] DriverConductorIpcTest.shouldBeAbleToAddMultipleExclusiveIpcPublicationsWithSameStreamId (2 ms)
+[       OK ] DriverConductorIpcTest.shouldBeAbleToAddMultipleExclusiveIpcPublicationsWithSameStreamId (0 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToAddMultipleIpcSubscriptionsWithSameStreamId
 [       OK ] DriverConductorIpcTest.shouldBeAbleToAddMultipleIpcSubscriptionsWithSameStreamId (1 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToAddSingleIpcSubscriptionThenAddSingleIpcPublication
@@ -1039,7 +1039,7 @@ Running main() from gmock_main.cc
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToAddMultipleIpcSubscriptionWithSameStreamIdThenAddSingleIpcPublication
 [       OK ] DriverConductorIpcTest.shouldBeAbleToAddMultipleIpcSubscriptionWithSameStreamIdThenAddSingleIpcPublication (1 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToAddSingleIpcSubscriptionThenAddMultipleExclusiveIpcPublicationsWithSameStreamId
-[       OK ] DriverConductorIpcTest.shouldBeAbleToAddSingleIpcSubscriptionThenAddMultipleExclusiveIpcPublicationsWithSameStreamId (0 ms)
+[       OK ] DriverConductorIpcTest.shouldBeAbleToAddSingleIpcSubscriptionThenAddMultipleExclusiveIpcPublicationsWithSameStreamId (10 ms)
 [ RUN      ] DriverConductorIpcTest.shouldNotLinkSubscriptionOnAddPublicationAfterFirstAddPublication
 [       OK ] DriverConductorIpcTest.shouldNotLinkSubscriptionOnAddPublicationAfterFirstAddPublication (0 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToTimeoutIpcPublication
@@ -1051,73 +1051,27 @@ Running main() from gmock_main.cc
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToTimeoutMultipleIpcSubscriptions
 [       OK ] DriverConductorIpcTest.shouldBeAbleToTimeoutMultipleIpcSubscriptions (1 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToNotTimeoutIpcSubscriptionOnKeepalive
-[       OK ] DriverConductorIpcTest.shouldBeAbleToNotTimeoutIpcSubscriptionOnKeepalive (13 ms)
+[       OK ] DriverConductorIpcTest.shouldBeAbleToNotTimeoutIpcSubscriptionOnKeepalive (0 ms)
 [ RUN      ] DriverConductorIpcTest.shouldBeAbleToTimeoutIpcPublicationWithActiveIpcSubscription
 [       OK ] DriverConductorIpcTest.shouldBeAbleToTimeoutIpcPublicationWithActiveIpcSubscription (0 ms)
-[----------] 19 tests from DriverConductorIpcTest (28 ms total)
+[----------] 19 tests from DriverConductorIpcTest (23 ms total)
 
 [----------] Global test environment tear-down
-[==========] 19 tests from 1 test case ran. (28 ms total)
+[==========] 19 tests from 1 test case ran. (23 ms total)
 [  PASSED  ] 19 tests.
 <end of output>
-Test time =   0.06 sec
+Test time =   0.07 sec
 ----------------------------------------------------------
 Test Passed.
-"driver_conductor_ipc_test" end time: Feb 19 07:44 WET
+"driver_conductor_ipc_test" end time: Feb 28 05:52 WET
 "driver_conductor_ipc_test" time elapsed: 00:00:00
-----------------------------------------------------------
-
-29/43 Testing: driver_conductor_spy_test
-29/43 Test: driver_conductor_spy_test
-Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/driver_conductor_spy_test"
-Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"driver_conductor_spy_test" start time: Feb 19 07:44 WET
-Output:
-----------------------------------------------------------
-Running main() from gmock_main.cc
-[==========] Running 11 tests from 1 test case.
-[----------] Global test environment set-up.
-[----------] 11 tests from DriverConductorSpyTest
-[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscription
-[       OK ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscription (4 ms)
-[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddAndRemoveSingleSubscription
-[       OK ] DriverConductorSpyTest.shouldBeAbleToAddAndRemoveSingleSubscription (9 ms)
-[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionsWithSameChannelSameStreamId
-[       OK ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionsWithSameChannelSameStreamId (1 ms)
-[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionsWithDifferentChannelSameStreamId
-[       OK ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionsWithDifferentChannelSameStreamId (0 ms)
-[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscriptionThenAddSinglePublication
-[       OK ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscriptionThenAddSinglePublication (1 ms)
-[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddSinglePublicationThenAddSingleSubscription
-[       OK ] DriverConductorSpyTest.shouldBeAbleToAddSinglePublicationThenAddSingleSubscription (0 ms)
-[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionWithSameStreamIdThenAddSinglePublication
-[       OK ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionWithSameStreamIdThenAddSinglePublication (1 ms)
-[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscriptionThenAddMultipleExclusivePublicationsWithSameStreamId
-[       OK ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscriptionThenAddMultipleExclusivePublicationsWithSameStreamId (0 ms)
-[ RUN      ] DriverConductorSpyTest.shouldNotLinkSubscriptionOnAddPublicationAfterFirstAddPublication
-[       OK ] DriverConductorSpyTest.shouldNotLinkSubscriptionOnAddPublicationAfterFirstAddPublication (1 ms)
-[ RUN      ] DriverConductorSpyTest.shouldBeAbleToTimeoutSubscription
-[       OK ] DriverConductorSpyTest.shouldBeAbleToTimeoutSubscription (0 ms)
-[ RUN      ] DriverConductorSpyTest.shouldBeAbleToNotTimeoutSubscriptionOnKeepalive
-[       OK ] DriverConductorSpyTest.shouldBeAbleToNotTimeoutSubscriptionOnKeepalive (1 ms)
-[----------] 11 tests from DriverConductorSpyTest (18 ms total)
-
-[----------] Global test environment tear-down
-[==========] 11 tests from 1 test case ran. (18 ms total)
-[  PASSED  ] 11 tests.
-<end of output>
-Test time =   0.04 sec
-----------------------------------------------------------
-Test Passed.
-"driver_conductor_spy_test" end time: Feb 19 07:44 WET
-"driver_conductor_spy_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
 28/43 Testing: driver_conductor_network_test
 28/43 Test: driver_conductor_network_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/driver_conductor_network_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"driver_conductor_network_test" start time: Feb 19 07:44 WET
+"driver_conductor_network_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1125,9 +1079,9 @@ Running main() from gmock_main.cc
 [----------] Global test environment set-up.
 [----------] 29 tests from DriverConductorNetworkTest
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToAddSingleNetworkPublication
-[       OK ] DriverConductorNetworkTest.shouldBeAbleToAddSingleNetworkPublication (5 ms)
+[       OK ] DriverConductorNetworkTest.shouldBeAbleToAddSingleNetworkPublication (3 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToAddAndRemoveSingleNetworkPublication
-[       OK ] DriverConductorNetworkTest.shouldBeAbleToAddAndRemoveSingleNetworkPublication (3 ms)
+[       OK ] DriverConductorNetworkTest.shouldBeAbleToAddAndRemoveSingleNetworkPublication (10 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToAddSingleNetworkSubscription
 [       OK ] DriverConductorNetworkTest.shouldBeAbleToAddSingleNetworkSubscription (1 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToAddAndRemoveSingleNetworkSubscription
@@ -1137,23 +1091,23 @@ Running main() from gmock_main.cc
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToAddMultipleNetworkPublicationsDifferentChannelsSameStreamId
 [       OK ] DriverConductorNetworkTest.shouldBeAbleToAddMultipleNetworkPublicationsDifferentChannelsSameStreamId (1 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToAddAndRemoveMultipleNetworkPublicationsToSameChannelSameStreamId
-[       OK ] DriverConductorNetworkTest.shouldBeAbleToAddAndRemoveMultipleNetworkPublicationsToSameChannelSameStreamId (0 ms)
+[       OK ] DriverConductorNetworkTest.shouldBeAbleToAddAndRemoveMultipleNetworkPublicationsToSameChannelSameStreamId (1 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToAddMultipleExclusiveNetworkPublicationsWithSameChannelSameStreamId
-[       OK ] DriverConductorNetworkTest.shouldBeAbleToAddMultipleExclusiveNetworkPublicationsWithSameChannelSameStreamId (1 ms)
+[       OK ] DriverConductorNetworkTest.shouldBeAbleToAddMultipleExclusiveNetworkPublicationsWithSameChannelSameStreamId (0 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToAddMultipleNetworkSubscriptionsWithSameChannelSameStreamId
 [       OK ] DriverConductorNetworkTest.shouldBeAbleToAddMultipleNetworkSubscriptionsWithSameChannelSameStreamId (1 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToAddMultipleNetworkSubscriptionsWithDifferentChannelSameStreamId
 [       OK ] DriverConductorNetworkTest.shouldBeAbleToAddMultipleNetworkSubscriptionsWithDifferentChannelSameStreamId (0 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldKeepSubscriptionMediaEndpointUponRemovalOfAllButOneSubscriber
-[       OK ] DriverConductorNetworkTest.shouldKeepSubscriptionMediaEndpointUponRemovalOfAllButOneSubscriber (21 ms)
+[       OK ] DriverConductorNetworkTest.shouldKeepSubscriptionMediaEndpointUponRemovalOfAllButOneSubscriber (0 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldErrorOnRemovePublicationOnUnknownRegistrationId
 [       OK ] DriverConductorNetworkTest.shouldErrorOnRemovePublicationOnUnknownRegistrationId (1 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldErrorOnRemoveSubscriptionOnUnknownRegistrationId
 [       OK ] DriverConductorNetworkTest.shouldErrorOnRemoveSubscriptionOnUnknownRegistrationId (0 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldErrorOnAddPublicationWithInvalidUri
-[       OK ] DriverConductorNetworkTest.shouldErrorOnAddPublicationWithInvalidUri (1 ms)
+[       OK ] DriverConductorNetworkTest.shouldErrorOnAddPublicationWithInvalidUri (10 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldErrorOnAddSubscriptionWithInvalidUri
-[       OK ] DriverConductorNetworkTest.shouldErrorOnAddSubscriptionWithInvalidUri (0 ms)
+[       OK ] DriverConductorNetworkTest.shouldErrorOnAddSubscriptionWithInvalidUri (1 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToTimeoutNetworkPublication
 [       OK ] DriverConductorNetworkTest.shouldBeAbleToTimeoutNetworkPublication (1 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldBeAbleToNotTimeoutNetworkPublicationOnKeepalive
@@ -1169,37 +1123,83 @@ Running main() from gmock_main.cc
 [ RUN      ] DriverConductorNetworkTest.shouldCreatePublicationImageForActiveNetworkSubscription
 [       OK ] DriverConductorNetworkTest.shouldCreatePublicationImageForActiveNetworkSubscription (0 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldNotCreatePublicationImageForNonActiveNetworkSubscription
-[       OK ] DriverConductorNetworkTest.shouldNotCreatePublicationImageForNonActiveNetworkSubscription (1 ms)
+[       OK ] DriverConductorNetworkTest.shouldNotCreatePublicationImageForNonActiveNetworkSubscription (0 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldRemoveSubscriptionFromImageWhenRemoveSubscription
-[       OK ] DriverConductorNetworkTest.shouldRemoveSubscriptionFromImageWhenRemoveSubscription (0 ms)
+[       OK ] DriverConductorNetworkTest.shouldRemoveSubscriptionFromImageWhenRemoveSubscription (1 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldTimeoutImageAndSendUnavailableImageWhenNoAcitvity
-[       OK ] DriverConductorNetworkTest.shouldTimeoutImageAndSendUnavailableImageWhenNoAcitvity (1 ms)
+[       OK ] DriverConductorNetworkTest.shouldTimeoutImageAndSendUnavailableImageWhenNoAcitvity (0 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldRemoveSubscriptionAfterImageTimeout
-[       OK ] DriverConductorNetworkTest.shouldRemoveSubscriptionAfterImageTimeout (0 ms)
+[       OK ] DriverConductorNetworkTest.shouldRemoveSubscriptionAfterImageTimeout (1 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldSendAvailableImageForMultipleSubscriptions
-[       OK ] DriverConductorNetworkTest.shouldSendAvailableImageForMultipleSubscriptions (0 ms)
+[       OK ] DriverConductorNetworkTest.shouldSendAvailableImageForMultipleSubscriptions (15 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldSendAvailableImageForSecondSubscriptionAfterCreatingImage
 [       OK ] DriverConductorNetworkTest.shouldSendAvailableImageForSecondSubscriptionAfterCreatingImage (1 ms)
 [ RUN      ] DriverConductorNetworkTest.shouldTimeoutImageAndSendUnavailableImageWhenNoActivityForMultipleSubscriptions
 [       OK ] DriverConductorNetworkTest.shouldTimeoutImageAndSendUnavailableImageWhenNoActivityForMultipleSubscriptions (0 ms)
-[----------] 29 tests from DriverConductorNetworkTest (43 ms total)
+[----------] 29 tests from DriverConductorNetworkTest (52 ms total)
 
 [----------] Global test environment tear-down
-[==========] 29 tests from 1 test case ran. (43 ms total)
+[==========] 29 tests from 1 test case ran. (52 ms total)
 [  PASSED  ] 29 tests.
 <end of output>
-Test time =   0.10 sec
+Test time =   0.08 sec
 ----------------------------------------------------------
 Test Passed.
-"driver_conductor_network_test" end time: Feb 19 07:44 WET
+"driver_conductor_network_test" end time: Feb 28 05:52 WET
 "driver_conductor_network_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/43 Testing: driver_conductor_spy_test
+29/43 Test: driver_conductor_spy_test
+Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/driver_conductor_spy_test"
+Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
+"driver_conductor_spy_test" start time: Feb 28 05:52 WET
+Output:
+----------------------------------------------------------
+Running main() from gmock_main.cc
+[==========] Running 11 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 11 tests from DriverConductorSpyTest
+[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscription
+[       OK ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscription (17 ms)
+[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddAndRemoveSingleSubscription
+[       OK ] DriverConductorSpyTest.shouldBeAbleToAddAndRemoveSingleSubscription (3 ms)
+[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionsWithSameChannelSameStreamId
+[       OK ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionsWithSameChannelSameStreamId (0 ms)
+[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionsWithDifferentChannelSameStreamId
+[       OK ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionsWithDifferentChannelSameStreamId (1 ms)
+[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscriptionThenAddSinglePublication
+[       OK ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscriptionThenAddSinglePublication (1 ms)
+[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddSinglePublicationThenAddSingleSubscription
+[       OK ] DriverConductorSpyTest.shouldBeAbleToAddSinglePublicationThenAddSingleSubscription (1 ms)
+[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionWithSameStreamIdThenAddSinglePublication
+[       OK ] DriverConductorSpyTest.shouldBeAbleToAddMultipleSubscriptionWithSameStreamIdThenAddSinglePublication (1 ms)
+[ RUN      ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscriptionThenAddMultipleExclusivePublicationsWithSameStreamId
+[       OK ] DriverConductorSpyTest.shouldBeAbleToAddSingleSubscriptionThenAddMultipleExclusivePublicationsWithSameStreamId (3 ms)
+[ RUN      ] DriverConductorSpyTest.shouldNotLinkSubscriptionOnAddPublicationAfterFirstAddPublication
+[       OK ] DriverConductorSpyTest.shouldNotLinkSubscriptionOnAddPublicationAfterFirstAddPublication (0 ms)
+[ RUN      ] DriverConductorSpyTest.shouldBeAbleToTimeoutSubscription
+[       OK ] DriverConductorSpyTest.shouldBeAbleToTimeoutSubscription (0 ms)
+[ RUN      ] DriverConductorSpyTest.shouldBeAbleToNotTimeoutSubscriptionOnKeepalive
+[       OK ] DriverConductorSpyTest.shouldBeAbleToNotTimeoutSubscriptionOnKeepalive (1 ms)
+[----------] 11 tests from DriverConductorSpyTest (35 ms total)
+
+[----------] Global test environment tear-down
+[==========] 11 tests from 1 test case ran. (35 ms total)
+[  PASSED  ] 11 tests.
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"driver_conductor_spy_test" end time: Feb 28 05:52 WET
+"driver_conductor_spy_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
 30/43 Testing: driver_conductor_counter_test
 30/43 Test: driver_conductor_counter_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/driver_conductor_counter_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"driver_conductor_counter_test" start time: Feb 19 07:44 WET
+"driver_conductor_counter_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1207,25 +1207,25 @@ Running main() from gmock_main.cc
 [----------] Global test environment set-up.
 [----------] 5 tests from DriverConductorCounterTest
 [ RUN      ] DriverConductorCounterTest.shouldBeAbleToAddSingleCounter
-[       OK ] DriverConductorCounterTest.shouldBeAbleToAddSingleCounter (6 ms)
+[       OK ] DriverConductorCounterTest.shouldBeAbleToAddSingleCounter (3 ms)
 [ RUN      ] DriverConductorCounterTest.shouldRemoveSingleCounter
-[       OK ] DriverConductorCounterTest.shouldRemoveSingleCounter (10 ms)
+[       OK ] DriverConductorCounterTest.shouldRemoveSingleCounter (17 ms)
 [ RUN      ] DriverConductorCounterTest.shouldRemoveCounterOnClientTimeout
-[       OK ] DriverConductorCounterTest.shouldRemoveCounterOnClientTimeout (0 ms)
+[       OK ] DriverConductorCounterTest.shouldRemoveCounterOnClientTimeout (1 ms)
 [ RUN      ] DriverConductorCounterTest.shouldRemoveMultipleCountersOnClientTimeout
 [       OK ] DriverConductorCounterTest.shouldRemoveMultipleCountersOnClientTimeout (0 ms)
 [ RUN      ] DriverConductorCounterTest.shouldNotRemoveCounterOnClientKeepalive
 [       OK ] DriverConductorCounterTest.shouldNotRemoveCounterOnClientKeepalive (1 ms)
-[----------] 5 tests from DriverConductorCounterTest (17 ms total)
+[----------] 5 tests from DriverConductorCounterTest (22 ms total)
 
 [----------] Global test environment tear-down
-[==========] 5 tests from 1 test case ran. (17 ms total)
+[==========] 5 tests from 1 test case ran. (22 ms total)
 [  PASSED  ] 5 tests.
 <end of output>
-Test time =   0.07 sec
+Test time =   0.08 sec
 ----------------------------------------------------------
 Test Passed.
-"driver_conductor_counter_test" end time: Feb 19 07:44 WET
+"driver_conductor_counter_test" end time: Feb 28 05:52 WET
 "driver_conductor_counter_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1233,7 +1233,7 @@ Test Passed.
 33/43 Test: uri_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/uri_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"uri_test" start time: Feb 19 07:44 WET
+"uri_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1283,7 +1283,7 @@ Running main() from gmock_main.cc
 [ RUN      ] UriTest.shouldParsePublicationParamIpcMtuLengthNotMultipleOfFrameAlignment
 [       OK ] UriTest.shouldParsePublicationParamIpcMtuLengthNotMultipleOfFrameAlignment (0 ms)
 [ RUN      ] UriTest.shouldParsePublicationParamIpcSparse
-[       OK ] UriTest.shouldParsePublicationParamIpcSparse (1 ms)
+[       OK ] UriTest.shouldParsePublicationParamIpcSparse (0 ms)
 [ RUN      ] UriTest.shouldParsePublicationParamsForReplayUdp
 [       OK ] UriTest.shouldParsePublicationParamsForReplayUdp (0 ms)
 [ RUN      ] UriTest.shouldParsePublicationParamsForReplayIpc
@@ -1327,7 +1327,7 @@ Running main() from gmock_main.cc
 [       OK ] UriResolverTest.shouldCalculateIpv4PrefixlenFromNetmask (0 ms)
 [ RUN      ] UriResolverTest.shouldCalculateIpv6PrefixlenFromNetmask
 [       OK ] UriResolverTest.shouldCalculateIpv6PrefixlenFromNetmask (0 ms)
-[----------] 13 tests from UriResolverTest (0 ms total)
+[----------] 13 tests from UriResolverTest (2 ms total)
 
 [----------] 4 tests from UriLookupTest
 [ RUN      ] UriLookupTest.shouldFindIpv4Loopback
@@ -1338,16 +1338,16 @@ Running main() from gmock_main.cc
 [       OK ] UriLookupTest.shouldFindIpv6 (0 ms)
 [ RUN      ] UriLookupTest.shouldNotFindUnknown
 [       OK ] UriLookupTest.shouldNotFindUnknown (0 ms)
-[----------] 4 tests from UriLookupTest (1 ms total)
+[----------] 4 tests from UriLookupTest (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 46 tests from 3 test cases ran. (12 ms total)
+[==========] 46 tests from 3 test cases ran. (4 ms total)
 [  PASSED  ] 46 tests.
 <end of output>
-Test time =   0.03 sec
+Test time =   0.02 sec
 ----------------------------------------------------------
 Test Passed.
-"uri_test" end time: Feb 19 07:44 WET
+"uri_test" end time: Feb 28 05:52 WET
 "uri_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1355,7 +1355,7 @@ Test Passed.
 34/43 Test: udp_channel_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/udp_channel_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"udp_channel_test" start time: Feb 19 07:44 WET
+"udp_channel_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1387,17 +1387,17 @@ Running main() from gmock_main.cc
 [ RUN      ] UdpChannelTest.shouldCanonicalizeForIpv4Multicast
 [       OK ] UdpChannelTest.shouldCanonicalizeForIpv4Multicast (1 ms)
 [ RUN      ] UdpChannelTest.shouldCanonicalizeForIpv6Multicast
-[       OK ] UdpChannelTest.shouldCanonicalizeForIpv6Multicast (0 ms)
-[----------] 13 tests from UdpChannelTest (2 ms total)
+[       OK ] UdpChannelTest.shouldCanonicalizeForIpv6Multicast (1 ms)
+[----------] 13 tests from UdpChannelTest (7 ms total)
 
 [----------] Global test environment tear-down
-[==========] 13 tests from 1 test case ran. (3 ms total)
+[==========] 13 tests from 1 test case ran. (11 ms total)
 [  PASSED  ] 13 tests.
 <end of output>
-Test time =   0.02 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"udp_channel_test" end time: Feb 19 07:44 WET
+"udp_channel_test" end time: Feb 28 05:52 WET
 "udp_channel_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1405,7 +1405,7 @@ Test Passed.
 35/43 Test: int64_to_ptr_hash_map_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/int64_to_ptr_hash_map_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"int64_to_ptr_hash_map_test" start time: Feb 19 07:44 WET
+"int64_to_ptr_hash_map_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1425,19 +1425,19 @@ Running main() from gmock_main.cc
 [ RUN      ] Int64ToPtrHashMapTest.shouldRemoveEntryAndCompactCollisionChain
 [       OK ] Int64ToPtrHashMapTest.shouldRemoveEntryAndCompactCollisionChain (0 ms)
 [ RUN      ] Int64ToPtrHashMapTest.shouldNotForEachEmptyMap
-[       OK ] Int64ToPtrHashMapTest.shouldNotForEachEmptyMap (0 ms)
+[       OK ] Int64ToPtrHashMapTest.shouldNotForEachEmptyMap (1 ms)
 [ RUN      ] Int64ToPtrHashMapTest.shouldForEachNonEmptyMap
 [       OK ] Int64ToPtrHashMapTest.shouldForEachNonEmptyMap (0 ms)
-[----------] 8 tests from Int64ToPtrHashMapTest (0 ms total)
+[----------] 8 tests from Int64ToPtrHashMapTest (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 8 tests from 1 test case ran. (0 ms total)
+[==========] 8 tests from 1 test case ran. (1 ms total)
 [  PASSED  ] 8 tests.
 <end of output>
-Test time =   0.01 sec
+Test time =   0.02 sec
 ----------------------------------------------------------
 Test Passed.
-"int64_to_ptr_hash_map_test" end time: Feb 19 07:44 WET
+"int64_to_ptr_hash_map_test" end time: Feb 28 05:52 WET
 "int64_to_ptr_hash_map_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1445,7 +1445,7 @@ Test Passed.
 36/43 Test: str_to_ptr_hash_map_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/str_to_ptr_hash_map_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"str_to_ptr_hash_map_test" start time: Feb 19 07:44 WET
+"str_to_ptr_hash_map_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1470,10 +1470,10 @@ Running main() from gmock_main.cc
 [==========] 6 tests from 1 test case ran. (0 ms total)
 [  PASSED  ] 6 tests.
 <end of output>
-Test time =   0.02 sec
+Test time =   0.03 sec
 ----------------------------------------------------------
 Test Passed.
-"str_to_ptr_hash_map_test" end time: Feb 19 07:44 WET
+"str_to_ptr_hash_map_test" end time: Feb 28 05:52 WET
 "str_to_ptr_hash_map_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1481,7 +1481,7 @@ Test Passed.
 37/43 Test: term_scanner_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/term_scanner_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"term_scanner_test" start time: Feb 19 07:44 WET
+"term_scanner_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1506,16 +1506,16 @@ Running main() from gmock_main.cc
 [       OK ] TermScannerTest.shouldScanLastMessageInBufferPlusPadding (0 ms)
 [ RUN      ] TermScannerTest.shouldScanLastMessageInBufferMinusPaddingLimitedByMtu
 [       OK ] TermScannerTest.shouldScanLastMessageInBufferMinusPaddingLimitedByMtu (0 ms)
-[----------] 9 tests from TermScannerTest (0 ms total)
+[----------] 9 tests from TermScannerTest (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 9 tests from 1 test case ran. (0 ms total)
+[==========] 9 tests from 1 test case ran. (10 ms total)
 [  PASSED  ] 9 tests.
 <end of output>
 Test time =   0.03 sec
 ----------------------------------------------------------
 Test Passed.
-"term_scanner_test" end time: Feb 19 07:44 WET
+"term_scanner_test" end time: Feb 28 05:52 WET
 "term_scanner_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1523,7 +1523,7 @@ Test Passed.
 38/43 Test: loss_detector_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/loss_detector_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"loss_detector_test" start time: Feb 19 07:44 WET
+"loss_detector_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1568,13 +1568,13 @@ Running main() from gmock_main.cc
 [----------] 12 tests from LossDetectorTest (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 16 tests from 2 test cases ran. (9 ms total)
+[==========] 16 tests from 2 test cases ran. (6 ms total)
 [  PASSED  ] 16 tests.
 <end of output>
-Test time =   0.02 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"loss_detector_test" end time: Feb 19 07:44 WET
+"loss_detector_test" end time: Feb 28 05:52 WET
 "loss_detector_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1582,7 +1582,7 @@ Test Passed.
 39/43 Test: retransmit_handler_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/retransmit_handler_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"retransmit_handler_test" start time: Feb 19 07:44 WET
+"retransmit_handler_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1590,23 +1590,23 @@ Running main() from gmock_main.cc
 [----------] Global test environment set-up.
 [----------] 4 tests from RetransmitHandlerTest
 [ RUN      ] RetransmitHandlerTest.shouldImmediateRetransmitOnNak
-[       OK ] RetransmitHandlerTest.shouldImmediateRetransmitOnNak (0 ms)
+[       OK ] RetransmitHandlerTest.shouldImmediateRetransmitOnNak (1 ms)
 [ RUN      ] RetransmitHandlerTest.shouldNotRetransmitOnNakWhileInLinger
 [       OK ] RetransmitHandlerTest.shouldNotRetransmitOnNakWhileInLinger (0 ms)
 [ RUN      ] RetransmitHandlerTest.shouldRetransmitOnNakAfterLinger
 [       OK ] RetransmitHandlerTest.shouldRetransmitOnNakAfterLinger (0 ms)
 [ RUN      ] RetransmitHandlerTest.shouldRetransmitOnMultipleNaks
 [       OK ] RetransmitHandlerTest.shouldRetransmitOnMultipleNaks (0 ms)
-[----------] 4 tests from RetransmitHandlerTest (0 ms total)
+[----------] 4 tests from RetransmitHandlerTest (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 4 tests from 1 test case ran. (0 ms total)
+[==========] 4 tests from 1 test case ran. (5 ms total)
 [  PASSED  ] 4 tests.
 <end of output>
-Test time =   0.03 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"retransmit_handler_test" end time: Feb 19 07:44 WET
+"retransmit_handler_test" end time: Feb 28 05:52 WET
 "retransmit_handler_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1614,7 +1614,7 @@ Test Passed.
 40/43 Test: loss_reporter_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/loss_reporter_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"loss_reporter_test" start time: Feb 19 07:44 WET
+"loss_reporter_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1626,21 +1626,21 @@ Running main() from gmock_main.cc
 [ RUN      ] LossReporterTest.shouldUpdateEntry
 [       OK ] LossReporterTest.shouldUpdateEntry (0 ms)
 [ RUN      ] LossReporterTest.shouldReadNoEntriesInEmptyReport
-[       OK ] LossReporterTest.shouldReadNoEntriesInEmptyReport (0 ms)
+[       OK ] LossReporterTest.shouldReadNoEntriesInEmptyReport (1 ms)
 [ RUN      ] LossReporterTest.shouldReadOneEntry
 [       OK ] LossReporterTest.shouldReadOneEntry (0 ms)
 [ RUN      ] LossReporterTest.shouldReadTwoEntries
 [       OK ] LossReporterTest.shouldReadTwoEntries (0 ms)
-[----------] 5 tests from LossReporterTest (0 ms total)
+[----------] 5 tests from LossReporterTest (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 5 tests from 1 test case ran. (0 ms total)
+[==========] 5 tests from 1 test case ran. (2 ms total)
 [  PASSED  ] 5 tests.
 <end of output>
-Test time =   0.03 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"loss_reporter_test" end time: Feb 19 07:44 WET
+"loss_reporter_test" end time: Feb 28 05:52 WET
 "loss_reporter_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1648,7 +1648,7 @@ Test Passed.
 41/43 Test: logbuffer_unblocker
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/logbuffer_unblocker"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"logbuffer_unblocker" start time: Feb 19 07:44 WET
+"logbuffer_unblocker" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1686,10 +1686,10 @@ Running main() from gmock_main.cc
 [==========] 11 tests from 2 test cases ran. (1 ms total)
 [  PASSED  ] 11 tests.
 <end of output>
-Test time =   0.01 sec
+Test time =   0.03 sec
 ----------------------------------------------------------
 Test Passed.
-"logbuffer_unblocker" end time: Feb 19 07:44 WET
+"logbuffer_unblocker" end time: Feb 28 05:52 WET
 "logbuffer_unblocker" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1697,7 +1697,7 @@ Test Passed.
 42/43 Test: term_gap_filler_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/term_gap_filler_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"term_gap_filler_test" start time: Feb 19 07:44 WET
+"term_gap_filler_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1720,10 +1720,10 @@ Running main() from gmock_main.cc
 [==========] 5 tests from 1 test case ran. (0 ms total)
 [  PASSED  ] 5 tests.
 <end of output>
-Test time =   0.02 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"term_gap_filler_test" end time: Feb 19 07:44 WET
+"term_gap_filler_test" end time: Feb 28 05:52 WET
 "term_gap_filler_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1731,7 +1731,7 @@ Test Passed.
 43/43 Test: parse_util_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/parse_util_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"parse_util_test" start time: Feb 19 07:44 WET
+"parse_util_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1759,13 +1759,13 @@ Running main() from gmock_main.cc
 [----------] 9 tests from ParseUtilTest (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 9 tests from 1 test case ran. (0 ms total)
+[==========] 9 tests from 1 test case ran. (2 ms total)
 [  PASSED  ] 9 tests.
 <end of output>
-Test time =   0.02 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"parse_util_test" end time: Feb 19 07:44 WET
+"parse_util_test" end time: Feb 28 05:52 WET
 "parse_util_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1773,7 +1773,7 @@ Test Passed.
 11/43 Test: concurrentTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/concurrentTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"concurrentTest" start time: Feb 19 07:44 WET
+"concurrentTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1787,19 +1787,19 @@ Running main() from gmock_main.cc
 [ RUN      ] atomicBufferTests.stringRead
 [       OK ] atomicBufferTests.stringRead (0 ms)
 [ RUN      ] atomicBufferTests.concurrentTest
-[       OK ] atomicBufferTests.concurrentTest (1123 ms)
+[       OK ] atomicBufferTests.concurrentTest (1015 ms)
 [ RUN      ] atomicBufferTests.checkStructOveray
-[       OK ] atomicBufferTests.checkStructOveray (0 ms)
-[----------] 5 tests from atomicBufferTests (1123 ms total)
+[       OK ] atomicBufferTests.checkStructOveray (1 ms)
+[----------] 5 tests from atomicBufferTests (1016 ms total)
 
 [----------] Global test environment tear-down
-[==========] 5 tests from 1 test case ran. (1123 ms total)
+[==========] 5 tests from 1 test case ran. (1016 ms total)
 [  PASSED  ] 5 tests.
 <end of output>
-Test time =   1.12 sec
+Test time =   1.02 sec
 ----------------------------------------------------------
 Test Passed.
-"concurrentTest" end time: Feb 19 07:44 WET
+"concurrentTest" end time: Feb 28 05:52 WET
 "concurrentTest" time elapsed: 00:00:01
 ----------------------------------------------------------
 
@@ -1807,7 +1807,7 @@ Test Passed.
 22/43 Test: spsc_rb_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/spsc_rb_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"spsc_rb_test" start time: Feb 19 07:44 WET
+"spsc_rb_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1844,19 +1844,19 @@ Running main() from gmock_main.cc
 
 [----------] 2 tests from SpscRbConcurrentTest
 [ RUN      ] SpscRbConcurrentTest.shouldProvideCcorrelationIds
-[       OK ] SpscRbConcurrentTest.shouldProvideCcorrelationIds (618 ms)
+[       OK ] SpscRbConcurrentTest.shouldProvideCcorrelationIds (778 ms)
 [ RUN      ] SpscRbConcurrentTest.shouldExchangeMessages
-[       OK ] SpscRbConcurrentTest.shouldExchangeMessages (1612 ms)
-[----------] 2 tests from SpscRbConcurrentTest (2230 ms total)
+[       OK ] SpscRbConcurrentTest.shouldExchangeMessages (1371 ms)
+[----------] 2 tests from SpscRbConcurrentTest (2149 ms total)
 
 [----------] Global test environment tear-down
-[==========] 15 tests from 2 test cases ran. (2230 ms total)
+[==========] 15 tests from 2 test cases ran. (2149 ms total)
 [  PASSED  ] 15 tests.
 <end of output>
-Test time =   2.25 sec
+Test time =   2.16 sec
 ----------------------------------------------------------
 Test Passed.
-"spsc_rb_test" end time: Feb 19 07:44 WET
+"spsc_rb_test" end time: Feb 28 05:52 WET
 "spsc_rb_test" time elapsed: 00:00:02
 ----------------------------------------------------------
 
@@ -1864,7 +1864,7 @@ Test Passed.
 21/43 Test: oneToOneRingBufferTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/oneToOneRingBufferTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"oneToOneRingBufferTest" start time: Feb 19 07:44 WET
+"oneToOneRingBufferTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1874,7 +1874,7 @@ Running main() from gmock_main.cc
 [ RUN      ] OneToOneRingBufferTest.shouldCalculateCapacityForBuffer
 [       OK ] OneToOneRingBufferTest.shouldCalculateCapacityForBuffer (0 ms)
 [ RUN      ] OneToOneRingBufferTest.shouldThrowForCapacityNotPowerOfTwo
-[       OK ] OneToOneRingBufferTest.shouldThrowForCapacityNotPowerOfTwo (0 ms)
+[       OK ] OneToOneRingBufferTest.shouldThrowForCapacityNotPowerOfTwo (1 ms)
 [ RUN      ] OneToOneRingBufferTest.shouldThrowWhenMaxMessageSizeExceeded
 [       OK ] OneToOneRingBufferTest.shouldThrowWhenMaxMessageSizeExceeded (0 ms)
 [ RUN      ] OneToOneRingBufferTest.shouldWriteToEmptyBuffer
@@ -1899,23 +1899,23 @@ Running main() from gmock_main.cc
 [       OK ] OneToOneRingBufferTest.shouldLimitReadOfMessages (0 ms)
 [ RUN      ] OneToOneRingBufferTest.shouldCopeWithExceptionFromHandler
 [       OK ] OneToOneRingBufferTest.shouldCopeWithExceptionFromHandler (0 ms)
-[----------] 14 tests from OneToOneRingBufferTest (0 ms total)
+[----------] 14 tests from OneToOneRingBufferTest (1 ms total)
 
 [----------] 2 tests from OneToOneRingBufferConcurrentTest
 [ RUN      ] OneToOneRingBufferConcurrentTest.shouldProvideCcorrelationIds
-[       OK ] OneToOneRingBufferConcurrentTest.shouldProvideCcorrelationIds (684 ms)
+[       OK ] OneToOneRingBufferConcurrentTest.shouldProvideCcorrelationIds (664 ms)
 [ RUN      ] OneToOneRingBufferConcurrentTest.shouldExchangeMessages
-[       OK ] OneToOneRingBufferConcurrentTest.shouldExchangeMessages (2111 ms)
-[----------] 2 tests from OneToOneRingBufferConcurrentTest (2795 ms total)
+[       OK ] OneToOneRingBufferConcurrentTest.shouldExchangeMessages (2055 ms)
+[----------] 2 tests from OneToOneRingBufferConcurrentTest (2719 ms total)
 
 [----------] Global test environment tear-down
-[==========] 16 tests from 2 test cases ran. (2796 ms total)
+[==========] 16 tests from 2 test cases ran. (2720 ms total)
 [  PASSED  ] 16 tests.
 <end of output>
-Test time =   2.82 sec
+Test time =   2.72 sec
 ----------------------------------------------------------
 Test Passed.
-"oneToOneRingBufferTest" end time: Feb 19 07:44 WET
+"oneToOneRingBufferTest" end time: Feb 28 05:52 WET
 "oneToOneRingBufferTest" time elapsed: 00:00:02
 ----------------------------------------------------------
 
@@ -1923,7 +1923,7 @@ Test Passed.
 23/43 Test: mpsc_rb_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/mpsc_rb_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"mpsc_rb_test" start time: Feb 19 07:44 WET
+"mpsc_rb_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -1966,27 +1966,27 @@ Running main() from gmock_main.cc
 
 [----------] 2 tests from MpscRbConcurrentTest
 [ RUN      ] MpscRbConcurrentTest.shouldProvideCorrelationIds
-[       OK ] MpscRbConcurrentTest.shouldProvideCorrelationIds (587 ms)
+[       OK ] MpscRbConcurrentTest.shouldProvideCorrelationIds (461 ms)
 [ RUN      ] MpscRbConcurrentTest.shouldExchangeMessages
-[       OK ] MpscRbConcurrentTest.shouldExchangeMessages (2276 ms)
-[----------] 2 tests from MpscRbConcurrentTest (2863 ms total)
+[       OK ] MpscRbConcurrentTest.shouldExchangeMessages (2908 ms)
+[----------] 2 tests from MpscRbConcurrentTest (3369 ms total)
 
 [----------] Global test environment tear-down
-[==========] 18 tests from 2 test cases ran. (2863 ms total)
+[==========] 18 tests from 2 test cases ran. (3369 ms total)
 [  PASSED  ] 18 tests.
 <end of output>
-Test time =   2.88 sec
+Test time =   3.38 sec
 ----------------------------------------------------------
 Test Passed.
-"mpsc_rb_test" end time: Feb 19 07:44 WET
-"mpsc_rb_test" time elapsed: 00:00:02
+"mpsc_rb_test" end time: Feb 28 05:52 WET
+"mpsc_rb_test" time elapsed: 00:00:03
 ----------------------------------------------------------
 
 31/43 Testing: spsc_queue_test
 31/43 Test: spsc_queue_test
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/spsc_queue_test"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"spsc_queue_test" start time: Feb 19 07:44 WET
+"spsc_queue_test" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -2013,25 +2013,70 @@ Running main() from gmock_main.cc
 
 [----------] 1 test from SpscQueueConcurrentTest
 [ RUN      ] SpscQueueConcurrentTest.shouldExchangeMessages
-[       OK ] SpscQueueConcurrentTest.shouldExchangeMessages (3070 ms)
-[----------] 1 test from SpscQueueConcurrentTest (3070 ms total)
+[       OK ] SpscQueueConcurrentTest.shouldExchangeMessages (3262 ms)
+[----------] 1 test from SpscQueueConcurrentTest (3262 ms total)
 
 [----------] Global test environment tear-down
-[==========] 9 tests from 2 test cases ran. (3070 ms total)
+[==========] 9 tests from 2 test cases ran. (3262 ms total)
 [  PASSED  ] 9 tests.
 <end of output>
-Test time =   3.10 sec
+Test time =   3.28 sec
 ----------------------------------------------------------
 Test Passed.
-"spsc_queue_test" end time: Feb 19 07:44 WET
+"spsc_queue_test" end time: Feb 28 05:52 WET
 "spsc_queue_test" time elapsed: 00:00:03
+----------------------------------------------------------
+
+32/43 Testing: mpsc_queue_test
+32/43 Test: mpsc_queue_test
+Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/mpsc_queue_test"
+Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
+"mpsc_queue_test" start time: Feb 28 05:52 WET
+Output:
+----------------------------------------------------------
+Running main() from gmock_main.cc
+[==========] Running 9 tests from 2 test cases.
+[----------] Global test environment set-up.
+[----------] 8 tests from MpscQueueTest
+[ RUN      ] MpscQueueTest.shouldGetSizeWhenEmpty
+[       OK ] MpscQueueTest.shouldGetSizeWhenEmpty (0 ms)
+[ RUN      ] MpscQueueTest.shouldReturnErrorWhenNullOffered
+[       OK ] MpscQueueTest.shouldReturnErrorWhenNullOffered (0 ms)
+[ RUN      ] MpscQueueTest.shouldOfferAndDrainToEmptyQueue
+[       OK ] MpscQueueTest.shouldOfferAndDrainToEmptyQueue (0 ms)
+[ RUN      ] MpscQueueTest.shouldFailToOfferToFullQueue
+[       OK ] MpscQueueTest.shouldFailToOfferToFullQueue (0 ms)
+[ RUN      ] MpscQueueTest.shouldDrainSingleElementFromFullQueue
+[       OK ] MpscQueueTest.shouldDrainSingleElementFromFullQueue (0 ms)
+[ RUN      ] MpscQueueTest.shouldDrainNothingFromEmptyQueue
+[       OK ] MpscQueueTest.shouldDrainNothingFromEmptyQueue (0 ms)
+[ RUN      ] MpscQueueTest.shouldDrainFullQueue
+[       OK ] MpscQueueTest.shouldDrainFullQueue (0 ms)
+[ RUN      ] MpscQueueTest.shouldDrainFullQueueWithLimit
+[       OK ] MpscQueueTest.shouldDrainFullQueueWithLimit (0 ms)
+[----------] 8 tests from MpscQueueTest (0 ms total)
+
+[----------] 1 test from MpscQueueConcurrentTest
+[ RUN      ] MpscQueueConcurrentTest.shouldExchangeMessages
+[       OK ] MpscQueueConcurrentTest.shouldExchangeMessages (3549 ms)
+[----------] 1 test from MpscQueueConcurrentTest (3549 ms total)
+
+[----------] Global test environment tear-down
+[==========] 9 tests from 2 test cases ran. (3549 ms total)
+[  PASSED  ] 9 tests.
+<end of output>
+Test time =   3.58 sec
+----------------------------------------------------------
+Test Passed.
+"mpsc_queue_test" end time: Feb 28 05:52 WET
+"mpsc_queue_test" time elapsed: 00:00:03
 ----------------------------------------------------------
 
 18/43 Testing: manyToOneRingBufferTest
 18/43 Test: manyToOneRingBufferTest
 Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/manyToOneRingBufferTest"
 Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-client/src/test/cpp
-"manyToOneRingBufferTest" start time: Feb 19 07:44 WET
+"manyToOneRingBufferTest" start time: Feb 28 05:52 WET
 Output:
 ----------------------------------------------------------
 Running main() from gmock_main.cc
@@ -2080,65 +2125,20 @@ Running main() from gmock_main.cc
 
 [----------] 2 tests from ManyToOneRingBufferConcurrentTest
 [ RUN      ] ManyToOneRingBufferConcurrentTest.shouldProvideCcorrelationIds
-[       OK ] ManyToOneRingBufferConcurrentTest.shouldProvideCcorrelationIds (698 ms)
+[       OK ] ManyToOneRingBufferConcurrentTest.shouldProvideCcorrelationIds (401 ms)
 [ RUN      ] ManyToOneRingBufferConcurrentTest.shouldExchangeMessages
-[       OK ] ManyToOneRingBufferConcurrentTest.shouldExchangeMessages (3378 ms)
-[----------] 2 tests from ManyToOneRingBufferConcurrentTest (4076 ms total)
+[       OK ] ManyToOneRingBufferConcurrentTest.shouldExchangeMessages (3738 ms)
+[----------] 2 tests from ManyToOneRingBufferConcurrentTest (4139 ms total)
 
 [----------] Global test environment tear-down
-[==========] 21 tests from 2 test cases ran. (4077 ms total)
+[==========] 21 tests from 2 test cases ran. (4140 ms total)
 [  PASSED  ] 21 tests.
 <end of output>
-Test time =   4.10 sec
+Test time =   4.14 sec
 ----------------------------------------------------------
 Test Passed.
-"manyToOneRingBufferTest" end time: Feb 19 07:44 WET
+"manyToOneRingBufferTest" end time: Feb 28 05:52 WET
 "manyToOneRingBufferTest" time elapsed: 00:00:04
 ----------------------------------------------------------
 
-32/43 Testing: mpsc_queue_test
-32/43 Test: mpsc_queue_test
-Command: "/home/daedalus/Documents/aeron4need/cppbuild/Release/binaries/mpsc_queue_test"
-Directory: /home/daedalus/Documents/aeron4need/cppbuild/Release/aeron-driver/src/test/c
-"mpsc_queue_test" start time: Feb 19 07:44 WET
-Output:
-----------------------------------------------------------
-Running main() from gmock_main.cc
-[==========] Running 9 tests from 2 test cases.
-[----------] Global test environment set-up.
-[----------] 8 tests from MpscQueueTest
-[ RUN      ] MpscQueueTest.shouldGetSizeWhenEmpty
-[       OK ] MpscQueueTest.shouldGetSizeWhenEmpty (0 ms)
-[ RUN      ] MpscQueueTest.shouldReturnErrorWhenNullOffered
-[       OK ] MpscQueueTest.shouldReturnErrorWhenNullOffered (0 ms)
-[ RUN      ] MpscQueueTest.shouldOfferAndDrainToEmptyQueue
-[       OK ] MpscQueueTest.shouldOfferAndDrainToEmptyQueue (0 ms)
-[ RUN      ] MpscQueueTest.shouldFailToOfferToFullQueue
-[       OK ] MpscQueueTest.shouldFailToOfferToFullQueue (0 ms)
-[ RUN      ] MpscQueueTest.shouldDrainSingleElementFromFullQueue
-[       OK ] MpscQueueTest.shouldDrainSingleElementFromFullQueue (0 ms)
-[ RUN      ] MpscQueueTest.shouldDrainNothingFromEmptyQueue
-[       OK ] MpscQueueTest.shouldDrainNothingFromEmptyQueue (0 ms)
-[ RUN      ] MpscQueueTest.shouldDrainFullQueue
-[       OK ] MpscQueueTest.shouldDrainFullQueue (0 ms)
-[ RUN      ] MpscQueueTest.shouldDrainFullQueueWithLimit
-[       OK ] MpscQueueTest.shouldDrainFullQueueWithLimit (0 ms)
-[----------] 8 tests from MpscQueueTest (0 ms total)
-
-[----------] 1 test from MpscQueueConcurrentTest
-[ RUN      ] MpscQueueConcurrentTest.shouldExchangeMessages
-[       OK ] MpscQueueConcurrentTest.shouldExchangeMessages (3959 ms)
-[----------] 1 test from MpscQueueConcurrentTest (3959 ms total)
-
-[----------] Global test environment tear-down
-[==========] 9 tests from 2 test cases ran. (3959 ms total)
-[  PASSED  ] 9 tests.
-<end of output>
-Test time =   3.98 sec
-----------------------------------------------------------
-Test Passed.
-"mpsc_queue_test" end time: Feb 19 07:44 WET
-"mpsc_queue_test" time elapsed: 00:00:03
-----------------------------------------------------------
-
-End testing: Feb 19 07:44 WET
+End testing: Feb 28 05:52 WET
