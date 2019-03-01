@@ -161,14 +161,13 @@ class CommunicationsManager:
 
 
 	def add_flow(self, throughput, link_list):
-		self.aeron_lib.addFlow(throughput, len(link_list), (c_ushort * len(link_list))(*link_list))
+		self.aeron_lib.addFlow(throughput, len(link_list), (c_uint * len(link_list))(*link_list))
 
 
 	def receive_flow(self, bandwidth, link_count, link_list):
-		#print("[Py] throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]), end="")
-		#print()
+		# print("[Py] throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]))
 		sys.stdout.flush()
-		self.flow_collector(bandwidth, link_list[0:link_count])
+		self.flow_collector(bandwidth, link_list[:link_count])
 		self.received += 1
 
 
@@ -178,10 +177,16 @@ class CommunicationsManager:
 		:return:
 		"""
 		
-		# FIXME add_flow directly in EmulationManager.py
-		for path in active_paths:
-			links = [link.index for link in path.links]
-			self.aeron_lib.addFlow(path.used_bandwidth, len(links), (c_ushort * len(links))(*links))
+		try:
+			# FIXME add_flow directly in EmulationManager.py
+			for path in active_paths:
+				links = [link.index for link in path.links]
+				self.aeron_lib.addFlow(int(path.used_bandwidth), len(links), (c_uint * len(links))(*links))
+				
+		except Exception as e:
+			print("[Py] FAILED: " + str(e))
+			sys.stdout.flush()
+			sys.stderr.flush()
 			
 		self.aeron_lib.flush()
 		
@@ -220,12 +225,12 @@ class CommunicationsManager:
 							continue
 						connection.close()
 						with self.stop_lock:
-							self.process_pool.terminate()
-							self.process_pool.join()
+							# self.process_pool.terminate()
+							# self.process_pool.join()
 							self.dashboard_socket.close()
 							for s in broadcast_sockets:
 								s.close()
-							self.sock.close()
+							# self.sock.close()
 							PathEmulation.tearDown()
 							message("Shutting down")
 							sys.stdout.flush()
