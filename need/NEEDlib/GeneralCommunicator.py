@@ -119,12 +119,13 @@ class CommunicationsManager:
 		with open(LOCAL_IPS_FILE, 'r') as file:
 			self.local_ips = json.load(file)
 			for key, value in self.local_ips.items():
-				self.aeron_lib.addLocalSubs(int(key), len(value), (c_int * len(value))(*value))
+				self.aeron_lib.addLocalSubs(int(key), len(value), (c_uint * len(value))(*value))
 		
 		with open(REMOTE_IPS_FILE, 'r') as file:
 			self.remote_ips = json.load(file)
 			for key, value in self.remote_ips.items():
-				self.aeron_lib.addRemoteSubs(int(key), len(value), (c_int * len(value))(*value))
+				# self.aeron_lib.addRemoteSubs(int(key), len(value), (c_int * len(value))(*value))
+				self.aeron_lib.addRemoteSubs(int(key))
 		
 		self.aeron_lib.startPolling()
 		

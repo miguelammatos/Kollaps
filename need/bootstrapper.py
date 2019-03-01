@@ -13,7 +13,7 @@ from subprocess import Popen
 from need.NEEDlib.utils import int2ip, ip2int
 
 UDP_PORT = 55555
-BUFFER_LEN = 512
+BUFFER_LEN = 1024
 
 gods = {}
 ready_gods = {}
@@ -151,12 +151,12 @@ def resolve_ips(docker_client, low_level_client):
 	
 		return gods
 	
-
+	
 	except Exception as e:
 		print("[Py] " + str(e))
 		stdout.flush()
 		stderr.flush()
-		sleep(5)
+		sys.exit(-1)
 	
 
 
