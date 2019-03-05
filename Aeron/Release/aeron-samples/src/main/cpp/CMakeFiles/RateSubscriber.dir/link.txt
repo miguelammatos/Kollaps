@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG -fPIC -DDISABLE_BOUNDS_CHECKS  -rdynamic CMakeFiles/RateSubscriber.dir/RateSubscriber.cpp.o  -o ../../../../binaries/RateSubscriber ../../../../lib/libaeron_client.a -lpthread 

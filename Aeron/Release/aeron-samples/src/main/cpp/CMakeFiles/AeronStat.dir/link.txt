@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG -fPIC -DDISABLE_BOUNDS_CHECKS  -rdynamic CMakeFiles/AeronStat.dir/AeronStat.cpp.o  -o ../../../../binaries/AeronStat ../../../../lib/libaeron_client.a -lpthread 

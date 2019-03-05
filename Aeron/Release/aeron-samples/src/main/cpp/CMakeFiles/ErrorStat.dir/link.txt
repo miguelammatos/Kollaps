@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG -fPIC -DDISABLE_BOUNDS_CHECKS  -rdynamic CMakeFiles/ErrorStat.dir/ErrorStat.cpp.o  -o ../../../../binaries/ErrorStat ../../../../lib/libaeron_client.a -lpthread 

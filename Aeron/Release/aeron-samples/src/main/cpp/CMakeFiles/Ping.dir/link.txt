@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG -fPIC -DDISABLE_BOUNDS_CHECKS  -rdynamic CMakeFiles/Ping.dir/Ping.cpp.o  -o ../../../../binaries/Ping ../../../../lib/libaeron_client.a ../../../../thirdparty/hdr_histogram/src/hdr_histogram-build/src/libhdr_histogram_static.a -lpthread 

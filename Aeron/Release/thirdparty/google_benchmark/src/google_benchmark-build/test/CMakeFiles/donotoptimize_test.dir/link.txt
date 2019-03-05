@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing  -rdynamic CMakeFiles/donotoptimize_test.dir/donotoptimize_test.cc.o  -o donotoptimize_test ../src/libbenchmark.a -lpthread -lrt 

@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing  -rdynamic CMakeFiles/multiple_ranges_test.dir/multiple_ranges_test.cc.o  -o multiple_ranges_test ../src/libbenchmark.a -lpthread -lrt 

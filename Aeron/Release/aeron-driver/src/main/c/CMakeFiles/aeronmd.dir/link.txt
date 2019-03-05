@@ -1,1 +1,0 @@
-/usr/bin/cc -O3 -DNDEBUG -DDISABLE_BOUNDS_CHECKS  -rdynamic CMakeFiles/aeronmd.dir/aeronmd.c.o  -o ../../../../binaries/aeronmd -Wl,-rpath,/home/daedalus/Documents/aeron4need/cppbuild/Release/lib: ../../../../lib/libaeron_driver.so -ldl -lbsd -luuid -lm -lpthread 

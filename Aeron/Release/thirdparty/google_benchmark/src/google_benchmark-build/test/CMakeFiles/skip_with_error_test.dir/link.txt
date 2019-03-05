@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing  -rdynamic CMakeFiles/skip_with_error_test.dir/skip_with_error_test.cc.o  -o skip_with_error_test ../src/libbenchmark.a -lpthread -lrt 

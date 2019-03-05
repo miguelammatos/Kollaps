@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing  -rdynamic CMakeFiles/complexity_test.dir/complexity_test.cc.o  -o complexity_test liboutput_test_helper.a ../src/libbenchmark.a -lpthread -lrt 

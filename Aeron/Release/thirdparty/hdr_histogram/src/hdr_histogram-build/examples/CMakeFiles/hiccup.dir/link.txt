@@ -1,1 +1,0 @@
-/usr/bin/cc -Wall -Wno-unknown-pragmas -Wextra -Wshadow -Winit-self -Wmissing-prototypes -Wpedantic -D_GNU_SOURCE -std=gnu89  -rdynamic CMakeFiles/hiccup.dir/hiccup.c.o  -o hiccup -Wl,-rpath,/home/daedalus/Documents/aeron4need/cppbuild/Release/thirdparty/hdr_histogram/src/hdr_histogram-build/src: ../src/libhdr_histogram.so.3.1.0 -lm -lz -lpthread -lrt 

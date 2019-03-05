@@ -7,7 +7,7 @@ from need.NEEDlib.EventScheduler import EventScheduler
 from threading import Thread, Lock
 from multiprocessing import Pool
 from _thread import interrupt_main
-from ctypes import CFUNCTYPE, POINTER, c_voidp, c_int, c_uint, c_ulong, c_ushort
+from ctypes import CFUNCTYPE, POINTER, c_voidp, c_uint, c_ushort, c_bool
 import socket
 import struct
 import json, pprint
@@ -109,9 +109,13 @@ class CommunicationsManager:
 		
 		# setup python callback
 		self.aeron_lib = ctypes.CDLL(AERON_LIB_PATH)
-		# self.aeron_lib.init(self.aeron_id, len(self.aeron_sub_list), (c_int * len(self.aeron_sub_list))(*self.aeron_sub_list))
-		self.aeron_lib.init(self.aeron_id)
-		CALLBACKTYPE = CFUNCTYPE(c_voidp, c_ulong, c_uint, POINTER(c_ushort))
+		
+		if link_count <= BYTE_LIMIT:
+			self.aeron_lib.init(self.aeron_id, True)
+		else:
+			self.aeron_lib.init(self.aeron_id, True)
+		
+		CALLBACKTYPE = CFUNCTYPE(c_voidp, c_uint, c_uint, POINTER(c_uint))
 		c_callback = CALLBACKTYPE(self.receive_flow)
 		self.callback = c_callback  # keep reference so it does not get garbage collected
 		self.aeron_lib.registerCallback(self.callback)
@@ -166,7 +170,7 @@ class CommunicationsManager:
 
 
 	def receive_flow(self, bandwidth, link_count, link_list):
-		# print("[Py] throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]))
+		print("[Py] throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]))
 		sys.stdout.flush()
 		self.flow_collector(bandwidth, link_list[:link_count])
 		self.received += 1

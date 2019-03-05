@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG -fPIC -DDISABLE_BOUNDS_CHECKS  -rdynamic CMakeFiles/Throughput.dir/Throughput.cpp.o  -o ../../../../binaries/Throughput ../../../../lib/libaeron_client.a -lpthread 

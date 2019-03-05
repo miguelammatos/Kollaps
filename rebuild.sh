@@ -70,4 +70,7 @@ docker tag localhost:5000/need need:2.0
 
 # docker service rm $(docker service ls -q)
 
+# docker volume rm $(docker volume ls -qf dangling=true)
+# docker volume ls -qf dangling=true | xargs -r docker volume rm
+
 

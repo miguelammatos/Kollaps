@@ -1,1 +1,0 @@
-/usr/bin/cc -Wall -Wno-unknown-pragmas -Wextra -Wshadow -Winit-self -Wmissing-prototypes -Wpedantic -D_GNU_SOURCE -std=gnu89  -rdynamic CMakeFiles/perftest.dir/hdr_histogram_perf.c.o  -o perftest ../src/libhdr_histogram_static.a -lm -lz -lrt 

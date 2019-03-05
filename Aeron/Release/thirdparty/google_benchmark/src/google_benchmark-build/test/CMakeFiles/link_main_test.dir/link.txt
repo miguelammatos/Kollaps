@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing  -rdynamic CMakeFiles/link_main_test.dir/link_main_test.cc.o  -o link_main_test ../src/libbenchmark_main.a ../src/libbenchmark.a -lpthread -lrt 

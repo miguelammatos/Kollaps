@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG -fPIC -DDISABLE_BOUNDS_CHECKS  -rdynamic CMakeFiles/BasicSubscriber.dir/BasicSubscriber.cpp.o  -o ../../../../binaries/BasicSubscriber ../../../../lib/libaeron_client.a -lpthread 

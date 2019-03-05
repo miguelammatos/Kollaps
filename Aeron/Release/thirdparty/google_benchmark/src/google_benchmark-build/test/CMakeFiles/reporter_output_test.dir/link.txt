@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++11  -Wall  -Wextra  -Wshadow  -pedantic  -pedantic-errors  -Wfloat-equal  -fstrict-aliasing  -Wstrict-aliasing  -rdynamic CMakeFiles/reporter_output_test.dir/reporter_output_test.cc.o  -o reporter_output_test liboutput_test_helper.a ../src/libbenchmark.a -lpthread -lrt 

@@ -1,1 +1,0 @@
-/usr/bin/cc -Wall -Wno-unknown-pragmas -Wextra -Wshadow -Winit-self -Wmissing-prototypes -Wpedantic -D_GNU_SOURCE -std=gnu89  -rdynamic CMakeFiles/hdr_histogram_log_test.dir/hdr_histogram_log_test.c.o CMakeFiles/hdr_histogram_log_test.dir/minunit.c.o  -o hdr_histogram_log_test ../src/libhdr_histogram_static.a -lm -lz -lrt 
