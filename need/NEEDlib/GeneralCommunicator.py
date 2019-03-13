@@ -111,9 +111,13 @@ class CommunicationsManager:
 		self.aeron_lib = ctypes.CDLL(AERON_LIB_PATH)
 		
 		if link_count <= BYTE_LIMIT:
-			self.aeron_lib.init(self.aeron_id, True)
+			self.aeron_lib.init(self.aeron_id, False)
+			self.flow_adding_func = self.aeron_lib.addFlow8
+			
 		else:
 			self.aeron_lib.init(self.aeron_id, True)
+			self.flow_adding_func = self.aeron_lib.addFlow16
+		
 		
 		CALLBACKTYPE = CFUNCTYPE(c_voidp, c_uint, c_uint, POINTER(c_uint))
 		c_callback = CALLBACKTYPE(self.receive_flow)
@@ -166,7 +170,7 @@ class CommunicationsManager:
 
 
 	def add_flow(self, throughput, link_list):
-		self.aeron_lib.addFlow(throughput, len(link_list), (c_uint * len(link_list))(*link_list))
+		self.flow_adding_func(throughput, len(link_list), (c_uint * len(link_list))(*link_list))
 
 
 	def receive_flow(self, bandwidth, link_count, link_list):
@@ -186,7 +190,7 @@ class CommunicationsManager:
 			# FIXME add_flow directly in EmulationManager.py
 			for path in active_paths:
 				links = [link.index for link in path.links]
-				self.aeron_lib.addFlow(int(path.used_bandwidth), len(links), (c_uint * len(links))(*links))
+				self.flow_adding_func(int(path.used_bandwidth), len(links), (c_uint * len(links))(*links))
 				
 		except Exception as e:
 			print("[Py] FAILED: " + str(e))

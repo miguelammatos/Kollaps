@@ -33,7 +33,7 @@ RUN pacman -Sy --noconfirm \
 ADD ./ /NEED/
 
 # FIXME solve lib folder because of compilation with cmake nonsense
-RUN cp -r /NEED/Aeron/bin /usr/bin/Aeron && \
+RUN cp -r /NEED/Aeron/Release/binaries /usr/bin/Aeron && \
     mkdir -p /home/daedalus/Documents/aeron4need/cppbuild/Release/ && \
     cp -r /NEED/Aeron/Release/lib /home/daedalus/Documents/aeron4need/cppbuild/Release/lib && \
     cp /NEED/Aeron/usr/lib/libbsd.so.0.9.1 /usr/lib/libbsd.so.0.9.1 && \
