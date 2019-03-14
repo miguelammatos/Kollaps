@@ -453,6 +453,7 @@ class XMLGraphParser:
                     fail("Unrecognized action: " + event.attrib['action'] +
                          " , allowed actions are join, leave, crash, disconnect, reconnect")
 
+            #Do something dynamically with a link
             elif 'origin' in event.attrib and 'dest' in event.attrib and 'time' in event.attrib:
                 # parse time of event
                 time = 0.0
@@ -463,22 +464,33 @@ class XMLGraphParser:
                 except ValueError as e:
                     fail("time attribute must be a valid real number")
 
+                #parse origin and destination
                 origin = event.attrib['origin']
                 destination = event.attrib['dest']
-                bandwidth = -1
-                if 'upload' in event.attrib:
-                    bandwidth = graph.bandwidth_in_bps(event.attrib['upload'])
-                latency = -1
-                if 'latency' in event.attrib:
-                    latency = int(event.attrib['latency'])
-                drop = -1
-                if 'drop' in event.attrib:
-                    drop = float(event.attrib['drop'])
-                jitter = -1
-                if 'jitter' in event.attrib:
-                    jitter = float(event.attrib['jitter'])
 
-                scheduler.schedule_link_change(time, graph, origin, destination, bandwidth, latency, jitter, drop)
+                if 'action' in event.attrib: #link is joining or leaving
+                    if event.attrib['action'] == 'leave':
+                        scheduler.schedule_link_leave(time, graph, origin, destination)
+                    elif event.attrib['action'] == 'join':
+                        print("Link has joined")
+                    else:
+                        fail("Unrecognized action for link: " + event.attrib['action'] + ", allowed are join and leave")
+
+                else: #properties of link are changing
+                    bandwidth = -1
+                    if 'upload' in event.attrib:
+                        bandwidth = graph.bandwidth_in_bps(event.attrib['upload'])
+                    latency = -1
+                    if 'latency' in event.attrib:
+                        latency = int(event.attrib['latency'])
+                    drop = -1
+                    if 'drop' in event.attrib:
+                        drop = float(event.attrib['drop'])
+                    jitter = -1
+                    if 'jitter' in event.attrib:
+                        jitter = float(event.attrib['jitter'])
+
+                    scheduler.schedule_link_change(time, graph, origin, destination, bandwidth, latency, jitter, drop)
 
             else:
                 fail(
