@@ -504,7 +504,8 @@ void TC_changeNetem(Destination *dest){
     struct rtattr *tail = NLMSG_TAIL(&req.n);
 
     struct tc_netem_qopt opt = { .limit = txqueuelen };
-    opt.loss = rint(dest->packetLossRate * UINT32_MAX);
+    //Funny thing here, 1.0f*UINT32_MAX > UINT32_MAX (float precision issue, we have to use double)
+    opt.loss = rint(((double)dest->packetLossRate) * UINT32_MAX);
     //Since we are updating the opt structure, we have to fill in latency and jitter as well
     // (distribution is not necessary however)
     opt.latency = tc_core_time2tick(dest->latency*(TIME_UNITS_PER_SEC/1000));
