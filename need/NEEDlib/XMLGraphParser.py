@@ -346,19 +346,34 @@ class XMLGraphParser:
         for event in dynamic:
             if event.tag != 'schedule':
                 fail("Only <schedule> is allowed inside <dynamic>")
+
+            # parse time of event
+            time = 0.0
+            try:
+                time = float(event.attrib['time'])
+                if time < 0.0:
+                    fail("time attribute must be a positive number")
+            except ValueError as e:
+                fail("time attribute must be a valid real number")
+
             if 'name' in event.attrib and 'time' in event.attrib and 'action' in event.attrib:
-                # parse name of service
-                if event.attrib['name'] != service.name:
+                node_name = event.attrib['name']
+                bridge_names = []
+                for bridge in graph.bridges:
+                    bridge_names.append(bridge)
+
+                # if a bridge is scheduled
+                if node_name in bridge_names:
+                    if event.attrib['action'] == 'join':
+                        message("Bridge " + node_name + " joining")
+                    elif event.attrib['action'] == 'leave':
+                        scheduler.schedule_bridge_leave(time, graph, node_name)
+                        message("Bridge " + node_name + " scheduled to leave at " + str(time))
                     continue
 
-                # parse time of event
-                time = 0.0
-                try:
-                    time = float(event.attrib['time'])
-                    if time < 0.0:
-                        fail("time attribute must be a positive number")
-                except ValueError as e:
-                    fail("time attribute must be a valid real number")
+                # parse name of service. only process actions that target us
+                if node_name != service.name:
+                    continue
 
                 # parse amount of replicas affected
                 amount = 1
@@ -455,14 +470,6 @@ class XMLGraphParser:
 
             #Do something dynamically with a link
             elif 'origin' in event.attrib and 'dest' in event.attrib and 'time' in event.attrib:
-                # parse time of event
-                time = 0.0
-                try:
-                    time = float(event.attrib['time'])
-                    if time < 0.0:
-                        fail("time attribute must be a positive number")
-                except ValueError as e:
-                    fail("time attribute must be a valid real number")
 
                 #parse origin and destination
                 origin = event.attrib['origin']

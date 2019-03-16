@@ -66,6 +66,8 @@ def main():
 
     message("Calculating shortest paths...")
     graph.calculate_shortest_paths()
+#    graph.print_links() #LL
+#    graph.print_paths() #LL
 
     message("Parsing dynamic event schedule...")
     scheduler = parser.parse_schedule(graph.root, graph)

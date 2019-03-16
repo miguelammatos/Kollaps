@@ -24,7 +24,7 @@ class NetGraph:
         self.link_counter = 0  # increment counter that will give each link an index
         self.path_counter = 0  # increment counter that will give each path an id
         self.removed_links = [] #LL; type: List[NetGraph.Link]
-        self.removed_bridges = [] #LL; type: Dict[str,List[NetGraph.Service]]; list has length at most 1
+        self.removed_bridges = {} #LL; type: Dict[str,List[NetGraph.Service]]; list has length at most 1
 
         self.networks = []  # type: List[str]
         self.supervisors = []  # type: List[NetGraph.Service]
@@ -293,18 +293,19 @@ class NetGraph:
             u = Q.pop(0)[1]  # type: NetGraph.Node
             for link in u.links:
                 alt = dist[u] + 1
-                if alt < dist[link.destination]:
-                    node = link.destination
-                    dist[node] = alt
-                    # append to the previous path
-                    path = self.paths[u].links[:]
-                    path.append(link)
-                    self.paths[node] = NetGraph.Path(path, self.path_counter)
-                    self.paths_by_id[self.path_counter] = self.paths[node]
-                    self.path_counter += 1
-                    for e in Q:  # find the node in Q and change its priority
-                        if e[1] == node:
-                            e[0] = alt
+                if link.destination in dist: # if destination is a bridge, it could have been removed
+                    if alt < dist[link.destination]:
+                        node = link.destination
+                        dist[node] = alt
+                        # append to the previous path
+                        path = self.paths[u].links[:]
+                        path.append(link)
+                        self.paths[node] = NetGraph.Path(path, self.path_counter)
+                        self.paths_by_id[self.path_counter] = self.paths[node]
+                        self.path_counter += 1
+                        for e in Q:  # find the node in Q and change its priority
+                            if e[1] == node:
+                                e[0] = alt
         end = time()
         print("shortest paths found in " + str(end - start))
 

@@ -13,7 +13,7 @@ if sys.version_info >= (3, 0):
 class EventScheduler:
     def __init__(self):
         self.events = []  # type: List[Timer]
-        self.link_changes = []
+        self.link_changes = [] # type: List[(float, NetGraph.Link)]
 
     def start(self):
         for e in self.events:
@@ -34,26 +34,14 @@ class EventScheduler:
     def schedule_reconnect(self, time):
         self.events.append(Timer(time, reconnect))
 
-    #LL
-################################################
     def schedule_link_leave(self, time, graph, origin, destination):
-#        graphmsg = "Scheduling link leave. Original graph's paths have BWs of:\n"
-#        for path in graph.paths.values():
-#            if len(path.links) > 0 and isinstance(path.links[-1].destination, NetGraph.Service):
-#                graphmsg += "\tto " + path.links[-1].destination.name + ": " + str(path.max_bandwidth) + "\n"
-#        message(graphmsg)
-################################################
         new_graph = copy(graph)
-#        new_graph.paths = copy(graph.paths) #we have to do this separately if we don't want to work within the original graph!
-#        new_graph.paths.clear()
-#        new_graph.paths_by_id = copy(graph.paths_by_id)
-#        new_graph.paths_by_id.clear()
         new_graph.paths = {}
         new_graph.paths_by_id = {}
         new_graph.path_counter = 0
-        new_graph.links = copy(graph.links) #Do we need a copy of this?
-        new_graph.removed_links = copy(graph.removed_links) #Do we need a copy of this?
-        new_graph.removed_bridges = copy(graph.removed_bridges) #Do we need a copy of this?
+        new_graph.links = copy(graph.links)
+        new_graph.removed_links = copy(graph.removed_links)
+        new_graph.removed_bridges = copy(graph.removed_bridges)
         for l in new_graph.links:
             if (l.source.name == origin and l.destination.name == destination) or (l.source.name == destination and l.destination.name == origin):
                 new_graph.removed_links.append(l)
@@ -66,14 +54,9 @@ class EventScheduler:
             for bridge in new_graph.bridges:
                 if l in new_graph.bridges[bridge][0].links:
                     new_graph.bridges[bridge][0].links.remove(l)
-#            l.flows.clear()
+            l.flows.clear()
 
         new_graph.calculate_shortest_paths()
-
-#        message("Original graph's paths:\n------------------------------------------\n" + hex(id(graph.paths)))
-#        message(graph.print_paths())
-#        message("New graph's paths:\n------------------------------------------\n" + hex(id(new_graph.paths)))
-#        message(new_graph.print_paths())
 
         for service, path in new_graph.paths.items():
             if not service == graph.root and isinstance(service, NetGraph.Service):
@@ -81,17 +64,28 @@ class EventScheduler:
 
         message("Link " + origin + "--" + destination + " scheduled to leave at " + str(time))
         self.events.append(Timer(time, change_paths, [graph, new_graph]))
-################################################
-#        graphmsg_end = "Done scheduling link leave. Original graph's paths have BWs of:\n"
-#        for path in graph.paths.values():
-#            if len(path.links) > 0 and isinstance(path.links[-1].destination, NetGraph.Service):
-#                graphmsg_end += "\tto " + path.links[-1].destination.name + ": " + str(path.max_bandwidth) + "\n"
-#        graphmsg_end += "NEW graph's paths have BWs of:\n"
-#        for path in new_graph.paths.values():
-#            if len(path.links) > 0 and isinstance(path.links[-1].destination, NetGraph.Service):
-#                graphmsg_end += "\tto " + path.links[-1].destination.name + ": " + str(path.max_bandwidth) + "\n"
-#        message(graphmsg_end)
-################################################
+
+    def schedule_bridge_leave(self, time, graph, name):
+        new_graph = copy(graph)
+        new_graph.paths = {}
+        new_graph.paths_by_id = {}
+        new_graph.path_counter = 0
+        new_graph.bridges = copy(graph.bridges)
+        new_graph.removed_links = copy(graph.removed_links)
+        new_graph.removed_bridges = copy(graph.removed_bridges)
+        new_graph.removed_bridges[name] = new_graph.bridges[name]
+        del new_graph.bridges[name]
+        #Hey, I'm a flow, so clear me maybe?
+
+        new_graph.calculate_shortest_paths()
+
+        for service, path in new_graph.paths.items():
+            if not service == graph.root and isinstance(service, NetGraph.Service):
+                path.calculate_end_to_end_properties()
+
+        message("Bridge " + name + " scheduled to leave at " + str(time))
+        self.events.append(Timer(time, change_paths, [graph, new_graph]))
+
 
     def schedule_link_change(self, time, graph, origin, destination, bandwidth, latency, jitter, drop):
         links = []
@@ -185,35 +179,13 @@ def link_change(links, new_links, paths, new_paths):
             '''
 
 def change_paths(graph, new_graph):
-    msg = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Changing graph at runtime <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n"
-#    msg += "old paths_by_id:\n" + str(graph.paths_by_id) + "\n"
-#    for key, path in graph.paths_by_id.items():
-#        msg += str(key) + ": " + path.prettyprint()
     graph.paths_by_id = copy(new_graph.paths_by_id)
-#    msg += "new paths_by_id:\n" + str(graph.paths_by_id) + "\n"
-#    for key, path in graph.paths_by_id.items():
-#        msg += str(key) + ": " + path.prettyprint()
     graph.path_counter = new_graph.path_counter
     for service in new_graph.paths:
         current_bw = graph.paths[service].current_bandwidth
         if not service == graph.root and isinstance(service, NetGraph.Service):
-#            if not service in graph.paths:
             with graph.paths[service].lock:
                 graph.paths[service] = new_graph.paths[service]
                 graph.paths[service].current_bandwidth = current_bw ######## this is currently necessary, but why?
-#                continue
-#            else:
-#                original_path = graph.paths[service]
-#                new_path = new_graph.paths[service]
-#                with original_path.lock:
-#                    original_path.jitter = new_path.jitter
-#                    original_path.latency = new_path.latency
-#                    original_path.drop = new_path.drop
-#                    original_path.RTT = new_path.RTT
-#                    original_path.max_bandwidth = new_path.max_bandwidth
                 change_loss(service, new_graph.paths[service].drop)
                 change_latency(service, new_graph.paths[service].latency, new_graph.paths[service].jitter)
-
-    msg += "Updated shortest paths after a link left"#, and these are the new paths:" + "\n"
-#    msg += graph.print_paths()
-    message(msg)
