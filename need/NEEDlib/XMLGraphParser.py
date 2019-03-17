@@ -365,10 +365,9 @@ class XMLGraphParser:
                 # if a bridge is scheduled
                 if node_name in bridge_names:
                     if event.attrib['action'] == 'join':
-                        message("Bridge " + node_name + " joining")
+                        scheduler.schedule_bridge_join(time, graph, node_name)
                     elif event.attrib['action'] == 'leave':
                         scheduler.schedule_bridge_leave(time, graph, node_name)
-                        message("Bridge " + node_name + " scheduled to leave at " + str(time))
                     continue
 
                 # parse name of service. only process actions that target us
@@ -479,7 +478,25 @@ class XMLGraphParser:
                     if event.attrib['action'] == 'leave':
                         scheduler.schedule_link_leave(time, graph, origin, destination)
                     elif event.attrib['action'] == 'join':
-                        print("Link has joined")
+                        #Link is already defined but has been removed before
+                        if not 'upload' in event.attrib or not 'latency' in event.attrib:
+                            scheduler.schedule_link_join(time, graph, origin, destination)
+                        #A completely new link with defined properties joins
+                        elif not 'upload' in event.attrib and not 'latency' in event.attrib and not 'network' in event.attrib:
+                            fail("Link description incomplete. For a new link, you must provide at least latency, upload, and network attributes.")
+                        #We have all the information we need
+                        else:
+                            bandwidth = graph.bandwidth_in_bps(event.attrib['upload'])
+                            latency = int(event.attrib['latency'])
+                            drop = 0
+                            if 'drop' in event.attrib:
+                                drop = float(event.attrib['drop'])
+                            jitter = 0
+                            if 'jitter' in event.attrib:
+                                jitter = float(event.attrib['jitter'])
+                            network = event.attrib['network']
+
+                            scheduler.schedule_new_link(self, time, graph, origin, destination, latency, jitter, drop, bandwidth, network)
                     else:
                         fail("Unrecognized action for link: " + event.attrib['action'] + ", allowed are join and leave")
 
