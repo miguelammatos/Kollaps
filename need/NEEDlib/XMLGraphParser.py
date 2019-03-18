@@ -484,9 +484,8 @@ class XMLGraphParser:
                         #A completely new link with defined properties joins
                         elif not 'upload' in event.attrib and not 'latency' in event.attrib and not 'network' in event.attrib:
                             fail("Link description incomplete. For a new link, you must provide at least latency, upload, and network attributes.")
-                        #We have all the information we need
                         else:
-                            bandwidth = graph.bandwidth_in_bps(event.attrib['upload'])
+                            bandwidth = event.attrib['upload']
                             latency = int(event.attrib['latency'])
                             drop = 0
                             if 'drop' in event.attrib:
@@ -496,7 +495,7 @@ class XMLGraphParser:
                                 jitter = float(event.attrib['jitter'])
                             network = event.attrib['network']
 
-                            scheduler.schedule_new_link(self, time, graph, origin, destination, latency, jitter, drop, bandwidth, network)
+                            scheduler.schedule_new_link(time, graph, origin, destination, latency, jitter, drop, bandwidth, network)
                     else:
                         fail("Unrecognized action for link: " + event.attrib['action'] + ", allowed are join and leave")
 
