@@ -203,11 +203,11 @@ class EmulationManager:
             return
 
         # This is an active flow
-        msg = "\n\n\n" + self.graph.root.name + "--" + host.name + ":" + str(throughput) + "\n"
-        msg += "going through links: "
-        for link in path.links:
-            msg += link.source.name  + "--" + link.destination.name + "--"
-        message(msg)
+#        msg = "\n\n\n" + self.graph.root.name + "--" + host.name + ":" + str(throughput) + "\n"
+#        msg += "going through links: "
+#        for link in path.links:
+#            msg += link.source.name  + "--" + link.destination.name + "--"
+#        message(msg)
         path.used_bandwidth = throughput
         self.active_paths.append(path)
         self.active_paths_ids.append(path.id)

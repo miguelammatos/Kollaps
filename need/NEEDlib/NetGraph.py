@@ -262,7 +262,7 @@ class NetGraph:
 
 
     def calculate_shortest_paths(self):
-        start = time()
+#        start = time()
         # Dijkstra's shortest path implementation
         # Distance is number of hops
         if self.root is None:
@@ -306,8 +306,8 @@ class NetGraph:
                         for e in Q:  # find the node in Q and change its priority
                             if e[1] == node:
                                 e[0] = alt
-        end = time()
-        print("shortest paths found in " + str(end - start))
+#        end = time()
+#        print("shortest paths found in " + str(end - start))
 
     def print_paths(self):
         nice = ""
