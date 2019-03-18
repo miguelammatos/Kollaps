@@ -53,21 +53,21 @@ class EventScheduler:
             if (l.source.name == origin and l.destination.name == destination) or (l.source.name == destination and l.destination.name == origin):
                 new_graph.removed_links.append(l)
         for l in new_graph.removed_links:
-            new_graph.links.remove(l)
-            for node in new_graph.services:
-                for nodeinstance in new_graph.services[node]:
-                    if l in nodeinstance.links:
-                        nodeinstance.links.remove(l)
-            for bridge in new_graph.bridges:
-                if l in new_graph.bridges[bridge][0].links:
-                    new_graph.bridges[bridge][0].links.remove(l)
+            if l in new_graph.links: # and has not been removed before
+                new_graph.links.remove(l)
+                for node in new_graph.services:
+                    for nodeinstance in new_graph.services[node]:
+                        if l in nodeinstance.links:
+                            nodeinstance.links.remove(l)
+                for bridge in new_graph.bridges:
+                    if l in new_graph.bridges[bridge][0].links:
+                        new_graph.bridges[bridge][0].links.remove(l)
 
         new_graph.calculate_shortest_paths()
 
         for service, path in new_graph.paths.items():
             if not service == graph.root and isinstance(service, NetGraph.Service):
                 path.calculate_end_to_end_properties()
-                message("New path after link leaving:\n" + path.prettyprint())
 
         self.path_changes.append((time, new_graph))
         self.path_changes.sort(reverse=True, key=lambda change: change[0])
@@ -299,8 +299,6 @@ def link_change(links, new_links, paths, new_paths):
 
 def path_change(graph, new_graph):
     graph.paths_by_id = copy(new_graph.paths_by_id)
-#    graph.path_counter = new_graph.path_counter
-#    graph.link_counter = new_graph.link_counter
     graph.removed_links = copy(new_graph.removed_links)
     graph.removed_bridges = copy(new_graph.removed_bridges)
 
