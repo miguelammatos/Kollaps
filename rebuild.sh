@@ -48,9 +48,9 @@ cd ..
 
 
 
-# docker tag need:2.0 localhost:5000/need && \
-# docker push localhost:5000/need
-# docker tag localhost:5000/need need:2.0
+docker tag need:2.0 localhost:5000/need && \
+docker push localhost:5000/need
+docker tag localhost:5000/need need:2.0
 
 # docker tag warpenguin.no-ip.org/dashboard:1.0 localhost:5000/warpenguin.no-ip.org/dashboard && \
 # docker push localhost:5000/warpenguin.no-ip.org/dashboard

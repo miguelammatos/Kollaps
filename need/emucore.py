@@ -23,7 +23,7 @@ def get_own_ip(graph):
     last_ip = None
     # Connect to at least 2 to avoid using our loopback ip
     for int_ip in graph.hosts_by_ip:
-        s.connect((int2ip(int_ip),1))
+        s.connect((int2ip(int_ip), 1))
         new_ip = s.getsockname()[0]
         if new_ip == last_ip:
             break

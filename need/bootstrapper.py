@@ -3,11 +3,12 @@
 import docker
 # from docker.types import Mount
 import socket
+import sys
 import json, pprint
 from multiprocessing import Process
 from time import sleep
 from signal import pause
-from sys import argv, stdout, stderr
+# from sys import argv, stdout, stderr
 from subprocess import Popen
 # from shutil import copy
 from need.NEEDlib.utils import int2ip, ip2int
@@ -72,7 +73,7 @@ def resolve_ips(docker_client, low_level_client):
 		
 		print("[Py (god)] ip: " + str(own_ip))
 		print("[Py (god)] number of gods: " + str(number_of_gods))
-		stdout.flush()
+		sys.stdout.flush()
 	
 		containers = docker_client.containers.list()
 		for container in containers:
@@ -102,7 +103,7 @@ def resolve_ips(docker_client, low_level_client):
 				if god_ip not in gods:
 					gods[god_ip] = list_of_ips
 					print(f"[Py (god)] {addr[0]} :: {data}")
-					stdout.flush()
+					sys.stdout.flush()
 			
 			else:
 				ready_gods[god_ip] = "READY"
@@ -144,58 +145,58 @@ def resolve_ips(docker_client, low_level_client):
 			new_dict = json.load(file)
 			print("\n[Py (god)] local:")
 			pprint.pprint(new_dict)
-			stdout.flush()
+			sys.stdout.flush()
 		
 		with open(REMOTE_IPS_FILE, 'r') as file:
 			new_dict = json.load(file)
 			print("\n[Py (god)] remote:")
 			pprint.pprint(new_dict)
-			stdout.flush()
+			sys.stdout.flush()
 	
 		return gods
 	
 	
 	except Exception as e:
 		print("[Py] " + str(e))
-		stdout.flush()
-		stderr.flush()
+		sys.stdout.flush()
+		sys.stderr.flush()
 		sys.exit(-1)
 
 
-def start_dashboard(client, lowLevelClient, instance_count):
-	dashboard_bootstrapped = False
-	while not dashboard_bootstrapped:
-
-		containers = client.containers.list()
-		for container in containers:
-			try:
-				# inject the Dashboard into the dashboard container
-				for key, value in container.labels.items():
-					if "dashboard" in value:
-						id = container.id
-						inspect_result = lowLevelClient.inspect_container(id)
-						pid = inspect_result["State"]["Pid"]
-						print("[Py (god)] Bootstrapping dashboard " + container.name + " ...")
-						stdout.flush()
-
-						cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
-						dashboard_instance = Popen(cmd)
-
-						instance_count += 1
-						print("[Py (god)] Done bootstrapping " + container.name)
-						stdout.flush()
-						already_bootstrapped[container.id] = dashboard_instance
-
-						dashboard_bootstrapped = True
-						break
-
-
-			except Exception as e:
-				print("[Py (god)] Dashboard bootstrapping failed:\n" + str(e) + "\n... will try again.")
-				stdout.flush()
-				stderr.flush()
-				sleep(5)
-				continue
+# def start_dashboard(client, lowLevelClient, instance_count):
+# 	dashboard_bootstrapped = False
+# 	while not dashboard_bootstrapped:
+#
+# 		containers = client.containers.list()
+# 		for container in containers:
+# 			try:
+# 				# inject the Dashboard into the dashboard container
+# 				for key, value in container.labels.items():
+# 					if "dashboard" in value:
+# 						id = container.id
+# 						inspect_result = lowLevelClient.inspect_container(id)
+# 						pid = inspect_result["State"]["Pid"]
+# 						print("[Py (god)] Bootstrapping dashboard " + container.name + " ...")
+# 						sys.stdout.flush()
+#
+# 						cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
+# 						dashboard_instance = Popen(cmd)
+#
+# 						instance_count += 1
+# 						print("[Py (god)] Done bootstrapping " + container.name)
+# 						sys.stdout.flush()
+# 						already_bootstrapped[container.id] = dashboard_instance
+#
+# 						dashboard_bootstrapped = True
+# 						break
+#
+#
+# 			except Exception as e:
+# 				print("[Py (god)] Dashboard bootstrapping failed:\n" + str(e) + "\n... will try again.")
+# 				sys.stdout.flush()
+# 				sys.stderr.flush()
+# 				sleep(5)
+# 				continue
 
 	
 
@@ -204,18 +205,18 @@ def main():
 	UDP_PORT = 55555
 	DOCKER_SOCK = "/var/run/docker.sock"
 
-	if len(argv) < 3:
-		print("If you are calling " + argv[0] + " from your workstation stop.")
+	if len(sys.argv) < 3:
+		print("If you are calling " + sys.argv[0] + " from your workstation stop.")
 		print("This should only be used inside containers")
 		return
 	
-	mode = argv[1]
-	label = argv[2]
+	mode = sys.argv[1]
+	label = sys.argv[2]
 
 
 	print("lable: " + label)
-	stdout.flush()
-	stderr.flush()
+	sys.stdout.flush()
+	sys.stderr.flush()
 
 	
 	# Connect to the local docker daemon
@@ -241,7 +242,7 @@ def main():
 				env = inspect_result["Config"]["Env"]
 				
 				print("[Py (bootstrapper)] ip: " + str(socket.gethostbyname(socket.gethostname())))
-				stdout.flush()
+				sys.stdout.flush()
 				
 				# create a "God" container that is in the host's Pid namespace
 				client.containers.run(image=boot_image,
@@ -267,8 +268,8 @@ def main():
 			
 			except Exception as e:
 				print(e)
-				stdout.flush()
-				stderr.flush()
+				sys.stdout.flush()
+				sys.stderr.flush()
 				sleep(5)
 				continue  # If we get any exceptions try again
 	
@@ -278,7 +279,7 @@ def main():
 	# First thing to do is copy over the topology
 	while True:
 		try:
-			bootstrapper_id = argv[3]
+			bootstrapper_id = sys.argv[3]
 			bootstrapper_pid = lowLevelClient.inspect_container(bootstrapper_id)["State"]["Pid"]
 			cmd = ["/bin/sh", "-c", "nsenter -t " + str(bootstrapper_pid) + " -m cat " + TOPOLOGY + " | cat > " + TOPOLOGY]
 			Popen(cmd).wait()
@@ -286,8 +287,8 @@ def main():
 		
 		except Exception as e:
 			print(e)
-			stdout.flush()
-			stderr.flush()
+			sys.stdout.flush()
+			sys.stderr.flush()
 			sleep(5)
 			continue
 	
@@ -301,50 +302,45 @@ def main():
 	
 	except Exception as e:
 		print(e)
-		stdout.flush()
-		stderr.flush()
+		sys.stdout.flush()
+		sys.stderr.flush()
 	
 	print("Bootstrapping all local containers with label " + label)
-	stdout.flush()
+	sys.stdout.flush()
 	
 	already_bootstrapped = {}
 	instance_count = 0
 	
 	ips_dict = resolve_ips(client, lowLevelClient)
 
-	dashboard_bootstrapped = False
-	while not dashboard_bootstrapped:
+	containers = client.containers.list()
+	for container in containers:
+		try:
+			# inject the Dashboard into the dashboard container
+			for key, value in container.labels.items():
+				if "dashboard" in value:
+					id = container.id
+					inspect_result = lowLevelClient.inspect_container(id)
+					pid = inspect_result["State"]["Pid"]
+					print("[Py (god)] Bootstrapping dashboard " + container.name + " ...")
+					sys.stdout.flush()
 
-		containers = client.containers.list()
-		for container in containers:
-			try:
-				# inject the Dashboard into the dashboard container
-				for key, value in container.labels.items():
-					if "dashboard" in value:
-						id = container.id
-						inspect_result = lowLevelClient.inspect_container(id)
-						pid = inspect_result["State"]["Pid"]
-						print("[Py (god)] Bootstrapping dashboard " + container.name + " ...")
-						stdout.flush()
+					cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
+					dashboard_instance = Popen(cmd)
 
-						cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
-						dashboard_instance = Popen(cmd)
+					instance_count += 1
+					print("[Py (god)] Done bootstrapping " + container.name)
+					sys.stdout.flush()
+					already_bootstrapped[container.id] = dashboard_instance
 
-						instance_count += 1
-						print("[Py (god)] Done bootstrapping " + container.name)
-						stdout.flush()
-						already_bootstrapped[container.id] = dashboard_instance
+					break
 
-						dashboard_bootstrapped = True
-						break
-
-
-			except Exception as e:
-				print("[Py (god)] Dashboard bootstrapping failed:\n" + str(e) + "\n... will try again.")
-				stdout.flush()
-				stderr.flush()
-				sleep(5)
-				continue
+		except Exception as e:
+			print("[Py (god)] Dashboard bootstrapping failed:\n" + str(e) + "\n... will try again.")
+			sys.stdout.flush()
+			sys.stderr.flush()
+			continue
+			
 
 	while True:
 		try:
@@ -364,20 +360,20 @@ def main():
 						inspect_result = lowLevelClient.inspect_container(id)
 						pid = inspect_result["State"]["Pid"]
 						print("Bootstrapping " + container.name + " ...")
-						stdout.flush()
+						sys.stdout.flush()
 						
 						cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(id), str(pid)]
 						emucore_instance = Popen(cmd)
 						
 						instance_count += 1
 						print("Done bootstrapping " + container.name)
-						stdout.flush()
+						sys.stdout.flush()
 						already_bootstrapped[container.id] = emucore_instance
 					
 					except:
 						print("Bootstrapping failed... will try again.")
-						stdout.flush()
-						stderr.flush()
+						sys.stdout.flush()
+						sys.stderr.flush()
 
 				# Check for bootstrapper termination
 				if container.id == bootstrapper_id and container.status == "running":
@@ -401,15 +397,15 @@ def main():
 					print("aeron_media_driver terminating.")
 					aeron_media_driver.wait()
 				
-				stdout.flush()
+				sys.stdout.flush()
 				return
 			
 			sleep(5)
 		
 		except Exception as e:
 			print(e)
-			stdout.flush()
-			stderr.flush()
+			sys.stdout.flush()
+			sys.stderr.flush()
 			sleep(5)
 			continue
 

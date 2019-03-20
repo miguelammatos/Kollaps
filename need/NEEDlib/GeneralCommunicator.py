@@ -61,7 +61,7 @@ class CommunicationsManager:
 	MAX_WORKERS = 10
 	
 	
-	def __init__(self, flow_collector, graph, event_scheduler):
+	def __init__(self, flow_collector, graph, event_scheduler, ip=None):
 		self.graph = graph  # type: NetGraph
 		self.scheduler = event_scheduler  # type: EventScheduler
 		self.flow_collector = flow_collector
@@ -90,8 +90,12 @@ class CommunicationsManager:
 		self.supervisor_count = 0
 		self.peer_count = 0
 		
-		# self.aeron_id = self.graph.root.ip
-		self.aeron_id = ip2int(socket.gethostbyname(socket.gethostname()))
+		if ip is None:
+			self.aeron_id = self.graph.root.ip
+		else:
+			self.aeron_id = ip2int(ip)
+			# self.aeron_id = ip2int(socket.gethostbyname(socket.gethostname()))
+			
 		self.aeron_sub_list = []
 		for service in self.graph.services:
 			hosts = self.graph.services[service]
@@ -104,9 +108,9 @@ class CommunicationsManager:
 		self.peer_count -= self.supervisor_count
 		
 
-		print("\n\nroot: " + str(self.aeron_id) + " ip: " + socket.gethostbyname(socket.gethostname()) + "int: " + int2ip(self.aeron_id))
-		print("list: " + str(self.aeron_sub_list))
-		sys.stdout.flush()
+		# print("\n\nroot: " + str(self.aeron_id) + " int: " + int2ip(self.aeron_id))
+		# print("list: " + str(self.aeron_sub_list))
+		# sys.stdout.flush()
 		
 		
 		# setup python callback
@@ -189,6 +193,9 @@ class CommunicationsManager:
 		"""
 		
 		try:
+			with self.stop_lock:
+				self.produced += self.peer_count
+			
 			# FIXME add_flow directly in EmulationManager.py
 			for path in active_paths:
 				links = [link.index for link in path.links]

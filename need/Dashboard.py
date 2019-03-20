@@ -49,7 +49,7 @@ def get_own_ip(graph):
     last_ip = None
     # Connect to at least 2 to avoid using our loopback ip
     for int_ip in graph.hosts_by_ip:
-        s.connect((int2ip(int_ip),1))
+        s.connect((int2ip(int_ip), 1))
         new_ip = s.getsockname()[0]
         if new_ip == last_ip:
             break
@@ -224,12 +224,18 @@ def resolve_hostnames():
                 #     if ip == host.ip:
                 #         DashboardState.graph.root = host
                 continue
+                
             with DashboardState.lock:
                 DashboardState.hosts[host].ip = ips[i]
                 DashboardState.hosts[host].status = 'Pending'
 
     # We can only instantiate the CommunicationsManager after the graphs root has been set
-    DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None)
+    
+    own_ip = socket.gethostbyname(socket.gethostname())
+    # print("\n\nhelp: " + own_ip)
+    # sys.stdout.flush()
+    
+    DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None, own_ip)
 
 def query_until_ready():
     resolve_hostnames()
