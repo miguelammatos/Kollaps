@@ -15,8 +15,11 @@ from need.NEEDlib.utils import int2ip, ip2int
 UDP_PORT = 55555
 BUFFER_LEN = 1024
 
+TOPOLOGY = "/topology.xml"
+
 gods = {}
 ready_gods = {}
+
 
 
 def broadcast_ips(local_ips_list, number_of_gods):
@@ -157,14 +160,50 @@ def resolve_ips(docker_client, low_level_client):
 		stdout.flush()
 		stderr.flush()
 		sys.exit(-1)
+
+
+def start_dashboard(client, lowLevelClient, instance_count):
+	dashboard_bootstrapped = False
+	while not dashboard_bootstrapped:
+
+		containers = client.containers.list()
+		for container in containers:
+			try:
+				# inject the Dashboard into the dashboard container
+				for key, value in container.labels.items():
+					if "dashboard" in value:
+						id = container.id
+						inspect_result = lowLevelClient.inspect_container(id)
+						pid = inspect_result["State"]["Pid"]
+						print("[Py (god)] Bootstrapping dashboard " + container.name + " ...")
+						stdout.flush()
+
+						cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
+						dashboard_instance = Popen(cmd)
+
+						instance_count += 1
+						print("[Py (god)] Done bootstrapping " + container.name)
+						stdout.flush()
+						already_bootstrapped[container.id] = dashboard_instance
+
+						dashboard_bootstrapped = True
+						break
+
+
+			except Exception as e:
+				print("[Py (god)] Dashboard bootstrapping failed:\n" + str(e) + "\n... will try again.")
+				stdout.flush()
+				stderr.flush()
+				sleep(5)
+				continue
+
 	
 
 
 def main():
 	UDP_PORT = 55555
 	DOCKER_SOCK = "/var/run/docker.sock"
-	TOPOLOGY = "/topology.xml"
-	
+
 	if len(argv) < 3:
 		print("If you are calling " + argv[0] + " from your workstation stop.")
 		print("This should only be used inside containers")
@@ -172,6 +211,12 @@ def main():
 	
 	mode = argv[1]
 	label = argv[2]
+
+
+	print("lable: " + label)
+	stdout.flush()
+	stderr.flush()
+
 	
 	# Connect to the local docker daemon
 	client = docker.DockerClient(base_url='unix:/' + DOCKER_SOCK)
@@ -256,6 +301,8 @@ def main():
 	
 	except Exception as e:
 		print(e)
+		stdout.flush()
+		stderr.flush()
 	
 	print("Bootstrapping all local containers with label " + label)
 	stdout.flush()
@@ -264,7 +311,41 @@ def main():
 	instance_count = 0
 	
 	ips_dict = resolve_ips(client, lowLevelClient)
-	
+
+	dashboard_bootstrapped = False
+	while not dashboard_bootstrapped:
+
+		containers = client.containers.list()
+		for container in containers:
+			try:
+				# inject the Dashboard into the dashboard container
+				for key, value in container.labels.items():
+					if "dashboard" in value:
+						id = container.id
+						inspect_result = lowLevelClient.inspect_container(id)
+						pid = inspect_result["State"]["Pid"]
+						print("[Py (god)] Bootstrapping dashboard " + container.name + " ...")
+						stdout.flush()
+
+						cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
+						dashboard_instance = Popen(cmd)
+
+						instance_count += 1
+						print("[Py (god)] Done bootstrapping " + container.name)
+						stdout.flush()
+						already_bootstrapped[container.id] = dashboard_instance
+
+						dashboard_bootstrapped = True
+						break
+
+
+			except Exception as e:
+				print("[Py (god)] Dashboard bootstrapping failed:\n" + str(e) + "\n... will try again.")
+				stdout.flush()
+				stderr.flush()
+				sleep(5)
+				continue
+
 	while True:
 		try:
 			running = 0  # running container counter, we stop the god if there are 0 same experiment containers running
@@ -274,8 +355,10 @@ def main():
 			for container in containers:
 				if label in container.labels:
 					running += 1
-				
+
+
 				if label in container.labels and container.id not in already_bootstrapped and container.status == "running":
+					# inject emucore into application containers
 					try:
 						id = container.id
 						inspect_result = lowLevelClient.inspect_container(id)
@@ -295,11 +378,11 @@ def main():
 						print("Bootstrapping failed... will try again.")
 						stdout.flush()
 						stderr.flush()
-				
+
 				# Check for bootstrapper termination
 				if container.id == bootstrapper_id and container.status == "running":
 					running += 1
-			
+
 			# Do some reaping
 			for key in already_bootstrapped:
 				already_bootstrapped[key].poll()

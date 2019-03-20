@@ -44,6 +44,18 @@ class Host:
         self.status = 'Down'
 
 
+def get_own_ip(graph):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    last_ip = None
+    # Connect to at least 2 to avoid using our loopback ip
+    for int_ip in graph.hosts_by_ip:
+        s.connect((int2ip(int_ip),1))
+        new_ip = s.getsockname()[0]
+        if new_ip == last_ip:
+            break
+        last_ip = new_ip
+    return last_ip
+
 
 @app.route('/')
 def main_page():
@@ -267,7 +279,7 @@ def main():
 
     with DashboardState.lock:
         for service in graph.services:
-            for i,host in enumerate(graph.services[service]):
+            for i, host in enumerate(graph.services[service]):
                 if host.supervisor:
                     continue
                 DashboardState.hosts[host] = Host(host.name, host.name + "." + str(i))

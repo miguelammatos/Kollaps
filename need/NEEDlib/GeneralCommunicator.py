@@ -3,6 +3,7 @@ from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.utils import fail, message, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error, int2ip
 import need.NEEDlib.PathEmulation as PathEmulation
 from need.NEEDlib.EventScheduler import EventScheduler
+from need.NEEDlib.utils import int2ip, ip2int
 
 from threading import Thread, Lock
 from multiprocessing import Pool
@@ -89,7 +90,8 @@ class CommunicationsManager:
 		self.supervisor_count = 0
 		self.peer_count = 0
 		
-		self.aeron_id = self.graph.root.ip
+		# self.aeron_id = self.graph.root.ip
+		self.aeron_id = ip2int(socket.gethostbyname(socket.gethostname()))
 		self.aeron_sub_list = []
 		for service in self.graph.services:
 			hosts = self.graph.services[service]
@@ -102,7 +104,7 @@ class CommunicationsManager:
 		self.peer_count -= self.supervisor_count
 		
 
-		print("\n\nroot: " + str(self.aeron_id) + " ip: " + int2ip(self.aeron_id))
+		print("\n\nroot: " + str(self.aeron_id) + " ip: " + socket.gethostbyname(socket.gethostname()) + "int: " + int2ip(self.aeron_id))
 		print("list: " + str(self.aeron_sub_list))
 		sys.stdout.flush()
 		

@@ -41,7 +41,7 @@ RUN cp -r /NEED/Aeron/Release/binaries /usr/bin/Aeron && \
     make -C /NEED/pid1 && \
     cp /NEED/pid1/pid1 /usr/bin/pid1 && \
     make -C /NEED/need/TCAL -j8 && \
-    pip3 --no-cache-dir install dnspython docker wheel && \
+    pip3 --no-cache-dir install wheel dnspython flask docker kubernetes && \
     pip3 --no-cache-dir wheel --no-deps -w /NEED /NEED && \
     pip3 --no-cache-dir install /NEED/need-2.0-py3-none-any.whl && \
 #     rm -rf /NEED && \
