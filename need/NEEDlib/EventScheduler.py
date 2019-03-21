@@ -14,7 +14,7 @@ class EventScheduler:
     def __init__(self):
         self.events = []  # type: List[Timer]
         self.link_changes = [] # type: List[(float, NetGraph.Link)]
-        self.path_changes = [] ############ TODO LL
+        self.path_changes = [] # type: List[(float, NetGraph)]
 
     def start(self):
         for e in self.events:
@@ -298,15 +298,28 @@ def link_change(links, new_links, paths, new_paths):
             '''
 
 def path_change(graph, new_graph):
+    #As it is currently, it does not work if we just set graph = new_graph.
+    #Therefore, we copy all the relevant attributes over.
+    #services and hosts_by_ip never change, so we don't copy these at the moment.
     graph.paths_by_id = copy(new_graph.paths_by_id)
     graph.removed_links = copy(new_graph.removed_links)
     graph.removed_bridges = copy(new_graph.removed_bridges)
+
+    graph.bridges = copy(new_graph.bridges)
+    graph.links = copy(new_graph.links)
+    graph.link_counter = new_graph.link_counter
+    graph.path_counter = new_graph.path_counter
+    graph.removed_links = copy(new_graph.removed_links)
+    graph.removed_bridges = copy(new_graph.removed_bridges)
+
+    graph.networks = copy(new_graph.networks)
+    graph.paths_by_id = copy(new_graph.paths_by_id)
 
     for service in new_graph.paths:
         current_bw = graph.paths[service].current_bandwidth
         if not service == graph.root and isinstance(service, NetGraph.Service):
             with graph.paths[service].lock:
                 graph.paths[service] = new_graph.paths[service]
-                graph.paths[service].current_bandwidth = current_bw ######## this is currently necessary, but why?
+                graph.paths[service].current_bandwidth = current_bw #the new paths have the clean maximum computed. Here we need the bookkeeping of the old path.
                 change_loss(service, new_graph.paths[service].drop)
                 change_latency(service, new_graph.paths[service].latency, new_graph.paths[service].jitter)
