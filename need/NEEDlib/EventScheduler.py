@@ -1,5 +1,5 @@
 from need.NEEDlib.utils import start_experiment, stop_experiment, crash_experiment, message
-from need.NEEDlib.PathEmulation import disconnect, reconnect, change_latency, change_loss, initialize_path
+from need.NEEDlib.PathEmulation import disconnect, reconnect, change_latency, change_loss
 from need.NEEDlib.NetGraph import NetGraph
 
 from threading import Timer
@@ -262,7 +262,7 @@ class EventScheduler:
         for link in links:
             message("Link " + link.source.name + ":" + link.destination.name + " scheduled to change at " + str(time))
         for path in paths:
-            message("Path to" + path.links[-1].destination.name + " scheduled to change at " + str(time))
+            message("Path to " + path.links[-1].destination.name + " scheduled to change at " + str(time))
 
         self.events.append(Timer(time, link_change,
                                  [links, new_links, paths, new_paths]))
@@ -315,11 +315,25 @@ def path_change(graph, new_graph):
     graph.networks = copy(new_graph.networks)
     graph.paths_by_id = copy(new_graph.paths_by_id)
 
+#    #is a service not reachable after this change? Then set packet loss to 100%
+#    for service in graph.paths:
+#        if isinstance(service, NetGraph.Service) and not service in new_graph.paths:
+#            change_loss(service, 1.0)
+
     for service in new_graph.paths:
-        current_bw = graph.paths[service].current_bandwidth
-        if not service == graph.root and isinstance(service, NetGraph.Service):
-            with graph.paths[service].lock:
+        if service in graph.paths:
+            current_bw = graph.paths[service].current_bandwidth
+            if not service == graph.root and isinstance(service, NetGraph.Service):
+                with graph.paths[service].lock:
+                    graph.paths[service] = new_graph.paths[service]
+                    graph.paths[service].current_bandwidth = current_bw #the new paths have the clean maximum computed. Here we need the bookkeeping of the old path.
+                    change_loss(service, new_graph.paths[service].drop)
+                    change_latency(service, new_graph.paths[service].latency, new_graph.paths[service].jitter)
+        else: # service is now reachable after not having been reachable
+            if isinstance(service, NetGraph.Service):
+                message("Applying new path to " + service.name + ", drop = " + str(new_graph.paths[service].drop) + "...")
                 graph.paths[service] = new_graph.paths[service]
-                graph.paths[service].current_bandwidth = current_bw #the new paths have the clean maximum computed. Here we need the bookkeeping of the old path.
+                graph.paths[service].current_bandwidth = 0
                 change_loss(service, new_graph.paths[service].drop)
                 change_latency(service, new_graph.paths[service].latency, new_graph.paths[service].jitter)
+                message("... done")

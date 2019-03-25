@@ -42,6 +42,18 @@ def initialize_path(path):
         if not PEState.shutdown and PEState.TCAL:
             PEState.TCAL.initDestination(destination.ip, int(bandwidth/1000), latency, c_float(jitter), c_float(drop))
 
+def disablePath(service):
+    """
+    :param service: NetGraph.Service
+    :return:
+    We choose 10kbit rather randomly here. The problem is that bandwidth will only be changed for active paths,
+    and if we take a super small value here, a path will never be active (in the emulation manager). Hence after
+    activating the path disabled here (ie. by adding new links), nothing will flow through them. LL based on comments by JN
+    """
+    with PEState.PathLock:
+        if not PEState.shutdown and PEState.TCAL:
+            PEState.TCAL.initDestination(service.ip, 10000, 1, c_float(0), c_float(1))
+
 
 def update_usage():
     with PEState.PathLock:

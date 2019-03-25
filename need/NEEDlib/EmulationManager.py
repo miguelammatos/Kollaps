@@ -57,6 +57,11 @@ class EmulationManager:
             if isinstance(service, NetGraph.Service):
                 path = self.graph.paths[service]
                 PathEmulation.initialize_path(path)
+        #LL: also drop everything that goes towards a host we don't see
+        for service in self.graph.services.values():
+            for serviceinstance in service:
+                if not serviceinstance in self.graph.paths and not serviceinstance.supervisor:
+                    PathEmulation.disablePath(serviceinstance)
         PathEmulation.register_usage_callback(collect_usage)
 
     #What check_active_flows does is call PathEmulation.update_usage(), which calls TCAL.update_usage(), which calls TC_updateUsage().
@@ -195,22 +200,23 @@ class EmulationManager:
         host.last_bytes = sent_bytes
 
         # Get the network path
-        path = self.graph.paths[host]
+        if host in self.graph.paths: # some services are not reachable, test for that
+            path = self.graph.paths[host]
 
-        # Check if this is an active flow
-        if throughput <= (path.max_bandwidth * EmulationManager.ERROR_MARGIN):
-            path.used_bandwidth = 0
-            return
+            # Check if this is an active flow
+            if throughput <= (path.max_bandwidth * EmulationManager.ERROR_MARGIN):
+                path.used_bandwidth = 0
+                return
 
-        # This is an active flow
-#        msg = "\n\n\n" + self.graph.root.name + "--" + host.name + ":" + str(throughput) + "\n"
-#        msg += "going through links: "
-#        for link in path.links:
-#            msg += link.source.name  + "--" + link.destination.name + "--"
-#        message(msg)
-        path.used_bandwidth = throughput
-        self.active_paths.append(path)
-        self.active_paths_ids.append(path.id)
+            # This is an active flow
+#            msg = "\n" + self.graph.root.name + "--" + host.name + ":" + str(throughput) + "\n"
+#            msg += "going through links: "
+#            for link in path.links:
+#                msg += link.source.name  + "--" + link.destination.name + "--"
+#            message(msg)
+            path.used_bandwidth = throughput
+            self.active_paths.append(path)
+            self.active_paths_ids.append(path.id)
 
 
     def accumulate_flow(self, bandwidth, link_indices):
