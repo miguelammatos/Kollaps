@@ -315,11 +315,6 @@ def path_change(graph, new_graph):
     graph.networks = copy(new_graph.networks)
     graph.paths_by_id = copy(new_graph.paths_by_id)
 
-#    #is a service not reachable after this change? Then set packet loss to 100%
-#    for service in graph.paths:
-#        if isinstance(service, NetGraph.Service) and not service in new_graph.paths:
-#            change_loss(service, 1.0)
-
     for service in new_graph.paths:
         if service in graph.paths:
             current_bw = graph.paths[service].current_bandwidth
@@ -337,3 +332,9 @@ def path_change(graph, new_graph):
                 change_loss(service, new_graph.paths[service].drop)
                 change_latency(service, new_graph.paths[service].latency, new_graph.paths[service].jitter)
                 message("... done")
+
+    #is a service not reachable after this change? Then set packet loss to 100%
+    for service in graph.paths:
+        if isinstance(service, NetGraph.Service) and not service in new_graph.paths:
+            del graph.paths[service]
+            change_loss(service, 1.0)
