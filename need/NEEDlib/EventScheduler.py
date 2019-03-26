@@ -290,7 +290,6 @@ def link_change(links, new_links, paths, new_paths):
             change_loss(service, path.drop)
             change_latency(service, path.latency, path.jitter)
             # We dont explicitly change bandwidth, the emulation manager will handle that for us
-
             '''
             message("Path " + path.links[0].source.name + " to " + path.links[-1].destination.name +
                     " changed to bw:" + str(path.max_bandwidth) + " rtt:"+str(path.RTT)
@@ -326,15 +325,16 @@ def path_change(graph, new_graph):
                     change_latency(service, new_graph.paths[service].latency, new_graph.paths[service].jitter)
         else: # service is now reachable after not having been reachable
             if isinstance(service, NetGraph.Service):
-                message("Applying new path to " + service.name + ", drop = " + str(new_graph.paths[service].drop) + "...")
                 graph.paths[service] = new_graph.paths[service]
                 graph.paths[service].current_bandwidth = 0
                 change_loss(service, new_graph.paths[service].drop)
                 change_latency(service, new_graph.paths[service].latency, new_graph.paths[service].jitter)
-                message("... done")
 
+    to_remove = []
     #is a service not reachable after this change? Then set packet loss to 100%
     for service in graph.paths:
         if isinstance(service, NetGraph.Service) and not service in new_graph.paths:
-            del graph.paths[service]
+            to_remove.append(service)
             change_loss(service, 1.0)
+    for service in to_remove:
+        del graph.paths[service]

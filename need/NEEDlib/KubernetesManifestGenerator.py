@@ -152,7 +152,7 @@ class KubernetesManifestGenerator:
             print("  template:")
             print("    metadata:")
             print("      labels:")
-            print("        app: NEED")
+            print("        app: NEED"+service_list[0].name)
             print("        "+self.experiment_UUID+": 'true'")
             print("    spec:")
             print("      containers:")
