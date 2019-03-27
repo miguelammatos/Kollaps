@@ -11,12 +11,11 @@ from kubernetes import client, config
 
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, json
 
-# from need.NEEDlib.CommunicationsManager import CommunicationsManager
-from need.NEEDlib.GeneralCommunicator import CommunicationsManager
+from need.NEEDlib.CommunicationsManager import CommunicationsManager
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.utils import int2ip, ip2int
-from need.NEEDlib.utils import print_message, print_error, print_and_fail
+from need.NEEDlib.utils import print_message, print_error, print_and_fail, print_named
 
 import sys
 if sys.version_info >= (3, 0):
@@ -122,7 +121,7 @@ def stopExperiment():
             s.close()
             
         except OSError as e:
-            print(e)
+            print_error(e)
             to_stop.insert(0, host)
             sleep(0.5)
 
@@ -137,7 +136,7 @@ def stopExperiment():
             data = s.recv(64)
             if len(data) < struct.calcsize("<3Q"):
                 s.close()
-                print("Got less than 24 bytes for counters.")
+                print_message("Got less than 24 bytes for counters.")
                 to_kill.insert(0, host)
                 continue
                 
@@ -151,14 +150,13 @@ def stopExperiment():
                 continue
                 
         except OSError as e:
-            print("timed out")
-            print(e)
+            print_error("timed out\n" + str(e))
             to_kill.insert(0, host)
             sleep(0.5)
 
     with DashboardState.lock:
     
-        print("[Py (dashboard)] recv " + str(received) + ", prod " + str(produced))
+        print_named("dashboard", "packets: recv " + str(received) + ", prod " + str(produced))
         sys.stdout.flush()
         
         if produced > 0:
@@ -193,7 +191,7 @@ def startExperiment():
                 continue
                 
         except OSError as e:
-            print(e)
+            print_error(e)
             pending_nodes.insert(0, host)
             sleep(0.5)
 
@@ -231,7 +229,7 @@ def resolve_hostnames():
                         need_pods = kubeAPIInstance.list_namespaced_pod('default')
                         
                 except Exception as e:
-                    print(e)
+                    print_error(e)
                     sys.stdout.flush()
                     sys.stderr.flush()
                     sleep(3)
@@ -312,12 +310,12 @@ def query_until_ready():
                 continue
                 
         except OSError as e:
+            print_error(e)
             pending_nodes.insert(0, host)
             sleep(1)
 
     with DashboardState.lock:
-        print("Dashboard: ready!", file=sys.stdout) #LL
-        sys.stdout.flush() #LL
+        print_named("dashboard", "Dashboard: ready!")  # PG
         DashboardState.ready = True
 
 

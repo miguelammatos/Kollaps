@@ -6,8 +6,7 @@ from os import environ
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.EventScheduler import EventScheduler
 import need.NEEDlib.PathEmulation as PathEmulation
-# from need.NEEDlib.CommunicationsManager import CommunicationsManager
-from need.NEEDlib.GeneralCommunicator import CommunicationsManager
+from need.NEEDlib.CommunicationsManager import CommunicationsManager
 from need.NEEDlib.utils import ENVIRONMENT
 from need.NEEDlib.utils import print_error, print_message
 
@@ -236,7 +235,7 @@ class EmulationManager:
 			# msg += "going through links: "
 			# for link in path.links:
 			# 	msg += link.source.name  + "--" + link.destination.name + "--"
-			# message(msg)
+			# print_message(msg)
 			
 			path.used_bandwidth = throughput
 			self.active_paths.append(path)

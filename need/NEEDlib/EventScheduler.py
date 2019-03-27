@@ -1,4 +1,5 @@
-from need.NEEDlib.utils import start_experiment, stop_experiment, crash_experiment, message
+
+from need.NEEDlib.utils import start_experiment, stop_experiment, crash_experiment, print_message
 from need.NEEDlib.PathEmulation import disconnect, reconnect, change_latency, change_loss
 from need.NEEDlib.NetGraph import NetGraph
 
@@ -72,7 +73,7 @@ class EventScheduler:
         self.path_changes.append((time, new_graph))
         self.path_changes.sort(reverse=True, key=lambda change: change[0])
 
-        message("Link " + origin + "--" + destination + " scheduled to leave at " + str(time))
+        print_message("Link " + origin + "--" + destination + " scheduled to leave at " + str(time))
         self.events.append(Timer(time, path_change, [graph, new_graph]))
 
     #Add back a link that has been removed before
@@ -115,7 +116,7 @@ class EventScheduler:
         self.path_changes.append((time, new_graph))
         self.path_changes.sort(reverse=True, key=lambda change: change[0])
 
-        message("Link " + origin + "--" + destination + " scheduled to join at " + str(time))
+        print_message("Link " + origin + "--" + destination + " scheduled to join at " + str(time))
         self.events.append(Timer(time, path_change, [graph, new_graph]))
 
 
@@ -143,7 +144,7 @@ class EventScheduler:
         self.path_changes.append((time, new_graph))
         self.path_changes.sort(reverse=True, key=lambda change: change[0])
 
-        message("Link " + source + "--" + destination + " scheduled to newly join at " + str(time))
+        print_message("Link " + source + "--" + destination + " scheduled to newly join at " + str(time))
         self.events.append(Timer(time, path_change, [graph, new_graph]))
 
     #Remove a bridge that is currently part of the graph
@@ -172,7 +173,7 @@ class EventScheduler:
         self.path_changes.append((time, new_graph))
         self.path_changes.sort(reverse=True, key=lambda change: change[0])
 
-        message("Bridge " + name + " scheduled to leave at " + str(time))
+        print_message("Bridge " + name + " scheduled to leave at " + str(time))
         self.events.append(Timer(time, path_change, [graph, new_graph]))
 
     #Add back a bridge that has been removed before
@@ -202,7 +203,7 @@ class EventScheduler:
         self.path_changes.append((time, new_graph))
         self.path_changes.sort(reverse=True, key=lambda change: change[0])
 
-        message("Bridge " + name + " scheduled to join back at " + str(time))
+        print_message("Bridge " + name + " scheduled to join back at " + str(time))
         self.events.append(Timer(time, path_change, [graph, new_graph]))
 
     #Change the properties of a link that is part of the graph
@@ -260,9 +261,9 @@ class EventScheduler:
                         break
 
         for link in links:
-            message("Link " + link.source.name + ":" + link.destination.name + " scheduled to change at " + str(time))
+            print_message("Link " + link.source.name + ":" + link.destination.name + " scheduled to change at " + str(time))
         for path in paths:
-            message("Path to " + path.links[-1].destination.name + " scheduled to change at " + str(time))
+            print_message("Path to " + path.links[-1].destination.name + " scheduled to change at " + str(time))
 
         self.events.append(Timer(time, link_change,
                                  [links, new_links, paths, new_paths]))
@@ -291,7 +292,7 @@ def link_change(links, new_links, paths, new_paths):
             change_latency(service, path.latency, path.jitter)
             # We dont explicitly change bandwidth, the emulation manager will handle that for us
             '''
-            message("Path " + path.links[0].source.name + " to " + path.links[-1].destination.name +
+            print_message("Path " + path.links[0].source.name + " to " + path.links[-1].destination.name +
                     " changed to bw:" + str(path.max_bandwidth) + " rtt:"+str(path.RTT)
                     + " j:" + str(path.jitter) + " l:" + str(path.drop))
             '''

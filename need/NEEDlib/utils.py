@@ -17,6 +17,11 @@ TOPOLOGY = "/topology.xml"
 LOCAL_IPS_FILE = "/local_ips.txt"
 REMOTE_IPS_FILE = "/remote_ips.txt"
 
+# PG this path is because aeron is compiled with cmake and it uses relative paths
+AERON_LIB_PATH = "/home/daedalus/Documents/aeron4need/cppbuild/Release/lib/libaeronlib.so"
+
+GOD_IPS_SHARE_PORT = 55555
+
 
 class ENVIRONMENT:
     NETWORK_INTERFACE = 'NETWORK_INTERFACE'
@@ -56,7 +61,7 @@ def start_experiment():
     command.replace('"', '\\"')
     command.replace("'", "\\'")
     arg = ['echo ' + command + ' > /tmp/NEED_hang']
-    message(arg[0])
+    print_message(arg[0])
     CONTAINER.container.exec_run(['/bin/sh'] + ['-c'] + arg, detach=True)
 
 
@@ -109,27 +114,27 @@ def get_own_ip(graph):
 
 
 def print_error(message):
-    print("ERROR: " + message, file=sys.stderr)
+    print("ERROR: " + str(message), file=sys.stderr)
     sys.stderr.flush()
 
 
 def print_message(message):
-    print(message, file=sys.stdout)
+    print(str(message), file=sys.stdout)
     sys.stdout.flush()
 
 
 def print_named(who, msg):
-    print("[Py (" + who + ")] " + msg, file=sys.stdout)
+    print("[Py (" + who + ")] " + str(msg), file=sys.stdout)
     sys.stdout.flush()
 
 
 def print_identified(graph, msg):
-    print("[Py (" + graph.root.name + ") " + get_own_ip(graph) + "] " + msg, file=sys.stdout)
+    print("[Py (" + graph.root.name + ") " + get_own_ip(graph) + "] " + str(msg), file=sys.stdout)
     sys.stdout.flush()
 
 
 def print_and_fail(message):
     print("An error occured, terminating!", file=sys.stderr)
-    print("Error Message: " + message, file=sys.stderr)
+    print("Error Message: " + str(message), file=sys.stderr)
     sys.stderr.flush()
     exit(-1)

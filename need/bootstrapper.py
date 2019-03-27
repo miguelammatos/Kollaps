@@ -15,12 +15,11 @@ from time import sleep
 from signal import pause
 # from shutil import copy
 
-from need.NEEDlib.utils import int2ip, ip2int, fail
-from need.NEEDlib.utils import print_message, print_error, print_and_fail
-from need.NEEDlib.utils import DOCKER_SOCK, TOPOLOGY, LOCAL_IPS_FILE, REMOTE_IPS_FILE
+from need.NEEDlib.utils import int2ip, ip2int
+from need.NEEDlib.utils import print_message, print_error, print_and_fail, print_named
+from need.NEEDlib.utils import DOCKER_SOCK, TOPOLOGY, LOCAL_IPS_FILE, REMOTE_IPS_FILE, GOD_IPS_SHARE_PORT
 
 
-UDP_PORT = 55555
 BUFFER_LEN = 1024
 
 gods = {}
@@ -31,7 +30,7 @@ def broadcast_ips(local_ips_list, number_of_gods):
 	global ready_gods
 	
 	sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	sender.bind(('', UDP_PORT + 1))
+	sender.bind(('', GOD_IPS_SHARE_PORT + 1))
 	
 	msg = ' '.join(local_ips_list)
 	
@@ -40,7 +39,7 @@ def broadcast_ips(local_ips_list, number_of_gods):
 	# while len(ready_gods) < number_of_gods:
 	while True:
 		for i in range(1, 254):
-			sender.sendto(bytes(msg, encoding='utf8'), ('10.1.0.' + str(i), UDP_PORT))
+			sender.sendto(bytes(msg, encoding='utf8'), ('10.1.0.' + str(i), GOD_IPS_SHARE_PORT))
 			
 		sleep(0.5)
 		tries += 1
@@ -50,12 +49,12 @@ def broadcast_ready(number_of_gods):
 	global ready_gods
 	
 	sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	sender.bind(('', UDP_PORT + 2))
+	sender.bind(('', GOD_IPS_SHARE_PORT + 2))
 	
 	# while len(ready_gods) < number_of_gods:
 	while True:
 		for i in range(1, 254):
-			sender.sendto(bytes("READY", encoding='utf8'), ('10.1.0.' + str(i), UDP_PORT))
+			sender.sendto(bytes("READY", encoding='utf8'), ('10.1.0.' + str(i), GOD_IPS_SHARE_PORT))
 		
 		sleep(0.5)
 
@@ -69,9 +68,8 @@ def resolve_ips(docker_client, low_level_client):
 		local_ips_list = []
 		own_ip = socket.gethostbyname(socket.gethostname())
 		
-		print("[Py (god)] ip: " + str(own_ip))
-		print("[Py (god)] number of gods: " + str(number_of_gods))
-		sys.stdout.flush()
+		print_named("god", "ip: " + str(own_ip))
+		print_named("god", "number of gods: " + str(number_of_gods))
 	
 		containers = docker_client.containers.list()
 		for container in containers:
@@ -89,7 +87,7 @@ def resolve_ips(docker_client, low_level_client):
 		
 		receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		receiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		receiver.bind(('', UDP_PORT))
+		receiver.bind(('', GOD_IPS_SHARE_PORT))
 		
 		while len(gods) < number_of_gods:
 			data, addr = receiver.recvfrom(BUFFER_LEN)
@@ -152,15 +150,15 @@ def resolve_ips(docker_client, low_level_client):
 		return gods
 	
 	except Exception as e:
-		print("[Py] " + str(e))
+		print_error("[Py ()] " + str(e))
 		sys.stdout.flush()
 		sys.stderr.flush()
 		sys.exit(-1)
 
 
 def kubernetes_bootstrapper():
-	mode = argv[1]
-	label = argv[2]
+	mode = sys.argv[1]
+	label = sys.argv[2]
 	god_id = None  # get this, it will be argv[3]
 	
 	# Connect to the local docker daemon
@@ -178,12 +176,12 @@ def kubernetes_bootstrapper():
 		
 		except Exception as e:
 			print(e)
-			stdout.flush()
+			sys.stdout.flush()
 			sleep(1)  # wait for the Kubernetes API
 	
 	# We are finally ready to proceed
 	print("Bootstrapping all local containers with label " + label)
-	stdout.flush()
+	sys.stdout.flush()
 	
 	already_bootstrapped = {}
 	instance_count = 0
@@ -216,11 +214,11 @@ def kubernetes_bootstrapper():
 					
 					except:
 						print("Bootstrapping failed... will try again.")
-						stdout.flush()
-						stderr.flush()
+						sys.stdout.flush()
+						sys.stderr.flush()
 				
 				# Check for bootstrapper termination
-				if container_id == god_id and pod.status.container_statuses[0].state.running != None:
+				if container_id == god_id and pod.status.container_statuses[0].state.running is not None:
 					running += 1
 					
 			# Do some reaping
@@ -239,24 +237,20 @@ def kubernetes_bootstrapper():
 			sleep(5)
 		
 		except Exception as e:
-			print(e)
-			stdout.flush()
+			print_error(e)
+			sys.stdout.flush()
 			sleep(1)
 
 
 
 def docker_bootstrapper():
 	
-	UDP_PORT = 55555
-
-	mode = argv[1]
-	label = argv[2]
-	
-	message("lable: " + label)
+	mode = sys.argv[1]
+	label = sys.argv[2]
 	
 	# Connect to the local docker daemon
 	client = docker.DockerClient(base_url='unix:/' + DOCKER_SOCK)
-	LowLevelClient = docker.APIClient(base_url='unix:/' + DOCKER_SOCK)
+	lowLevelClient = docker.APIClient(base_url='unix:/' + DOCKER_SOCK)
 
 
 	if mode == "-s":
@@ -328,7 +322,7 @@ def docker_bootstrapper():
 	aeron_media_driver = None
 	try:
 		aeron_media_driver = Popen('/usr/bin/Aeron/aeronmd')
-		print("started aeron_media_driver.")
+		print_named("god", "started aeron_media_driver.")
 	
 	except Exception as e:
 		print_error("[Py (bootstrapper)] failed to start aeron media driver.")
@@ -415,12 +409,11 @@ def docker_bootstrapper():
 						already_bootstrapped[key].kill()
 						already_bootstrapped[key].wait()
 						
-
-				print_message("[Py (god)] God terminating.")
+				print_named("god", "God terminating.")
 				
 				if aeron_media_driver:
 					aeron_media_driver.terminate()
-					print_message("[Py (god)] aeron_media_driver terminating.")
+					print_named("god", "aeron_media_driver terminating.")
 					aeron_media_driver.wait()
 				
 				sys.stdout.flush()
@@ -439,20 +432,20 @@ def docker_bootstrapper():
 
 if __name__ == '__main__':
 
-	if len(argv) < 3:
-		print("If you are calling " + argv[0] + " from your workstation stop.")
+	if len(sys.argv) < 3:
+		print("If you are calling " + sys.argv[0] + " from your workstation stop.")
 		print("This should only be used inside containers")
 		exit(-1)
 	
 	orchestrator = os.getenv('NEED_ORCHESTRATOR', 'swarm')
-	print("orchestrator: " + orchestrator)
+	print_named("bootstrapper", "orchestrator: " + orchestrator)
 	
 	if orchestrator == 'kubernetes':
 		kubernetes_bootstrapper()
 		
 	else:
 		if orchestrator != 'swarm':
-			print("Unrecognized orchestrator. Using default docker swarm.")
+			print_named("bootstrapper", "Unrecognized orchestrator. Using default docker swarm.")
 		
 		docker_bootstrapper()
 

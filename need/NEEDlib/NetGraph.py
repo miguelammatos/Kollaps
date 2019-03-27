@@ -1,6 +1,5 @@
 
 from kubernetes import client, config
-from need.NEEDlib.utils import fail, ip2int
 from time import sleep, time
 from math import sqrt
 from os import environ
@@ -8,6 +7,8 @@ from threading import Lock
 import re
 import os
 import dns.resolver
+
+from need.NEEDlib.utils import print_and_fail, ip2int
 
 import sys
 if sys.version_info >= (3, 0):
@@ -77,7 +78,7 @@ class NetGraph:
                 self.drop = float(drop)
                 self.jitter = float(jitter)
             except:
-                fail("Provided link data is not valid: "
+                print_and_fail("Provided link data is not valid: "
                     + latency + "ms "
                     + drop + "drop rate "
                     + bandwidth)
@@ -124,7 +125,7 @@ class NetGraph:
                     # Problem is similar to probability of getting at least one 6 in multiple dice rolls
                     total_not_drop_probability *= (1.0-float(link.drop))
                 except:
-                    fail("Provided link data is not valid: "
+                    print_and_fail("Provided link data is not valid: "
                         + str(link.latency) + "ms "
                         + str(link.drop) + "drop rate "
                         + link.bandwidth)
@@ -163,7 +164,7 @@ class NetGraph:
         if len(self.get_nodes(name)) == 0:
             self.bridges[name] = [bridge]
         else:
-            fail("Cant add bridge with name: " + name + ". Another node with the same name already exists")
+            print_and_fail("Cant add bridge with name: " + name + ". Another node with the same name already exists")
         return bridge
 
     def new_link(self, source, destination, latency, jitter, drop, bandwidth, network):
@@ -182,7 +183,7 @@ class NetGraph:
 
     def bandwidth_in_bps(self, bandwidth_string):
         if re.match(self.bandwidth_re, bandwidth_string) is None:
-            fail("Bandwidth is not properly specified, accepted values must be: [0-9]+[KMG]bps")
+            print_and_fail("Bandwidth is not properly specified, accepted values must be: [0-9]+[KMG]bps")
         results = re.findall(self.bandwidth_re, bandwidth_string)
         base = results[0][0]
         multiplier = results[0][1]
@@ -266,7 +267,7 @@ class NetGraph:
         # Dijkstra's shortest path implementation
         # Distance is number of hops
         if self.root is None:
-            fail("Root of the tree has not been defined.")
+            print_and_fail("Root of the tree has not been defined.")
 
         inf = float("inf")
         dist = {}

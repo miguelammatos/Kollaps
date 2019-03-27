@@ -2,7 +2,8 @@
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.EmulationManager import EmulationManager
-from need.NEEDlib.utils import fail, message, ENVIRONMENT, int2ip, ip2int, setup_container
+from need.NEEDlib.utils import ENVIRONMENT, int2ip, ip2int, setup_container
+from need.NEEDlib.utils import print_and_fail, print_message, print_identified
 
 from signal import signal, SIGTERM
 import socket
@@ -13,9 +14,9 @@ def get_own_ip(graph):
     # Old way using the netifaces dependency (bad because it has a binary component)
     # interface = os.environ.get(ENVIRONMENT.NETWORK_INTERFACE, 'eth0')
     # if interface is None:
-    #     fail("NETWORK_INTERFACE environment variable is not set!")
+    #     print_and_fail("NETWORK_INTERFACE environment variable is not set!")
     # if interface not in netifaces.interfaces():
-    #     fail("$NETWORK_INTERFACE: " + interface + " does not exist!")
+    #     print_and_fail("$NETWORK_INTERFACE: " + interface + " does not exist!")
     # ownIP = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
 
     # New way:
@@ -33,7 +34,7 @@ def get_own_ip(graph):
 
 def main():
     if len(sys.argv) < 4:
-        fail("Missing arguments. emucore <topology> <container id>")
+        print_and_fail("Missing arguments. emucore <topology> <container id>")
     else:
         topology_file = sys.argv[1]
     # For future reference: This topology file must not exceed 512KB otherwise docker refuses
@@ -49,34 +50,35 @@ def main():
 
     parser = XMLGraphParser(topology_file, graph)
     parser.fill_graph()
-    message("Done parsing topology")
+    print_message("Done parsing topology")
 
-    message("Resolving hostnames...")
+    print_message("Resolving hostnames...")
     graph.resolve_hostnames()
-    message("All hosts found!")
+    print_message("All hosts found!")
 
-    message("Determining the root of the tree...")
+    print_message("Determining the root of the tree...")
     # Get our own ip address and set the root of the "tree"
     ownIP = get_own_ip(graph)
     graph.root = graph.hosts_by_ip[ip2int(ownIP)]
+    
     if graph.root is None:
-        fail("Failed to identify current service instance in topology!")
-    message("We are " + graph.root.name + "@" + ownIP)
+        print_and_fail("Failed to identify current service instance in topology!")
+    print_message("We are " + graph.root.name + "@" + ownIP)
 
-    message("Calculating shortest paths...")
+    print_identified(graph, "Calculating shortest paths...")
     graph.calculate_shortest_paths()
 #    graph.print_links() #LL
 #    graph.print_paths() #LL
 
-    message("Parsing dynamic event schedule...")
+    print_message("Parsing dynamic event schedule...")
     scheduler = parser.parse_schedule(graph.root, graph)
 
     signal(SIGTERM, lambda signum, frame: exit(0))
 
-    message("Initializing network emulation...")
+    print_message("Initializing network emulation...")
     manager = EmulationManager(graph, scheduler)
     manager.initialize()
-    message("Waiting for command to start experiment")
+    print_identified(graph, "Waiting for command to start experiment")
     sys.stdout.flush()
     sys.stderr.flush()
 

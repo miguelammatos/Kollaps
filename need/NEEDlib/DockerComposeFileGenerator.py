@@ -1,5 +1,6 @@
+
 from need.NEEDlib.NetGraph import NetGraph
-from need.NEEDlib.utils import fail
+from need.NEEDlib.utils import print_and_fail
 from uuid import uuid4
 
 
@@ -83,7 +84,7 @@ class DockerComposeFileGenerator:
 		network = self.graph.links[0].network
 		for link in self.graph.links:
 			if link.network != network:
-				fail("Multiple network support is not yet implemented!")
+				print_and_fail("Multiple network support is not yet implemented!")
 
 		print("networks:")
 		print("  NEEDnet:")

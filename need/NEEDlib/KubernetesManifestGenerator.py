@@ -1,5 +1,6 @@
+
 from need.NEEDlib.NetGraph import NetGraph
-from need.NEEDlib.utils import fail
+from need.NEEDlib.utils import print_and_fail
 from uuid import uuid4
 
 

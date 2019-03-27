@@ -6,7 +6,7 @@ from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.DockerComposeFileGenerator import DockerComposeFileGenerator
 from need.NEEDlib.KubernetesManifestGenerator import KubernetesManifestGenerator
-from need.NEEDlib.utils import fail, SHORT_LIMIT
+from need.NEEDlib.utils import SHORT_LIMIT
 from need.NEEDlib.utils import print_message, print_error, print_and_fail
 
 
@@ -32,7 +32,7 @@ def main():
     print("      has " + str(service_count) + " hosts.", file=sys.stderr)
 
     if len(graph.links) > SHORT_LIMIT:
-        fail("Topology has too many links: " + str(len(graph.links)))
+        print_and_fail("Topology has too many links: " + str(len(graph.links)))
         
     for path in graph.paths:
         if len(path.links) > 249:
