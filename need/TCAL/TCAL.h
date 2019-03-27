@@ -9,10 +9,10 @@ typedef struct netif{
 
 void init(unsigned short controllPort, int txqueuelen);
 
-void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, float packetLoss);
+void initDestination(unsigned int ip, int bandwidth, float latency, float jitter, float packetLoss);
 void changeBandwidth(unsigned int ip, int bandwidth);
 void changeLoss(unsigned int ip, float packetLoss);
-void changeLatency(unsigned int ip, int latency, float jitter);
+void changeLatency(unsigned int ip, float latency, float jitter);
 void updateUsage();
 unsigned long queryUsage(unsigned int ip);
 void registerUsageCallback(void(*callback)(unsigned int, unsigned long, unsigned int));

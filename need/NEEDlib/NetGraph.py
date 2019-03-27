@@ -73,7 +73,7 @@ class NetGraph:
             self.source = source  # type: NetGraph.Node
             self.destination = destination  # type: NetGraph.Node
             try:
-                self.latency = int(latency)
+                self.latency = float(latency)
                 self.drop = float(drop)
                 self.jitter = float(jitter)
             except:
@@ -117,7 +117,7 @@ class NetGraph:
                     # Accumulate jitter by summing the variances
                     self.jitter = sqrt( (self.jitter*self.jitter)+(link.jitter*link.jitter))
                     # Latency is just a sum
-                    self.latency += int(link.latency)
+                    self.latency += float(link.latency)
                     # Drop is product of reverse probabilities reversed
                     # basically calculate the probability of not dropping across the entire path
                     # and then invert it

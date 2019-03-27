@@ -486,7 +486,7 @@ class XMLGraphParser:
                             fail("Link description incomplete. For a new link, you must provide at least latency, upload, and network attributes.")
                         else:
                             bandwidth = event.attrib['upload']
-                            latency = int(event.attrib['latency'])
+                            latency = float(event.attrib['latency'])
                             drop = 0
                             if 'drop' in event.attrib:
                                 drop = float(event.attrib['drop'])
@@ -505,7 +505,7 @@ class XMLGraphParser:
                         bandwidth = graph.bandwidth_in_bps(event.attrib['upload'])
                     latency = -1
                     if 'latency' in event.attrib:
-                        latency = int(event.attrib['latency'])
+                        latency = float(event.attrib['latency'])
                     drop = -1
                     if 'drop' in event.attrib:
                         drop = float(event.attrib['drop'])

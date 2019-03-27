@@ -194,9 +194,6 @@ void TC_initDestination(Destination *dest) {
     char bandwidth[MAX_INT_CHAR_LEN+4];
     snprintf(bandwidth, MAX_INT_CHAR_LEN+4, "%uKbit", dest->bandwidth);
 
-    char latency[MAX_INT_CHAR_LEN+2];
-    snprintf(latency, MAX_INT_CHAR_LEN+2, "%ums", dest->latency);
-
     char txqlen[MAX_INT_CHAR_LEN];
     snprintf(txqlen, MAX_INT_CHAR_LEN, "%u", txqueuelen);
 
@@ -219,8 +216,14 @@ void TC_initDestination(Destination *dest) {
     free(quantum);
 
 
+    char* latency = NULL; //
     char* loss = NULL;
     char* jitter = NULL;
+
+    size = snprintf(NULL, 0, "%0.6fms", dest->latency);
+    latency = (char*)malloc(sizeof(char)*(size+1));
+    snprintf(latency, size+1, "%0.6fms", dest->latency);
+
     //Create the netem qdisc for emulating latency and attach it to the previous htb class
     //Warning, if we use new netem features, double check that TC_changePacketLoss() still works (might need changes)
     ADD_DEV

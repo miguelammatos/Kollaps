@@ -233,7 +233,7 @@ class EventScheduler:
 
                 # Update only what has changed
                 copy_l.bandwidth_bps = bandwidth if bandwidth >= 0 else copy_l.bandwidth_bps
-                copy_l.latency = int(latency) if latency >= 0 else copy_l.latency
+                copy_l.latency = float(latency) if latency >= 0 else copy_l.latency
                 copy_l.jitter = float(jitter) if jitter >= 0 else copy_l.jitter
                 copy_l.drop = float(drop) if drop >= 0 else copy_l.drop
 

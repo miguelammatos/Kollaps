@@ -40,7 +40,7 @@ def initialize_path(path):
 
     with PEState.PathLock:
         if not PEState.shutdown and PEState.TCAL:
-            PEState.TCAL.initDestination(destination.ip, int(bandwidth/1000), latency, c_float(jitter), c_float(drop))
+            PEState.TCAL.initDestination(destination.ip, int(bandwidth/1000), c_float(latency), c_float(jitter), c_float(drop))
 
 def disablePath(service):
     """
@@ -103,7 +103,7 @@ def change_latency(service, latency, jitter):
     pass
     with PEState.PathLock:
         if not PEState.shutdown and PEState.TCAL:
-            PEState.TCAL.changeLatency(service.ip, latency, c_float(jitter))
+            PEState.TCAL.changeLatency(service.ip, c_float(latency), c_float(jitter))
 
 def register_usage_callback(callback):
     """
