@@ -194,9 +194,6 @@ void TC_initDestination(Destination *dest) {
     char bandwidth[MAX_INT_CHAR_LEN+4];
     snprintf(bandwidth, MAX_INT_CHAR_LEN+4, "%uKbit", dest->bandwidth);
 
-    char latency[MAX_INT_CHAR_LEN+2];
-    snprintf(latency, MAX_INT_CHAR_LEN+2, "%ums", dest->latency);
-
     char txqlen[MAX_INT_CHAR_LEN];
     snprintf(txqlen, MAX_INT_CHAR_LEN, "%u", txqueuelen);
 
@@ -219,8 +216,14 @@ void TC_initDestination(Destination *dest) {
     free(quantum);
 
 
+    char* latency = NULL; //
     char* loss = NULL;
     char* jitter = NULL;
+
+    size = snprintf(NULL, 0, "%0.6fms", dest->latency);
+    latency = (char*)malloc(sizeof(char)*(size+1));
+    snprintf(latency, size+1, "%0.6fms", dest->latency);
+
     //Create the netem qdisc for emulating latency and attach it to the previous htb class
     //Warning, if we use new netem features, double check that TC_changePacketLoss() still works (might need changes)
     ADD_DEV
@@ -504,7 +507,8 @@ void TC_changeNetem(Destination *dest){
     struct rtattr *tail = NLMSG_TAIL(&req.n);
 
     struct tc_netem_qopt opt = { .limit = txqueuelen };
-    opt.loss = rint(dest->packetLossRate * UINT32_MAX);
+    //Funny thing here, 1.0f*UINT32_MAX > UINT32_MAX (float precision issue, we have to use double)
+    opt.loss = rint(((double)dest->packetLossRate) * UINT32_MAX);
     //Since we are updating the opt structure, we have to fill in latency and jitter as well
     // (distribution is not necessary however)
     opt.latency = tc_core_time2tick(dest->latency*(TIME_UNITS_PER_SEC/1000));

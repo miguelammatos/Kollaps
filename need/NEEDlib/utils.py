@@ -10,9 +10,12 @@ from subprocess import Popen
 BYTE_LIMIT = 255
 SHORT_LIMIT = 65535
 # INT_LIMIT = 4294967296
+
 DOCKER_SOCK = "/var/run/docker.sock"
 
 TOPOLOGY = "/topology.xml"
+LOCAL_IPS_FILE = "/local_ips.txt"
+REMOTE_IPS_FILE = "/remote_ips.txt"
 
 
 class ENVIRONMENT:
@@ -29,23 +32,6 @@ class CONTAINER:
     ll = None  # type: docker.APIClient
     container = None
     process = None
-
-
-def fail(message):
-    print("An error occured, terminating!", file=sys.stderr)
-    print("Error Message: " + message, file=sys.stderr)
-    sys.stderr.flush()
-    exit(-1)
-
-
-def error(message):
-    print("ERROR: " + message, file=sys.stderr)
-    sys.stderr.flush()
-
-
-def message(m):
-    print(m, file=sys.stdout)
-    sys.stdout.flush()
 
 
 def start_experiment():
@@ -122,10 +108,28 @@ def get_own_ip(graph):
     return last_ip
 
 
-# def identified_print(who, msg):
-#     print("[Py (" + who + ") " + get_own_ip() + "] " + msg, file=sys.stdout)
-#     sys.stdout.flush()
+def print_error(message):
+    print("ERROR: " + message, file=sys.stderr)
+    sys.stderr.flush()
 
-def identified_print(graph, msg):
+
+def print_message(message):
+    print(message, file=sys.stdout)
+    sys.stdout.flush()
+
+
+def print_named(who, msg):
+    print("[Py (" + who + ")] " + msg, file=sys.stdout)
+    sys.stdout.flush()
+
+
+def print_identified(graph, msg):
     print("[Py (" + graph.root.name + ") " + get_own_ip(graph) + "] " + msg, file=sys.stdout)
     sys.stdout.flush()
+
+
+def print_and_fail(message):
+    print("An error occured, terminating!", file=sys.stderr)
+    print("Error Message: " + message, file=sys.stderr)
+    sys.stderr.flush()
+    exit(-1)

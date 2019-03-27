@@ -10,7 +10,7 @@
 
 typedef struct {
     unsigned int ipv4;
-    int latency;
+    float latency;
     float jitter;
     int bandwidth; //in Kbps
     float packetLossRate;
@@ -22,7 +22,7 @@ typedef struct {
     UT_hash_handle hh_h;
 }Destination;
 
-Destination* destination_create(unsigned int ipv4, int bandwidth, int latency, float jitter, float packetLossRate);
+Destination* destination_create(unsigned int ipv4, int bandwidth, float latency, float jitter, float packetLossRate);
 void destination_getOctetHex(Destination* self, short octet, char* hexOctet);
 void destination_getIpHex(Destination* self, char* hexIp);
 

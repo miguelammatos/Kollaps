@@ -346,19 +346,33 @@ class XMLGraphParser:
         for event in dynamic:
             if event.tag != 'schedule':
                 fail("Only <schedule> is allowed inside <dynamic>")
+
+            # parse time of event
+            time = 0.0
+            try:
+                time = float(event.attrib['time'])
+                if time < 0.0:
+                    fail("time attribute must be a positive number")
+            except ValueError as e:
+                fail("time attribute must be a valid real number")
+
             if 'name' in event.attrib and 'time' in event.attrib and 'action' in event.attrib:
-                # parse name of service
-                if event.attrib['name'] != service.name:
+                node_name = event.attrib['name']
+                bridge_names = []
+                for bridge in graph.bridges:
+                    bridge_names.append(bridge)
+
+                # if a bridge is scheduled
+                if node_name in bridge_names:
+                    if event.attrib['action'] == 'join':
+                        scheduler.schedule_bridge_join(time, graph, node_name)
+                    elif event.attrib['action'] == 'leave':
+                        scheduler.schedule_bridge_leave(time, graph, node_name)
                     continue
 
-                # parse time of event
-                time = 0.0
-                try:
-                    time = float(event.attrib['time'])
-                    if time < 0.0:
-                        fail("time attribute must be a positive number")
-                except ValueError as e:
-                    fail("time attribute must be a valid real number")
+                # parse name of service. only process actions that target us
+                if node_name != service.name:
+                    continue
 
                 # parse amount of replicas affected
                 amount = 1
@@ -453,32 +467,53 @@ class XMLGraphParser:
                     fail("Unrecognized action: " + event.attrib['action'] +
                          " , allowed actions are join, leave, crash, disconnect, reconnect")
 
+            #Do something dynamically with a link
             elif 'origin' in event.attrib and 'dest' in event.attrib and 'time' in event.attrib:
-                # parse time of event
-                time = 0.0
-                try:
-                    time = float(event.attrib['time'])
-                    if time < 0.0:
-                        fail("time attribute must be a positive number")
-                except ValueError as e:
-                    fail("time attribute must be a valid real number")
 
+                #parse origin and destination
                 origin = event.attrib['origin']
                 destination = event.attrib['dest']
-                bandwidth = -1
-                if 'upload' in event.attrib:
-                    bandwidth = graph.bandwidth_in_bps(event.attrib['upload'])
-                latency = -1
-                if 'latency' in event.attrib:
-                    latency = int(event.attrib['latency'])
-                drop = -1
-                if 'drop' in event.attrib:
-                    drop = float(event.attrib['drop'])
-                jitter = -1
-                if 'jitter' in event.attrib:
-                    jitter = float(event.attrib['jitter'])
 
-                scheduler.schedule_link_change(time, graph, origin, destination, bandwidth, latency, jitter, drop)
+                if 'action' in event.attrib: #link is joining or leaving
+                    if event.attrib['action'] == 'leave':
+                        scheduler.schedule_link_leave(time, graph, origin, destination)
+                    elif event.attrib['action'] == 'join':
+                        #Link is already defined but has been removed before
+                        if not 'upload' in event.attrib or not 'latency' in event.attrib:
+                            scheduler.schedule_link_join(time, graph, origin, destination)
+                        #A completely new link with defined properties joins
+                        elif not 'upload' in event.attrib and not 'latency' in event.attrib and not 'network' in event.attrib:
+                            fail("Link description incomplete. For a new link, you must provide at least latency, upload, and network attributes.")
+                        else:
+                            bandwidth = event.attrib['upload']
+                            latency = float(event.attrib['latency'])
+                            drop = 0
+                            if 'drop' in event.attrib:
+                                drop = float(event.attrib['drop'])
+                            jitter = 0
+                            if 'jitter' in event.attrib:
+                                jitter = float(event.attrib['jitter'])
+                            network = event.attrib['network']
+
+                            scheduler.schedule_new_link(time, graph, origin, destination, latency, jitter, drop, bandwidth, network)
+                    else:
+                        fail("Unrecognized action for link: " + event.attrib['action'] + ", allowed are join and leave")
+
+                else: #properties of link are changing
+                    bandwidth = -1
+                    if 'upload' in event.attrib:
+                        bandwidth = graph.bandwidth_in_bps(event.attrib['upload'])
+                    latency = -1
+                    if 'latency' in event.attrib:
+                        latency = float(event.attrib['latency'])
+                    drop = -1
+                    if 'drop' in event.attrib:
+                        drop = float(event.attrib['drop'])
+                    jitter = -1
+                    if 'jitter' in event.attrib:
+                        jitter = float(event.attrib['jitter'])
+
+                    scheduler.schedule_link_change(time, graph, origin, destination, bandwidth, latency, jitter, drop)
 
             else:
                 fail(

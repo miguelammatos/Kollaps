@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
- 
+
 <head>
     <title>NEED Dashboard</title>
     <link href="/static/css/style.css" rel="stylesheet">
     <meta http-equiv="refresh" content="2"/>
 </head>
- 
+
 <body>
     <div class="container">
         <div class="header">
@@ -31,20 +31,34 @@
                     </tr>
                     {% for key, flow in flows.items() %}
                     <tr>
-                        <td>{{graph.links[flow[0]].source.name}}</td>
-                        <td>{{graph.links[flow[1]].destination.name}}</td>
+                        <td> <!-- LL: ugly hack
+                                  if new links have been added dynamically, the dashboard doesn't know about them
+                                  the clean solution would be to always keep the graph updated -->
+                          {% if graph.links|length > flow[0] %}
+                            {{graph.links[flow[0]].source.name}}
+                          {% else %}
+                            source
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if graph.links|length > flow[1] %}
+                            {{graph.links[flow[1]].destination.name}}
+                          {% else %}
+                            destination
+                          {% endif %}
+                        </td>
                         <td style="text-align:right">{{flow[2]}}Kbps</td>
                     </tr>
                     {% endfor %}
                 </table>
             </div>
         </div>
- 
+
         <footer class="footer">
             <p>NEED 2018</p>
         </footer>
- 
+
     </div>
 </body>
- 
+
 </html>

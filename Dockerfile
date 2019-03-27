@@ -2,15 +2,16 @@
 # base/archlinux is deprecated; replaced with archlinux/base
 FROM archlinux/base:latest
 
-#Yes we are using archlinux
-#Crazy right? Why not debian or ubuntu or alpine?
-#1st pacman is a lot faster than all the others, so faster image builds
-#2nd alpine uses busybox which is buggy
-#3rd we actually get less packet loss with arch than with any other distros
+
+# Yes we are using archlinux
+# Crazy right? Why not debian or ubuntu or alpine?
+# 1st pacman is a lot faster than all the others, so faster image builds
+# 2nd alpine uses busybox which is buggy
+# 3rd we actually get less packet loss with arch than with any other distros
 
 WORKDIR /
 
-#Location of netem distribution files on archlinux
+# Location of netem distribution files on archlinux
 ENV TC_LIB_DIR "/usr/share/tc/"
 
 
@@ -22,16 +23,21 @@ RUN pacman -Sy --noconfirm \
     make \
     flex \
     bison \
+    gcc \
     pkgconf \
     iptables \
     iproute2 \
-    gcc \
     grep \
     tcpdump
+#    procps-ng
 
-    
+
+
 ADD ./ /NEED/
 
+
+# RUN sysctl net.core.rmem_max=2097152 && \
+#    sysctl net.core.wmem_max=2097152
 
 RUN tar -C /NEED/ -zxvf NEED/Aeron.tar.gz && \
 	cp -r /NEED/Aeron/binaries /usr/bin/Aeron && \
@@ -39,7 +45,8 @@ RUN tar -C /NEED/ -zxvf NEED/Aeron.tar.gz && \
     cp -r /NEED/Aeron/lib /home/daedalus/Documents/aeron4need/cppbuild/Release/lib && \
     cp /NEED/Aeron/usr/lib/libbsd.so.0.9.1 /usr/lib/libbsd.so.0.9.1 && \
     cp /NEED/Aeron/usr/lib/libbsd.so.0 /usr/lib/libbsd.so.0
-    
+
+# LL: only added kubernetes in l.33
 RUN make -C /NEED/pid1 && \
     cp /NEED/pid1/pid1 /usr/bin/pid1 && \
     make -C /NEED/need/TCAL -j8 && \

@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "Destination.h"
 
-Destination* destination_create(unsigned int ipv4, int bandwidth, int latency,
+Destination* destination_create(unsigned int ipv4, int bandwidth, float latency,
                          float jitter, float packetLossRate) {
 
     Destination* self = malloc(sizeof(Destination));

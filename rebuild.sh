@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-docker stack rm 5
+docker stack rm top
 docker rm $(docker ps -aq)
 
 
@@ -26,9 +26,9 @@ sudo pip install --force-reinstall need-2.0-py3-none-any.whl
 docker build --rm -t need:2.0 .
 # docker build --no-cache --rm -t need:2.0 .
 
-NEEDdeploymentGenerator examples/topology5.xml > topology5.yaml
-NEEDdeploymentGenerator examples/topology100.xml > topology100.yaml
-NEEDdeploymentGenerator examples/simple_dynamic.xml > simple_dynamic.yaml
+NEEDdeploymentGenerator examples/topology5.xml -s > topology5.yaml
+NEEDdeploymentGenerator examples/topology100.xml -s > topology100.yaml
+NEEDdeploymentGenerator examples/simple_dynamic.xml -s > simple_dynamic.yaml
 
 
 cd ../need_images/
@@ -57,8 +57,11 @@ cd ..
 # docker push localhost:5000/need
 # docker tag localhost:5000/need need:2.0
 
-########################################################################################
 
+
+
+
+########################################################################################
 
 # docker tag warpenguin.no-ip.org/dashboard:1.0 localhost:5000/warpenguin.no-ip.org/dashboard && \
 # docker push localhost:5000/warpenguin.no-ip.org/dashboard

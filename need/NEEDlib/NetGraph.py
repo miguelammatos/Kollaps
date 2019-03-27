@@ -1,10 +1,12 @@
+
+from kubernetes import client, config
 from need.NEEDlib.utils import fail, ip2int
-from time import sleep
+from time import sleep, time
 from math import sqrt
 from os import environ
 from threading import Lock
 import re
-
+import os
 import dns.resolver
 
 import sys
@@ -21,6 +23,8 @@ class NetGraph:
         self.links = []  # type: List[NetGraph.Link]
         self.link_counter = 0  # increment counter that will give each link an index
         self.path_counter = 0  # increment counter that will give each path an id
+        self.removed_links = [] #LL; type: List[NetGraph.Link]
+        self.removed_bridges = {} #LL; type: Dict[str,List[NetGraph.Service]]; list has length at most 1
 
         self.networks = []  # type: List[str]
         self.supervisors = []  # type: List[NetGraph.Service]
@@ -69,14 +73,14 @@ class NetGraph:
             self.source = source  # type: NetGraph.Node
             self.destination = destination  # type: NetGraph.Node
             try:
-                self.latency = int(latency)
+                self.latency = float(latency)
                 self.drop = float(drop)
                 self.jitter = float(jitter)
             except:
                 fail("Provided link data is not valid: "
-                     + latency + "ms "
-                     + drop + "drop rate "
-                     + bandwidth)
+                    + latency + "ms "
+                    + drop + "drop rate "
+                    + bandwidth)
             self.bandwidth = bandwidth  # type: str
             self.bandwidth_bps = bps  # type: int
             self.flows = []  # type: List[Tuple[int, int]]  # (RTT, Bandwidth)
@@ -113,7 +117,7 @@ class NetGraph:
                     # Accumulate jitter by summing the variances
                     self.jitter = sqrt( (self.jitter*self.jitter)+(link.jitter*link.jitter))
                     # Latency is just a sum
-                    self.latency += int(link.latency)
+                    self.latency += float(link.latency)
                     # Drop is product of reverse probabilities reversed
                     # basically calculate the probability of not dropping across the entire path
                     # and then invert it
@@ -121,11 +125,18 @@ class NetGraph:
                     total_not_drop_probability *= (1.0-float(link.drop))
                 except:
                     fail("Provided link data is not valid: "
-                         + str(link.latency) + "ms "
-                         + str(link.drop) + "drop rate "
-                         + link.bandwidth)
+                        + str(link.latency) + "ms "
+                        + str(link.drop) + "drop rate "
+                        + link.bandwidth)
             self.RTT = self.latency*2
             self.drop = (1.0-total_not_drop_probability)
+
+        def prettyprint(self):
+            pretty = "I am a path and these are my links:\n"
+            for link in self.links:
+                pretty += "  " + link.source.name + "--" + link.destination.name + "\n"
+            pretty += "    These are my end-to-end properties: bandwidth=" + str(self.max_bandwidth) + ", latency = " + str(self.latency) + ", jitter = " + str(self.jitter)  + ", drop = " + str(self.drop) + "\n"
+            return pretty
 
     def get_nodes(self, name):
         if name in self.services:
@@ -183,37 +194,75 @@ class NetGraph:
             return int(base) * 1000 * 1000 * 1000
 
     def resolve_hostnames(self):
-        # python's built in address resolver looks in /etc/hosts first
-        # this is a problem since services with multiple replicas (same hostname)
-        # will only have ONE entry in /etc/hosts, so the other hosts will never be found...
-        # Solution: forcefully use dns queries that skip /etc/hosts (this pulls the dnspython dependency...)
 
-        # Moreover, in some scenarios the /etc/resolv.conf is broken inside the containers
-        # So to get the names to resolve properly we need to force to use dockers internal nameserver
-        # 127.0.0.11
+        orchestrator = os.getenv('NEED_ORCHESTRATOR', 'swarm')
+        if orchestrator == 'kubernetes':
+            # kubernetes version
+            # we are only talking to the kubernetes API
 
-        experimentUUID = environ.get('NEED_UUID', '')
-        docker_resolver = dns.resolver.Resolver(configure=False)
-        docker_resolver.nameservers = ['127.0.0.11']
-        for service in self.services:
-            hosts = self.services[service]
-            ips = []
-            while len(ips) != len(hosts):
-                try:
-                    answers = docker_resolver.query(service + "-" + experimentUUID, 'A')
-                    ips = [str(ip) for ip in answers]
-                    if len(ips) != len(hosts):
+            experimentUUID = environ.get('NEED_UUID', '')
+            config.load_incluster_config()
+            kubeAPIInstance = client.CoreV1Api()
+            need_pods = kubeAPIInstance.list_namespaced_pod('default')
+            for service in self.services:
+                hosts = self.services[service]
+                answers = []
+                ips = []
+                while len(ips) != len(hosts):
+                    answers = []
+                    need_pods = kubeAPIInstance.list_namespaced_pod('default')
+                    try:
+                        for pod in need_pods.items:  # loop through pods - much less elegant than using a DNS service
+                            if pod.metadata.name.startswith(service + "-" + experimentUUID):
+                                if pod.status.pod_ip is not None:  # LL
+                                    answers.append(pod.status.pod_ip)
+                        ips = [str(ip) for ip in answers]
+                    except:
                         sleep(3)
-                except:
-                    sleep(3)
-            ips.sort()  # needed for deterministic behaviour
-            for i in range(len(hosts)):
-                int_ip = ip2int(ips[i])
-                hosts[i].ip = int_ip
-                hosts[i].replica_id = i
-                self.hosts_by_ip[int_ip] = hosts[i]
+                ips.sort()  # needed for deterministic behaviour
+                for i in range(len(hosts)):
+                    int_ip = ip2int(ips[i])
+                    hosts[i].ip = int_ip
+                    hosts[i].replica_id = i
+                    self.hosts_by_ip[int_ip] = hosts[i]
+
+        else:
+            if orchestrator != 'swarm':
+                print("Unrecognized orchestrator. Using default docker swarm.")
+
+            # python's built in address resolver looks in /etc/hosts first
+            # this is a problem since services with multiple replicas (same hostname)
+            # will only have ONE entry in /etc/hosts, so the other hosts will never be found...
+            # Solution: forcefully use dns queries that skip /etc/hosts (this pulls the dnspython dependency...)
+
+            # Moreover, in some scenarios the /etc/resolv.conf is broken inside the containers
+            # So to get the names to resolve properly we need to force to use dockers internal nameserver
+            # 127.0.0.11
+
+            experimentUUID = environ.get('NEED_UUID', '')
+            docker_resolver = dns.resolver.Resolver(configure=False)
+            docker_resolver.nameservers = ['127.0.0.11']
+            for service in self.services:
+                hosts = self.services[service]
+                ips = []
+                while len(ips) != len(hosts):
+                    try:
+                        answers = docker_resolver.query(service + "-" + experimentUUID, 'A')
+                        ips = [str(ip) for ip in answers]
+                        if len(ips) != len(hosts):
+                            sleep(3)
+                    except:
+                        sleep(3)
+                ips.sort()  # needed for deterministic behaviour
+                for i in range(len(hosts)):
+                    int_ip = ip2int(ips[i])
+                    hosts[i].ip = int_ip
+                    hosts[i].replica_id = i
+                    self.hosts_by_ip[int_ip] = hosts[i]
+
 
     def calculate_shortest_paths(self):
+#        start = time()
         # Dijkstra's shortest path implementation
         # Distance is number of hops
         if self.root is None:
@@ -244,16 +293,36 @@ class NetGraph:
             u = Q.pop(0)[1]  # type: NetGraph.Node
             for link in u.links:
                 alt = dist[u] + 1
-                if alt < dist[link.destination]:
-                    node = link.destination
-                    dist[node] = alt
-                    # append to the previous path
-                    path = self.paths[u].links[:]
-                    path.append(link)
-                    self.paths[node] = NetGraph.Path(path, self.path_counter)
-                    self.paths_by_id[self.path_counter] = self.paths[node]
-                    self.path_counter += 1
-                    for e in Q:  # find the node in Q and change its priority
-                        if e[1] == node:
-                            e[0] = alt
+                if link.destination in dist: # if destination is a bridge, it could have been removed
+                    if alt < dist[link.destination]:
+                        node = link.destination
+                        dist[node] = alt
+                        # append to the previous path
+                        path = self.paths[u].links[:]
+                        path.append(link)
+                        self.paths[node] = NetGraph.Path(path, self.path_counter)
+                        self.paths_by_id[self.path_counter] = self.paths[node]
+                        self.path_counter += 1
+                        for e in Q:  # find the node in Q and change its priority
+                            if e[1] == node:
+                                e[0] = alt
+#        end = time()
+#        print("shortest paths found in " + str(end - start))
 
+    def print_paths(self):
+        nice = ""
+        for node, path in self.paths.items():
+            nice += "To node " + node.name
+            if isinstance(node, NetGraph.Service):
+                nice += "_" + str(node.replica_id)
+            nice += "\n"
+            nice += path.prettyprint()
+        return "---------------------\nPaths from node " + str(self.root.name) + "_" + str(self.root.replica_id) + ":\n" + "---------------------\n" + nice + "---------------------"
+
+"""
+    def print_links(self):
+        nice = "I am a graph and these are my links:\n"
+        for link in self.links:
+            nice += "Link index " + str(link.index) + ": " + link.source.name + "--" + link.destination.name + "\n"
+        print(nice, file=sys.stdout)
+"""

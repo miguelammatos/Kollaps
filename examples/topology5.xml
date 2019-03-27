@@ -29,5 +29,6 @@
 		<schedule name="client2" time="120.0" action="crash"/>
 		<schedule name="client3" time="120.0" action="crash"/>
 		<schedule name="server"  time="120.0" action="leave" amount="3"/>
+
 	</dynamic>
 </experiment>

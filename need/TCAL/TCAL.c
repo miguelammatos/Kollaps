@@ -25,7 +25,7 @@ void init(unsigned short controllPort, int txqueuelen){
     TC_init(controllPort, txqueuelen);
 }
 
-void initDestination(unsigned int ip, int bandwidth, int latency, float jitter, float packetLoss){
+void initDestination(unsigned int ip, int bandwidth, float latency, float jitter, float packetLoss){
     Destination* dest = destination_create(ip, bandwidth, latency, jitter, packetLoss);
     dest->handle = ++handleCounter;
     HASH_ADD(hh_ip, hosts, ipv4, sizeof(int), dest);
@@ -56,7 +56,7 @@ void changeLoss(unsigned int ip, float packetLoss){
     TC_changeNetem(dest);
 }
 
-void changeLatency(unsigned int ip, int latency, float jitter){
+void changeLatency(unsigned int ip, float latency, float jitter){
     Destination* dest;
     HASH_FIND(hh_ip, hosts, &ip, sizeof(int), dest);
     dest->latency = latency;
