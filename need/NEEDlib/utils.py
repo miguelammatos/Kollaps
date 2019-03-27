@@ -13,8 +13,6 @@ SHORT_LIMIT = 65535
 DOCKER_SOCK = "/var/run/docker.sock"
 
 TOPOLOGY = "/topology.xml"
-IPS_FILE = "/ips_file.txt"
-
 
 
 class ENVIRONMENT:
@@ -22,6 +20,7 @@ class ENVIRONMENT:
     BROADCAST = 'BROADCAST_ADDRESS'
     POOL_PERIOD = 'NEED_POOL_PERIOD'
     ITERATION_COUNT = 'NEED_ITERATION_COUNT'
+
 
 class CONTAINER:
     id = None
@@ -31,15 +30,18 @@ class CONTAINER:
     container = None
     process = None
 
+
 def fail(message):
     print("An error occured, terminating!", file=sys.stderr)
     print("Error Message: " + message, file=sys.stderr)
     sys.stderr.flush()
     exit(-1)
 
+
 def error(message):
     print("ERROR: " + message, file=sys.stderr)
     sys.stderr.flush()
+
 
 def message(m):
     print(m, file=sys.stdout)
@@ -72,13 +74,13 @@ def start_experiment():
     CONTAINER.container.exec_run(['/bin/sh'] + ['-c'] + arg, detach=True)
 
 
-
 def stop_experiment():
     # kill all but pid 1 (this might create zombies)
     Popen(
         ["nsenter", "-t", str(CONTAINER.pid), "-p", "-m", "/bin/sh", "-c", "kill -2 -1"]
     ).wait()
     return
+
 
 def crash_experiment():
     # kill all but pid 1 (this might create zombies)
@@ -87,6 +89,7 @@ def crash_experiment():
     ).wait()
     return
 
+
 def setup_container(id, pid):
     CONTAINER.id = id
     CONTAINER.pid = pid
@@ -94,9 +97,35 @@ def setup_container(id, pid):
     CONTAINER.ll = docker.APIClient(base_url='unix:/' + DOCKER_SOCK)
     CONTAINER.container = CONTAINER.client.containers.get(id)
 
+
 def ip2int(addr):
     return struct.unpack("!I", socket.inet_aton(addr))[0]
+
 
 def int2ip(addr):
     return socket.inet_ntoa(struct.pack("!I", addr))
 
+
+# def get_own_ip():
+#     return str(socket.gethostbyname(socket.gethostname()))
+
+def get_own_ip(graph):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    last_ip = None
+    # Connect to at least 2 to avoid using our loopback ip
+    for int_ip in graph.hosts_by_ip:
+        s.connect((int2ip(int_ip), 1))
+        new_ip = s.getsockname()[0]
+        if new_ip == last_ip:
+            break
+        last_ip = new_ip
+    return last_ip
+
+
+# def identified_print(who, msg):
+#     print("[Py (" + who + ") " + get_own_ip() + "] " + msg, file=sys.stdout)
+#     sys.stdout.flush()
+
+def identified_print(graph, msg):
+    print("[Py (" + graph.root.name + ") " + get_own_ip(graph) + "] " + msg, file=sys.stdout)
+    sys.stdout.flush()

@@ -11,7 +11,7 @@ from signal import pause
 # from sys import argv, stdout, stderr
 from subprocess import Popen
 # from shutil import copy
-from need.NEEDlib.utils import int2ip, ip2int
+from need.NEEDlib.utils import int2ip, ip2int, fail
 
 UDP_PORT = 55555
 BUFFER_LEN = 1024
@@ -267,7 +267,7 @@ def main():
 				return
 			
 			except Exception as e:
-				print(e)
+				fail(e)
 				sys.stdout.flush()
 				sys.stderr.flush()
 				sleep(5)
@@ -286,7 +286,7 @@ def main():
 			break
 		
 		except Exception as e:
-			print(e)
+			fail(e)
 			sys.stdout.flush()
 			sys.stderr.flush()
 			sleep(5)
@@ -301,7 +301,7 @@ def main():
 		print("started aeron_media_driver.")
 	
 	except Exception as e:
-		print(e)
+		fail(e)
 		sys.stdout.flush()
 		sys.stderr.flush()
 	
@@ -322,26 +322,26 @@ def main():
 					id = container.id
 					inspect_result = lowLevelClient.inspect_container(id)
 					pid = inspect_result["State"]["Pid"]
-					print("[Py (god)] Bootstrapping dashboard " + container.name + " ...")
+					print("[Py (god)] Bootstrapping dashboard ...")
 					sys.stdout.flush()
 
 					cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
 					dashboard_instance = Popen(cmd)
 
 					instance_count += 1
-					print("[Py (god)] Done bootstrapping " + container.name)
+					print("[Py (god)] Done bootstrapping dashboard.")
 					sys.stdout.flush()
 					already_bootstrapped[container.id] = dashboard_instance
 
 					break
-
+					
 		except Exception as e:
-			print("[Py (god)] Dashboard bootstrapping failed:\n" + str(e) + "\n... will try again.")
+			fail("[Py (god)] Dashboard bootstrapping failed:\n" + str(e) + "\n... will try again.")
 			sys.stdout.flush()
 			sys.stderr.flush()
 			continue
 			
-
+			
 	while True:
 		try:
 			running = 0  # running container counter, we stop the god if there are 0 same experiment containers running

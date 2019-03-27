@@ -3,7 +3,7 @@ from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.utils import fail, message, start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT, error, int2ip
 import need.NEEDlib.PathEmulation as PathEmulation
 from need.NEEDlib.EventScheduler import EventScheduler
-from need.NEEDlib.utils import int2ip, ip2int
+from need.NEEDlib.utils import int2ip, ip2int, identified_print
 
 from threading import Thread, Lock
 from multiprocessing import Pool
@@ -73,7 +73,6 @@ class CommunicationsManager:
 		
 		self.aeron_lib = None
 		self.aeron_id = None
-		self.aeron_sub_list = None
 		self.local_ips = {}
 		self.remote_ips = {}
 
@@ -96,18 +95,21 @@ class CommunicationsManager:
 			self.aeron_id = ip2int(ip)
 			# self.aeron_id = ip2int(socket.gethostbyname(socket.gethostname()))
 			
-		self.aeron_sub_list = []
 		for service in self.graph.services:
 			hosts = self.graph.services[service]
 			for host in hosts:
 				if host != self.graph.root:
 					self.peer_count += 1
-					self.aeron_sub_list.append(host.ip)
+					
 				if host.supervisor:
 					self.supervisor_count += 1
 		self.peer_count -= self.supervisor_count
 		
-
+		
+		print("peer count " + str(self.peer_count))
+		sys.stdout.flush()
+		
+		
 		# print("\n\nroot: " + str(self.aeron_id) + " int: " + int2ip(self.aeron_id))
 		# print("list: " + str(self.aeron_sub_list))
 		# sys.stdout.flush()
@@ -180,8 +182,8 @@ class CommunicationsManager:
 
 
 	def receive_flow(self, bandwidth, link_count, link_list):
-		print("[Py] throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]))
-		sys.stdout.flush()
+		# print("[Py] (received) throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]))
+		# sys.stdout.flush()
 		self.flow_collector(bandwidth, link_list[:link_count])
 		self.received += 1
 
@@ -194,19 +196,21 @@ class CommunicationsManager:
 		
 		try:
 			with self.stop_lock:
-				self.produced += self.peer_count
-			
-			# FIXME add_flow directly in EmulationManager.py
-			for path in active_paths:
-				links = [link.index for link in path.links]
-				self.flow_adding_func(int(path.used_bandwidth), len(links), (c_uint * len(links))(*links))
+				if len(active_paths) > 0:
+					self.produced += self.peer_count
+					
+					# TODO add_flow directly in EmulationManager.py
+					for path in active_paths:
+						links = [link.index for link in path.links]
+						self.flow_adding_func(int(path.used_bandwidth), len(links), (c_uint * len(links))(*links))
+					
+					self.aeron_lib.flush()
 				
 		except Exception as e:
 			print("[Py] FAILED: " + str(e))
 			sys.stdout.flush()
 			sys.stderr.flush()
 			
-		self.aeron_lib.flush()
 		
 	
 	def shutdown(self):
@@ -231,23 +235,33 @@ class CommunicationsManager:
 
 					elif command == CommunicationsManager.SHUTDOWN_COMMAND:
 						message("Received Shutdown command")
+						
+						
+						identified_print(self.graph, "recv " + str(self.received) + ", prod " + str(self.produced))
+						
+						
 						connection.send(struct.pack("<3Q", self.produced, 50, self.received))
 						ack = connection.recv(1)
+						
 						if len(ack) != 1:
 							error("Bad ACK len:" + str(len(ack)))
 							connection.close()
 							continue
+							
 						if struct.unpack("<1B", ack)[0] != CommunicationsManager.ACK:
 							error("Bad ACK, not and ACK" + str(struct.unpack("<1B", ack)))
 							connection.close()
 							continue
+							
 						connection.close()
+						
 						with self.stop_lock:
 							# self.process_pool.terminate()
 							# self.process_pool.join()
 							self.dashboard_socket.close()
 							for s in broadcast_sockets:
 								s.close()
+								
 							# self.sock.close()
 							PathEmulation.tearDown()
 							message("Shutting down")
@@ -255,6 +269,7 @@ class CommunicationsManager:
 							sys.stderr.flush()
 							stop_experiment()
 							interrupt_main()
+							
 							return
 
 					elif command == CommunicationsManager.READY_COMMAND:

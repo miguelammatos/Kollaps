@@ -12,7 +12,7 @@ import socket
 from need.NEEDlib.GeneralCommunicator import CommunicationsManager
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
-from need.NEEDlib.utils import int2ip, ip2int
+from need.NEEDlib.utils import int2ip, ip2int, fail, message
 
 import dns.resolver
 
@@ -116,6 +116,7 @@ def stopExperiment():
             s.connect((host.ip, CommunicationsManager.TCP_PORT))
             s.send(struct.pack("<1B", CommunicationsManager.STOP_COMMAND))
             s.close()
+            
         except OSError as e:
             print(e)
             to_stop.insert(0, host)
@@ -135,6 +136,7 @@ def stopExperiment():
                 print("Got less than 24 bytes for counters.")
                 to_kill.insert(0, host)
                 continue
+                
             s.send(struct.pack("<1B", CommunicationsManager.ACK))
             s.close()
             data_tuple = struct.unpack("<3Q", data)
@@ -143,6 +145,7 @@ def stopExperiment():
             with DashboardState.lock:
                 host.status = 'Down'
                 continue
+                
         except OSError as e:
             print("timed out")
             print(e)
@@ -150,6 +153,10 @@ def stopExperiment():
             sleep(0.5)
 
     with DashboardState.lock:
+    
+        print("[Py (dashboard)] recv " + str(received) + ", prod " + str(produced))
+        sys.stdout.flush()
+        
         if produced > 0:
             DashboardState.lost_packets = 1-(received/produced)
         else:
@@ -179,6 +186,7 @@ def startExperiment():
             with DashboardState.lock:
                 host.status = 'Running'
                 continue
+                
         except OSError as e:
             print(e)
             pending_nodes.insert(0, host)
@@ -213,8 +221,10 @@ def resolve_hostnames():
                 ips = [str(ip) for ip in answers]
                 if len(ips) != len(service_instances):
                     sleep(3)
+                    
             except:
                 sleep(3)
+                
         ips.sort()  # needed for deterministic behaviour
         for i in range(len(service_instances)):
                 service_instances[i].ip = ip2int(ips[i])
@@ -245,6 +255,7 @@ def query_until_ready():
         if node.supervisor:
             continue
         pending_nodes.append(host)
+        
     while pending_nodes:
         host = pending_nodes.pop()
         try:
@@ -259,6 +270,7 @@ def query_until_ready():
             with DashboardState.lock:
                 host.status = 'Ready'
                 continue
+                
         except OSError as e:
             print(e)
             pending_nodes.insert(0, host)

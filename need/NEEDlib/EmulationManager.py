@@ -25,7 +25,7 @@ class EmulationManager:
 
 	# Generic loop tuning
 	ERROR_MARGIN = 0.01  # in percent
-	POOL_PERIOD = 0.05 # in seconds
+	POOL_PERIOD = 0.05	# in seconds
 	ITERATIONS_TO_INTEGRATE = 2
 
 	# Exponential weighted moving average tuning
@@ -75,11 +75,13 @@ class EmulationManager:
 				if sleep_time > 0.0:
 					sleep(sleep_time)
 				last_time = time()
+				
 				with self.state_lock:
 					self.active_paths.clear()
 					self.active_paths_ids.clear()
 					self.check_active_flows()
 				self.comms.broadcast_flows(self.active_paths)
+				
 			with self.state_lock:
 				self.apply_bandwidth()
 				self.flow_accumulator.clear()
