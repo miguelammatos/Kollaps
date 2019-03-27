@@ -59,7 +59,7 @@ def broadcast_ready(number_of_gods):
 		sleep(0.5)
 
 
-def resolve_ips(docker_client, low_level_client):
+def resolve_ips(client, low_level_client):
 	global gods
 	global ready_gods
 
@@ -70,15 +70,25 @@ def resolve_ips(docker_client, low_level_client):
 		
 		print_named("god", "ip: " + str(own_ip))
 		print_named("god", "number of gods: " + str(number_of_gods))
-	
-		containers = docker_client.containers.list()
-		for container in containers:
-			test_net_config = low_level_client.inspect_container(container.id)['NetworkSettings']['Networks'].get('test_overlay')
+		
+		orchestrator = os.getenv('NEED_ORCHESTRATOR', 'swarm')
+		if orchestrator == 'kubernetes':
+			need_pods = client.list_namespaced_pod('default')
+			for pod in need_pods.items:
+				local_ips_list.append(pod.status.pod_ip)
 			
-			if test_net_config is not None:
-				container_ip = test_net_config["IPAddress"]
-				if container_ip not in local_ips_list:
-					local_ips_list.append(container_ip)
+		else:
+			if orchestrator != 'swarm':
+				print_named("bootstrapper", "Unrecognized orchestrator. Using default docker swarm.")
+			
+			containers = client.containers.list()
+			for container in containers:
+				test_net_config = low_level_client.inspect_container(container.id)['NetworkSettings']['Networks'].get('test_overlay')
+				
+				if test_net_config is not None:
+					container_ip = test_net_config["IPAddress"]
+					if container_ip not in local_ips_list:
+						local_ips_list.append(container_ip)
 		
 		local_ips_list.remove(own_ip)
 
@@ -150,9 +160,8 @@ def resolve_ips(docker_client, low_level_client):
 		return gods
 	
 	except Exception as e:
-		print_error("[Py ()] " + str(e))
+		print_error("[Py (god)] " + str(e))
 		sys.stdout.flush()
-		sys.stderr.flush()
 		sys.exit(-1)
 
 
@@ -164,8 +173,8 @@ def kubernetes_bootstrapper():
 	# Connect to the local docker daemon
 	config.load_incluster_config()
 	kubeAPIInstance = client.CoreV1Api()
-	LowLevelClient = docker.APIClient(base_url='unix:/' + DOCKER_SOCK)
-	need_pods = kubeAPIInstance.list_namespaced_pod('default')
+	lowLevelClient = docker.APIClient(base_url='unix:/' + DOCKER_SOCK)
+	# need_pods = kubeAPIInstance.list_namespaced_pod('default')
 	
 	while not god_id:
 		need_pods = kubeAPIInstance.list_namespaced_pod('default')
@@ -178,6 +187,18 @@ def kubernetes_bootstrapper():
 			print(e)
 			sys.stdout.flush()
 			sleep(1)  # wait for the Kubernetes API
+
+
+	# next we start the Aeron Media Driver
+	aeron_media_driver = None
+	try:
+		aeron_media_driver = Popen('/usr/bin/Aeron/aeronmd')
+		print_named("god", "started aeron_media_driver.")
+	
+	except Exception as e:
+		print_error("[Py (bootstrapper)] failed to start aeron media driver.")
+		print_and_fail(e)
+
 	
 	# We are finally ready to proceed
 	print("Bootstrapping all local containers with label " + label)
@@ -185,6 +206,31 @@ def kubernetes_bootstrapper():
 	
 	already_bootstrapped = {}
 	instance_count = 0
+	
+	resolve_ips(kubeAPIInstance, lowLevelClient)
+	
+	need_pods = kubeAPIInstance.list_namespaced_pod('default')
+	for pod in need_pods.items:
+		try:
+			# inject the Dashboard into the dashboard container
+			for key, value in pod.metadata.labels.items():
+				if "dashboard" in value:
+					container_id = pod.status.container_statuses[0].container_id[9:]
+					container_pid = lowLevelClient.inspect_container(container_id)["State"]["Pid"]
+					
+					cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
+					dashboard_instance = Popen(cmd)
+					
+					instance_count += 1
+					print_named("god", "Done bootstrapping dashboard.")
+					already_bootstrapped[container_id] = dashboard_instance
+
+					break
+		
+		except Exception as e:
+			print_error("[Py (god)] Dashboard bootstrapping failed:\n" + str(e) + "\n... will try again.")
+			continue
+
 	
 	while True:
 		try:
@@ -203,7 +249,7 @@ def kubernetes_bootstrapper():
 						and pod.status.container_statuses[0].state.running is not None:
 					
 					try:
-						container_pid = LowLevelClient.inspect_container(container_id)["State"]["Pid"]
+						container_pid = lowLevelClient.inspect_container(container_id)["State"]["Pid"]
 						emucore_instance = Popen(
 							["nsenter", "-t", str(container_pid), "-n",
 							 "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(container_id),
@@ -231,14 +277,22 @@ def kubernetes_bootstrapper():
 					if already_bootstrapped[key].poll() is not None:
 						already_bootstrapped[key].kill()
 						already_bootstrapped[key].wait()
-				print("God terminating")
+						
+				print_named("god", "God terminating.")
+				
+				if aeron_media_driver:
+					aeron_media_driver.terminate()
+					print_named("god", "aeron_media_driver terminating.")
+					aeron_media_driver.wait()
+				
+				sys.stdout.flush()
 				return
 			
 			sleep(5)
 		
 		except Exception as e:
-			print_error(e)
 			sys.stdout.flush()
+			print_error(e)
 			sleep(1)
 
 
@@ -330,11 +384,11 @@ def docker_bootstrapper():
 	
 	
 	# we are finally ready to proceed
-	print_message("[Py (bootstrapper)] Bootstrapping all local containers with label " + label)
+	print_named("bootstrapper", "Bootstrapping all local containers with label " + label)
 	already_bootstrapped = {}
 	instance_count = 0
 	
-	ips_dict = resolve_ips(client, lowLevelClient)
+	resolve_ips(client, lowLevelClient)
 	
 	containers = client.containers.list()
 	for container in containers:
@@ -374,7 +428,9 @@ def docker_bootstrapper():
 				if label in container.labels:
 					running += 1
 		
-				if label in container.labels and container.id not in already_bootstrapped and container.status == "running":
+				if label in container.labels \
+						and container.id not in already_bootstrapped \
+						and container.status == "running":
 					# inject emucore into application containers
 					try:
 						id = container.id
@@ -383,8 +439,7 @@ def docker_bootstrapper():
 						
 						print_message("[Py (god)] Bootstrapping " + container.name + " ...")
 						
-						cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(id),
-							   str(pid)]
+						cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(id), str(pid)]
 						emucore_instance = Popen(cmd)
 						
 						instance_count += 1

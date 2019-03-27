@@ -115,4 +115,5 @@ ENV/
 
 # other
 rebuild.sh
+trace_dumps/*
 

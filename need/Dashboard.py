@@ -203,7 +203,6 @@ def resolve_hostnames():
     experimentUUID = environ.get('NEED_UUID', '')
     
     orchestrator = getenv('NEED_ORCHESTRATOR', 'swarm')
-    
     if orchestrator == 'kubernetes':
         config.load_incluster_config()
         kubeAPIInstance = client.CoreV1Api()
