@@ -496,6 +496,10 @@ class XMLGraphParser:
                             network = event.attrib['network']
 
                             scheduler.schedule_new_link(time, graph, origin, destination, latency, jitter, drop, bandwidth, network)
+                            if 'download' in event.attrib:
+                                bandwidth = event.attrib['download']
+                                scheduler.schedule_new_link(time, graph, destination, origin, latency, jitter, drop, bandwidth, network)
+
                     else:
                         fail("Unrecognized action for link: " + event.attrib['action'] + ", allowed are join and leave")
 
