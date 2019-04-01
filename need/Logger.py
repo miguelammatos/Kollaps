@@ -1,7 +1,8 @@
-from threading import Lock
+
 import time
 import json
 from os import environ
+from threading import Lock
 
 from need.NEEDlib.CommunicationsManager import CommunicationsManager
 from need.NEEDlib.NetGraph import NetGraph
@@ -27,8 +28,10 @@ def collect_flow(bandwidth, links):
         if key in LoggerState.flows:
             LoggerState.flows[key][0] += int(bandwidth/1000)
             LoggerState.flows[key][1] += 1
+            
         else:
             LoggerState.flows[key] = [int(bandwidth/1000), 1]
+            
     return True
 
 
@@ -42,8 +45,9 @@ def main():
 
     graph = NetGraph()
     XMLGraphParser(topology_file, graph).fill_graph()
-
-    LoggerState.comms = CommunicationsManager(collect_flow, graph, None)
+    
+	own_ip = socket.gethostbyname(socket.gethostname())
+    LoggerState.comms = CommunicationsManager(collect_flow, graph, None, own_ip)
 
     LoggerState.graph = graph
 
@@ -57,10 +61,12 @@ def main():
             for key in LoggerState.flows:
                 output[key] = (LoggerState.flows[key][0]/LoggerState.flows[key][1], LoggerState.flows[key][1])
             LoggerState.flows.clear()
+            
         if(len(output) > 1):
             json.dump(output, log_file)
             log_file.write("\n")
             log_file.flush()
+            
         output.clear()
         sleep_time = AVERAGE_INTERVAL - ((time.time() - starttime) % AVERAGE_INTERVAL)
         time.sleep(sleep_time)

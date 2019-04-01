@@ -28,8 +28,8 @@ RUN pacman -Sy --noconfirm \
     iptables \
     iproute2 \
     grep \
-    tcpdump
-#    procps-ng
+    tcpdump \
+    iputils
 
 
 
