@@ -18,15 +18,15 @@
 
 ######################################################################################################
 
-# sudo docker stack rm top
-# sudo docker rm $(docker ps -aq)
-# 
-# 
+docker stack rm top
+docker rm $(docker ps -aq)
+
+
 # yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries/ ~/Documents/NEED/Aeron/
 # yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/lib/ ~/Documents/NEED/Aeron/
 # yes | cp -rpf /usr/lib/libbsd.so.0.9.1  ~/Documents/NEED/Aeron/usr/lib/libbsd.so.0.9.1
 # yes | cp -rpf /usr/lib/libbsd.so.0  ~/Documents/NEED/Aeron/usr/lib/libbsd.so.0
-
+# 
 # tar -zcvf Aeron.tar.gz Aeron
 
 
@@ -35,36 +35,34 @@
 
 cd ~/Documents/NEED/
 
-pip3 wheel --no-deps . .
-sudo pip3 install --force-reinstall need-2.0-py3-none-any.whl
+pip wheel --no-deps . .
+sudo pip install --force-reinstall need-2.0-py3-none-any.whl
 
 
-sudo docker build --rm -t need:2.0 .
-# docker build --no-cache --rm -t need:2.0 .
+# docker build --rm -t need:2.0 .
+docker build --no-cache --rm -t need:2.0 .
 
-NEEDdeploymentGenerator examples/topology5.xml -k > topology5.yaml
-NEEDdeploymentGenerator examples/topology100.xml -k > topology100.yaml
-NEEDdeploymentGenerator examples/simple_dynamic.xml -k > simple_dynamic.yaml
+NEEDdeploymentGenerator examples/topology5.xml -s > topology5.yaml
+NEEDdeploymentGenerator examples/topology100.xml -s > topology100.yaml
+NEEDdeploymentGenerator examples/simple_dynamic.xml -s > simple_dynamic.yaml
 
 
-cd /home/derp/Documents/NEED_Images/samples_need_2_0/
+cd ~/Documents/NEED_Images/samples_need_2_0/
 
 cd alpineclient/
-sudo docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 .
+docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 .
 cd ..
 
 cd alpineserver/
-sudo docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 .
+docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 .
 cd ..
 
 cd logger/
-chmod 400 id_rsa.NEED
-sudo docker build --rm -t warpenguin.no-ip.org/logger:1.0 .
+docker build --rm -t warpenguin.no-ip.org/logger:1.0 .
 cd ..
 
 cd dashboard/
-chmod 400 id_rsa.NEED
-sudo docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 .
+docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 .
 cd ..
 
 

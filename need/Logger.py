@@ -1,5 +1,6 @@
 
 import time
+import socket
 import json
 from os import environ
 from threading import Lock
@@ -7,6 +8,7 @@ from threading import Lock
 from need.NEEDlib.CommunicationsManager import CommunicationsManager
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
+from need.NEEDlib.utils import print_named
 
 import sys
 if sys.version_info >= (3, 0):
@@ -46,10 +48,12 @@ def main():
     graph = NetGraph()
     XMLGraphParser(topology_file, graph).fill_graph()
     
-	own_ip = socket.gethostbyname(socket.gethostname())
+    own_ip = socket.gethostbyname(socket.gethostname())
     LoggerState.comms = CommunicationsManager(collect_flow, graph, None, own_ip)
 
     LoggerState.graph = graph
+    
+    print_named("logger", "Logger ready!")  # PG
 
     log_file = open(LOG_FILE, 'w')
 

@@ -292,7 +292,7 @@ def query_until_ready():
         if node.supervisor:
             continue
         pending_nodes.append(host)
-        
+    
     while pending_nodes:
         host = pending_nodes.pop()
         try:
@@ -307,15 +307,15 @@ def query_until_ready():
             with DashboardState.lock:
                 host.status = 'Ready'
                 continue
-                
+        
         except OSError as e:
             print_error(e)
             pending_nodes.insert(0, host)
             sleep(1)
-
+    
     with DashboardState.lock:
-        print_named("dashboard", "Dashboard: ready!")  # PG
         DashboardState.ready = True
+    print_named("dashboard", "Dashboard: ready!")  # PG
 
 
 def collect_flow(bandwidth, links):

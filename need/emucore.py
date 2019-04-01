@@ -3,7 +3,7 @@ from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.EmulationManager import EmulationManager
 from need.NEEDlib.utils import ENVIRONMENT, int2ip, ip2int, setup_container
-from need.NEEDlib.utils import print_and_fail, print_message, print_identified
+from need.NEEDlib.utils import print_and_fail, print_message, print_identified, print_named
 
 from signal import signal, SIGTERM
 import socket
@@ -33,6 +33,7 @@ def get_own_ip(graph):
 
 
 def main():
+    
     if len(sys.argv) < 4:
         print_and_fail("Missing arguments. emucore <topology> <container id>")
     else:

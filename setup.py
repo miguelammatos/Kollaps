@@ -19,6 +19,7 @@ setup(name='need',
       entry_points={
           'console_scripts': ['NEEDdeploymentGenerator=need.deploymentGenerator:main',
                               'NEEDDashboard=need.Dashboard:main',
+                              'NEEDLogger=need.Logger:main',
                               'NEEDemucore=need.emucore:main',
                               'NEEDbootstrapper=need.bootstrapper:main'],
       },

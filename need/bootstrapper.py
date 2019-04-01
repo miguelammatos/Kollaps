@@ -119,9 +119,10 @@ def resolve_ips(client, low_level_client):
 		ip_broadcast.start()
 		
 		receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		#receiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		receiver.bind(('0.0.0.0', GOD_IPS_SHARE_PORT))
-		
+		# receiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		# receiver.bind(('0.0.0.0', GOD_IPS_SHARE_PORT))
+		receiver.bind(('', GOD_IPS_SHARE_PORT))
+
 		while len(gods) < number_of_gods:
 			data, addr = receiver.recvfrom(BUFFER_LEN)
 			god_ip = int(ip2int(addr[0]))
@@ -253,7 +254,7 @@ def kubernetes_bootstrapper():
 					container_id = pod.status.container_statuses[0].container_id[9:]
 					container_pid = lowLevelClient.inspect_container(container_id)["State"]["Pid"]
 					
-					cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/NEED/need/Logger.py", TOPOLOGY]
+					cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDLogger", TOPOLOGY]
 					dashboard_instance = Popen(cmd)
 					
 					instance_count += 1
@@ -425,12 +426,15 @@ def docker_bootstrapper():
 	
 	resolve_ips(client, lowLevelClient)
 	
+	bootstrapped_dashboard = False
+	bootstrapped_logger = False
+
 	containers = client.containers.list()
 	for container in containers:
 		try:
 			# inject the Dashboard into the dashboard container
 			for key, value in container.labels.items():
-				if "dashboard" in value:
+				if not bootstrapped_dashboard and "dashboard" in value:
 					id = container.id
 					inspect_result = lowLevelClient.inspect_container(id)
 					pid = inspect_result["State"]["Pid"]
@@ -445,21 +449,24 @@ def docker_bootstrapper():
 					sys.stdout.flush()
 					already_bootstrapped[container.id] = dashboard_instance
 					
+					bootstrapped_dashboard = True
 					
-				elif "logger" in value:
+					
+				elif not bootstrapped_logger and "logger" in value:
 					id = container.id
 					inspect_result = lowLevelClient.inspect_container(id)
 					pid = inspect_result["State"]["Pid"]
 					print_named("god", "Bootstrapping logger ...")
 					sys.stdout.flush()
 					
-					cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/NEED/need/Logger.py", "-m", "need.Logger"]
+					cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDLogger", TOPOLOGY]
 					dashboard_instance = Popen(cmd)
 					
 					instance_count += 1
 					print("[Py (god)] Done bootstrapping logger.")
 					sys.stdout.flush()
 					already_bootstrapped[container.id] = dashboard_instance
+					bootstrapped_logger = True
 		
 		except Exception as e:
 			print_error("[Py (god)] supervisor bootstrapping failed:\n" + str(e) + "\n... will try again.")
