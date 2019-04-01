@@ -106,8 +106,8 @@ class EmulationManager:
 			with self.state_lock:
 				self.apply_bandwidth()
 				self.flow_accumulator.clear()
-				
-				
+	
+	
 	def apply_flow(self, flow):
 		INDICES = 0
 		BW = 1
@@ -121,7 +121,11 @@ class EmulationManager:
 				if link.index == index:
 					with link.lock:
 						rtt += (link.latency * 2)
-					# Add it to the link's flows
+						
+		# Add it to the link's flows
+		for index in link_indices:
+			for link in self.graph.links:
+				if link.index == index:
 					link.flows.append((rtt, bandwidth))
 
 
