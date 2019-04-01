@@ -254,7 +254,7 @@ def kubernetes_bootstrapper():
 					container_id = pod.status.container_statuses[0].container_id[9:]
 					container_pid = lowLevelClient.inspect_container(container_id)["State"]["Pid"]
 					
-					cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDLogger", TOPOLOGY]
+					cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDLogger", TOPOLOGY]
 					dashboard_instance = Popen(cmd)
 					
 					instance_count += 1
