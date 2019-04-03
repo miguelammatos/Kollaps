@@ -65,6 +65,9 @@ To create it run:
 docker network create --attachable --driver=overlay --subnet=10.1.0.0/24 test_overlay
 ```
 
+For the God container to work as intended, all nodes in the swarm need to be managers
+and any network from the previous command needs to be created with the --attachable flag.
+
 This example uses the overlay driver, but ipvlan/macvlan networks are also supported.
 
 Make sure to define a subnet that does not collide with other networks on your setup.

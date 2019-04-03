@@ -26,35 +26,35 @@ gods = {}
 ready_gods = {}
 
 
-def broadcast_ips(local_ips_list, number_of_gods):
+def broadcast_ips(local_ips_list):
 	global ready_gods
 	
 	sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	sender.bind(('', GOD_IPS_SHARE_PORT + 1))
 	
-	ip_prefix = socket.gethostbyname(socket.gethostname()).rsplit('.', 1)[0] + "."
-	
 	msg = ' '.join(local_ips_list)
-	
+
+	# go over the entire subnetwork
 	while True:
 		for i in range(1, 254):
-			sender.sendto(bytes(msg, encoding='utf8'), (ip_prefix + str(i), GOD_IPS_SHARE_PORT))
+			for j in range(1, 254):
+				for t in range(1, 254):
+					sender.sendto(bytes(msg, encoding='utf8'), ("10." + str(i) + "." + str(j) + "." + str(t), GOD_IPS_SHARE_PORT))
 			
 		sleep(0.5)
-		#tries += 1
+
 		
-		
-def broadcast_ready(number_of_gods):
+def broadcast_ready():
 	global ready_gods
 	
 	sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	sender.bind(('', GOD_IPS_SHARE_PORT + 2))
-	
-	ip_prefix = socket.gethostbyname(socket.gethostname()).rsplit('.', 1)[0] + "."
-	
+
 	while True:
 		for i in range(1, 254):
-			sender.sendto(bytes("READY", encoding='utf8'), (ip_prefix + str(i), GOD_IPS_SHARE_PORT))
+			for j in range(1, 254):
+				for t in range(1, 254):
+					sender.sendto(bytes("READY", encoding='utf8'), ("10." + str(i) + "." + str(j) + "." + str(t), GOD_IPS_SHARE_PORT))
 		
 		sleep(0.5)
 
@@ -64,16 +64,16 @@ def resolve_ips(client, low_level_client):
 	global ready_gods
 
 	try:
-		number_of_gods = len(low_level_client.nodes())
 		local_ips_list = []
 		own_ip = socket.gethostbyname(socket.gethostname())
-		
-		print_named("god", "ip: " + str(own_ip))
-		print_named("god", "number of gods: " + str(number_of_gods))
-		
+
 		orchestrator = os.getenv('NEED_ORCHESTRATOR', 'swarm')
 		if orchestrator == 'kubernetes':
-			
+
+			number_of_gods = len(client.list_node())  # one god per machine
+			print_named("god", "ip: " + str(own_ip) + ", #gods: " + str(number_of_gods))
+
+			# container may start without an IP, so just retry until all are set
 			while len(local_ips_list) <= 0:
 				need_pods = client.list_namespaced_pod('default')
 				for pod in need_pods.items:
@@ -81,29 +81,15 @@ def resolve_ips(client, low_level_client):
 					
 				if None in local_ips_list:
 					local_ips_list.clear()
-				
-				#if pod.status.pod_ip is None:
-					#local_ips_list.append("111.111.111.111")
-				#else:
-					#local_ips_list.append(pod.status.pod_ip)
-			#need_pods = client.list_namespaced_pod('default')
-			#tries = 100
-			#for pod in need_pods.items:
-				#while pod.status.pod_ip is None and tries > 0:
-					#sleep(1)
-					#tries -= 1
-					##print_named("god", "pod.status.pod_ip is None")
-				#local_ips_list.append(pod.status.pod_ip)
-				
-				##if pod.status.pod_ip is None:
-					##local_ips_list.append("111.111.111.111")
-				##else:
-					##local_ips_list.append(pod.status.pod_ip)
 			
 		else:
 			if orchestrator != 'swarm':
 				print_named("bootstrapper", "Unrecognized orchestrator. Using default docker swarm.")
-			
+
+			number_of_gods = len(low_level_client.nodes())  # one god per machine
+			print_named("god", "ip: " + str(own_ip) + ", #gods: " + str(number_of_gods))
+
+			# find IPs of all local containers connected to the test_overlay network
 			containers = client.containers.list()
 			for container in containers:
 				test_net_config = low_level_client.inspect_container(container.id)['NetworkSettings']['Networks'].get('test_overlay')
@@ -113,15 +99,15 @@ def resolve_ips(client, low_level_client):
 					if container_ip not in local_ips_list:
 						local_ips_list.append(container_ip)
 		
-		local_ips_list.remove(own_ip)
+		local_ips_list.remove(own_ip)  # remove self from the list of IPs
 
+		# listen for msgs from other gods
+		receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		receiver.bind(('', GOD_IPS_SHARE_PORT))
+
+		# broadcast local IPs
 		ip_broadcast = Process(target=broadcast_ips, args=(local_ips_list, number_of_gods, ))
 		ip_broadcast.start()
-		
-		receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		# receiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		# receiver.bind(('0.0.0.0', GOD_IPS_SHARE_PORT))
-		receiver.bind(('', GOD_IPS_SHARE_PORT))
 
 		while len(gods) < number_of_gods:
 			data, addr = receiver.recvfrom(BUFFER_LEN)
@@ -138,7 +124,7 @@ def resolve_ips(client, low_level_client):
 				ready_gods[god_ip] = "READY"
 				print_named("god", f"{addr[0]} :: READY")
 
-		
+		# broadcast ready msgs
 		ready_broadcast = Process(target=broadcast_ready, args=(number_of_gods,))
 		ready_broadcast.start()
 
@@ -150,16 +136,16 @@ def resolve_ips(client, low_level_client):
 			if data.startswith(b"READY"):
 				ready_gods[god_ip] = "READY"
 				print_named("god", f"{addr[0]} :: READY")
-				
 
+		# terminate all broadcasts
 		ip_broadcast.terminate()
 		ready_broadcast.terminate()
 		ip_broadcast.join()
 		ready_broadcast.join()
 		
-		
+		# write all known IPs to a file to be read from c++ lib if necessary
+		# this information is not currently being used because everyone publishes to the logs in the god containers
 		own_ip = ip2int(own_ip)
-		
 		local_god = {}
 		local_god[own_ip] = gods[own_ip]
 		with open(LOCAL_IPS_FILE, 'w') as l_file:
@@ -168,8 +154,7 @@ def resolve_ips(client, low_level_client):
 		del gods[own_ip]
 		with open(REMOTE_IPS_FILE, 'w') as r_file:
 			r_file.write(json.dumps(gods))
-		
-		
+
 		with open(LOCAL_IPS_FILE, 'r') as file:
 			new_dict = json.load(file)
 			print("\n[Py (god)] local:")
@@ -371,11 +356,8 @@ def docker_bootstrapper():
 									shm_size=4000000000,
 									remove=True,
 									environment=env,
-									# ports={"55555/udp":55555, "55556/udp":55556},
-									# volumes={DOCKER_SOCK: {'bind': DOCKER_SOCK, 'mode': 'rw'}},
 									volumes_from=[us.id],
 									# network_mode="container:"+us.id,  # share the network stack with this container
-									# network='olympus_overlay',
 									network='test_overlay',
 									labels=["god" + label],
 									detach=True)
@@ -539,8 +521,6 @@ def docker_bootstrapper():
 			continue
 
 
-
-
 if __name__ == '__main__':
 
 	if len(sys.argv) < 3:
@@ -559,41 +539,3 @@ if __name__ == '__main__':
 			print_named("bootstrapper", "Unrecognized orchestrator. Using default docker swarm.")
 		
 		docker_bootstrapper()
-
-
-
-# def start_dashboard(client, lowLevelClient, instance_count):
-# 	dashboard_bootstrapped = False
-# 	while not dashboard_bootstrapped:
-#
-# 		containers = client.containers.list()
-# 		for container in containers:
-# 			try:
-# 				# inject the Dashboard into the dashboard container
-# 				for key, value in container.labels.items():
-# 					if "dashboard" in value:
-# 						id = container.id
-# 						inspect_result = lowLevelClient.inspect_container(id)
-# 						pid = inspect_result["State"]["Pid"]
-# 						print("[Py (god)] Bootstrapping dashboard " + container.name + " ...")
-# 						sys.stdout.flush()
-#
-# 						cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
-# 						dashboard_instance = Popen(cmd)
-#
-# 						instance_count += 1
-# 						print("[Py (god)] Done bootstrapping " + container.name)
-# 						sys.stdout.flush()
-# 						already_bootstrapped[container.id] = dashboard_instance
-#
-# 						dashboard_bootstrapped = True
-# 						break
-#
-#
-# 			except Exception as e:
-# 				print("[Py (god)] Dashboard bootstrapping failed:\n" + str(e) + "\n... will try again.")
-# 				sys.stdout.flush()
-# 				sys.stderr.flush()
-# 				sleep(5)
-# 				continue
-
