@@ -153,10 +153,10 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 It also gives you a join command like this: `sudo kubeadm join <IP>:<PORT> --token <TOKEN> --discovery-token-ca-cert-hash sha256:<HASH>`. Use this on the worker nodes to join the cluster.
 
-Next (on the master again), install the Weavenet CNI plugin:
+Next (on the master again), install the Weavenet CNI plugin with a custom IP range:
 
 ```
-$kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+$kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')&env.IPALLOC_RANGE=10.2.0.0/24"
 ```
 
 If you want to run pods on the master node, un-taint it:
@@ -191,7 +191,7 @@ $kubectl apply -f topology5.yaml
 
 To access the dashboard, run `$kubectl get pods -o wide` and find the dashboard pod. Copy the IP address shown and open <IP>:8088 in your browser.
 
-To remove all components fo the experiment, run:
+To remove all components for the experiment, run:
 
 ```
 $kubectl delete -f topology5.yaml
