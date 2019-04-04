@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 ########### reset kubernetes ########################################################################
 
 
@@ -35,12 +34,12 @@ docker rm $(docker ps -aq)
 
 cd ~/Documents/NEED/
 
-pip wheel --no-deps . .
-sudo pip install --force-reinstall need-2.0-py3-none-any.whl
+pip wheel --no-deps . . && \
+sudo pip install --force-reinstall need-2.0-py3-none-any.whl && \
+docker build --rm -t need:2.0 .
+# docker build --no-cache --rm -t need:2.0 .
 
 
-# docker build --rm -t need:2.0 .
-docker build --no-cache --rm -t need:2.0 .
 
 NEEDdeploymentGenerator examples/topology5.xml -s > topology5.yaml
 NEEDdeploymentGenerator examples/topology100.xml -s > topology100.yaml
@@ -98,4 +97,5 @@ cd ..
 # docker volume rm $(docker volume ls -qf dangling=true)
 # docker volume ls -qf dangling=true | xargs -r docker volume rm
 
+# sudo pip install --ignore-installed PyYAML
 

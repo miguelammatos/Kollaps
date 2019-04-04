@@ -26,37 +26,18 @@ gods = {}
 ready_gods = {}
 
 
-def broadcast_ips(local_ips_list):
-    global ready_gods
-
-    sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sender.bind(('', GOD_IPS_SHARE_PORT + 1))
-
-    msg = ' '.join(local_ips_list)
-
-    # go over the entire subnetwork
+def broadcast_ips(sender_sock, local_ips_list):
+    msg = socket.gethostbyname(socket.gethostname()) + " " + ' '.join(local_ips_list)
     while True:
-        for i in range(1, 254):
-            for j in range(1, 254):
-                for t in range(1, 254):
-                    sender.sendto(bytes(msg, encoding='utf8'), ("10." + str(i) + "." + str(j) + "." + str(t), GOD_IPS_SHARE_PORT))
-
-        sleep(0.5)
+        sender_sock.sendto(bytes(msg, encoding='utf8'), ('255.255.255.255', GOD_IPS_SHARE_PORT))
+        sleep(1)
 
 
-def broadcast_ready():
-    global ready_gods
-
-    sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sender.bind(('', GOD_IPS_SHARE_PORT + 2))
-
+def broadcast_ready(sender_sock):
+    msg = "READY " + socket.gethostbyname(socket.gethostname())
     while True:
-        for i in range(1, 254):
-            for j in range(1, 254):
-                for t in range(1, 254):
-                    sender.sendto(bytes("READY", encoding='utf8'), ("10." + str(i) + "." + str(j) + "." + str(t), GOD_IPS_SHARE_PORT))
-
-        sleep(0.5)
+        sender_sock.sendto(bytes(msg, encoding='utf8'), ('255.255.255.255', GOD_IPS_SHARE_PORT))
+        sleep(1)
 
 
 def resolve_ips(client, low_level_client):
@@ -102,40 +83,46 @@ def resolve_ips(client, low_level_client):
         local_ips_list.remove(own_ip)  # remove self from the list of IPs
 
         # listen for msgs from other gods
-        receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        receiver.bind(('', GOD_IPS_SHARE_PORT))
+        recv_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        recv_sock.bind(('', GOD_IPS_SHARE_PORT))
+
+        # setup broadcast
+        sender_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sender_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sender_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sender_sock.setblocking(False)
 
         # broadcast local IPs
-        ip_broadcast = Process(target=broadcast_ips, args=(local_ips_list, ))
+        ip_broadcast = Process(target=broadcast_ips, args=(sender_sock, local_ips_list, ))
         ip_broadcast.start()
 
         while len(gods) < number_of_gods:
-            data, addr = receiver.recvfrom(BUFFER_LEN)
-            god_ip = int(ip2int(addr[0]))
+            data, addr = recv_sock.recvfrom(BUFFER_LEN)
+            list_of_ips = data.decode("utf-8").split()
 
-            if not data.startswith(b"READY"):
-                list_of_ips = [ip2int(ip) for ip in data.decode("utf-8").split()]
-
-                if god_ip not in gods:
-                    gods[god_ip] = list_of_ips
-                    print_named("god", f"{addr[0]} :: {data}")
+            if list_of_ips[0] == "READY":
+                ready_gods[ip2int(list_of_ips[1])] = "READY"
+                print_named("god", f"{list_of_ips[1]} :: READY")
 
             else:
-                ready_gods[god_ip] = "READY"
-                print_named("god", f"{addr[0]} :: READY")
+                if list_of_ips[0] not in gods:
+                    list_of_ips = [ip2int(ip) for ip in list_of_ips]
+                    gods[list_of_ips[0]] = list_of_ips[1:]
+                    print_named("god", f"{list_of_ips[0]} :: {list_of_ips[1:]}")
+
 
         # broadcast ready msgs
-        ready_broadcast = Process(target=broadcast_ready, args=(number_of_gods,))
+        ready_broadcast = Process(target=broadcast_ready, args=(sender_sock,))
         ready_broadcast.start()
 
         while len(ready_gods) < number_of_gods:
-            data, addr = receiver.recvfrom(BUFFER_LEN)
-            god_ip = int(ip2int(addr[0]))
+            data, addr = recv_sock.recvfrom(BUFFER_LEN)
 
-            # if data.split()[0] == "READY":
-            if data.startswith(b"READY"):
-                ready_gods[god_ip] = "READY"
-                print_named("god", f"{addr[0]} :: READY")
+            list_of_ips = data.decode("utf-8").split()
+
+            if list_of_ips[0] == "READY":
+                ready_gods[list_of_ips[1]] = "READY"
+                print_named("god", f"{list_of_ips[1]} :: READY")
 
         # terminate all broadcasts
         ip_broadcast.terminate()
@@ -170,9 +157,7 @@ def resolve_ips(client, low_level_client):
         return gods
 
     except Exception as e:
-        print_error_named("god", e)
-        sys.stdout.flush()
-        sys.exit(-1)
+        print_and_fail(e)
 
 
 def kubernetes_bootstrapper():
