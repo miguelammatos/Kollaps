@@ -24,7 +24,7 @@ class KubernetesManifestGenerator:
         print("  name: listpods")
         print("rules:")
         print("- apiGroups: [\"\"]")
-        print("  resources: [\"pods\"]")
+        print("  resources: [\"pods\", \"nodes\"]")
         print("  verbs: [\"list\"]")
         print("---")
         print("kind: ClusterRoleBinding")
