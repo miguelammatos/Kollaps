@@ -205,31 +205,36 @@ def kubernetes_bootstrapper():
     resolve_ips(kubeAPIInstance, lowLevelClient)
 
     need_pods = kubeAPIInstance.list_namespaced_pod('default')
+    local_containers = []
+    for container in lowLevelClient.containers():
+        local_containers.append(container["Id"])
     for pod in need_pods.items:
         try:
             # inject the Dashboard into the dashboard container
             for key, value in pod.metadata.labels.items():
                 if "dashboard" in value:
                     container_id = pod.status.container_statuses[0].container_id[9:]
-                    container_pid = lowLevelClient.inspect_container(container_id)["State"]["Pid"]
+                    if container_id in local_containers:
+                        container_pid = lowLevelClient.inspect_container(container_id)["State"]["Pid"]
 
-                    cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
-                    dashboard_instance = Popen(cmd)
+                        cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
+                        dashboard_instance = Popen(cmd)
 
-                    instance_count += 1
-                    print_named("god", "Done bootstrapping dashboard.")
-                    already_bootstrapped[container_id] = dashboard_instance
+                        instance_count += 1
+                        print_named("god", "Done bootstrapping dashboard.")
+                        already_bootstrapped[container_id] = dashboard_instance
 
                 if "logger" in value:
                     container_id = pod.status.container_statuses[0].container_id[9:]
-                    container_pid = lowLevelClient.inspect_container(container_id)["State"]["Pid"]
+                    if container_id in local_containers:
+                        container_pid = lowLevelClient.inspect_container(container_id)["State"]["Pid"]
 
-                    cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDLogger", TOPOLOGY]
-                    dashboard_instance = Popen(cmd)
+                        cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDLogger", TOPOLOGY]
+                        logger_instance = Popen(cmd)
 
-                    instance_count += 1
-                    print_named("god", "Done bootstrapping logger.")
-                    already_bootstrapped[container_id] = dashboard_instance
+                        instance_count += 1
+                        print_named("god", "Done bootstrapping logger.")
+                        already_bootstrapped[container_id] = logger_instance
 
                     break
 
@@ -251,6 +256,7 @@ def kubernetes_bootstrapper():
                     running += 1
 
                 if label in pod.metadata.labels \
+                        and container_id in local_containers \
                         and container_id not in already_bootstrapped \
                         and pod.status.container_statuses[0].state.running is not None:
 
