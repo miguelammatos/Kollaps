@@ -2,7 +2,6 @@
 
 ########### reset kubernetes ########################################################################
 
-
 # sudo swapoff --a && \
 # sudo kubeadm reset && \
 # sudo sysctl net.bridge.bridge-nf-call-iptables=1 && \
@@ -12,7 +11,6 @@
 # sudo chown $(id -u):$(id -g) $HOME/.kube/config && \
 # kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')" && \
 # kubectl taint nodes --all node-role.kubernetes.io/master-
-
 
 
 ######################################################################################################
@@ -29,7 +27,6 @@ docker rm $(docker ps -aq)
 # tar -zcvf Aeron.tar.gz Aeron
 
 
-
 ######################################################################################################
 
 cd ~/Documents/NEED/
@@ -40,38 +37,41 @@ docker build --rm -t need:2.0 .
 # docker build --no-cache --rm -t need:2.0 .
 
 
+######################################################################################################
+
+# cd ~/Documents/NEED_Images/samples_need_2_0/
+# 
+# cd alpineclient/
+# docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 .
+# cd ..
+# 
+# cd alpineserver/
+# docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 .
+# cd ..
+# 
+# cd logger/
+# docker build --rm -t warpenguin.no-ip.org/logger:1.0 .
+# cd ..
+# 
+# cd dashboard/
+# docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 .
+# cd ..
+
+
+######################################################################################################
+
+cd ~/Documents/NEED/
 
 NEEDdeploymentGenerator examples/topology5.xml -s > topology5.yaml
 NEEDdeploymentGenerator examples/topology100.xml -s > topology100.yaml
 NEEDdeploymentGenerator examples/simple_dynamic.xml -s > simple_dynamic.yaml
 
 
-cd ~/Documents/NEED_Images/samples_need_2_0/
+########################################################################################
 
-cd alpineclient/
-docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 .
-cd ..
-
-cd alpineserver/
-docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 .
-cd ..
-
-cd logger/
-docker build --rm -t warpenguin.no-ip.org/logger:1.0 .
-cd ..
-
-cd dashboard/
-docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 .
-cd ..
-
-
-
-# docker tag need:2.0 localhost:5000/need && \
-# docker push localhost:5000/need
-# docker tag localhost:5000/need need:2.0
-
-
-
+docker tag need:2.0 localhost:5000/need && \
+docker push localhost:5000/need
+docker tag localhost:5000/need need:2.0
 
 
 ########################################################################################

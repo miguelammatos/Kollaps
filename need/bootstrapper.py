@@ -13,9 +13,10 @@ from subprocess import Popen
 from multiprocessing import Process
 from time import sleep
 from signal import pause
+from contextlib import suppress
 # from shutil import copy
 
-from need.NEEDlib.utils import int2ip, ip2int
+from need.NEEDlib.utils import int2ip, ip2int, list_compare
 from need.NEEDlib.utils import print_message, print_error, print_and_fail, print_named, print_error_named
 from need.NEEDlib.utils import DOCKER_SOCK, TOPOLOGY, LOCAL_IPS_FILE, REMOTE_IPS_FILE, GOD_IPS_SHARE_PORT
 
@@ -27,17 +28,16 @@ ready_gods = {}
 
 
 def broadcast_ips(sender_sock, local_ips_list):
-    msg = socket.gethostbyname(socket.gethostname()) + " " + ' '.join(local_ips_list)
+    msg = ' '.join(local_ips_list)
     while True:
-        sender_sock.sendto(bytes(msg, encoding='utf8'), ('255.255.255.255', GOD_IPS_SHARE_PORT))
-        sleep(1)
-
+        sender_sock.sendto(bytes(msg, encoding='utf8'), ('<broadcast>', GOD_IPS_SHARE_PORT))
+        sleep(2)
 
 def broadcast_ready(sender_sock):
-    msg = "READY " + socket.gethostbyname(socket.gethostname())
+    msg = "READY "
     while True:
-        sender_sock.sendto(bytes(msg, encoding='utf8'), ('255.255.255.255', GOD_IPS_SHARE_PORT))
-        sleep(1)
+        sender_sock.sendto(bytes(msg, encoding='utf8'), ('<broadcast>', GOD_IPS_SHARE_PORT))
+        sleep(2)
 
 
 def resolve_ips(client, low_level_client):
@@ -80,7 +80,8 @@ def resolve_ips(client, low_level_client):
                     if container_ip not in local_ips_list:
                         local_ips_list.append(container_ip)
 
-        local_ips_list.remove(own_ip)  # remove self from the list of IPs
+        with suppress(ValueError):          # if god is not on the same network the remove will fail, so just ignore it
+            local_ips_list.remove(own_ip)   # if god is on the same network remove it from the list of IPs
 
         # listen for msgs from other gods
         recv_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -88,6 +89,7 @@ def resolve_ips(client, low_level_client):
 
         # setup broadcast
         sender_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sender_sock.bind(('', GOD_IPS_SHARE_PORT+1))
         sender_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         sender_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sender_sock.setblocking(False)
@@ -99,17 +101,18 @@ def resolve_ips(client, low_level_client):
         while len(gods) < number_of_gods:
             data, addr = recv_sock.recvfrom(BUFFER_LEN)
             list_of_ips = data.decode("utf-8").split()
+            
+            # print_named("god", f"{list_of_ips[0]} :: {list_of_ips[1:]}")
+            print_named("god1", f"{addr[0]} :: {list_of_ips}")
 
             if list_of_ips[0] == "READY":
-                ready_gods[ip2int(list_of_ips[1])] = "READY"
-                print_named("god", f"{list_of_ips[1]} :: READY")
-
+                ready_gods[ip2int(addr[0])] = "READY"
+                
             else:
-                if list_of_ips[0] not in gods:
+                if ip2int(addr[0]) not in gods:
                     list_of_ips = [ip2int(ip) for ip in list_of_ips]
-                    gods[list_of_ips[0]] = list_of_ips[1:]
-                    print_named("god", f"{list_of_ips[0]} :: {list_of_ips[1:]}")
-
+                    gods[ip2int(addr[0])] = list_of_ips
+                    
 
         # broadcast ready msgs
         ready_broadcast = Process(target=broadcast_ready, args=(sender_sock,))
@@ -117,22 +120,34 @@ def resolve_ips(client, low_level_client):
 
         while len(ready_gods) < number_of_gods:
             data, addr = recv_sock.recvfrom(BUFFER_LEN)
-
             list_of_ips = data.decode("utf-8").split()
 
+            print_named("god2", f"{addr[0]} :: {list_of_ips}")
+
             if list_of_ips[0] == "READY":
-                ready_gods[list_of_ips[1]] = "READY"
-                print_named("god", f"{list_of_ips[1]} :: READY")
+                ready_gods[ip2int(addr[0])] = "READY"
 
         # terminate all broadcasts
         ip_broadcast.terminate()
         ready_broadcast.terminate()
         ip_broadcast.join()
         ready_broadcast.join()
-
+        
+        # find owr own IP by matching the local IPs
+        list_of_ips = [ip2int(ip) for ip in local_ips_list]
+        for key, value in gods.items():
+            if list_compare(list_of_ips, value) == 0:
+                own_ip = key
+                break
+                
+            # shorter_len = len(value) if len(value) < len(local_ips_list) else len(local_ips_list)
+            # for i in range(shorter_len):
+            #     if value[i] != local_ips_list[i]:
+            #         break   # lists are different
+        
         # write all known IPs to a file to be read from c++ lib if necessary
         # this information is not currently being used because everyone publishes to the logs in the god containers
-        own_ip = ip2int(own_ip)
+        # own_ip = ip2int(own_ip)
         local_god = {}
         local_god[own_ip] = gods[own_ip]
         with open(LOCAL_IPS_FILE, 'w') as l_file:
@@ -191,13 +206,12 @@ def kubernetes_bootstrapper():
         print_named("god", "started aeron_media_driver.")
 
     except Exception as e:
-        print_error_named("bootstrapper", "failed to start aeron media driver.")
+        print_error_named("god", "failed to start aeron media driver.")
         print_and_fail(e)
 
 
     # We are finally ready to proceed
-    print("Bootstrapping all local containers with label " + label)
-    sys.stdout.flush()
+    print_named("god", "Bootstrapping all local containers with label " + label)
 
     already_bootstrapped = {}
     instance_count = 0
@@ -273,7 +287,6 @@ def kubernetes_bootstrapper():
                     except Exception as e:
                         print_error_named("god", "Bootstrapping failed:\n" + str(e) + "\n... will try again.")
                         sys.stdout.flush()
-                        sys.stderr.flush()
 
                 # Check for bootstrapper termination
                 if container_id == god_id and pod.status.container_statuses[0].state.running is not None:
@@ -344,12 +357,13 @@ def docker_bootstrapper():
                                     command=["-g", label, str(us.id)],
                                     privileged=True,
                                     pid_mode="host",
+                                    network="host",
                                     shm_size=4000000000,
                                     remove=True,
                                     environment=env,
                                     volumes_from=[us.id],
                                     # network_mode="container:"+us.id,  # share the network stack with this container
-                                    network='test_overlay',
+                                    # network='test_overlay',
                                     labels=["god" + label],
                                     detach=True)
                                     # stderr=True,
@@ -388,12 +402,12 @@ def docker_bootstrapper():
         print_named("god", "started aeron_media_driver.")
 
     except Exception as e:
-        print_error("[Py (bootstrapper)] failed to start aeron media driver.")
+        print_error("[Py (god)] failed to start aeron media driver.")
         print_and_fail(e)
 
 
     # we are finally ready to proceed
-    print_named("bootstrapper", "Bootstrapping all local containers with label " + label)
+    print_named("god", "Bootstrapping all local containers with label " + label)
     already_bootstrapped = {}
     instance_count = 0
 

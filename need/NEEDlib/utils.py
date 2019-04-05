@@ -98,8 +98,9 @@ def int2ip(addr):
 	return socket.inet_ntoa(struct.pack("!I", addr))
 
 
-# def get_own_ip():
-#     return str(socket.gethostbyname(socket.gethostname()))
+def list_compare(list1, list2):
+	return (list1 > list2) - (list1 < list2)
+
 
 def get_own_ip(graph):
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
