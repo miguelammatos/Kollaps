@@ -346,7 +346,6 @@ def kubernetes_bootstrapper():
 
 
 def docker_bootstrapper():
-
     mode = sys.argv[1]
     label = sys.argv[2]
 
@@ -436,53 +435,6 @@ def docker_bootstrapper():
 
     resolve_ips(client, lowLevelClient)
 
-    bootstrapped_dashboard = False
-    bootstrapped_logger = False
-
-    containers = client.containers.list()
-    for container in containers:
-        try:
-            # inject the Dashboard into the dashboard container
-            for key, value in container.labels.items():
-                if not bootstrapped_dashboard and "dashboard" in value:
-                    id = container.id
-                    inspect_result = lowLevelClient.inspect_container(id)
-                    pid = inspect_result["State"]["Pid"]
-                    print("[Py (god)] Bootstrapping dashboard ...")
-                    sys.stdout.flush()
-
-                    cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard", TOPOLOGY]
-                    dashboard_instance = Popen(cmd)
-
-                    instance_count += 1
-                    print("[Py (god)] Done bootstrapping dashboard.")
-                    sys.stdout.flush()
-                    already_bootstrapped[container.id] = dashboard_instance
-
-                    bootstrapped_dashboard = True
-
-
-                elif not bootstrapped_logger and "logger" in value:
-                    id = container.id
-                    inspect_result = lowLevelClient.inspect_container(id)
-                    pid = inspect_result["State"]["Pid"]
-                    print_named("god", "Bootstrapping logger ...")
-                    sys.stdout.flush()
-
-                    cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDLogger", TOPOLOGY]
-                    dashboard_instance = Popen(cmd)
-
-                    instance_count += 1
-                    print("[Py (god)] Done bootstrapping logger.")
-                    sys.stdout.flush()
-                    already_bootstrapped[container.id] = dashboard_instance
-                    bootstrapped_logger = True
-
-        except Exception as e:
-            print_error("[Py (god)] supervisor bootstrapping failed:\n" + str(e) + "\n... will try again.")
-            continue
-
-
     while True:
         try:
             running = 0  # running container counter, we stop the god if there are 0 same experiment containers running
@@ -491,29 +443,76 @@ def docker_bootstrapper():
             containers = client.containers.list()
             for container in containers:
 
+
                 if label in container.labels:
                     running += 1
 
-                if label in container.labels \
-                        and container.id not in already_bootstrapped \
-                        and container.status == "running":
-                    # inject emucore into application containers
+                if container.id not in already_bootstrapped and container.status == "running":
+
                     try:
-                        id = container.id
-                        inspect_result = lowLevelClient.inspect_container(id)
-                        pid = inspect_result["State"]["Pid"]
+                        # inject the Dashboard into the dashboard container
+                        if "dashboard" in container.labels['com.docker.swarm.service.name']:
+                            try:
+                                id = container.id
+                                inspect_result = lowLevelClient.inspect_container(id)
+                                pid = inspect_result["State"]["Pid"]
 
-                        print_message("[Py (god)] Bootstrapping " + container.name + " ...")
+                                cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard",
+                                       TOPOLOGY]
+                                dashboard_instance = Popen(cmd)
 
-                        cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore", TOPOLOGY, str(id), str(pid)]
-                        emucore_instance = Popen(cmd)
+                                instance_count += 1
+                                print_named("god", "Dashboard bootstrapped.")
+                                already_bootstrapped[container.id] = dashboard_instance
 
-                        instance_count += 1
-                        print_message("[Py (god)] Done bootstrapping " + container.name)
-                        already_bootstrapped[container.id] = emucore_instance
+                                continue
+
+                            except:
+                                print_error_named("god", "! failed to bootstrap dashboard.")
+
+                        # inject the Logger into the logger container
+                        elif "logger" in container.labels['com.docker.swarm.service.name']:
+                            try:
+                                id = container.id
+                                inspect_result = lowLevelClient.inspect_container(id)
+                                pid = inspect_result["State"]["Pid"]
+
+                                cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDLogger",
+                                       TOPOLOGY]
+                                dashboard_instance = Popen(cmd)
+
+                                instance_count += 1
+                                print("[Py (god)] Logger bootstrapped.")
+                                sys.stdout.flush()
+                                already_bootstrapped[container.id] = dashboard_instance
+
+                                continue
+
+                            except:
+                                print_error_named("god", "! failed to bootstrap dashboard.")
+
+                        # if not a supervisor container, inject emucore into application containers
+                        elif label in container.labels:
+                            try:
+                                id = container.id
+                                inspect_result = lowLevelClient.inspect_container(id)
+                                pid = inspect_result["State"]["Pid"]
+
+                                print_named("god", "Bootstrapping " + container.name + " ...")
+
+                                cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore",
+                                       TOPOLOGY, str(id), str(pid)]
+                                emucore_instance = Popen(cmd)
+
+                                instance_count += 1
+                                print_named("god", "Done bootstrapping " + container.name)
+                                already_bootstrapped[container.id] = emucore_instance
+
+                            except:
+                                print_error_named("god", "! App conatiner bootstrapping failed... will try again.")
 
                     except:
-                        print_error("[Py (god)] Bootstrapping failed... will try again.")
+                        pass
 
                 # Check for bootstrapper termination
                 if container.id == bootstrapper_id and container.status == "running":

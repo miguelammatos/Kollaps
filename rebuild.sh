@@ -39,23 +39,23 @@ docker build --rm -t need:2.0 .
 
 ######################################################################################################
 
-# cd ~/Documents/NEED_Images/samples_need_2_0/
-# 
-# cd alpineclient/
-# docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 .
-# cd ..
-# 
-# cd alpineserver/
-# docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 .
-# cd ..
-# 
-# cd logger/
-# docker build --rm -t warpenguin.no-ip.org/logger:1.0 .
-# cd ..
-# 
-# cd dashboard/
-# docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 .
-# cd ..
+cd ~/Documents/NEED_Images/samples_need_2_0/
+
+cd alpineclient/
+docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 .
+cd ..
+
+cd alpineserver/
+docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 .
+cd ..
+
+cd logger/
+docker build --rm -t warpenguin.no-ip.org/logger:1.0 .
+cd ..
+
+cd dashboard/
+docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 .
+cd ..
 
 
 ######################################################################################################
@@ -69,9 +69,9 @@ NEEDdeploymentGenerator examples/simple_dynamic.xml -s > simple_dynamic.yaml
 
 ########################################################################################
 
-docker tag need:2.0 localhost:5000/need && \
-docker push localhost:5000/need
-docker tag localhost:5000/need need:2.0
+#docker tag need:2.0 localhost:5000/need && \
+#docker push localhost:5000/need
+#docker tag localhost:5000/need need:2.0
 
 
 ########################################################################################
