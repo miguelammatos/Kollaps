@@ -5,6 +5,7 @@ from need.NEEDlib.NetGraph import NetGraph
 
 from threading import Timer
 from copy import copy
+from time import time
 
 import sys
 if sys.version_info >= (3, 0):
@@ -298,6 +299,7 @@ def link_change(links, new_links, paths, new_paths):
             '''
 
 def path_change(graph, new_graph):
+    start = time()
     #As it is currently, it does not work if we just set graph = new_graph.
     #Therefore, we copy all the relevant attributes over.
     #services and hosts_by_ip never change, so we don't copy these at the moment.
@@ -339,3 +341,6 @@ def path_change(graph, new_graph):
             change_loss(service, 1.0)
     for service in to_remove:
         del graph.paths[service]
+
+    end = time()
+    print("recalculated in " + str(end - start))

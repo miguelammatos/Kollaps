@@ -9,6 +9,7 @@ import sys
 import socket
 import json, pprint
 
+import netifaces as ni
 from subprocess import Popen
 from multiprocessing import Process
 from time import sleep
@@ -46,19 +47,33 @@ def resolve_ips(client, low_level_client):
 
     try:
         local_ips_list = []
-        own_ip = socket.gethostbyname(socket.gethostname())
+        own_ips = []# = socket.gethostbyname(socket.gethostname())
+        try:
+            for iface in ni.interfaces():
+                own_ips.append(ni.ifaddresses(iface)[ni.AF_INET][0]['addr'])
+        except Exception as e:
+            pass
+
+        node_ips = []
+        for node in client.list_node().items:
+            for address in node.status.addresses:
+                if address.type == "InternalIP":
+                    node_ips.append(address.address)
+
+        own_ip = [IP for IP in own_ips if IP in node_ips][0]
 
         orchestrator = os.getenv('NEED_ORCHESTRATOR', 'swarm')
         if orchestrator == 'kubernetes':
 
             number_of_gods = len(client.list_node().to_dict()["items"])  # one god per machine
-            print_named("god", "ip: " + str(own_ip) + ", #gods: " + str(number_of_gods))
+            print_named("god", "ip: " + str(own_ip) + ", nr. of gods: " + str(number_of_gods))
 
             # container may start without an IP, so just retry until all are set
             while len(local_ips_list) <= 0:
                 need_pods = client.list_namespaced_pod('default')
                 for pod in need_pods.items:
-                    local_ips_list.append(pod.status.pod_ip)
+                    if pod.status.host_ip == own_ip:
+                        local_ips_list.append(pod.status.pod_ip)
 
                 if None in local_ips_list:
                     local_ips_list.clear()
@@ -101,18 +116,18 @@ def resolve_ips(client, low_level_client):
         while len(gods) < number_of_gods:
             data, addr = recv_sock.recvfrom(BUFFER_LEN)
             list_of_ips = data.decode("utf-8").split()
-            
+
             # print_named("god", f"{list_of_ips[0]} :: {list_of_ips[1:]}")
             print_named("god1", f"{addr[0]} :: {list_of_ips}")
 
             if list_of_ips[0] == "READY":
                 ready_gods[ip2int(addr[0])] = "READY"
-                
+
             else:
                 if ip2int(addr[0]) not in gods:
                     list_of_ips = [ip2int(ip) for ip in list_of_ips]
                     gods[ip2int(addr[0])] = list_of_ips
-                    
+
 
         # broadcast ready msgs
         ready_broadcast = Process(target=broadcast_ready, args=(sender_sock,))
@@ -132,19 +147,19 @@ def resolve_ips(client, low_level_client):
         ready_broadcast.terminate()
         ip_broadcast.join()
         ready_broadcast.join()
-        
+
         # find owr own IP by matching the local IPs
         list_of_ips = [ip2int(ip) for ip in local_ips_list]
         for key, value in gods.items():
             if list_compare(list_of_ips, value) == 0:
                 own_ip = key
                 break
-                
+
             # shorter_len = len(value) if len(value) < len(local_ips_list) else len(local_ips_list)
             # for i in range(shorter_len):
             #     if value[i] != local_ips_list[i]:
             #         break   # lists are different
-        
+
         # write all known IPs to a file to be read from c++ lib if necessary
         # this information is not currently being used because everyone publishes to the logs in the god containers
         # own_ip = ip2int(own_ip)
