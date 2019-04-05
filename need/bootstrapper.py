@@ -46,21 +46,29 @@ def resolve_ips(client, low_level_client):
     global ready_gods
 
     try:
-        local_ips_list = []
-        own_ips = []# = socket.gethostbyname(socket.gethostname())
-        try:
-            for iface in ni.interfaces():
-                own_ips.append(ni.ifaddresses(iface)[ni.AF_INET][0]['addr'])
-        except Exception as e:
-            pass
+        #labouriously collect our IP as seen by the pods
+        own_ip = None
+        while own_ip is None:
+            node_ips = []
+            for node in client.list_node().items:
+                for address in node.status.addresses:
+                    if address.type == "InternalIP":
+                        node_ips.append(address.address)
+            if len(node_ips) == 1:
+                own_ip = node_ips[0]
+                break
 
-        node_ips = []
-        for node in client.list_node().items:
-            for address in node.status.addresses:
-                if address.type == "InternalIP":
-                    node_ips.append(address.address)
+            local_ips_list = []
+            own_ips = []# own_ip = socket.gethostbyname(socket.gethostname())
+            try:
+                for iface in ni.interfaces():
+                    own_ips.append(ni.ifaddresses(iface)[ni.AF_INET][0]['addr'])
+            except Exception as e:
+                pass
 
-        own_ip = [IP for IP in own_ips if IP in node_ips][0]
+            intersection = [IP for IP in own_ips if IP in node_ips]
+            if not len(intersection) == 0:
+                own_ip = intersection[0]
 
         orchestrator = os.getenv('NEED_ORCHESTRATOR', 'swarm')
         if orchestrator == 'kubernetes':
