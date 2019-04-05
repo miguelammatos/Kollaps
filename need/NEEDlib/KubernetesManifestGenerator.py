@@ -90,6 +90,7 @@ class KubernetesManifestGenerator:
         print("        configMap:")
         print("          name: topology")
         print("          defaultMode: 440")
+        print("      hostNetwork: true")
 
     def print_service(self, service_list):
         if not service_list[0].supervisor:
