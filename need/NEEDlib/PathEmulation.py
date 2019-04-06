@@ -52,7 +52,7 @@ def disablePath(service):
     """
     with PEState.PathLock:
         if not PEState.shutdown and PEState.TCAL:
-            PEState.TCAL.initDestination(service.ip, 10000, 1, c_float(0), c_float(1))
+            PEState.TCAL.initDestination(service.ip, 10000, c_float(1), c_float(0), c_float(1))
 
 
 def update_usage():
