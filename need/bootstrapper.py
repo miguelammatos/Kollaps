@@ -47,9 +47,7 @@ def resolve_ips(client, low_level_client):
 
 	try:
 		local_ips_list = []
-				
-		#PG, I left the code here but this is no longer necessary here
-		#it is easier to get our IP from the broadcast later
+		
 		#labouriously collect our IP as seen by the pods
 		own_ip = None
 		while own_ip is None:
@@ -76,9 +74,6 @@ def resolve_ips(client, low_level_client):
 				
 		orchestrator = os.getenv('NEED_ORCHESTRATOR', 'swarm')
 		if orchestrator == 'kubernetes':
-			
-			#PG, I think it is better to do something similar to the bootstrapping loop
-			#I think it is faster and is one less dependency
 			number_of_gods = len(client.list_node().to_dict()["items"])  # one god per machine
 			print_named("god", "ip: " + str(own_ip) + ", nr. of gods: " + str(number_of_gods))
 
