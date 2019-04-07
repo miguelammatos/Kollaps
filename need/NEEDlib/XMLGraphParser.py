@@ -1,9 +1,9 @@
+
 import xml.etree.ElementTree as ET
 from random import choice, randint, seed, randrange
 from string import ascii_letters
 
-
-from need.NEEDlib.utils import fail, message
+from need.NEEDlib.utils import print_and_fail, print_message
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.EventScheduler import EventScheduler
 
@@ -20,11 +20,11 @@ class XMLGraphParser:
     def parse_services(self, experiment, services):
         for service in services:
             if service.tag != 'service':
-                fail('Invalid tag inside <services>: ' + service.tag)
+                print_and_fail('Invalid tag inside <services>: ' + service.tag)
             if 'name' not in service.attrib or 'image' not in service.attrib:
-                fail('A service needs a name and an image attribute.')
+                print_and_fail('A service needs a name and an image attribute.')
             if not service.attrib['name'] or not service.attrib['image']:
-                fail('A service needs a name and an image attribute.')
+                print_and_fail('A service needs a name and an image attribute.')
 
 
             command = None
@@ -51,7 +51,7 @@ class XMLGraphParser:
                 try:
                     replicas = int(service.attrib['replicas'])
                 except:
-                    fail('replicas attribute must be a valid integer.')
+                    print_and_fail('replicas attribute must be a valid integer.')
             replicas = self.calulate_required_replicas(service.attrib['name'], replicas, experiment, reuse)
 
             for i in range(replicas):
@@ -65,11 +65,11 @@ class XMLGraphParser:
     def parse_bridges(self, root):
         for bridge in root:
             if bridge.tag != 'bridge':
-                fail('Invalid tag inside <bridges>: ' + bridge.tag)
+                print_and_fail('Invalid tag inside <bridges>: ' + bridge.tag)
             if 'name' not in bridge.attrib:
-                fail('A bridge needs to have a name.')
+                print_and_fail('A bridge needs to have a name.')
             if not bridge.attrib['name']:
-                fail('A bridge needs to have a name.')
+                print_and_fail('A bridge needs to have a name.')
             self.graph.new_bridge(bridge.attrib['name'])
 
     def create_meta_bridge(self):
@@ -83,10 +83,10 @@ class XMLGraphParser:
     def parse_links(self, root):
         for link in root:
             if link.tag != 'link':
-                fail('Invalid tag inside <links>: ' + link.tag)
+                print_and_fail('Invalid tag inside <links>: ' + link.tag)
             if 'origin' not in link.attrib or 'dest' not in link.attrib or 'latency' not in link.attrib or \
                     'upload' not in link.attrib or 'network' not in link.attrib:
-                fail("Incomplete link description.")
+                print_and_fail("Incomplete link description.")
 
             source_nodes = self.graph.get_nodes(link.attrib['origin'])
             destination_nodes = self.graph.get_nodes(link.attrib['dest'])
@@ -164,7 +164,7 @@ class XMLGraphParser:
         for child in root:
             if child.tag == 'dynamic':
                 if dynamic is not None:
-                    fail("Only one <dynamic> block is allowed.")
+                    print_and_fail("Only one <dynamic> block is allowed.")
                 dynamic = child
 
         if dynamic is None:
@@ -187,7 +187,7 @@ class XMLGraphParser:
 
         for event in dynamic:
             if event.tag != 'schedule':
-                fail("Only <schedule> is allowed inside <dynamic>")
+                print_and_fail("Only <schedule> is allowed inside <dynamic>")
             if 'name' in event.attrib and 'time' in event.attrib and 'action' in event.attrib:
                 # parse name of service
                 if event.attrib['name'] != service:
@@ -198,9 +198,9 @@ class XMLGraphParser:
                 try:
                     time = float(event.attrib['time'])
                     if time < 0.0:
-                        fail("time attribute must be a positive number")
+                        print_and_fail("time attribute must be a positive number")
                 except ValueError as e:
-                    fail("time attribute must be a valid real number")
+                    print_and_fail("time attribute must be a valid real number")
 
                 # parse amount
                 amount = 1
@@ -208,9 +208,9 @@ class XMLGraphParser:
                    try:
                        amount = int(event.attrib['amount'])
                        if amount < 1:
-                           fail("amount attribute must be an integer >= 1")
+                           print_and_fail("amount attribute must be an integer >= 1")
                    except ValueError as e:
-                       fail("amount attribute must be an integer >= 1")
+                       print_and_fail("amount attribute must be an integer >= 1")
 
                 # parse action
                 if event.attrib['action'] == 'join':
@@ -244,15 +244,15 @@ class XMLGraphParser:
             elif event[TYPE] == DISCONNECT:
                 disconnected += event[AMMOUNT]
                 if event[AMMOUNT] > current_replicas:
-                    fail("Dynamic section for " + service + " disconnects more replicas than are joined at second "
+                    print_and_fail("Dynamic section for " + service + " disconnects more replicas than are joined at second "
                          + str(event[TIME]))
             elif event[TYPE] == RECONNECT:
                 disconnected -= event[AMMOUNT]
                 if event[AMMOUNT] > disconnected:
-                    fail("Dynamic section for " + service + " reconnects more replicas than are disconnected at second "
+                    print_and_fail("Dynamic section for " + service + " reconnects more replicas than are disconnected at second "
                          + str(event[TIME]))
             if current_replicas < 0:
-                fail("Dynamic section for " + service + " causes a negative number of replicas at second " + str(event[TIME]))
+                print_and_fail("Dynamic section for " + service + " causes a negative number of replicas at second " + str(event[TIME]))
             if current_replicas > max_replicas:
                 max_replicas = current_replicas
 
@@ -261,14 +261,15 @@ class XMLGraphParser:
         else:
             return cummulative_replicas
 
+
     def fill_graph(self):
         XMLtree = ET.parse(self.file)
         root = XMLtree.getroot()
         if root.tag != 'experiment':
-            fail('Not a valid NEED topology file, root is not <experiment>')
+            print_and_fail('Not a valid NEED topology file, root is not <experiment>')
 
         if 'boot' not in root.attrib:
-            fail('<experiment boot="?"> The experiment needs a valid boostrapper image name')
+            print_and_fail('<experiment boot="?"> The experiment needs a valid boostrapper image name')
 
         self.graph.bootstrapper = root.attrib['boot']
         services = None
@@ -277,33 +278,34 @@ class XMLGraphParser:
         for child in root:
             if child.tag == 'services':
                 if services is not None:
-                    fail("Only one <services> block is allowed.")
+                    print_and_fail("Only one <services> block is allowed.")
                 services = child
             elif child.tag == 'bridges':
                 if bridges is not None:
-                    fail("Only one <bridges> block is allowed.")
+                    print_and_fail("Only one <bridges> block is allowed.")
                 bridges = child
             elif child.tag == 'links':
                 if links is not None:
-                    fail("Only one <links> block is allowed.")
+                    print_and_fail("Only one <links> block is allowed.")
                 links = child
             elif child.tag == 'dynamic':
                 pass
             else:
-                fail('Unknown tag: ' + child.tag)
+                print_and_fail('Unknown tag: ' + child.tag)
 
         # Links must be parsed last
         if services is None:
-            fail("No services declared in topology description")
+            print_and_fail("No services declared in topology description")
         self.parse_services(root, services)
         if bridges is not None:
             self.parse_bridges(bridges)
         if links is None:
-            fail("No links declared in topology descritpion")
+            print_and_fail("No links declared in topology descritpion")
         self.parse_links(links)
 
         for service in self.supervisors:
             self.graph.set_supervisor(service)
+
 
     def parse_schedule(self, service, graph):
         """
@@ -313,14 +315,14 @@ class XMLGraphParser:
         XMLtree = ET.parse(self.file)
         root = XMLtree.getroot()
         if root.tag != 'experiment':
-            fail('Not a valid NEED topology file, root is not <experiment>')
+            print_and_fail('Not a valid NEED topology file, root is not <experiment>')
 
         dynamic = None
 
         for child in root:
             if child.tag == 'dynamic':
                 if dynamic is not None:
-                    fail("Only one <dynamic> block is allowed.")
+                    print_and_fail("Only one <dynamic> block is allowed.")
                 dynamic = child
 
         scheduler = EventScheduler()
@@ -345,16 +347,16 @@ class XMLGraphParser:
         # there is a dynamic block, so check if there is anything scheduled for us
         for event in dynamic:
             if event.tag != 'schedule':
-                fail("Only <schedule> is allowed inside <dynamic>")
+                print_and_fail("Only <schedule> is allowed inside <dynamic>")
 
             # parse time of event
             time = 0.0
             try:
                 time = float(event.attrib['time'])
                 if time < 0.0:
-                    fail("time attribute must be a positive number")
+                    print_and_fail("time attribute must be a positive number")
             except ValueError as e:
-                fail("time attribute must be a valid real number")
+                print_and_fail("time attribute must be a valid real number")
 
             if 'name' in event.attrib and 'time' in event.attrib and 'action' in event.attrib:
                 node_name = event.attrib['name']
@@ -399,7 +401,7 @@ class XMLGraphParser:
                         # if its us, schedule the action
                         if service.replica_id == id:
                             scheduler.schedule_join(time)
-                            message(service.name + " replica " + str(service.replica_id) + " scheduled to join at " + str(time))
+                            print_message(service.name + " replica " + str(service.replica_id) + " scheduled to join at " + str(time))
                         if first_join < 0.0:
                             first_join = time
 
@@ -419,11 +421,11 @@ class XMLGraphParser:
                         if service.replica_id == id:
                             if event.attrib['action'] == 'leave':
                                 scheduler.schedule_leave(time)
-                                message(service.name + " replica " + str(service.replica_id) +
+                                print_message(service.name + " replica " + str(service.replica_id) +
                                         " scheduled to leave at " + str(time))
                             elif event.attrib['action'] == 'crash':
                                 scheduler.schedule_crash(time)
-                                message(service.name + " replica " + str(service.replica_id) +
+                                print_message(service.name + " replica " + str(service.replica_id) +
                                         " scheduled to crash at " + str(time))
                         if first_leave > time:
                             first_leave = time
@@ -442,7 +444,7 @@ class XMLGraphParser:
 
                         # if its us, schedule the action
                         if service.replica_id == id:
-                            message(service.name + " replica " + str(service.replica_id) +
+                            print_message(service.name + " replica " + str(service.replica_id) +
                                     " scheduled to reconnect at " + str(time))
                             scheduler.schedule_reconnect(time)
 
@@ -460,11 +462,11 @@ class XMLGraphParser:
 
                         # if its us, schedule the action
                         if service.replica_id == id:
-                            message(service.name + " replica " + str(service.replica_id) +
+                            print_message(service.name + " replica " + str(service.replica_id) +
                                     " scheduled to disconnect at " + str(time))
                             scheduler.schedule_disconnect(time)
                 else:
-                    fail("Unrecognized action: " + event.attrib['action'] +
+                    print_and_fail("Unrecognized action: " + event.attrib['action'] +
                          " , allowed actions are join, leave, crash, disconnect, reconnect")
 
             #Do something dynamically with a link
@@ -483,7 +485,7 @@ class XMLGraphParser:
                             scheduler.schedule_link_join(time, graph, origin, destination)
                         #A completely new link with defined properties joins
                         elif not 'upload' in event.attrib and not 'latency' in event.attrib and not 'network' in event.attrib:
-                            fail("Link description incomplete. For a new link, you must provide at least latency, upload, and network attributes.")
+                            print_and_fail("Link description incomplete. For a new link, you must provide at least latency, upload, and network attributes.")
                         else:
                             bandwidth = event.attrib['upload']
                             latency = float(event.attrib['latency'])
@@ -501,7 +503,7 @@ class XMLGraphParser:
                                 scheduler.schedule_new_link(time, graph, destination, origin, latency, jitter, drop, bandwidth, network)
 
                     else:
-                        fail("Unrecognized action for link: " + event.attrib['action'] + ", allowed are join and leave")
+                        print_and_fail("Unrecognized action for link: " + event.attrib['action'] + ", allowed are join and leave")
 
                 else: #properties of link are changing
                     bandwidth = -1
@@ -520,15 +522,15 @@ class XMLGraphParser:
                     scheduler.schedule_link_change(time, graph, origin, destination, bandwidth, latency, jitter, drop)
 
             else:
-                fail(
+                print_and_fail(
                     '<schedule> must have either name, time and action attributes,' +
                     ' or link origin dest and properties attributes')
 
         # deal with auto join
         if first_join < 0.0:
-            message(service.name + " scheduled to join at " + str(0.0))
+            print_message(service.name + " scheduled to join at " + str(0.0))
             scheduler.schedule_join(0.0)
         if first_leave < first_join:
-            fail("Dynamic: service " + service.name + " leaves before having joined")
+            print_and_fail("Dynamic: service " + service.name + " leaves before having joined")
 
         return scheduler

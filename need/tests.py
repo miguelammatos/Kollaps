@@ -2,7 +2,7 @@
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
 from need.NEEDlib.EmulationManager import EmulationManager
-from need.NEEDlib.utils import fail
+from need.NEEDlib.utils import print_and_fail
 from need.NEEDlib.CommunicationsManager import CommunicationsManager
 import need.NEEDlib.PathEmulation as PathEmulation
 
@@ -192,7 +192,7 @@ def main():
     '''
 
     if graph.root is None:
-        fail("Failed to identify current service instance in topology!")
+        print_and_fail("Failed to identify current service instance in topology!")
 
     print("Calculating shortest paths...")
     graph.calculate_shortest_paths()

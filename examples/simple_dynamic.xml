@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<experiment boot="need:2.0">
+	<services>
+		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:1.0" supervisor="true" port="8088"/>
+		<service name="logger"  image="warpenguin.no-ip.org/logger:1.0" supervisor="true" />
+		<service name="client" image="warpenguin.no-ip.org/alpineclient:1.0" command="['server', '0', '0']"/>
+		<service name="server" image="warpenguin.no-ip.org/alpineserver:1.0" share="false"/>
+	</services>
+	<bridges>
+                <bridge name="s1"/>
+                <bridge name="s2"/>
+	</bridges>
+        <links>
+                <link origin="client" dest="s1" latency="10" upload="100Mbps" download="100Mbps" network="test_overlay"/>
+                <link origin="s1" dest="s2" latency="10" upload="100Mbps" download="100Mbps" network="test_overlay"/>
+                <link origin="s2" dest="server" latency="10" upload="100Mbps" download="100Mbps" network="test_overlay"/>
+	</links>
+	<dynamic>
+		<schedule name="client" time="0.0" action="join"/>
+		<schedule name="server"  time="0.0" action="join"/>
+
+		<schedule origin="s1" dest="s2" time="10.0" upload="20Mbps"/>
+		<schedule origin="s2" dest="s1" time="20.0" upload="20Mbps"/>
+
+		<schedule origin="s1" dest="s2" time="20.0" upload="100Mbps"/>
+		<schedule origin="s2" dest="s1" time="20.0" upload="100Mbps"/>
+
+		<schedule origin="s1" dest="s2" time="30.0" upload="20Mbps"/>
+		<schedule origin="s2" dest="s1" time="30.0" upload="20Mbps"/>
+
+		<schedule origin="s1" dest="s2" time="40.0" upload="100Mbps"/>
+		<schedule origin="s2" dest="s1" time="40.0" upload="100Mbps"/>
+
+		<schedule origin="s1" dest="s2" time="50.0" upload="20Mbps"/>
+		<schedule origin="s2" dest="s1" time="50.0" upload="20Mbps"/>
+
+		<schedule origin="s1" dest="s2" time="60.0" upload="100Mbps"/>
+		<schedule origin="s2" dest="s1" time="60.0" upload="100Mbps"/>
+
+		<schedule origin="s1" dest="s2" time="70.0" upload="20Mbps"/>
+		<schedule origin="s2" dest="s1" time="70.0" upload="20Mbps"/>
+
+		<schedule origin="s1" dest="s2" time="80.0" upload="100Mbps"/>
+		<schedule origin="s2" dest="s1" time="80.0" upload="100Mbps"/>
+
+		<schedule origin="s1" dest="s2" time="90.0" upload="20Mbps"/>
+		<schedule origin="s2" dest="s1" time="90.0" upload="20Mbps"/>
+
+		<schedule name="client" time="240.0" action="crash"/>
+		<schedule name="server"  time="240.0" action="leave"/>
+	</dynamic>
+</experiment>

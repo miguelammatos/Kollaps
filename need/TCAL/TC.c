@@ -258,6 +258,8 @@ void TC_initDestination(Destination *dest) {
         free(loss);
     if(jitter)
         free(jitter);
+    if(latency)
+        free(latency);
     argc = 0;
 
 

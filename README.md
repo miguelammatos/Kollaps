@@ -11,7 +11,8 @@ This readme is a quick introduction to get NEED running, for further reference s
 ## Pre-requisites
 You need a machine running Linux with a recent version of Docker installed, and python 3.
 
-Also this machine has to be part of a Docker Swarm.
+This machine has to be a manager of a Docker Swarm.
+(it needs to be a manager so that the God container can attach itself to the test_network)
 
 To create a Swarm of 1 machine execute:
 ```
@@ -21,13 +22,13 @@ $docker swarm init
 ## Install instructions
 ```
 $pip wheel --no-deps . .
-$pip install need-1.1-py3-none-any.whl
+$pip install need-2.0-py3-none-any.whl
 ```
 Installing the python package will give you access to the NEEDdeploymentGenerator command to translate need topology descritions into Docker Swarm Compose files on your local machine.
 
 You also need to build the need docker image, to do so execute on this folder:
 ```
-$docker build --rm -t need:1.1 .
+$docker build --rm -t need:2.0 .
 ```
 
 ## How to use
@@ -35,7 +36,7 @@ Some simple experiment examples are available in the examples folder.
 
 These experiments use images that are available in https://github.com/joaoneves792/NEED_Images
 
-Before proceding you should build all the images in the folder "samples_need_1_1/" of the above repo.
+Before proceding you should build all the images in the folder "samples_need_2_0/" of the above repo.
 
 To avoid changing the xml example files the images should be built with the following tags:
 
@@ -55,14 +56,17 @@ Experiments are described as xml files that can be converted into Docker Swarm C
 
 Example:
 ```
-$NEEDdeploymentGenerator topology5.xml > topology5.yaml
+$NEEDdeploymentGenerator topology5.xml -s > topology5.yaml
 ```
 
-This experiment requires that a network named "test_overlay" exists.
+This experiment requires the existence of an attachable network named "test_overlay".
 To create it run:
 ```
-docker network create --driver=overlay --subnet=10.1.0.0/24 test_overlay
+docker network create --attachable --driver=overlay --subnet=10.1.0.0/24 test_overlay
 ```
+
+For the God container to work as intended, all nodes in the swarm need to be managers
+and any network from the previous command needs to be created with the --attachable flag.
 
 This example uses the overlay driver, but ipvlan/macvlan networks are also supported.
 
@@ -99,7 +103,10 @@ Removing the containers without cleanly stopping the experiment can potentially 
 
 If you have started an experiment (services report as "running" on the dashboard) allways stop it through the dashboard before removing the containers.
 
-## NEED on Kubernetes
+
+
+
+# NEED on Kubernetes
 
 Since version 2.0, NEED experiments can also be run with Kubernetes as an orchestrator.
 
@@ -149,10 +156,10 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 It also gives you a join command like this: `sudo kubeadm join <IP>:<PORT> --token <TOKEN> --discovery-token-ca-cert-hash sha256:<HASH>`. Use this on the worker nodes to join the cluster.
 
-Next (on the master again), install the Weavenet CNI plugin:
+Next (on the master again), install the Weavenet CNI plugin with a custom IP range:
 
 ```
-$kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+$kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')&env.IPALLOC_RANGE=10.2.0.0/24"
 ```
 
 If you want to run pods on the master node, un-taint it:
@@ -187,7 +194,7 @@ $kubectl apply -f topology5.yaml
 
 To access the dashboard, run `$kubectl get pods -o wide` and find the dashboard pod. Copy the IP address shown and open <IP>:8088 in your browser.
 
-To remove all components fo the experiment, run:
+To remove all components for the experiment, run:
 
 ```
 $kubectl delete -f topology5.yaml

@@ -1,5 +1,6 @@
+
 from need.NEEDlib.NetGraph import NetGraph
-from need.NEEDlib.utils import fail
+from need.NEEDlib.utils import print_and_fail
 from uuid import uuid4
 
 
@@ -23,7 +24,7 @@ class KubernetesManifestGenerator:
         print("  name: listpods")
         print("rules:")
         print("- apiGroups: [\"\"]")
-        print("  resources: [\"pods\"]")
+        print("  resources: [\"pods\", \"nodes\"]")
         print("  verbs: [\"list\"]")
         print("---")
         print("kind: ClusterRoleBinding")
@@ -74,9 +75,14 @@ class KubernetesManifestGenerator:
         print("        - name: topology")
         print("          mountPath: /topology.xml")
         print("          subPath: topology.xml")
+        print("        - name: dshm")
+        print("          mountPath: /dev/shm")
         print("      serviceAccountName: need-listpods")
         print("      hostPID: true")
         print("      volumes:")
+        print("      - name: dshm")
+        print("        emptyDir:")
+        print("          medium: Memory")
         print("      - name: docker-socket")
         print("        hostPath:")
         print("          path: /run")
@@ -84,6 +90,7 @@ class KubernetesManifestGenerator:
         print("        configMap:")
         print("          name: topology")
         print("          defaultMode: 440")
+        print("      hostNetwork: true")
 
     def print_service(self, service_list):
         if not service_list[0].supervisor:

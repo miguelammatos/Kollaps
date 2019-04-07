@@ -1,9 +1,11 @@
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
 # C extensions
+Aeron/*
 *.so
 *.o
 
@@ -25,6 +27,9 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+*.whl
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -107,11 +112,8 @@ ENV/
 # compose files
 *.yaml
 
-# wheels
-*.whl
-
 
 # other
 rebuild.sh
-
+trace_dumps/*
 
