@@ -6,7 +6,11 @@ LIBUTC=./libutc/tc/libutc.a
 
 CC=gcc
 #CC=gcc
-CFLAGS = -O3 -fPIC -I./libutc/include -I ./libutc/ip/  -I./libutc/include/uapi -I./libutc/tc/
+#We compile without optimizations because we have observed a bug even with -O2. In the function
+#destination_create(), with -O2 or -O3, the compiled code assumes we are passing 3 ints and 2 floats,
+#even though we of course pass 2 ints and 3 floats.
+#LL based on comments + analysis by JN
+CFLAGS = -O0 -fPIC -I./libutc/include -I ./libutc/ip/  -I./libutc/include/uapi -I./libutc/tc/
 LDFLAGS= -shared -ldl -lm
 LDLIBS = $(LIBUTC) $(LIBNETLINK) $(LIBUTIL)
 
