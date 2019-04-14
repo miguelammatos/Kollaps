@@ -4,7 +4,7 @@ import need.NEEDlib.PathEmulation as PathEmulation
 from need.NEEDlib.EventScheduler import EventScheduler
 from need.NEEDlib.utils import start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT
 from need.NEEDlib.utils import LOCAL_IPS_FILE, REMOTE_IPS_FILE, AERON_LIB_PATH
-from need.NEEDlib.utils import int2ip, ip2int, print_identified, print_error, print_and_fail, print_message
+from need.NEEDlib.utils import int2ip, ip2int, print_identified, print_error, print_and_fail, print_message, print_named
 
 from threading import Thread, Lock
 from multiprocessing import Pool
@@ -119,11 +119,33 @@ class CommunicationsManager:
 		self.callback = c_callback  # keep reference so it does not get garbage collected
 		self.aeron_lib.registerCallback(self.callback)
 		
+		
+		
+		# FIXME PG testing something in aeronlib
+		# print_identified(self.graph, self.graph.print_paths())
+		
+		my_starting_links = []
+		for key, path in self.graph.paths_by_id.items():
+			if len(path.links) > 0 and path.links[0].index not in my_starting_links:
+				my_starting_links.append(path.links[0].index)
+				
+		print_named(ip, my_starting_links)
+		
+		
+		
 		with open(LOCAL_IPS_FILE, 'r') as file:
 			self.local_ips = json.load(file)
 			for key, value in self.local_ips.items():
-				self.aeron_lib.addLocalSubs(int(key), len(value), (c_uint * len(value))(*value))
+				self.aeron_lib.addLocalSubs(int(key), len(my_starting_links), (c_uint * len(my_starting_links))(*my_starting_links))
+
+
+
 		
+		# with open(LOCAL_IPS_FILE, 'r') as file:
+		# 	self.local_ips = json.load(file)
+		# 	for key, value in self.local_ips.items():
+		# 		self.aeron_lib.addLocalSubs(int(key), len(value), (c_uint * len(value))(*value))
+				
 		with open(REMOTE_IPS_FILE, 'r') as file:
 			self.remote_ips = json.load(file)
 			for key, value in self.remote_ips.items():
@@ -169,8 +191,7 @@ class CommunicationsManager:
 
 
 	def receive_flow(self, bandwidth, link_count, link_list):
-		# print("[Py] (received) throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]))
-		# sys.stdout.flush()
+		# print_named("(received)", "throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]))
 		self.flow_collector(bandwidth, link_list[:link_count])
 		self.received += 1
 

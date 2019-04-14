@@ -28,7 +28,7 @@ class EmulationManager:
 	# Generic loop tuning
 	ERROR_MARGIN = 0.01  # in percent
 	POOL_PERIOD = 0.05	# in seconds
-	ITERATIONS_TO_INTEGRATE = 2
+	ITERATIONS_TO_INTEGRATE = 1
 
 	# Exponential weighted moving average tuning
 	ALPHA = 0.25
@@ -137,6 +137,7 @@ class EmulationManager:
 		# First update the graph with the information of the flows
 		active_links = []
 		
+		# FIXME PG testing something in aeronlib
 		# Add the info about our flows
 		for path in self.active_paths:
 			for link in path.links:

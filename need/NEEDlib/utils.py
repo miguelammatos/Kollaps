@@ -121,7 +121,7 @@ def print_error(message):
 
 
 def print_error_named(who, message):
-	print("[Py (" + who + ")] " + "ERROR: " + str(message), file=sys.stderr)
+	print("[Py (" + str(who) + ")] " + "ERROR: " + str(message), file=sys.stderr)
 	sys.stderr.flush()
 
 
@@ -131,12 +131,12 @@ def print_message(message):
 
 
 def print_named(who, msg):
-	print("[Py (" + who + ")] " + str(msg), file=sys.stdout)
+	print("[Py (" + str(who) + ")] " + str(msg), file=sys.stdout)
 	sys.stdout.flush()
 
 
 def print_identified(graph, msg):
-	print("[Py (" + graph.root.name + ") " + get_own_ip(graph) + "] " + str(msg), file=sys.stdout)
+	print("[Py (" + graph.root.name + ") " + str(get_own_ip(graph)) + "] " + str(msg), file=sys.stdout)
 	sys.stdout.flush()
 
 

@@ -22,7 +22,7 @@ from need.NEEDlib.utils import print_message, print_error, print_and_fail, print
 from need.NEEDlib.utils import DOCKER_SOCK, TOPOLOGY, LOCAL_IPS_FILE, REMOTE_IPS_FILE, GOD_IPS_SHARE_PORT
 
 
-BUFFER_LEN = 1024
+BUFFER_LEN = 4096
 
 gods = {}
 ready_gods = {}

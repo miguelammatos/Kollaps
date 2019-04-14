@@ -44,7 +44,8 @@ RUN tar -C /NEED/ -zxvf NEED/Aeron.tar.gz && \
     mkdir -p /home/daedalus/Documents/aeron4need/cppbuild/Release/ && \
     cp -r /NEED/Aeron/lib /home/daedalus/Documents/aeron4need/cppbuild/Release/lib && \
     cp /NEED/Aeron/usr/lib/libbsd.so.0.9.1 /usr/lib/libbsd.so.0.9.1 && \
-    cp /NEED/Aeron/usr/lib/libbsd.so.0 /usr/lib/libbsd.so.0
+    cp /NEED/Aeron/usr/lib/libbsd.so.0 /usr/lib/libbsd.so.0 && \
+    rm -f Aeron.tar.gz
 
 # LL: only added kubernetes in l.33
 RUN make -C /NEED/pid1 && \

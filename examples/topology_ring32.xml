@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<experiment boot="need:2.0"> 
+	<services> 
+		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:1.0" supervisor="true" port="8088"/> 
+		<service name="logger"  image="warpenguin.no-ip.org/logger:1.0" supervisor="true" />
+		<service name="server0" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server1" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server2" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server3" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server4" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server5" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server6" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server7" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server8" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server9" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server10" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server11" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server12" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server13" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server14" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server15" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server16" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server17" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server18" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server19" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server20" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server21" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server22" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server23" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server24" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server25" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server26" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server27" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server28" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server29" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server30" image="warpenguin.no-ip.org/alpineserver:1.0" />
+		<service name="server31" image="warpenguin.no-ip.org/alpineserver:1.0" />
+	</services> 
+	<bridges>
+		<bridge name="s0" />
+		<bridge name="s1" />
+		<bridge name="s2" />
+		<bridge name="s3" />
+		<bridge name="s4" />
+		<bridge name="s5" />
+		<bridge name="s6" />
+		<bridge name="s7" />
+		<bridge name="s8" />
+		<bridge name="s9" />
+		<bridge name="s10" />
+		<bridge name="s11" />
+		<bridge name="s12" />
+		<bridge name="s13" />
+		<bridge name="s14" />
+		<bridge name="s15" />
+		<bridge name="s16" />
+		<bridge name="s17" />
+		<bridge name="s18" />
+		<bridge name="s19" />
+		<bridge name="s20" />
+		<bridge name="s21" />
+		<bridge name="s22" />
+		<bridge name="s23" />
+		<bridge name="s24" />
+		<bridge name="s25" />
+		<bridge name="s26" />
+		<bridge name="s27" />
+		<bridge name="s28" />
+		<bridge name="s29" />
+		<bridge name="s30" />
+		<bridge name="s31" />
+	</bridges> 
+        <links>
+		<link origin="server0" dest="s0" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s0" dest="server1" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server1" dest="s1" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s1" dest="server2" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server2" dest="s2" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s2" dest="server3" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server3" dest="s3" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s3" dest="server4" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server4" dest="s4" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s4" dest="server5" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server5" dest="s5" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s5" dest="server6" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server6" dest="s6" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s6" dest="server7" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server7" dest="s7" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s7" dest="server8" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server8" dest="s8" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s8" dest="server9" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server9" dest="s9" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s9" dest="server10" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server10" dest="s10" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s10" dest="server11" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server11" dest="s11" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s11" dest="server12" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server12" dest="s12" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s12" dest="server13" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server13" dest="s13" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s13" dest="server14" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server14" dest="s14" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s14" dest="server15" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server15" dest="s15" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s15" dest="server16" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server16" dest="s16" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s16" dest="server17" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server17" dest="s17" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s17" dest="server18" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server18" dest="s18" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s18" dest="server19" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server19" dest="s19" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s19" dest="server20" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server20" dest="s20" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s20" dest="server21" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server21" dest="s21" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s21" dest="server22" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server22" dest="s22" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s22" dest="server23" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server23" dest="s23" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s23" dest="server24" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server24" dest="s24" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s24" dest="server25" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server25" dest="s25" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s25" dest="server26" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server26" dest="s26" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s26" dest="server27" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server27" dest="s27" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s27" dest="server28" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server28" dest="s28" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s28" dest="server29" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server29" dest="s29" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s29" dest="server30" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server30" dest="s30" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s30" dest="server31" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="server31" dest="s31" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+		<link origin="s31" dest="server0" latency="0.1" upload="10Mbps" download="100Mbps" network="test_overlay"/>
+	</links> 
+	<dynamic>
+		<schedule name="server0" time="0.0" action="join"/>
+		<schedule name="server1" time="0.0" action="join"/>
+		<schedule name="server2" time="0.0" action="join"/>
+		<schedule name="server3" time="0.0" action="join"/>
+		<schedule name="server4" time="0.0" action="join"/>
+		<schedule name="server5" time="0.0" action="join"/>
+		<schedule name="server6" time="0.0" action="join"/>
+		<schedule name="server7" time="0.0" action="join"/>
+		<schedule name="server8" time="0.0" action="join"/>
+		<schedule name="server9" time="0.0" action="join"/>
+		<schedule name="server10" time="0.0" action="join"/>
+		<schedule name="server11" time="0.0" action="join"/>
+		<schedule name="server12" time="0.0" action="join"/>
+		<schedule name="server13" time="0.0" action="join"/>
+		<schedule name="server14" time="0.0" action="join"/>
+		<schedule name="server15" time="0.0" action="join"/>
+		<schedule name="server16" time="0.0" action="join"/>
+		<schedule name="server17" time="0.0" action="join"/>
+		<schedule name="server18" time="0.0" action="join"/>
+		<schedule name="server19" time="0.0" action="join"/>
+		<schedule name="server20" time="0.0" action="join"/>
+		<schedule name="server21" time="0.0" action="join"/>
+		<schedule name="server22" time="0.0" action="join"/>
+		<schedule name="server23" time="0.0" action="join"/>
+		<schedule name="server24" time="0.0" action="join"/>
+		<schedule name="server25" time="0.0" action="join"/>
+		<schedule name="server26" time="0.0" action="join"/>
+		<schedule name="server27" time="0.0" action="join"/>
+		<schedule name="server28" time="0.0" action="join"/>
+		<schedule name="server29" time="0.0" action="join"/>
+		<schedule name="server30" time="0.0" action="join"/>
+		<schedule name="server31" time="0.0" action="join"/>
+		<schedule origin="server0" dest="s0" time="20.0" action="leave" />
+		<schedule name="server0"  time="300.0" action="leave"/>
+		<schedule name="server1"  time="300.0" action="leave"/>
+		<schedule name="server2"  time="300.0" action="leave"/>
+		<schedule name="server3"  time="300.0" action="leave"/>
+		<schedule name="server4"  time="300.0" action="leave"/>
+		<schedule name="server5"  time="300.0" action="leave"/>
+		<schedule name="server6"  time="300.0" action="leave"/>
+		<schedule name="server7"  time="300.0" action="leave"/>
+		<schedule name="server8"  time="300.0" action="leave"/>
+		<schedule name="server9"  time="300.0" action="leave"/>
+		<schedule name="server10"  time="300.0" action="leave"/>
+		<schedule name="server11"  time="300.0" action="leave"/>
+		<schedule name="server12"  time="300.0" action="leave"/>
+		<schedule name="server13"  time="300.0" action="leave"/>
+		<schedule name="server14"  time="300.0" action="leave"/>
+		<schedule name="server15"  time="300.0" action="leave"/>
+		<schedule name="server16"  time="300.0" action="leave"/>
+		<schedule name="server17"  time="300.0" action="leave"/>
+		<schedule name="server18"  time="300.0" action="leave"/>
+		<schedule name="server19"  time="300.0" action="leave"/>
+		<schedule name="server20"  time="300.0" action="leave"/>
+		<schedule name="server21"  time="300.0" action="leave"/>
+		<schedule name="server22"  time="300.0" action="leave"/>
+		<schedule name="server23"  time="300.0" action="leave"/>
+		<schedule name="server24"  time="300.0" action="leave"/>
+		<schedule name="server25"  time="300.0" action="leave"/>
+		<schedule name="server26"  time="300.0" action="leave"/>
+		<schedule name="server27"  time="300.0" action="leave"/>
+		<schedule name="server28"  time="300.0" action="leave"/>
+		<schedule name="server29"  time="300.0" action="leave"/>
+		<schedule name="server30"  time="300.0" action="leave"/>
+		<schedule name="server31"  time="300.0" action="leave"/>
+	</dynamic> 
+</experiment>
