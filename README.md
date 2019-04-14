@@ -24,7 +24,7 @@ $docker swarm init
 $pip wheel --no-deps . .
 $pip install need-2.0-py3-none-any.whl
 ```
-Installing the python package will give you access to the NEEDdeploymentGenerator command to translate need topology descritions into Docker Swarm Compose files on your local machine.
+Installing the python package will give you access to the NEEDdeploymentGenerator command to translate need topology descriptions into Docker Swarm Compose files on your local machine.
 
 You also need to build the need docker image, to do so execute on this folder:
 ```
@@ -101,7 +101,7 @@ $docker stack rm 5
 ## Note
 Removing the containers without cleanly stopping the experiment can potentially trigger a kernel memory corruption bug, leading to system instability!
 
-If you have started an experiment (services report as "running" on the dashboard) allways stop it through the dashboard before removing the containers.
+If you have started an experiment (services report as "running" on the dashboard) always stop it through the dashboard before removing the containers.
 
 
 
