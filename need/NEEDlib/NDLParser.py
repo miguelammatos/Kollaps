@@ -39,6 +39,7 @@ reserved = {
     'reconnect': 'RECONNECT',
     'quit': 'QUIT',
     'churn': 'CHURN',
+    'replace': 'REPLACE',
     'flap': 'FLAP',
     'percentage': 'PERCENTAGE'
 }
@@ -78,6 +79,7 @@ t_DISCONNECT = r'disconnect'
 t_RECONNECT = r'reconnect'
 t_QUIT = r'quit'
 t_CHURN = r'churn'
+t_REPLACE = r'replace'
 t_FLAP = r'flap'
 
 def t_INSTANT(t):
@@ -399,7 +401,7 @@ def p_join_event(p):
                   | JOIN INTEGER
                   | JOIN PERCENTAGE'''
     if len(p) == 2:
-        p[0] = p[1]
+        p[0] = [p[1]]
     else:
         p[0] = [p[1], p[2]]
 
@@ -408,7 +410,7 @@ def p_leave_event(p):
                    | LEAVE INTEGER
                    | LEAVE PERCENTAGE'''
     if len(p) == 2:
-        p[0] = p[1]
+        p[0] = [p[1]]
     else:
         p[0] = [p[1], p[2]]
 
@@ -417,7 +419,7 @@ def p_crash_event(p):
                    | CRASH INTEGER
                    | CRASH PERCENTAGE'''
     if len(p) == 2:
-        p[0] = p[1]
+        p[0] = [p[1]]
     else:
         p[0] = [p[1], p[2]]
 
@@ -426,7 +428,7 @@ def p_disconnect_event(p):
                         | DISCONNECT INTEGER
                         | DISCONNECT PERCENTAGE'''
     if len(p) == 2:
-        p[0] = p[1]
+        p[0] = [p[1]]
     else:
         p[0] = [p[1], p[2]]
 
@@ -434,7 +436,7 @@ def p_reconnect_event(p):
     '''reconnect_event : RECONNECT
                        | RECONNECT INTEGER'''
     if len(p) == 2:
-        p[0] = p[1]
+        p[0] = [p[1]]
     else:
         p[0] = [p[1], p[2]]
 
@@ -448,8 +450,17 @@ def p_set_event(p):
 
 def p_churn_event(p):
     '''churn_event : CHURN INTEGER
-                   | CHURN PERCENTAGE'''
-    p[0] = ["churn", p[2]]
+                   | CHURN PERCENTAGE
+                   | CHURN INTEGER replace_rate
+                   | CHURN PERCENTAGE replace_rate'''
+    if len(p) == 3:
+        p[0] = ["churn", p[2]]
+    elif len(p) > 3:
+        p[0] = ["churn", p[2], p[3]]
+
+def p_replace_rate(p):
+    '''replace_rate : REPLACE PERCENTAGE'''
+    p[0] = p[2]
 
 def p_flap_event(p):
     '''flap_event : FLAP INSTANT'''

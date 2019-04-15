@@ -1,5 +1,7 @@
 import sys
 import ast
+import random
+import datetime
 from xml.etree import ElementTree as ET
 from xml.dom import minidom
 from need.NEEDlib.NDLParser import BootstrapperDeclaration, NodeDeclaration, BridgeDeclaration, LinkDeclaration, EventDeclaration
@@ -11,7 +13,10 @@ bootstrapper = []
 nodes = []
 bridges = []
 links = []
-churn_event_types = ["join", "leave", "crash", "churn"]
+nodenames = []
+bridgenames = []
+
+churn_event_types = ["join", "leave", "crash", "churn", "disconnect", "reconnect"]
 churn_events = []
 other_events = []
 quit_events = []
@@ -21,7 +26,18 @@ tags["nodes"] = {}
 tags["bridges"] = {}
 tags["links"] = {}
 
+#data structures to keep track of how many instances have joined
+#and how many are not disconnected
+up = {}
+connected = {}
+
 topology = ET.Element("experiment")
+
+def getRandomMoments(start, end, quantity):
+    moments = []
+    for i in range(quantity):
+        moments.append(float("%.3f" % random.uniform(start, end)))
+    return moments
 
 def order(declarations):
     for dec in declarations:
@@ -106,6 +122,9 @@ def addNodes():
     for node in nodes:
         n = ET.SubElement(nodes_element, "service")
         image = getattr(node, "image")
+        nodenames.append(image[0])
+        up[image[0]] = [] #initialize bookkeeping for dynamic states
+        connected[image[0]] = []
         n.attrib["name"] = image[0]
         n.attrib["image"] = image[1]
         if len(image) == 3:
@@ -134,8 +153,10 @@ def addBridges():
             for br in getattr(bridge, "names"):
                 b = ET.SubElement(bridges_element, "bridge")
                 b.attrib["name"] = br
+                bridgenames.append(br)
         elif "name" in dir(bridge):
             b = ET.SubElement(bridges_element, "bridge")
+            bridgenames.append(getattr(bridge, "name"))
             b.attrib["name"] = getattr(bridge, "name")
             b.attrib["tags"] = getattr(bridge, "tags")
 
@@ -162,6 +183,7 @@ def addLinks():
         if "tags" in dir(link):
             l.attrib["tags"] = getattr(link, "tags")
 
+#finds all entities of a certain type with at least one of any number of defined tags
 def get_tagged_elements(element_type, selected_tags):
     result = []
     for tag in selected_tags:
@@ -171,80 +193,198 @@ def get_tagged_elements(element_type, selected_tags):
             result.append(tags[element_type][tag])
     return result
 
-def addEvents():
+#finds all entities for a certain (ID/link/tag) selector for any entity type.
+def getScope(selector, node=False, link=False, bridge=False):
+    scope = [] #list of nodes
+    if selector[0] == "id_selector" or selector[0] == "link_selector":
+        scope.append(selector[1])
+    elif selector[0] == "tag_selector":
+        if node:
+            scope += get_tagged_elements("nodes", selector[1:])
+        if link:
+            scope += get_tagged_elements("links", selector[1:])
+        if bridge:
+            scope += get_tagged_elements("bridges", selector[1:])
+    return scope
+
+def addOtherEvents():
     events_element = ET.SubElement(topology, "dynamic")
     for event in other_events: #set, disconnect, reconnect, flap events
-        type = getattr(event, "event")
+        type = getattr(event, "event")[0]
         time = getattr(event, "time")
         selector = getattr(event, "selector")
-        if type == "disconnect" or type == "reconnect":
-            scope = [] #list of nodes which to disconnect
-            if selector[0] == "id_selector":
-                scope.append(selector[1])
-            elif selector[0] == "tag_selector":
-                scope = get_tagged_elements("nodes", selector[1:])
-            for targeted_node in scope:
+        scope = []
+        if selector[0] == "link_selector":
+            scope.append(selector[1])
+        elif selector[0] == "tag_selector":
+            scope = get_tagged_elements("links", selector[1:])
+        #(link property) set events
+        if type[0] == "set":
+            for targeted_link in scope:
+                e = ET.SubElement(events_element, "schedule")
+                e.attrib["origin"] = targeted_link.split("--")[0]
+                e.attrib["dest"] = targeted_link.split("--")[1]
+                e.attrib["time"] = str(time[1])
+                for property in type[1]:
+                    if property[0] == "latency" or property[0] == "drop" \
+                                or property[0] == "upload" or property[0] == "jitter":
+                            e.attrib[property[0]] = str(property[1])
+                    else:
+                        print("You can't change link attribute " + property[0] + " at runtime. Skippping.")
+        #flap events
+        elif type[0] == "flap":
+            for targeted_link in scope:
+                orig = targeted_link.split("--")[0]
+                dest = targeted_link.split("--")[1]
+                current_time = time[1]
+                down = True
+                while current_time < time[2]:
+                    e = ET.SubElement(events_element, "schedule")
+                    e.attrib["origin"] = orig
+                    e.attrib["dest"] = dest
+                    e.attrib["time"] = str(float("%.3f" % current_time)) #hack due to rounding errors
+                    if down:
+                        e.attrib["loss"] = str(1.0)
+                    else:
+                        e.attrib["loss"] = str(0.0)
+                    down = not down
+                    current_time += type[1]
+                #by default bring the link up again in the end
+                if not down:
+                    e = ET.SubElement(events_element, "schedule")
+                    e.attrib["origin"] = orig
+                    e.attrib["dest"] = dest
+                    e.attrib["time"] = str(float("%.3f" % current_time)) #hack due to rounding errors
+                    e.attrib["loss"] = str(0.0)
+
+def join_leave(type, quantity, selector, time):
+    scope = getScope(selector, node=True, link=True, bridge=True)
+    events_element = topology.find('dynamic')
+    for targeted_entity in scope:
+        if targeted_entity in bridgenames: #it's a bridge
+            e = ET.SubElement(events_element, "schedule")
+            e.attrib["name"] = targeted_entity
+            e.attrib["time"] = str(time[1])
+            e.attrib["action"] = type
+        elif "--" in targeted_entity: #it's a link
+            e = ET.SubElement(events_element, "schedule")
+            e.attrib["origin"] = targeted_entity.split("--")[0]
+            e.attrib["dest"] = targeted_entity.split("--")[1]
+            e.attrib["time"] = str(time[1])
+            e.attrib["action"] = type
+        elif targeted_entity in nodenames: #it's a node
+            coeff = 1 if type == "join" else -1
+            if len(time) == 2:
+                e = ET.SubElement(events_element, "schedule")
+                e.attrib["name"] = targeted_entity
+                e.attrib["time"] = str(time[1])
+                e.attrib["action"] = type
+                if quantity > 1:
+                    e.attrib["amount"] = str(quantity)
+                up[targeted_entity].append((time[1], coeff*quantity))
+            else: #join/leave over a period of time
+                mom = getRandomMoments(time[1], time[2], quantity)
+                for m in mom:
+                    e = ET.SubElement(events_element, "schedule")
+                    e.attrib["name"] = targeted_entity
+                    e.attrib["time"] = str(m)
+                    e.attrib["action"] = type
+                    up[targeted_entity].append((m, coeff))
+
+def crash_churn(type, quantity, selector, time, percentage=0.0):
+    scope = getScope(node=True, selector=selector)
+    events_element = topology.find('dynamic')
+    for targeted_node in scope:
+        if len(time) == 2:
+            e = ET.SubElement(events_element, "schedule")
+            e.attrib["name"] = targeted_node
+            e.attrib["time"] = str(time[1])
+            e.attrib["action"] = "crash"
+            if quantity > 1:
+                e.attrib["amount"] = str(quantity)
+            up[targeted_entity].append((time[1], -1*quantity))
+        else: #crash/churn over a period of time
+            mom = getRandomMoments(time[1], time[2], quantity)
+            for m in mom:
                 e = ET.SubElement(events_element, "schedule")
                 e.attrib["name"] = targeted_node
-                e.attrib["time"] = str(time[1])
-                #disconnect events
-                if type == "disconnect":
-                    e.attrib["action"] = "disconnect"
-                    if len(time) == 3:
-                        e2 = ET.SubElement(events_element, "schedule")
-                        e2.attrib["name"] = targeted_node
-                        e2.attrib["time"] = str(time[2])
-                        e2.attrib["action"] = "reconnect"
-                #reconnect events
-                elif type == "reconnect":
-                    e.attrib["action"] = "reconnect"
-        elif isinstance(type, list):
-            scope = []
-            if selector[0] == "link_selector":
-                scope.append(selector[1])
-            elif selector[0] == "tag_selector":
-                scope = get_tagged_elements("links", selector[1:])
-            #(link property) set events
-            if type[0] == "set":
-                for targeted_link in scope:
+                e.attrib["time"] = str(m)
+                e.attrib["action"] = "crash"
+                up[targeted_node].append((m, -1))
+                if type == "churn" and random.uniform(0, 1) < percentage:
                     e = ET.SubElement(events_element, "schedule")
-                    e.attrib["origin"] = targeted_link.split("--")[0]
-                    e.attrib["dest"] = targeted_link.split("--")[1]
-                    e.attrib["time"] = str(time[1])
-                    for property in type[1]:
-                        if property[0] == "latency" or property[0] == "drop" \
-                                    or property[0] == "upload" or property[0] == "jitter":
-                                e.attrib[property[0]] = str(property[1])
-                        else:
-                            print("You can't change link attribute " + property[0] + " at runtime. Skippping.")
-            #flap events
-            elif type[0] == "flap":
-                for targeted_link in scope:
-                    orig = targeted_link.split("--")[0]
-                    dest = targeted_link.split("--")[1]
-                    current_time = time[1]
-                    down = True
-                    while current_time < time[2]:
-                        e = ET.SubElement(events_element, "schedule")
-                        e.attrib["origin"] = orig
-                        e.attrib["dest"] = dest
-                        e.attrib["time"] = str(float("%.3f" % current_time)) #hack due to rounding errors
-                        if down:
-                            e.attrib["loss"] = str(1.0)
-                        else:
-                            e.attrib["loss"] = str(0.0)
-                        down = not down
-                        current_time += type[1]
-                    #by default bring the link up again in the end
-                    if not down:
-                        e = ET.SubElement(events_element, "schedule")
-                        e.attrib["origin"] = orig
-                        e.attrib["dest"] = dest
-                        e.attrib["time"] = str(float("%.3f" % current_time)) #hack due to rounding errors
-                        e.attrib["loss"] = str(0.0)
+                    e.attrib["name"] = targeted_node
+                    e.attrib["time"] = str(m)
+                    e.attrib["action"] = "join"
+                    up[targeted_node].append((m, 1))
 
-    for event in churn_events: #set, disconnect, reconnect, flap events
-        pass #TODO
+def disconnect_reconnect(type, quantity, selector, time):
+    scope = getScope(node=True, selector=selector)
+    events_element = topology.find('dynamic')
+    for targeted_node in scope:
+        e = ET.SubElement(events_element, "schedule")
+        e.attrib["name"] = targeted_node
+        e.attrib["time"] = str(time[1])
+        if quantity > 1:
+            e.attrib["amount"] = str(quantity)
+        #disconnect events
+        if type == "disconnect":
+            e.attrib["action"] = "disconnect"
+            up[targeted_node].append((time[1], -1*quantity))
+            connected[targeted_node].append((time[1], -1*quantity))
+            if len(time) == 3:
+                e2 = ET.SubElement(events_element, "schedule")
+                e2.attrib["name"] = targeted_node
+                e2.attrib["time"] = str(time[2])
+                e2.attrib["action"] = "reconnect"
+                if quantity > 1:
+                    e2.attrib["amount"] = str(quantity)
+                up[targeted_node].append((time[2], quantity))
+                connected[targeted_node].append((time[2], quantity))
+        #reconnect events
+        elif type == "reconnect":
+            e.attrib["action"] = "reconnect"
+            up[targeted_node].append((time[1], -1*quantity))
+            connected[targeted_node].append((time[1], quantity))
+
+#We do this first to know the respective number of online services
+#for events that have a percentage as quantity.
+def addAbsoluteNumberEvents():
+    for event in churn_events: #join, leave, crash, churn, disconnect, reconnect events
+        evt = getattr(event, "event")
+        type = evt[0]
+        quantity = 1
+        if len(evt) > 1:
+            quantity = evt[1]
+        if isinstance(quantity, int): #only look at events that specify an absolute number of instances
+            time = getattr(event, "time")
+            selector = getattr(event, "selector")
+
+            #it is not impossible to think that these could be merged even more
+            if type == "join" or type == "leave":
+                join_leave(type, quantity, selector, time)
+
+            elif type == "crash" or type == "churn":
+                replacement = 0.0
+                if len(evt) == 3:
+                    replacement = float(evt[2].replace("%", ""))/100.0
+                crash_churn(type, quantity, selector, time, replacement)
+
+            elif type == "disconnect" or type == "reconnect":
+                disconnect_reconnect(type, quantity, selector, time)
+
+    print("up:")
+    for key in up:
+        up[key].sort(key=lambda change: change[0])
+        print (key + ": " + str(up[key]))
+    print("connected:")
+    for key in connected:
+        connected[key].sort(key=lambda change: change[0])
+        print (key + ": " + str(connected[key]))
+
+def addPercentageEvents():
+    for event in churn_events: #join, leave, crash, churn, disconnect, reconnect events
+        pass
 
 def makeXML():
     addBootstrapper()
@@ -252,12 +392,22 @@ def makeXML():
     addBridges()
     addLinks()
     process_tags()
-    addEvents()
+    addOtherEvents()
+    addAbsoluteNumberEvents()
+    addPercentageEvents()
 
-def ndl_generate(declarations):
+def addInfo(seed):
+    now = datetime.datetime.now()
+    e = ET.SubElement(topology, "informations")
+    e.attrib["source"] = "Topology compiled with NDLTranslator on " + now.strftime("%d.%m.%Y %H:%M")
+    e.attrib["seed"] = str(seed)
+
+def ndl_generate(declarations, seed=12345):
+    random.seed(seed)
     order(declarations)
     checkValidity()
     makeXML()
+    addInfo(seed)
 
     ugly_xml = ET.tostring(topology, encoding='utf-8', method='xml')
     reparsed = minidom.parseString(ugly_xml)
