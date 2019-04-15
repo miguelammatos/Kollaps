@@ -30,12 +30,19 @@ reserved = {
     'network': 'NETWORK',
     'at': 'AT',
     'from': 'FROM',
-    'to': 'TO'
+    'to': 'TO',
+    'join': 'JOIN',
+    'crash': 'CRASH',
+    'leave': 'LEAVE',
+    'set': 'SET',
+    'disconnect': 'DISCONNECT',
+    'reconnect': 'RECONNECT',
+    'quit': 'QUIT',
+    'churn': 'CHURN',
+    'flap': 'FLAP',
+    'percentage': 'PERCENTAGE'
 }
-
 tokens = ['ID', 'INSTANT', 'INTEGER', 'FLOAT', 'LINKINSTANCE', 'COMMANDS', 'EQ'] + list(reserved.values())
-
-#literals = "="
 
 # Tokens
 t_BOOTSTRAPPER = r'bootstrapper'
@@ -63,6 +70,15 @@ t_AT = r'at'
 t_FROM = r'from'
 t_TO = r'to'
 t_EQ = r'='
+t_JOIN = r'join'
+t_CRASH = r'crash'
+t_LEAVE = r'leave'
+t_SET = r'set'
+t_DISCONNECT = r'disconnect'
+t_RECONNECT = r'reconnect'
+t_QUIT = r'quit'
+t_CHURN = r'churn'
+t_FLAP = r'flap'
 
 def t_INSTANT(t):
     r'([0-9]*d)?([0-9]*h)?([0-9]*m)?([0-9]+(\.[0-9]+)?s)?(?<=[0-9](d|h|m|s))' #positive lookbehind
@@ -90,6 +106,10 @@ def t_SPEED(t):
     r'[0-9]+(G|M|K)bps'
     return t
 
+def t_PERCENTAGE(t):
+    r'[0-9]+%'
+    return t
+
 def t_FLOAT(t):
     r'[0-9]+\.[0-9]+' #technically an int that *may* also be a float, eg. for latency etc.
     t.value = float(t.value)
@@ -99,7 +119,6 @@ def t_INTEGER(t):
     r'[0-9]+'
     t.value = int(t.value)
     return t
-
 
 def t_LINKINSTANCE(t):
     r'[a-zA-Z0-9\.:/\-_]+--[a-zA-Z0-9\.:/\-_]+'
@@ -114,11 +133,10 @@ def t_ID(t):
 t_ignore = " \t"
 
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+#    print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
 #Build the lexer
-
 lex.lex()
 
 class NDLDeclaration:
@@ -149,8 +167,8 @@ def p_declaration(p):
                      | node_declaration
                      | multi_bridge_declaration
                      | bridge_declaration
-                     | link_declaration'''
-#                     | event_declaration'''
+                     | link_declaration
+                     | event_declaration'''
     p[0] = p[1]
 
 def p_bootstrapper_declaration(p):
@@ -176,14 +194,12 @@ def p_node_declaration_list(p):
     else:
         p[0] = p[1] + [p[2]]
 
-
 def p_node_declaration_element(p):
     '''node_declaration_element : supervisor_declaration
                                | share_reuse_declaration
                                | command_declaration
                                | tags'''
     p[0] = p[1]
-
 
 
 def p_image_declaration(p):
@@ -283,14 +299,11 @@ def p_bw_declaration(p):
                       | bw_declaration bw_download_declaration'''
     if len(p) == 4:
         p[0] = ["bw", p[3]]
-        print("one-sided. p[0] = " + str(p[0]))
     else:
         if "symmetric" in p[2]:
             p[1].append(p[1][1])
-            print("symmetric. p[1] = " + str(p[1]))
         else:
             p[1].append(p[2][1])
-            print("asymmetric. p[1] = " + str(p[1]))
         p[0] = p[1]
 
 def p_download_declaration(p):
@@ -326,22 +339,146 @@ def p_tags(p):
     '''tags : taglist'''
     p[0] = p[1]
 
-#def p_time(p):
-#    '''time : AT INSTANT
-#            | FROM INSTANT TO INSTANT'''
-#    if p[1] == 'at':
-#        p[0] = Time(start=p[2], end=-1)
-#    elif p[1] == 'from' and p[3] == 'to':
-#        p[0] = Time(start=p[2], end=p[4])
+def p_event_declaration(p):
+    '''event_declaration : instant_event
+                         | continuous_event'''
+    p[0] = p[1]
+
+def p_instant_event(p):
+    '''instant_event : time quit_event
+                     | time selector moment_event'''
+    e = EventDeclaration()
+    setattr(e, "type", "instant")
+    setattr(e, "time", p[1])
+    if len(p) > 3:
+        setattr(e, "selector", p[2])
+        setattr(e, "event", p[3])
+    else:
+        setattr(e, "event", p[2])
+    p[0] = e
+
+def p_continuous_event(p):
+    '''continuous_event : churn_event
+                        | timespan churn_event
+                        | timespan selector period_event'''
+    #churn is the only type of continuous event that doesn't need a
+    #timespan and also not a selector
+    e = EventDeclaration()
+    setattr(e, "type", "continuous")
+    if len(p) > 3:
+        setattr(e, "time", p[1])
+        setattr(e, "selector", p[2])
+        setattr(e, "event", p[3])
+    elif len(p) > 2:
+        setattr(e, "time", p[1])
+        setattr(e, "event", p[2])
+    elif len(p) == 2:
+        setattr(e, "event", p[1])
+    p[0] = e
+
+def p_moment_event(p):
+    '''moment_event : join_event
+                      | leave_event
+                      | crash_event
+                      | set_event
+                      | disconnect_event
+                      | reconnect_event'''
+    p[0] = p[1]
+
+def p_period_event(p):
+    '''period_event : churn_event
+                    | flap_event
+                    | disconnect_event
+                    | join_event
+                    | leave_event
+                    | crash_event'''
+    p[0] = p[1]
+
+def p_join_event(p):
+    '''join_event : JOIN
+                  | JOIN INTEGER
+                  | JOIN PERCENTAGE'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = [p[1], p[2]]
+
+def p_leave_event(p):
+    '''leave_event : LEAVE
+                   | LEAVE INTEGER
+                   | LEAVE PERCENTAGE'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = [p[1], p[2]]
+
+def p_crash_event(p):
+    '''crash_event : CRASH
+                   | CRASH INTEGER
+                   | CRASH PERCENTAGE'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = [p[1], p[2]]
+
+def p_disconnect_event(p):
+    '''disconnect_event : DISCONNECT
+                        | DISCONNECT INTEGER
+                        | DISCONNECT PERCENTAGE'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = [p[1], p[2]]
+
+def p_reconnect_event(p):
+    '''reconnect_event : RECONNECT
+                       | RECONNECT INTEGER'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = [p[1], p[2]]
+
+def p_quit_event(p):
+    '''quit_event : QUIT'''
+    p[0] = ["quit"]
+
+def p_set_event(p):
+    '''set_event : SET link_declaration_list'''
+    p[0] = ["set", p[2]]
+
+def p_churn_event(p):
+    '''churn_event : CHURN INTEGER
+                   | CHURN PERCENTAGE'''
+    p[0] = ["churn", p[2]]
+
+def p_flap_event(p):
+    '''flap_event : FLAP INSTANT'''
+    p[0] = ["flap", p[2]]
+
+def p_time(p):
+    '''time : AT INSTANT'''
+    p[0] = ["time", p[2]]
+
+def p_timespan(p):
+    '''timespan : FROM INSTANT TO INSTANT'''
+    p[0] = ["time", p[2], p[4]]
+
+def p_selector(p):
+    '''selector : ID
+                | LINKINSTANCE
+                | tags'''
+    if isinstance(p[1], list):
+        p[0] = ["tag_selector"] + p[1][1:]
+    elif "--" in p[1] :
+        p[0] = ["link_selector"] + [p[1]]
+    else:
+        p[0] = ["id_selector"] + [p[1]] #can be a node or a bridge
 
 def p_error(p):
-    print("Syntax error at '%s'" % p.value)
+    pass #print("Syntax error at '%s'" % p.value)
 
 #compile
-
 yacc.yacc()
-
-declarations = [] #add one parsed object per input line
 
 def ndl_parse(input):
     result = yacc.parse(input, debug=False)

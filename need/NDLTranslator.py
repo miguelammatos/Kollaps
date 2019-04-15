@@ -16,11 +16,12 @@ def main():
         print("Error reading file. Exiting.")
         sys.exit(-1)
     for line in declarations:
-#        try:
-            parsed_declarations.append(ndl_parse(line.strip()))
-#        except:
-#            print("Could not parse line: \"" + line.strip() + "\". Skipping.")
-#            continue
+        if len(line.strip()) > 0 and not line.strip()[0] == '#':
+            try:
+                parsed_declarations.append(ndl_parse(line.strip()))
+            except:
+                print("Could not parse line: \"" + line.strip() + "\". Skipping.")
+                continue
 
     print(ndl_generate(parsed_declarations))
 
