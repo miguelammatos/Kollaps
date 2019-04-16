@@ -533,4 +533,6 @@ class XMLGraphParser:
         if first_leave < first_join:
             print_and_fail("Dynamic: service " + service.name + " leaves before having joined")
 
+        scheduler.schedule_graph_changes()
+
         return scheduler

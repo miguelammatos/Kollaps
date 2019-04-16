@@ -28,7 +28,7 @@ class EmulationManager:
 	# Generic loop tuning
 	ERROR_MARGIN = 0.01  # in percent
 	POOL_PERIOD = 0.05	# in seconds
-	ITERATIONS_TO_INTEGRATE = 1
+	ITERATIONS_TO_INTEGRATE = 2
 
 	# Exponential weighted moving average tuning
 	ALPHA = 0.25
