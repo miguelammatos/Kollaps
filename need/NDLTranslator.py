@@ -23,7 +23,13 @@ def main():
                 print("Could not parse line: \"" + line.strip() + "\". Skipping.")
                 continue
 
-    print(ndl_generate(parsed_declarations))
+    s=12345
+    if len(sys.argv) > 3 and sys.argv[2] == "-s":
+        try:
+            s = int(sys.argv[3])
+        except:
+            print("Illegal seed, not an int. Using standard seed of 12345.")
+    print(ndl_generate(parsed_declarations, seed=s))
 
 if __name__ == "__main__":
     main()

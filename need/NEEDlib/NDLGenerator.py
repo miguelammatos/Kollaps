@@ -142,8 +142,8 @@ def addNodes():
             for attrib in getattr(node, "share_reuse"):
                 n.attrib[attrib[1]] = "true"
         ### for testing only, can be removed in the end ###
-        if "tags" in dir(node):
-            n.attrib["tags"] = getattr(node, "tags")
+#        if "tags" in dir(node):
+#            n.attrib["tags"] = getattr(node, "tags")
 
 def addBridges():
     bridges_element = ET.SubElement(topology, "bridges")
@@ -180,8 +180,8 @@ def addLinks():
         if "network" in dir(link):
             l.attrib["network"] = getattr(link, "network")[0]
         ### for testing only, can be removed in the end ###
-        if "tags" in dir(link):
-            l.attrib["tags"] = getattr(link, "tags")
+#        if "tags" in dir(link):
+#            l.attrib["tags"] = getattr(link, "tags")
 
 #finds all entities of a certain type with at least one of any number of defined tags
 def get_tagged_elements(element_type, selected_tags):
@@ -210,29 +210,26 @@ def getScope(selector, node=False, link=False, bridge=False):
 def addOtherEvents():
     events_element = ET.SubElement(topology, "dynamic")
     for event in other_events: #set, disconnect, reconnect, flap events
-        type = getattr(event, "event")[0]
+        evt = getattr(event, "event")
+        type = evt[0]
         time = getattr(event, "time")
         selector = getattr(event, "selector")
-        scope = []
-        if selector[0] == "link_selector":
-            scope.append(selector[1])
-        elif selector[0] == "tag_selector":
-            scope = get_tagged_elements("links", selector[1:])
+        scope = getScope(selector, link=True)
         #(link property) set events
-        if type[0] == "set":
+        if type == "set":
             for targeted_link in scope:
                 e = ET.SubElement(events_element, "schedule")
                 e.attrib["origin"] = targeted_link.split("--")[0]
                 e.attrib["dest"] = targeted_link.split("--")[1]
                 e.attrib["time"] = str(time[1])
-                for property in type[1]:
+                for property in evt[1]:
                     if property[0] == "latency" or property[0] == "drop" \
                                 or property[0] == "upload" or property[0] == "jitter":
                             e.attrib[property[0]] = str(property[1])
                     else:
                         print("You can't change link attribute " + property[0] + " at runtime. Skippping.")
         #flap events
-        elif type[0] == "flap":
+        elif type == "flap":
             for targeted_link in scope:
                 orig = targeted_link.split("--")[0]
                 dest = targeted_link.split("--")[1]
@@ -248,7 +245,7 @@ def addOtherEvents():
                     else:
                         e.attrib["loss"] = str(0.0)
                     down = not down
-                    current_time += type[1]
+                    current_time += evt[1]
                 #by default bring the link up again in the end
                 if not down:
                     e = ET.SubElement(events_element, "schedule")
@@ -350,41 +347,100 @@ def disconnect_reconnect(type, quantity, selector, time):
 #We do this first to know the respective number of online services
 #for events that have a percentage as quantity.
 def addAbsoluteNumberEvents():
-    for event in churn_events: #join, leave, crash, churn, disconnect, reconnect events
+    absolute_events = [e for e in churn_events if (len(getattr(e, "event")) == 1) \
+                or (len(getattr(e, "event")) > 1 and isinstance(getattr(e, "event")[1], int))]
+    for event in absolute_events:
         evt = getattr(event, "event")
         type = evt[0]
-        quantity = 1
-        if len(evt) > 1:
-            quantity = evt[1]
-        if isinstance(quantity, int): #only look at events that specify an absolute number of instances
-            time = getattr(event, "time")
-            selector = getattr(event, "selector")
+        quantity = 1 if len(getattr(event, "event")) == 1 else getattr(event, "event")[1]
+        time = getattr(event, "time")
+        selector = getattr(event, "selector")
 
-            #it is not impossible to think that these could be merged even more
-            if type == "join" or type == "leave":
-                join_leave(type, quantity, selector, time)
+        #it is not impossible to think that these could be merged even more
+        if type == "join" or type == "leave":
+            join_leave(type, quantity, selector, time)
 
-            elif type == "crash" or type == "churn":
-                replacement = 0.0
-                if len(evt) == 3:
-                    replacement = float(evt[2].replace("%", ""))/100.0
-                crash_churn(type, quantity, selector, time, replacement)
+        elif type == "crash" or type == "churn":
+            replacement = 0.0
+            if len(evt) == 3:
+                replacement = float(evt[2].replace("%", ""))/100.0
+            crash_churn(type, quantity, selector, time, replacement)
 
-            elif type == "disconnect" or type == "reconnect":
-                disconnect_reconnect(type, quantity, selector, time)
+        elif type == "disconnect" or type == "reconnect":
+            disconnect_reconnect(type, quantity, selector, time)
 
-    print("up:")
+def sort_bookkeeping_lists():
     for key in up:
         up[key].sort(key=lambda change: change[0])
-        print (key + ": " + str(up[key]))
-    print("connected:")
     for key in connected:
         connected[key].sort(key=lambda change: change[0])
-        print (key + ": " + str(connected[key]))
 
+def calculate_active_nodes(nodename, time):
+    node_events = up[nodename]
+    up_nodes = 0
+    index = 0
+    while node_events[index][0] < time:
+        up_nodes += node_events[index][1]
+        if index < len(node_events)-1:
+            index += 1
+        else:
+            break
+    return up_nodes
+
+def calculate_disconnected_nodes(nodename, time):
+    node_events = connected[nodename]
+    connected_nodes = 0
+    index = 0
+    while node_events[index][0] < time:
+        connected_nodes += node_events[index][1]
+        if index < len(node_events)-1:
+            index += 1
+        else:
+            break
+    return connected_nodes
+
+#we calculate these after those with absolute numbers, because only then
+#can we know what to take the percentage of.
+#we always round down.
 def addPercentageEvents():
-    for event in churn_events: #join, leave, crash, churn, disconnect, reconnect events
-        pass
+    percentage_events = [e for e in churn_events if len(getattr(e, "event")) > 1 \
+                and not isinstance(getattr(e, "event")[1], int)]
+    percentage_events.sort(key=lambda event: getattr(event, "type")) #continuous first, then instant
+    percentage_events.sort(key=lambda event: getattr(event, "time")[1]) #then sort by start time. the above sorting breaks ties
+    for event in percentage_events:
+        sort_bookkeeping_lists()
+        type = getattr(event, "event")[0]
+        percentage = float(getattr(event, "event")[1].replace("%", ""))/100.0
+        time = getattr(event, "time")
+        selector = getattr(event, "selector")
+        scope = getScope(selector, node=True) #here it's the same for all types of event
+        if type == "join" or type == "leave":
+            for nodename in scope:
+                active_nodes = calculate_active_nodes(nodename, time[1])
+                to_target = int(percentage*float(active_nodes))
+                if to_target > 0:
+                    join_leave(type, to_target, ["id_selector", nodename], time)
+        elif type == "crash" or type == "churn":
+            replacement = 0.0
+            if len(getattr(event, "event")) == 3:
+                replacement = float(getattr(event, "event")[2].replace("%", ""))/100.0
+            for nodename in scope:
+                active_nodes = calculate_active_nodes(nodename, time[1])
+                to_target = int(percentage*float(active_nodes))
+                if to_target > 0:
+                    crash_churn(type, to_target, ["id_selector", nodename], time, replacement)
+        elif type == "disconnect" or type == "reconnect":
+            for nodename in scope:
+                if type == "disconnect":
+                    active_nodes = calculate_active_nodes(nodename, time[1])
+                    to_target = int(percentage*float(active_nodes))
+                    if to_target > 0:
+                        disconnect_reconnect("disconnect", to_target, ["id_selector", nodename], time)
+                elif type == "reconnect":
+                    active_ndoes = calculate_disconnected_nodes(nodename, time[1])
+                    to_target = int(percentage*float(active_nodes))
+                    if to_target > 0:
+                        disconnect_reconnect("reconnect", to_target, ["id_selector", nodename], time)
 
 def makeXML():
     addBootstrapper()
