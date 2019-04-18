@@ -108,11 +108,10 @@ class CommunicationsManager:
 		if link_count <= BYTE_LIMIT:
 			self.aeron_lib.init(self.aeron_id, False)
 			self.flow_adding_func = self.aeron_lib.addFlow8
-			
+
 		else:
 			self.aeron_lib.init(self.aeron_id, True)
 			self.flow_adding_func = self.aeron_lib.addFlow16
-		
 		
 		CALLBACKTYPE = CFUNCTYPE(c_voidp, c_uint, c_uint, POINTER(c_uint))
 		c_callback = CALLBACKTYPE(self.receive_flow)
@@ -120,26 +119,17 @@ class CommunicationsManager:
 		self.aeron_lib.registerCallback(self.callback)
 		
 		
-		
-		# FIXME PG testing something in aeronlib
-		# print_identified(self.graph, self.graph.print_paths())
-		
+		# TODO PG run through this again, rename variables to match new god logs functionality
 		my_starting_links = []
 		for key, path in self.graph.paths_by_id.items():
 			if len(path.links) > 0 and path.links[0].index not in my_starting_links:
 				my_starting_links.append(path.links[0].index)
-				
-		print_named(ip, my_starting_links)
-		
-		
+						
 		
 		with open(LOCAL_IPS_FILE, 'r') as file:
 			self.local_ips = json.load(file)
 			for key, value in self.local_ips.items():
 				self.aeron_lib.addLocalSubs(int(key), len(my_starting_links), (c_uint * len(my_starting_links))(*my_starting_links))
-
-
-
 		
 		# with open(LOCAL_IPS_FILE, 'r') as file:
 		# 	self.local_ips = json.load(file)

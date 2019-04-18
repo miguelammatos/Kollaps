@@ -19,13 +19,16 @@
 docker stack rm top
 docker rm $(docker ps -aq)
 
-mkdir -p ~/Documents/NEED/Aeron/usr/lib && \
-yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries ~/Documents/NEED/Aeron/ && \
-yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/lib ~/Documents/NEED/Aeron/  && \
-yes | cp -rpf /usr/lib/libbsd.so.0.9.1  ~/Documents/NEED/Aeron/usr/lib/libbsd.so.0.9.1  && \
-yes | cp -rpf /usr/lib/libbsd.so.0  ~/Documents/NEED/Aeron/usr/lib/libbsd.so.0  && \
-tar -zcvf Aeron.tar.gz Aeron  && \
-rm -rf Aeron/
+# mkdir -p ~/Documents/NEED/Aeron/usr/lib && \
+# mkdir -p ~/Documents/NEED/Aeron/binaries && \
+# # yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries ~/Documents/NEED/Aeron/ && \
+# yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries/aeronmd ~/Documents/NEED/Aeron/binaries/ && \
+# yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries/AeronStat ~/Documents/NEED/Aeron/binaries/ && \
+# yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/lib ~/Documents/NEED/Aeron/  && \
+# yes | cp -rpf /usr/lib/libbsd.so.0.9.1  ~/Documents/NEED/Aeron/usr/lib/libbsd.so.0.9.1  && \
+# yes | cp -rpf /usr/lib/libbsd.so.0  ~/Documents/NEED/Aeron/usr/lib/libbsd.so.0  && \
+# tar -zcvf Aeron.tar.gz Aeron  && \
+# rm -rf Aeron/
 
 
 ######################################################################################################
@@ -40,31 +43,20 @@ docker build --rm -t need:2.0 .
 
 #################################################################################################
 
-# cd ~/Documents/NEED_Images/samples_need_2_0/
-# 
-# cd alpineclient/
-# sudo docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 .
-# cd ..
-# 
-# cd alpineserver/
-# sudo docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 .
-# cd ..
-# 
-# cd logger/
-# sudo docker build --rm -t warpenguin.no-ip.org/logger:1.0 .
-# cd ..
-# 
-# cd dashboard/
-# sudo docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 .
-# cd ..
+# docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 ~/Documents/NEED_Images/samples_need_2_0/alpineclient && \
+# docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 ~/Documents/NEED_Images/samples_need_2_0/alpineserver && \
+# docker build --rm -t warpenguin.no-ip.org/logger:1.0 ~/Documents/NEED_Images/samples_need_2_0/logger && \
+# docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 ~/Documents/NEED_Images/samples_need_2_0/dashboard
+
 
 
 #################################################################################################
 
 # cd ~/Documents/NEED/
 # 
-# NEEDdeploymentGenerator examples/topology5.xml -s > topology5.yaml
-# NEEDdeploymentGenerator examples/topology100.xml -s > topology100.yaml
+NEEDdeploymentGenerator examples/topology5.xml -s > topology5.yaml
+NEEDdeploymentGenerator examples/topology100.xml -s > topology100.yaml
+NEEDdeploymentGenerator examples/topology200.xml -s > topology200.yaml
 # NEEDdeploymentGenerator examples/simple_dynamic.xml -s > simple_dynamic.yaml
 # NEEDdeploymentGenerator examples/topology_dynamic.xml -s > topology_dynamic.yaml
 # NEEDdeploymentGenerator examples/topology_ring32.xml -s > topology_ring32.yaml
@@ -80,6 +72,11 @@ docker tag localhost:5000/need need:2.0
 
 
 ########################################################################################
+
+# docker run -d -p 5000:5000 --restart=always --name registry registry:2  && \
+# docker swarm init && \
+# docker network create --attachable --driver=overlay --subnet=10.1.0.0/24 test_overlay
+
 
 # docker tag warpenguin.no-ip.org/dashboard:1.0 localhost:5000/warpenguin.no-ip.org/dashboard && \
 # docker push localhost:5000/warpenguin.no-ip.org/dashboard
@@ -104,6 +101,29 @@ docker tag localhost:5000/need need:2.0
 
 # sudo pip install --ignore-installed PyYAML
 
+# export AERON_IPC_TERM_BUFFER_LENGTH=1g && \
+# export AERON_TERM_BUFFER_LENGTH=1g
+
+
+########################################################################################
+
+# cd ~/Documents/NEED_Images/samples_need_2_0/
+# 
+# cd alpineclient/
+# sudo docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 .
+# cd ..
+# 
+# cd alpineserver/
+# sudo docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 .
+# cd ..
+# 
+# cd logger/
+# sudo docker build --rm -t warpenguin.no-ip.org/logger:1.0 .
+# cd ..
+# 
+# cd dashboard/
+# sudo docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 .
+# cd ..
 
 
 ########################################################################################

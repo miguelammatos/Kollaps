@@ -64,7 +64,9 @@ def get_own_ip(graph):
 def main_page():
     with DashboardState.lock:
         if DashboardState.graph is not None:
-            answer = render_template('index.html', hosts=DashboardState.hosts, stopping=DashboardState.stopping,
+            answer = render_template('index.html',
+                                     hosts=DashboardState.hosts,
+                                     stopping=DashboardState.stopping,
                                      max_gap=DashboardState.largest_produced_gap,
                                      max_gap_avg=DashboardState.largest_produced_gap_average,
                                      lost_packets=DashboardState.lost_packets)

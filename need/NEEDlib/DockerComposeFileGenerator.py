@@ -23,6 +23,8 @@ class DockerComposeFileGenerator:
 		print("    environment:")
 		print("      NEED_UUID: '" + self.experiment_UUID + "'")
 		print("      NEED_ORCHESTRATOR: swarm")
+		print("      AERON_TERM_BUFFER_LENGTH: " + str(2*64*1024*1024))		# must be multiple of 64*1024
+		print("      AERON_IPC_TERM_BUFFER_LENGTH: " + str(2*64*1024*1024))	# must be multiple of 64*1024
 		print("    labels:")
 		print("      " + "boot"+self.experiment_UUID + ": \"true\"")
 		print("    volumes:")

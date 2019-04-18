@@ -26,7 +26,7 @@ def collect_usage(ip, sent_bytes, qlen):  # qlen: number of packets in the qdisc
 class EmulationManager:
 
 	# Generic loop tuning
-	ERROR_MARGIN = 0.01  # in percent
+	ERROR_MARGIN = 0.01	# in percent
 	POOL_PERIOD = 0.05	# in seconds
 	ITERATIONS_TO_INTEGRATE = 2
 
@@ -36,11 +36,11 @@ class EmulationManager:
 	
 	
 	def __init__(self, net_graph, event_scheduler):
-		self.graph = net_graph  # type: NetGraph
-		self.scheduler = event_scheduler  # type: EventScheduler
-		self.active_paths = []  # type: List[NetGraph.Path]
-		self.active_paths_ids = []  # type: List[int]
-		self.flow_accumulator = {}  # type: Dict[str, List[List[int], int]]
+		self.graph = net_graph				# type: NetGraph
+		self.scheduler = event_scheduler	# type: EventScheduler
+		self.active_paths = []				# type: List[NetGraph.Path]
+		self.active_paths_ids = []			# type: List[int]
+		self.flow_accumulator = {}			# type: Dict[str, List[List[int], int, int]]
 		self.state_lock = Lock()
 		self.last_time = 0
 		EmulationManager.POOL_PERIOD = float(environ.get(ENVIRONMENT.POOL_PERIOD, str(EmulationManager.POOL_PERIOD)))
@@ -105,7 +105,8 @@ class EmulationManager:
 				
 			with self.state_lock:
 				self.apply_bandwidth()
-				self.flow_accumulator.clear()
+				# FIXME dont clear here
+				# self.flow_accumulator.clear()
 	
 	
 	def apply_flow(self, flow):
@@ -133,7 +134,8 @@ class EmulationManager:
 		INDICES = 0
 		RTT = 0
 		BW = 1
-		
+		AGE = 2
+
 		# First update the graph with the information of the flows
 		active_links = []
 		
@@ -145,14 +147,30 @@ class EmulationManager:
 				link.flows.append((path.RTT, path.used_bandwidth))
 		
 		# Add the info about others flows
+		to_delete = []
+		
 		for key in self.flow_accumulator:
 			flow = self.flow_accumulator[key]
-			link_indices = flow[INDICES]
-			self.apply_flow(flow)
-			for index in link_indices:
-				for link in self.graph.links:
-					if link.index == index:  # graph.links[x] does not necessarily contain the link with index x anymore
-						active_links.append(link)
+			
+			# FIXME age of flows, old packets
+			if flow[AGE] < 2:
+				link_indices = flow[INDICES]
+				self.apply_flow(flow)
+				for index in link_indices:
+					for link in self.graph.links:
+						if link.index == index:  # graph.links[x] does not necessarily contain the link with index x anymore
+							active_links.append(link)
+				
+				flow[AGE] += 1
+				
+			else:
+				to_delete.append(key)
+				
+		# delete old flows outside of dictionary iteration
+		for key in to_delete:
+			del self.flow_accumulator[key]
+		to_delete.clear()
+		
 		
 		# Now apply the RTT Aware Min-Max to calculate the new BW
 		for id in self.active_paths_ids:
@@ -249,34 +267,36 @@ class EmulationManager:
 			# self.comms.add_flow(throughput, path.links)
 
 		
-	def accumulate_flow(self, bandwidth, link_indices):
+	def accumulate_flow(self, bandwidth, link_indices, age=0):
 		"""
 		This method adds a flow to the accumulator (Note: it doesnt grab the lock)
 		:param bandwidth: int
 		:param link_indices: List[int]
+		:param age: int
 		"""
-		BW = 1
 		key = str(link_indices[0]) + ":" + str(link_indices[-1])
 		if key in self.flow_accumulator:
 			flow = self.flow_accumulator[key]
-			flow[BW] = bandwidth
+			flow[1] = bandwidth		# flow.bandwidth
+			flow[2] = age			# flow.age
 		else:
-			self.flow_accumulator[key] = [link_indices, bandwidth]
+			self.flow_accumulator[key] = [link_indices, bandwidth, age]
 	
 	
 	# link_indices contains the indices of all links on a given path with that bandwidth
 	# ie. len(link_indices) = # of links in path
-	def collect_flow(self, bandwidth, link_indices):
+	def collect_flow(self, bandwidth, link_indices, age=0):
 		"""
 		This method collects a flow from other nodes, it checks if it is interesting and if so calls accumulate_flow
 		:param bandwidth: int
 		:param link_indices: List[int]
+		:param age: int
 		"""
 		# TODO the return value is no longer useful
 		
 		# Check if this flow is interesting to us
 		with self.state_lock:
-			self.accumulate_flow(bandwidth, link_indices)
+			self.accumulate_flow(bandwidth, link_indices, age)
 		return True
 
 
