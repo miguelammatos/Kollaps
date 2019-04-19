@@ -19,16 +19,16 @@
 docker stack rm top
 docker rm $(docker ps -aq)
 
-# mkdir -p ~/Documents/NEED/Aeron/usr/lib && \
-# mkdir -p ~/Documents/NEED/Aeron/binaries && \
-# # yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries ~/Documents/NEED/Aeron/ && \
-# yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries/aeronmd ~/Documents/NEED/Aeron/binaries/ && \
-# yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries/AeronStat ~/Documents/NEED/Aeron/binaries/ && \
-# yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/lib ~/Documents/NEED/Aeron/  && \
-# yes | cp -rpf /usr/lib/libbsd.so.0.9.1  ~/Documents/NEED/Aeron/usr/lib/libbsd.so.0.9.1  && \
-# yes | cp -rpf /usr/lib/libbsd.so.0  ~/Documents/NEED/Aeron/usr/lib/libbsd.so.0  && \
-# tar -zcvf Aeron.tar.gz Aeron  && \
-# rm -rf Aeron/
+mkdir -p ~/Documents/NEED/Aeron/usr/lib && \
+mkdir -p ~/Documents/NEED/Aeron/binaries && \
+# yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries ~/Documents/NEED/Aeron/ && \
+yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries/aeronmd ~/Documents/NEED/Aeron/binaries/ && \
+yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries/AeronStat ~/Documents/NEED/Aeron/binaries/ && \
+yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/lib ~/Documents/NEED/Aeron/  && \
+yes | cp -rpf /usr/lib/libbsd.so.0.9.1  ~/Documents/NEED/Aeron/usr/lib/libbsd.so.0.9.1  && \
+yes | cp -rpf /usr/lib/libbsd.so.0  ~/Documents/NEED/Aeron/usr/lib/libbsd.so.0  && \
+tar -zcvf Aeron.tar.gz Aeron  && \
+rm -rf Aeron/
 
 
 ######################################################################################################
@@ -54,9 +54,10 @@ docker build --rm -t need:2.0 .
 
 # cd ~/Documents/NEED/
 # 
-NEEDdeploymentGenerator examples/topology5.xml -s > topology5.yaml
-NEEDdeploymentGenerator examples/topology100.xml -s > topology100.yaml
-NEEDdeploymentGenerator examples/topology200.xml -s > topology200.yaml
+NEEDdeploymentGenerator examples/topology5.xml -s > topology5.yaml && \
+NEEDdeploymentGenerator examples/topology100.xml -s > topology100.yaml && \
+NEEDdeploymentGenerator examples/topology200.xml -s > topology200.yaml && \
+NEEDdeploymentGenerator examples/topology400.xml -s > topology400.yaml
 # NEEDdeploymentGenerator examples/simple_dynamic.xml -s > simple_dynamic.yaml
 # NEEDdeploymentGenerator examples/topology_dynamic.xml -s > topology_dynamic.yaml
 # NEEDdeploymentGenerator examples/topology_ring32.xml -s > topology_ring32.yaml

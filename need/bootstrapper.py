@@ -45,7 +45,7 @@ def resolve_ips(client, low_level_client):
     global gods
     global ready_gods
     
-    sleep(10)
+    sleep(5)
     
     try:
         local_ips_list = []
@@ -190,9 +190,6 @@ def resolve_ips(client, low_level_client):
                 break
 
         print_named("god", "ip: " + int2ip(own_ip) + ", nr. of gods: " + str(number_of_gods))
-        for key, value in gods.items():
-            print_named(">>> ", len(value))
-        
         
         # write all known IPs to a file to be read from c++ lib if necessary
         # this information is not currently being used because everyone publishes to the logs in the god containers

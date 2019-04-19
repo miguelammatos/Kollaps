@@ -148,11 +148,10 @@ class EmulationManager:
 		
 		# Add the info about others flows
 		to_delete = []
-		
 		for key in self.flow_accumulator:
 			flow = self.flow_accumulator[key]
 			
-			# FIXME age of flows, old packets
+			# TODO recheck age of flows, old packets
 			if flow[AGE] < 2:
 				link_indices = flow[INDICES]
 				self.apply_flow(flow)
@@ -169,8 +168,7 @@ class EmulationManager:
 		# delete old flows outside of dictionary iteration
 		for key in to_delete:
 			del self.flow_accumulator[key]
-		to_delete.clear()
-		
+			
 		
 		# Now apply the RTT Aware Min-Max to calculate the new BW
 		for id in self.active_paths_ids:
