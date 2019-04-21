@@ -1,14 +1,14 @@
 
 from time import time, sleep
 from threading import Lock
-from os import environ
+from os import environ, getenv
 
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.EventScheduler import EventScheduler
 import need.NEEDlib.PathEmulation as PathEmulation
 from need.NEEDlib.CommunicationsManager import CommunicationsManager
 from need.NEEDlib.utils import ENVIRONMENT
-from need.NEEDlib.utils import print_error, print_message
+from need.NEEDlib.utils import print_named, print_message, print_identified
 
 import sys
 if sys.version_info >= (3, 0):
@@ -27,8 +27,9 @@ class EmulationManager:
 
 	# Generic loop tuning
 	ERROR_MARGIN = 0.01	# in percent
-	POOL_PERIOD = 0.05	# in seconds
-	ITERATIONS_TO_INTEGRATE = 2
+	POOL_PERIOD = float(getenv('POOL_PERIOD', 0.05))		# in seconds
+	ITERATIONS_TO_INTEGRATE = int(getenv('ITERATIONS', 2))	# how many times POOL_PERIOD
+	MAX_FLOW_AGE = int(getenv('MAX_FLOW_AGE', 2))			# times a flow is kept before deletion
 
 	# Exponential weighted moving average tuning
 	ALPHA = 0.25
@@ -43,6 +44,9 @@ class EmulationManager:
 		self.flow_accumulator = {}			# type: Dict[str, List[List[int], int, int]]
 		self.state_lock = Lock()
 		self.last_time = 0
+		
+		self.delayed_flows = 0  # FIXME remove this
+		
 		EmulationManager.POOL_PERIOD = float(environ.get(ENVIRONMENT.POOL_PERIOD, str(EmulationManager.POOL_PERIOD)))
 		EmulationManager.ITERATIONS_TO_INTEGRATE = int(environ.get(ENVIRONMENT.ITERATION_COUNT,
 																   str(EmulationManager.ITERATIONS_TO_INTEGRATE)))
@@ -85,35 +89,41 @@ class EmulationManager:
 		self.last_time = time()
 		self.check_active_flows()  # to prevent bug where data has already passed through the filters before
 		last_time = time()
-
-
-		while True:
-			for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):
-				sleep_time = EmulationManager.POOL_PERIOD - (time() - last_time)
-				
-				if sleep_time > 0.0:
-					sleep(sleep_time)
+		
+		try:
+			while True:
+				for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):
+					sleep_time = EmulationManager.POOL_PERIOD - (time() - last_time)
 					
-				last_time = time()
-				
-				with self.state_lock:
-					self.active_paths.clear()
-					self.active_paths_ids.clear()
-					self.check_active_flows()
+					if sleep_time > 0.0:
+						sleep(sleep_time)
+						
+					last_time = time()
 					
+					with self.state_lock:
+						self.comms.clear_flows_to_be_sent()
+						self.active_paths.clear()
+						self.active_paths_ids.clear()
+						self.check_active_flows()
+						
+				# aeron is reliable so send only once
 				self.comms.broadcast_flows(self.active_paths)
 				
-			with self.state_lock:
-				self.apply_bandwidth()
-				# FIXME dont clear here
-				# self.flow_accumulator.clear()
-	
+				with self.state_lock:
+					self.apply_bandwidth()
+					# self.flow_accumulator.clear()		# dont clear here
+				
+					
+		except KeyboardInterrupt:
+			print_identified(self.graph, "closed with kKeyboardInterrupt")
+		
+		
+		print_identified(self.graph, f"used {self.delayed_flows} cached flows")
+
 	
 	def apply_flow(self, flow):
-		INDICES = 0
-		BW = 1
-		link_indices = flow[INDICES]
-		bandwidth = flow[BW]
+		link_indices = flow[0]	# flow.INDICES
+		bandwidth = flow[1]		# flow.BW
 		
 		# Calculate RTT of this flow
 		rtt = 0
@@ -139,7 +149,6 @@ class EmulationManager:
 		# First update the graph with the information of the flows
 		active_links = []
 		
-		# FIXME PG testing something in aeronlib
 		# Add the info about our flows
 		for path in self.active_paths:
 			for link in path.links:
@@ -152,22 +161,22 @@ class EmulationManager:
 			flow = self.flow_accumulator[key]
 			
 			# TODO recheck age of flows, old packets
-			if flow[AGE] < 2:
+			if flow[AGE] < EmulationManager.MAX_FLOW_AGE:
 				link_indices = flow[INDICES]
 				self.apply_flow(flow)
 				for index in link_indices:
 					for link in self.graph.links:
 						if link.index == index:  # graph.links[x] does not necessarily contain the link with index x anymore
 							active_links.append(link)
+							
+				# FIXME unnecessary counter, for testing
+				if flow[AGE] > 0:
+					self.delayed_flows += 1
 				
 				flow[AGE] += 1
-				
+
 			else:
 				to_delete.append(key)
-				
-		# delete old flows outside of dictionary iteration
-		for key in to_delete:
-			del self.flow_accumulator[key]
 			
 		
 		# Now apply the RTT Aware Min-Max to calculate the new BW
@@ -221,6 +230,10 @@ class EmulationManager:
 		# clear the state on the graph
 		for link in active_links:
 			link.flows.clear()
+		
+		# delete old flows outside of dictionary iteration
+		for key in to_delete:
+			del self.flow_accumulator[key]
 
 			
 	def check_active_flows(self):
@@ -261,8 +274,9 @@ class EmulationManager:
 			path.used_bandwidth = throughput
 			self.active_paths.append(path)
 			self.active_paths_ids.append(path.id)
-	
-			# self.comms.add_flow(throughput, path.links)
+			
+			# FIXME PG
+			self.comms.add_flow(int(throughput), [link.index for link in path.links])
 
 		
 	def accumulate_flow(self, bandwidth, link_indices, age=0):

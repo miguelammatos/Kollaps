@@ -147,5 +147,5 @@ def print_and_fail(msg):
 	print("Error Message: " + str(message), file=sys.stderr)
 	sys.stdout.flush()
 	sys.stderr.flush()
-	sleep(5)
+	sleep(20)
 	exit(-1)
