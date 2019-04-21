@@ -105,7 +105,7 @@ def resolve_ips(client, low_level_client):
             data, addr = recv_sock.recvfrom(BUFFER_LEN)
             msg = data.decode("utf-8").split()
     
-            print_named("god1", f"{addr[0]} :: {msg[0]}")
+            print_named("god2", f"{addr[0]} :: {msg[0]}")
             ipAsInt = ip2int(addr[0])
     
             if msg[0] == "READY" and ipAsInt not in ready_gods:

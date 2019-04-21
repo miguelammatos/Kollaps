@@ -147,8 +147,8 @@ class CommunicationsManager:
 		# 			self.supervisor_count += 1
 		# self.peer_count -= self.supervisor_count
 		#
-		workers = CommunicationsManager.MAX_WORKERS
-		self.process_pool = Pool(processes=workers)
+		# workers = CommunicationsManager.MAX_WORKERS
+		# self.process_pool = Pool(processes=workers)
 		# slice_count = int(len(broadcast_group)/workers)
 		# slice_count = slice_count if slice_count > 0 else 1
 		# self.broadcast_groups = [broadcast_group[i:i+slice_count] for i in range(0, len(broadcast_group), slice_count)]

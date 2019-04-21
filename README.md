@@ -62,7 +62,7 @@ $NEEDdeploymentGenerator topology5.xml -s > topology5.yaml
 This experiment requires the existence of an attachable network named "test_overlay".
 To create it run:
 ```
-docker network create --attachable --driver=overlay --subnet=10.1.0.0/24 test_overlay
+docker network create --driver=overlay --subnet=10.1.0.0/24 test_overlay
 ```
 
 For the God container to work as intended, all nodes in the swarm need to be managers
