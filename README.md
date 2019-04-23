@@ -65,9 +65,6 @@ To create it run:
 docker network create --driver=overlay --subnet=10.1.0.0/24 test_overlay
 ```
 
-For the God container to work as intended, all nodes in the swarm need to be managers
-and any network from the previous command needs to be created with the --attachable flag.
-
 This example uses the overlay driver, but ipvlan/macvlan networks are also supported.
 
 Make sure to define a subnet that does not collide with other networks on your setup.
@@ -170,7 +167,7 @@ $kubectl taint nodes --all node-role.kubernetes.io/master-
 
 ### Creating manifest files for NEED experiments
 
-For instructions on how to install the NEED tools like the NEEDdeploymentGenerator, see above. To generate a Docker Swarm compose file, run:
+For instructions on how to install the NEED tools like the NEEDdeploymentGenerator, see above. To generate a Docker Swarm compose file, run on a Manager node:
 
 ```
 $NEEDdeploymentGenerator topology5.xml -s > topology5.yaml

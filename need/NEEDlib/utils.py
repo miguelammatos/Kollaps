@@ -2,6 +2,8 @@
 import subprocess
 import sys
 import struct
+import string
+import random
 import socket
 import docker
 from subprocess import Popen
@@ -96,6 +98,10 @@ def ip2int(addr):
 
 def int2ip(addr):
 	return socket.inet_ntoa(struct.pack("!I", addr))
+
+
+def get_short_id(size=4, chars=string.ascii_uppercase + string.digits):
+	return ''.join(random.choice(chars) for _ in range(size))
 
 
 def list_compare(list1, list2):

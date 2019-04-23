@@ -1,7 +1,8 @@
 #!/bin/sh
 
+pwdesktop=nope
+pwlaptop=nope
 
-password=nope
 ########### reset kubernetes ########################################################################
 
 # sudo swapoff --a && \
@@ -18,7 +19,7 @@ password=nope
 
 ###############################################################################################
 
-# echo $password | sudo -S systemctl restart docker
+echo $pwdesktop | sudo -S systemctl restart docker
 
 docker stack rm top
 docker rm $(docker ps -aq)
@@ -28,7 +29,6 @@ docker rm $(docker ps -aq)
 
 mkdir -p ~/Documents/NEED/Aeron/usr/lib && \
 mkdir -p ~/Documents/NEED/Aeron/binaries && \
-# yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries ~/Documents/NEED/Aeron/ && \
 yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries/aeronmd ~/Documents/NEED/Aeron/binaries/ && \
 yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/binaries/AeronStat ~/Documents/NEED/Aeron/binaries/ && \
 yes | cp -rpf ~/Documents/aeron4need/cppbuild/Release/lib ~/Documents/NEED/Aeron/  && \
@@ -43,7 +43,7 @@ rm -rf Aeron/
 cd ~/Documents/NEED/
 
 pip3 wheel --no-deps . . && \
-echo $password | sudo -S pip3 install --force-reinstall need-2.0-py3-none-any.whl && \
+echo $pwdesktop | sudo -S pip3 install --force-reinstall need-2.0-py3-none-any.whl && \
 docker build --rm -t need:2.0 .
 # docker build --no-cache --rm -t need:2.0 .
 
@@ -53,13 +53,15 @@ docker build --rm -t need:2.0 .
 # docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 ~/Documents/NEED_Images/samples_need_2_0/alpineclient && \
 # docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 ~/Documents/NEED_Images/samples_need_2_0/alpineserver && \
 # docker build --rm -t warpenguin.no-ip.org/logger:1.0 ~/Documents/NEED_Images/samples_need_2_0/logger && \
-# docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 ~/Documents/NEED_Images/samples_need_2_0/dashboard
+# docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 ~/Documents/NEED_Images/samples_need_2_0/dashboard && \
+# docker build --rm -t warpenguin.no-ip.org/pingclient:vm ~/Documents/NEED_Images/samples_need_2_0/pingclient
 
 
 # sudo docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 ~/NEED_Images/samples_need_2_0/alpineclient && \
 # sudo docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 ~//NEED_Images/samples_need_2_0/alpineserver && \
 # sudo docker build --rm -t warpenguin.no-ip.org/logger:1.0 ~/NEED_Images/samples_need_2_0/logger && \
-# sudo docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 ~//NEED_Images/samples_need_2_0/dashboard
+# sudo docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 ~//NEED_Images/samples_need_2_0/dashboard && \
+# sudo docker build --rm -t warpenguin.no-ip.org/pingclient:vm ~/Documents/NEED_Images/samples_need_2_0/pingclient
 
 
 #################################################################################################
@@ -80,32 +82,35 @@ NEEDdeploymentGenerator examples/topology400.xml -s > topology400.yaml
 ########################################################################################
 
 # docker tag need:2.0 localhost:5000/need && \
-# docker push localhost:5000/need
+# docker push localhost:5000/need && \
 # docker tag localhost:5000/need need:2.0
 
+# echo -e "\e[92mpass for jet: \e[0m"
+# ssh -t daedalus@192.168.2.234 "docker pull leviathan:5000/need && docker tag leviathan:5000/need need:2.0 && echo $pwlaptop | sudo -S systemctl restart docker"
+# 
+
+########################################################################################
+
+# rsync -rav -e ssh --exclude='.git*' --exclude='need/TCAL*' --exclude='rebuild.sh' --exclude='.idea' /home/daedalus/Documents/NEED ubuntu@eiger-4.maas:/home/ubuntu/ && \
+# rsync -rav -e ssh --exclude='.git*' --exclude='need/TCAL*' --exclude='rebuild.sh' --exclude='.idea' /home/daedalus/Documents/NEED ubuntu@eiger-5.maas:/home/ubuntu/ && \
+# rsync -rav -e ssh --exclude='.git*' --exclude='need/TCAL*' --exclude='rebuild.sh' --exclude='.idea' /home/daedalus/Documents/NEED ubuntu@eiger-6.maas:/home/ubuntu/ && \
+# rsync -rav -e ssh --exclude='.git*' --exclude='need/TCAL*' --exclude='rebuild.sh' --exclude='.idea' /home/daedalus/Documents/NEED ubuntu@eiger-7.maas:/home/ubuntu/
+
+
+# rsync -rav -e ssh ubuntu@eiger-4.maas:/tmp/eval /home/daedalus/Documents/benches/scalefree/ && \
+# rsync -rav -e ssh ubuntu@eiger-5.maas:/tmp/eval /home/daedalus/Documents/benches/scalefree/ && \
+# rsync -rav -e ssh ubuntu@eiger-6.maas:/tmp/eval /home/daedalus/Documents/benches/scalefree/ && \
+# rsync -rav -e ssh ubuntu@eiger-7.maas:/tmp/eval /home/daedalus/Documents/benches/scalefree/
 
 ########################################################################################
 
 # docker run -d -p 5000:5000 --restart=always --name registry registry:2  && \
 # docker swarm init && \
-# docker network create --attachable --driver=overlay --subnet=10.1.0.0/24 test_overlay
+# docker network create --driver=overlay --subnet=10.1.0.0/24 test_overlay
 
-
-# docker tag warpenguin.no-ip.org/dashboard:1.0 localhost:5000/warpenguin.no-ip.org/dashboard && \
-# docker push localhost:5000/warpenguin.no-ip.org/dashboard
-# docker tag localhost:5000/warpenguin.no-ip.org/dashboard warpenguin.no-ip.org/dashboard:1.0
-
-
-# docker pull leviathan:5000/need && \
-# docker tag leviathan:5000/need need:2.0 && \
-# docker pull leviathan:5000/warpenguin.no-ip.org/dashboard && \
-# docker tag leviathan:5000/warpenguin.no-ip.org/dashboard warpenguin.no-ip.org/dashboard:1.0
 
 # ssh daedalus@jet docker pull leviathan:5000/need && docker tag leviathan:5000/need need:2.0
 
-# docker stack rm __deployed_name__
-
-# docker rm $(docker ps -aq)
 
 # docker service rm $(docker service ls -q)
 
@@ -113,30 +118,6 @@ NEEDdeploymentGenerator examples/topology400.xml -s > topology400.yaml
 # docker volume ls -qf dangling=true | xargs -r docker volume rm
 
 # sudo pip install --ignore-installed PyYAML
-
-# export AERON_IPC_TERM_BUFFER_LENGTH=1g && \
-# export AERON_TERM_BUFFER_LENGTH=1g
-
-
-########################################################################################
-
-# cd ~/Documents/NEED_Images/samples_need_2_0/
-# 
-# cd alpineclient/
-# sudo docker build --rm -t warpenguin.no-ip.org/alpineclient:1.0 .
-# cd ..
-# 
-# cd alpineserver/
-# sudo docker build --rm -t warpenguin.no-ip.org/alpineserver:1.0 .
-# cd ..
-# 
-# cd logger/
-# sudo docker build --rm -t warpenguin.no-ip.org/logger:1.0 .
-# cd ..
-# 
-# cd dashboard/
-# sudo docker build --rm -t warpenguin.no-ip.org/dashboard:1.0 .
-# cd ..
 
 
 ########################################################################################

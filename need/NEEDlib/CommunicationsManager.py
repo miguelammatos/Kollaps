@@ -4,12 +4,12 @@ import need.NEEDlib.PathEmulation as PathEmulation
 from need.NEEDlib.EventScheduler import EventScheduler
 from need.NEEDlib.utils import start_experiment, stop_experiment, BYTE_LIMIT, SHORT_LIMIT
 from need.NEEDlib.utils import LOCAL_IPS_FILE, REMOTE_IPS_FILE, AERON_LIB_PATH
-from need.NEEDlib.utils import int2ip, ip2int, print_identified, print_error, print_and_fail, print_message, print_named
+from need.NEEDlib.utils import int2ip, ip2int, print_identified, print_error, print_and_fail, print_message, print_error_named
 
 from threading import Thread, Lock
 from multiprocessing import Pool
 from _thread import interrupt_main
-from ctypes import CFUNCTYPE, POINTER, c_voidp, c_uint, c_ushort, c_bool
+from ctypes import CFUNCTYPE, POINTER, c_voidp, c_uint, c_ulong, c_bool
 import socket
 import struct
 import json
@@ -22,23 +22,6 @@ if sys.version_info >= (3, 0):
 
 # Global variable used within the process pool(so we dont need to create new ones all the time)
 broadcast_sockets = {}  # type: Dict[socket.socket]
-
-
-def initialize_process(ips):
-	global broadcast_sockets
-	for ip in ips:
-		broadcast_sockets[ip] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		broadcast_sockets[ip].connect((ip, CommunicationsManager.UDP_PORT))
-
-
-def send_datagram(packet, fmt, ips):
-	global broadcast_sockets
-	size = struct.calcsize(fmt)
-	data = ctypes.create_string_buffer(size)
-	# We cant pickle structs...
-	struct.pack_into(fmt, data, 0, *packet)
-	for ip in ips:
-		broadcast_sockets[ip].send(data)
 
 
 class CommunicationsManager:
@@ -54,7 +37,7 @@ class CommunicationsManager:
 	START_COMMAND = 4
 	ACK = 120
 	i_SIZE = struct.calcsize("<1i")
-	MAX_WORKERS = 2
+	MAX_WORKERS = 1
 	
 	
 	def __init__(self, flow_collector, graph, event_scheduler, ip=None):
@@ -113,28 +96,11 @@ class CommunicationsManager:
 			self.aeron_lib.init(self.aeron_id, True)
 			self.flow_adding_func = self.aeron_lib.addFlow16
 		
-		CALLBACKTYPE = CFUNCTYPE(c_voidp, c_uint, c_uint, POINTER(c_uint))
+		CALLBACKTYPE = CFUNCTYPE(c_voidp, c_ulong, c_uint, POINTER(c_uint))
 		c_callback = CALLBACKTYPE(self.receive_flow)
 		self.callback = c_callback  # keep reference so it does not get garbage collected
 		self.aeron_lib.registerCallback(self.callback)
 		
-		
-		# TODO PG run through this again, rename variables to match new god logs functionality
-		my_starting_links = []
-		for key, path in self.graph.paths_by_id.items():
-			if len(path.links) > 0 and path.links[0].index not in my_starting_links:
-				my_starting_links.append(path.links[0].index)
-						
-		
-		with open(LOCAL_IPS_FILE, 'r') as file:
-			for line in file.readlines():
-				self.aeron_lib.addLocalSubs(int(line), len(my_starting_links), (c_uint * len(my_starting_links))(*my_starting_links))
-				
-		with open(REMOTE_IPS_FILE, 'r') as file:
-			for line in file.readlines():
-				self.aeron_lib.addRemoteSubs(int(line))
-		
-		self.aeron_lib.startPolling()
 		
 		# broadcast_group = []
 		# for service in self.graph.services:
@@ -146,7 +112,7 @@ class CommunicationsManager:
 		# 		if host.supervisor:
 		# 			self.supervisor_count += 1
 		# self.peer_count -= self.supervisor_count
-		#
+
 		# workers = CommunicationsManager.MAX_WORKERS
 		# self.process_pool = Pool(processes=workers)
 		# slice_count = int(len(broadcast_group)/workers)
@@ -166,6 +132,22 @@ class CommunicationsManager:
 		self.dashboard_thread = Thread(target=self.receive_dashboard_commands)
 		self.dashboard_thread.daemon = True
 		self.dashboard_thread.start()
+		
+		# TODO PG run through this again, rename variables to match new god logs functionality
+		my_starting_links = []
+		for key, path in self.graph.paths_by_id.items():
+			if len(path.links) > 0 and path.links[0].index not in my_starting_links:
+				my_starting_links.append(path.links[0].index)
+		
+		with open(LOCAL_IPS_FILE, 'r') as file:
+			for line in file.readlines():
+				self.aeron_lib.addLocalSubs(int(line), len(my_starting_links), (c_uint * len(my_starting_links))(*my_starting_links))
+		
+		with open(REMOTE_IPS_FILE, 'r') as file:
+			for line in file.readlines():
+				self.aeron_lib.addRemoteSubs(int(line))
+		
+		self.aeron_lib.startPolling()
 
 
 	def add_flow(self, throughput, link_list):
@@ -181,10 +163,34 @@ class CommunicationsManager:
 	def clear_flows_to_be_sent(self):
 		self.aeron_lib.clearFlows()
 	
+	# def broadcast_flows(self, active_paths):
+	# 	self.aeron_lib.flush()
+	
+	# def broadcast_flows(self, active_paths):
+	# 	global g_aeron_lib
+	# 	self.process_pool.apply_async(broadcast_flows_async, (g_aeron_lib, active_paths, 2, ))
+	
 	
 	def broadcast_flows(self, active_paths):
-		self.aeron_lib.flush()
-		
+		"""
+		:param active_paths: List[NetGraph.Path]
+		:return:
+		"""
+		try:
+			with self.stop_lock:
+				if len(active_paths) > 0:
+					self.produced += self.peer_count
+
+					for path in active_paths:
+						links = [link.index for link in path.links]
+						self.flow_adding_func(int(path.used_bandwidth), len(links), (c_uint * len(links))(*links))
+
+					self.aeron_lib.flush()
+
+		except Exception as e:
+			print_error_named("broadcast_flows", str(e))
+	
+	
 	
 	def shutdown(self):
 		self.aeron_lib.teardown()
@@ -255,3 +261,39 @@ class CommunicationsManager:
 						
 			except OSError as e:
 				continue  # Connection timed out (most likely)
+
+
+
+# def initialize_process(ips):
+# 	global broadcast_sockets
+# 	for ip in ips:
+# 		broadcast_sockets[ip] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# 		broadcast_sockets[ip].connect((ip, CommunicationsManager.UDP_PORT))
+#
+#
+# def send_datagram(packet, fmt, ips):
+# 	global broadcast_sockets
+# 	size = struct.calcsize(fmt)
+# 	data = ctypes.create_string_buffer(size)
+# 	# We cant pickle structs...
+# 	struct.pack_into(fmt, data, 0, *packet)
+# 	for ip in ips:
+# 		broadcast_sockets[ip].send(data)
+#
+#
+# g_aeron_lib = None
+#
+# def broadcast_flows_async(g_aeron_lib, active_paths, value2):
+# 	try:
+#
+# 		print_message("!!!!!! " + str(len(active_paths)))
+#
+# 		if len(active_paths) > 0:
+# 			for path in active_paths:
+# 				links = [link.index for link in path.links]
+# 				g_aeron_lib.flow_adding_func(int(path.used_bandwidth), len(links), (c_uint * len(links))(*links))
+#
+# 			g_aeron_lib.aeron_lib.flush()
+#
+# 	except Exception as e:
+# 		print_error_named("broadcast_flows", str(e))

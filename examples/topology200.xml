@@ -15,7 +15,7 @@
         <links>
                 <link origin="client1" dest="s1" latency="10" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
                 <link origin="client2" dest="s1" latency="10" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
-                <link origin="s1" dest="s2" latency="10" upload="2000Mbps" download="1000Mbps" network="test_overlay"/>
+                <link origin="s1" dest="s2" latency="10" upload="2000Mbps" download="2000Mbps" network="test_overlay"/>
                 <link origin="s2" dest="server1" latency="5" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
                 <link origin="s2" dest="server2" latency="5" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
 	</links>

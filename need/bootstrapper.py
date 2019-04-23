@@ -47,7 +47,6 @@ def resolve_ips(client, low_level_client):
     global ready_gods
     
     try:
-        local_ips_list = []
         own_ip = "(not yet known)"
         own_ip_int = ip2int("127.0.0.1")
         number_of_gods = 0
@@ -136,14 +135,14 @@ def resolve_ips(client, low_level_client):
 
         with open(REMOTE_IPS_FILE, 'a') as remotes_file:
             for god in gods:
-                remotes_file.write(str(god))
+                remotes_file.write(str(god) + "\n")
                 
         known_ips = ""
         with open(LOCAL_IPS_FILE, 'r') as file:
             known_ips += "local IP: "
             for line in file.readlines():
                 known_ips += int2ip(int(line.strip())) + ", "
-
+        
         known_ips += "\n           "
         with open(REMOTE_IPS_FILE, 'r') as file:
             known_ips += "remote IPs: "
@@ -339,18 +338,19 @@ def docker_bootstrapper():
 
                 # create a "God" container that is in the host's Pid namespace
                 client.containers.run(image=boot_image,
-                                    command=["-g", label, str(us.id)],
-                                    privileged=True,
-                                    pid_mode="host",
-                                    network="host",
-                                    shm_size=int(os.getenv('SHM_SIZE', '4000000000')),
-                                    remove=True,
-                                    environment=env,
-                                    volumes_from=[us.id],
-                                    # network_mode="container:"+us.id,  # share the network stack with this container
-                                    # network='test_overlay',
-                                    labels=["god" + label],
-                                    detach=True)
+                                      command=["-g", label, str(us.id)],
+                                      privileged=True,
+                                      pid_mode="host",
+                                      network="host",
+                                      shm_size=int(os.getenv('SHM_SIZE', '8000000000')),
+                                      remove=True,
+                                      name="god_" + str(random.getrandbits(64)),  # grep friendly
+                                      environment=env,
+                                      volumes_from=[us.id],
+                                      # network_mode="container:"+us.id,  # share the network stack with this container
+                                      # network='test_overlay',
+                                      labels=["god" + label],
+                                      detach=True)
                                     # stderr=True,
                                     # stdout=True)
                 

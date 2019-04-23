@@ -17,15 +17,15 @@
                 <bridge name="s2"/>
 	</bridges>
         <links>
-                <link origin="client1" dest="s1" latency="10" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
-                <link origin="client2" dest="s1" latency="10" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
-				<link origin="client3" dest="s1" latency="10" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
-                <link origin="client4" dest="s1" latency="10" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
-                <link origin="s1" dest="s2" latency="10" upload="2000Mbps" download="1000Mbps" network="test_overlay"/>
-                <link origin="s2" dest="server1" latency="5" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
-                <link origin="s2" dest="server2" latency="5" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
-                <link origin="s2" dest="server3" latency="5" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
-                <link origin="s2" dest="server4" latency="5" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
+                <link origin="client1" dest="s1" latency="10" upload="2000Mbps" download="2000Mbps" network="test_overlay"/>
+                <link origin="client2" dest="s1" latency="10" upload="2000Mbps" download="2000Mbps" network="test_overlay"/>
+				<link origin="client3" dest="s1" latency="10" upload="2000Mbps" download="2000Mbps" network="test_overlay"/>
+                <link origin="client4" dest="s1" latency="10" upload="2000Mbps" download="2000Mbps" network="test_overlay"/>
+                <link origin="s1" dest="s2" latency="10" upload="1000Mbps" download="1000Mbps" network="test_overlay"/>
+                <link origin="s2" dest="server1" latency="5" upload="2000Mbps" download="2000Mbps" network="test_overlay"/>
+                <link origin="s2" dest="server2" latency="5" upload="2000Mbps" download="2000Mbps" network="test_overlay"/>
+                <link origin="s2" dest="server3" latency="5" upload="2000Mbps" download="2000Mbps" network="test_overlay"/>
+                <link origin="s2" dest="server4" latency="5" upload="2000Mbps" download="2000Mbps" network="test_overlay"/>
 		</links>
 	<dynamic>
 		<schedule name="client1" time="0.0" action="join" amount="50"/>

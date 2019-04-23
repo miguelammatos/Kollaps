@@ -28,7 +28,7 @@ class EmulationManager:
 	# Generic loop tuning
 	ERROR_MARGIN = 0.01	# in percent
 	POOL_PERIOD = float(getenv('POOL_PERIOD', 0.05))		# in seconds
-	ITERATIONS_TO_INTEGRATE = int(getenv('ITERATIONS', 2))	# how many times POOL_PERIOD
+	ITERATIONS_TO_INTEGRATE = int(getenv('ITERATIONS', 1))	# how many times POOL_PERIOD
 	MAX_FLOW_AGE = int(getenv('MAX_FLOW_AGE', 2))			# times a flow is kept before deletion
 
 	# Exponential weighted moving average tuning
@@ -44,15 +44,14 @@ class EmulationManager:
 		self.flow_accumulator = {}			# type: Dict[str, List[List[int], int, int]]
 		self.state_lock = Lock()
 		self.last_time = 0
-		
-		self.delayed_flows = 0  # FIXME remove this
+		# self.delayed_flows = 0
 		
 		EmulationManager.POOL_PERIOD = float(environ.get(ENVIRONMENT.POOL_PERIOD, str(EmulationManager.POOL_PERIOD)))
 		EmulationManager.ITERATIONS_TO_INTEGRATE = int(environ.get(ENVIRONMENT.ITERATION_COUNT,
 																   str(EmulationManager.ITERATIONS_TO_INTEGRATE)))
 		
 		print_message("Pool Period: " + str(EmulationManager.POOL_PERIOD))
-		print_message("Iteration Count: " + str(EmulationManager.ITERATIONS_TO_INTEGRATE))
+		# print_message("Iteration Count: " + str(EmulationManager.ITERATIONS_TO_INTEGRATE))
 		
 		self.check_flows_time_delta = 0
 		# We need to give the callback a reference to ourselves (kind of hackish...)
@@ -60,8 +59,8 @@ class EmulationManager:
 		emuManager = self
 		
 		self.comms = CommunicationsManager(self.collect_flow, self.graph, self.scheduler)
-
-
+		
+		
 	def initialize(self):
 		PathEmulation.init(CommunicationsManager.UDP_PORT)
 		
@@ -92,39 +91,38 @@ class EmulationManager:
 		
 		try:
 			while True:
-				for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):
-					sleep_time = EmulationManager.POOL_PERIOD - (time() - last_time)
+				# for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):		# CHANGED iteration count
+				sleep_time = EmulationManager.POOL_PERIOD - (time() - last_time)
+				
+				if sleep_time > 0.0:
+					sleep(sleep_time)
 					
-					if sleep_time > 0.0:
-						sleep(sleep_time)
-						
-					last_time = time()
-					
-					with self.state_lock:
-						self.comms.clear_flows_to_be_sent()
-						self.active_paths.clear()
-						self.active_paths_ids.clear()
-						self.check_active_flows()
+				last_time = time()
+				
+				with self.state_lock:
+					self.active_paths.clear()
+					self.active_paths_ids.clear()
+					self.check_active_flows()
 						
 				# aeron is reliable so send only once
 				self.comms.broadcast_flows(self.active_paths)
 				
 				with self.state_lock:
 					self.apply_bandwidth()
-					# self.flow_accumulator.clear()		# dont clear here
+					# self.flow_accumulator.clear()		# CHANGED dont clear here
 				
-					
-		except KeyboardInterrupt:
-			print_identified(self.graph, "closed with kKeyboardInterrupt")
+		# except KeyboardInterrupt:
+		# 	print_identified(self.graph, "closed with KeyboardInterrupt")
 		
+		except:
+			# print_identified(self.graph, f"used {self.delayed_flows} cached flows")
+			pass
 		
-		print_identified(self.graph, f"used {self.delayed_flows} cached flows")
-
 	
 	def apply_flow(self, flow):
 		link_indices = flow[0]	# flow.INDICES
 		bandwidth = flow[1]		# flow.BW
-		
+
 		# Calculate RTT of this flow
 		rtt = 0
 		for index in link_indices:
@@ -132,7 +130,7 @@ class EmulationManager:
 				if link.index == index:
 					with link.lock:
 						rtt += (link.latency * 2)
-						
+
 		# Add it to the link's flows
 		for index in link_indices:
 			for link in self.graph.links:
@@ -148,18 +146,18 @@ class EmulationManager:
 
 		# First update the graph with the information of the flows
 		active_links = []
-		
+
 		# Add the info about our flows
 		for path in self.active_paths:
 			for link in path.links:
 				active_links.append(link)
 				link.flows.append((path.RTT, path.used_bandwidth))
-		
+
 		# Add the info about others flows
 		to_delete = []
 		for key in self.flow_accumulator:
 			flow = self.flow_accumulator[key]
-			
+
 			# TODO recheck age of flows, old packets
 			if flow[AGE] < EmulationManager.MAX_FLOW_AGE:
 				link_indices = flow[INDICES]
@@ -168,17 +166,17 @@ class EmulationManager:
 					for link in self.graph.links:
 						if link.index == index:  # graph.links[x] does not necessarily contain the link with index x anymore
 							active_links.append(link)
-							
-				# FIXME unnecessary counter, for testing
-				if flow[AGE] > 0:
-					self.delayed_flows += 1
-				
+
+				# # FIXME unnecessary counter, for testing
+				# if flow[AGE] > 0:
+				# 	self.delayed_flows += 1
+
 				flow[AGE] += 1
 
 			else:
 				to_delete.append(key)
-			
-		
+
+
 		# Now apply the RTT Aware Min-Max to calculate the new BW
 		for id in self.active_paths_ids:
 			path = self.graph.paths_by_id[id]
@@ -191,7 +189,7 @@ class EmulationManager:
 					max_bandwidth_on_link = []
 					# calculate our bandwidth
 					max_bandwidth_on_link.append(((1.0 / link.flows[0][RTT]) / rtt_reverse_sum) * link.bandwidth_bps)
-					
+
 					# Maximize link utilization to 100%
 					spare_bw = link.bandwidth_bps - max_bandwidth_on_link[0]
 					our_share = max_bandwidth_on_link[0] / link.bandwidth_bps
@@ -200,23 +198,23 @@ class EmulationManager:
 						flow = link.flows[i]
 						# calculate the bandwidth for everyone
 						max_bandwidth_on_link.append(((1.0 / flow[RTT]) / rtt_reverse_sum) * link.bandwidth_bps)
-						
+
 						# Check if a flow is "hungry" (wants more than its allocated share)
 						if flow[BW] > max_bandwidth_on_link[i]:
 							spare_bw -= max_bandwidth_on_link[i]
 							hungry_usage_sum += max_bandwidth_on_link[i] / link.bandwidth_bps
 						else:
 							spare_bw -= flow[BW]
-					
+
 					normalized_share = our_share / hungry_usage_sum  # we get a share of the spare proportional to our RTT
 					maximized = max_bandwidth_on_link[0] + (normalized_share * spare_bw)
 					if maximized > max_bandwidth_on_link[0]:
 						max_bandwidth_on_link[0] = maximized
-					
+
 					# If this link restricts us more than previously try to assume this bandwidth as the max
 					if max_bandwidth_on_link[0] < max_bandwidth:
 						max_bandwidth = max_bandwidth_on_link[0]
-				
+
 				if max_bandwidth <= path.max_bandwidth and max_bandwidth != path.current_bandwidth:
 					if max_bandwidth <= path.current_bandwidth:
 						path.current_bandwidth = max_bandwidth  # if its less then we now for sure it is correct
@@ -226,11 +224,11 @@ class EmulationManager:
 												 EmulationManager.ALPHA * max_bandwidth
 					service = path.links[-1].destination
 					PathEmulation.change_bandwidth(service, path.current_bandwidth)
-		
+
 		# clear the state on the graph
 		for link in active_links:
 			link.flows.clear()
-		
+
 		# delete old flows outside of dictionary iteration
 		for key in to_delete:
 			del self.flow_accumulator[key]
@@ -275,8 +273,8 @@ class EmulationManager:
 			self.active_paths.append(path)
 			self.active_paths_ids.append(path.id)
 			
-			# FIXME PG
-			self.comms.add_flow(int(throughput), [link.index for link in path.links])
+			# # CHANGED PG alternative place to add flows
+			# self.comms.add_flow(int(throughput), [link.index for link in path.links])
 
 		
 	def accumulate_flow(self, bandwidth, link_indices, age=0):
