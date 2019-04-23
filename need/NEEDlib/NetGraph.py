@@ -133,11 +133,14 @@ class NetGraph:
             self.drop = (1.0-total_not_drop_probability)
 
         def prettyprint(self):
-            pretty = "I am a path and these are my links:\n"
-            for link in self.links:
-                pretty += "  " + link.source.name + "--" + link.destination.name + "\n"
-            pretty += "    These are my end-to-end properties: bandwidth=" + str(self.max_bandwidth) + ", latency = " + str(self.latency) + ", jitter = " + str(self.jitter)  + ", drop = " + str(self.drop) + "\n"
-            return pretty
+            if len(self.links) > 0 and isinstance(self.links[-1].destination, NetGraph.Service):
+                pretty = "I am a path and these are my links:\n"
+                for link in self.links:
+                    pretty += "  " + link.source.name + "--" + link.destination.name + "\n"
+                pretty += "    These are my end-to-end properties: bandwidth=" + '{:,}'.format(self.max_bandwidth).replace(',', '\'') + ", latency = " + str(self.latency) + ", jitter = " + str(self.jitter)  + ", drop = " + str(self.drop) + "\n"
+                return pretty
+            else:
+                return None
 
     def get_nodes(self, name):
         if name in self.services:

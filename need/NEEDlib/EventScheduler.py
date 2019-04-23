@@ -30,25 +30,47 @@ class EventScheduler:
             current_graph = self.path_changes[0][1] #work from the last change onwards
         return current_graph
 
+    #replaces old link objects with new ones
+    def replace_link_objects(self, nodes, links):
+        for service in nodes:
+            for instance in service:
+                indices = []
+                new_links = []
+                for link in instance.links:
+                    indices.append(link.index)
+                for index in indices:
+                    for lnk in links:
+                        if lnk.index == index:
+                            new_links.append(lnk)
+                instance.links = new_links
+
     def initialize_new_graph(self, current_graph):
         new_graph = copy(current_graph)
         new_graph.paths = {}
         new_graph.paths_by_id = {}
         new_graph.path_counter = 0
-        new_graph.links = copy(current_graph.links)
         new_graph.removed_links = copy(current_graph.removed_links)
         new_graph.removed_bridges = copy(current_graph.removed_bridges)
+        new_graph.links = []
+        for link in current_graph.links: #used to be: new_graph.links = copy(current_graph.links)
+            new_graph.links.append(copy(link)) #shallow copy keeps reference to origin, dest objects, but that's ok
+        self.replace_link_objects(new_graph.services.values(), new_graph.links)
+        self.replace_link_objects(new_graph.bridges.values(), new_graph.links)
         return new_graph
 
-    def recompute_graph(self, graph, new_graph, time):
+    def recompute_and_store(self, new_graph, time):
         new_graph.calculate_shortest_paths()
 
         for service, path in new_graph.paths.items():
-            if not service == graph.root and isinstance(service, NetGraph.Service):
+            if not service == new_graph.root and isinstance(service, NetGraph.Service):
                 path.calculate_end_to_end_properties()
 
-        self.path_changes.append((time, new_graph))
+        self.path_changes.insert(0, (time, new_graph))
         self.path_changes.sort(reverse=True, key=lambda change: change[0])
+        blah = "Recomputed and stored. Current graph = " + str(new_graph) + ", time = " + str(time) + "\nPath changes:\n"
+        for graph in self.path_changes:
+            blah += str(graph[1]) + ", time = " + str(graph[0]) + "\nPath changes:\n"
+        print_message(blah)
 
     def schedule_join(self, time):
         self.events.append(Timer(time, start_experiment))
@@ -70,10 +92,10 @@ class EventScheduler:
     #it is computed on top of all the others.
     def schedule_graph_changes(self):
         TIME = 0
-        GRAPH = 1
+        GRAPHS = 1
         for i in range(len(self.graph_changes)):
             if i == len(self.graph_changes)-1 or self.graph_changes[i][TIME] < self.graph_changes[i+1][TIME]:
-                self.events.append(Timer(self.graph_changes[i][TIME], path_change, self.graph_changes[i][GRAPH]))
+                self.events.append(Timer(self.graph_changes[i][TIME], path_change, [self.graph_changes[i][GRAPHS]]))
                 print_message("scheduling an update at " + str(self.graph_changes[i][TIME]))
             else:
                 print_message("NOT scheduling an update at " + str(self.graph_changes[i][TIME]))
@@ -98,10 +120,10 @@ class EventScheduler:
                     if l in new_graph.bridges[bridge][0].links:
                         new_graph.bridges[bridge][0].links.remove(l)
 
-        self.recompute_graph(graph, new_graph, time)
+        self.recompute_and_store(new_graph, time)
 
         print_message("Link " + origin + "--" + destination + " scheduled to leave at " + str(time))
-        self.graph_changes.append((time, [graph, new_graph, time]))
+        self.graph_changes.append((time, [graph, new_graph]))
 
     #Add back a link that has been removed before
     def schedule_link_join(self, time, graph, origin, destination):
@@ -125,10 +147,10 @@ class EventScheduler:
                 if l.source == new_graph.bridges[bridge][0]:
                     new_graph.bridges[bridge][0].links.append(l)
 
-        self.recompute_graph(graph, new_graph, time)
+        self.recompute_and_store(new_graph, time)
 
         print_message("Link " + origin + "--" + destination + " scheduled to join at " + str(time))
-        self.graph_changes.append((time, [graph, new_graph, time]))
+        self.graph_changes.append((time, [graph, new_graph]))
 
 
     #Add a completely new link
@@ -138,23 +160,27 @@ class EventScheduler:
 
         new_graph.new_link(source, destination, latency, jitter, drop, bandwidth, network)
 
-        self.recompute_graph(graph, new_graph, time)
+        self.recompute_and_store(new_graph, time)
 
         print_message("Link " + source + "--" + destination + " scheduled to newly join at " + str(time))
-        self.graph_changes.append((time, [graph, new_graph, time]))
+        self.graph_changes.append((time, [graph, new_graph]))
 
     #Remove a bridge that is currently part of the graph
     def schedule_bridge_leave(self, time, graph, name):
         current_graph = self.get_current_graph(graph)
         new_graph = self.initialize_new_graph(current_graph)
 
+        #hack to still find the bridge in XMLGraphParser at startup time
+        #it doesn't matter to have it there, because it will be overwritten by dynamic changes at runtime
+        graph.removed_bridges[name] = new_graph.bridges[name]
+
         new_graph.removed_bridges[name] = new_graph.bridges[name]
         del new_graph.bridges[name]
 
-        self.recompute_graph(graph, new_graph, time)
+        self.recompute_and_store(new_graph, time)
 
         print_message("Bridge " + name + " scheduled to leave at " + str(time))
-        self.graph_changes.append((time, [graph, new_graph, time]))
+        self.graph_changes.append((time, [graph, new_graph]))
 
     #Add back a bridge that has been removed before
     def schedule_bridge_join(self, time, graph, name):
@@ -165,146 +191,131 @@ class EventScheduler:
         del new_graph.removed_bridges[name]
         new_graph.bridges[name] = bridge
 
-        self.recompute_graph(graph, new_graph, time)
+        self.recompute_and_store(new_graph, time)
+
+        print_message(msg)
 
         print_message("Bridge " + name + " scheduled to join back at " + str(time))
-        self.graph_changes.append((time, [graph, new_graph, time]))
+        self.graph_changes.append((time, [graph, new_graph]))
 
     #Change the properties of a link that is part of the graph
     def schedule_link_change(self, time, graph, origin, destination, bandwidth, latency, jitter, drop):
-        links = []
-        new_links = []
-        paths = []
-        new_paths = []
+        current_graph = self.get_current_graph(graph)
+        new_graph = self.initialize_new_graph(current_graph)
 
-        # Update link info
-        for l in graph.links:
-            if l.source.name == origin and l.destination.name == destination:
-                links.append(l)
-                copy_l = None
+#        msg = "-------------------\nbefore link_change:\n-------------------\n"
+#        for path in current_graph.paths_by_id.values():
+#            p = path.prettyprint()
+#            if not p is None:
+#                msg += p
 
-                # Check for previous changes
-                for changed_event in self.link_changes:
-                    changed_link = changed_event[1]  # type: NetGraph.Link
-                    if changed_link.index == l.index:
-                        copy_l = copy(changed_link)
-                        break
+        for link in new_graph.links:
+            if link.source.name == origin and link.destination.name == destination:
+                link.bandwidth_bps = bandwidth if bandwidth >= 0 else link.bandwidth_bps
+                link.latency = float(latency) if latency >= 0 else link.latency
+                link.jitter = float(jitter) if jitter >= 0 else link.jitter
+                link.drop = float(drop) if drop >= 0 else link.drop
 
-                # if no previous changes
-                if copy_l is None:
-                    copy_l = copy(l)
+        self.recompute_and_store(new_graph, time)
 
-                # at this point, copy_l has all attributes that l has at the time we schedule the link change. LL
+#        msg += "------------------\nafter link_change:\n------------------\n"
+#        for path in new_graph.paths_by_id.values():
+#            p = path.prettyprint()
+#            if not p is None:
+#                msg += p
 
-                # Update only what has changed
-                copy_l.bandwidth_bps = bandwidth if bandwidth >= 0 else copy_l.bandwidth_bps
-                copy_l.latency = float(latency) if latency >= 0 else copy_l.latency
-                copy_l.jitter = float(jitter) if jitter >= 0 else copy_l.jitter
-                copy_l.drop = float(drop) if drop >= 0 else copy_l.drop
+#        print_message(msg)
 
-                new_links.append(copy_l)
-                self.link_changes.append((time, copy_l))
-                self.link_changes.sort(reverse=True, key=lambda change: change[0])  # make sure they are sorted in time
+        print_message("Link " + origin + "--" + destination + " scheduled to change at " + str(time))
+        self.graph_changes.append((time, [graph, new_graph]))
 
-        # Update path info
-        for key in graph.paths:
-            if not isinstance(key, NetGraph.Service): # If we get a path to a bridge, ignore
-                continue
-            path = graph.paths[key]
-            for new_link in new_links:
-                for i, l in enumerate(path.links):
-                    if l.index == new_link.index:
-                        paths.append(path)  # There wont be duplicated paths since there cant be multiple changed links
-                        new_path = copy(path) # in the same path (replicated links must be on different paths)
+#we need these to re-install the original link objects into changed topologies
+def get_original_links(original_links, new_links):
+        indices = []
+        old_links = []
+        for link in new_links:
+            inorig = False
+            for lnk in original_links:
+                if lnk.index == link.index:
+                    indices.append(link.index)
+                    inorig = True
+            if not inorig: #a new link has joined in this event
+                old_links.append(link)
+        for index in indices:
+            for lnk in original_links:
+                if lnk.index == index:
+                    for link in new_links:
+                        if link.index == index:
+                            lnk.bandwidth_bps = link.bandwidth_bps
+                            lnk.latency = link.latency
+                            lnk.jitter = link.jitter
+                            lnk.drop = link.drop
+                            lnk.flows = link.flows
+                            lnk.last_flows_count = link.last_flows_count
+                    old_links.append(lnk)
 
-                        # Pre-compute the path properties
-                        new_path.links = copy(path.links)
-                        new_path.links[i] = new_link
-                        new_path.calculate_end_to_end_properties()
-                        new_paths.append(new_path)
-                        break
+        return old_links
 
-        for link in links:
-            print_message("Link " + link.source.name + ":" + link.destination.name + " scheduled to change at " + str(time))
-        for path in paths:
-            print_message("Path to " + path.links[-1].destination.name + " scheduled to change at " + str(time))
-
-        self.events.append(Timer(time, link_change, [links, new_links, paths, new_paths]))
-
-
-
-def link_change(links, new_links, paths, new_paths):
-    for i, l in enumerate(links):
-        with l.lock:
-            l.bandwidth_bps = new_links[i].bandwidth_bps
-            l.latency = new_links[i].latency
-            l.jitter = new_links[i].jitter
-            l.drop = new_links[i].drop
-
-    for i, path in enumerate(paths):
-        with path.lock:
-            # Apply the precomputed path properties
-            path.jitter = new_paths[i].jitter
-            path.latency = new_paths[i].latency
-            path.drop = new_paths[i].drop
-            path.RTT = new_paths[i].RTT
-            path.max_bandwidth = new_paths[i].max_bandwidth
-
-            service = path.links[-1].destination
-            change_loss(service, path.drop)
-            change_latency(service, path.latency, path.jitter)
-            # We dont explicitly change bandwidth, the emulation manager will handle that for us
-            '''
-            print_message("Path " + path.links[0].source.name + " to " + path.links[-1].destination.name +
-                    " changed to bw:" + str(path.max_bandwidth) + " rtt:"+str(path.RTT)
-                    + " j:" + str(path.jitter) + " l:" + str(path.drop))
-            '''
-
-def path_change(graph, new_graph, changetime):
-#    print_message("performing an update, time = " + str(changetime))
+#As it is currently, it does not work if we just set graph = new_graph.
+#Therefore, we copy all the relevant attributes over.
+#services and hosts_by_ip never change, so we don't copy these at the moment.
+def path_change(graphs):
+    graph = graphs[0]
+    new_graph = graphs[1]
     start = time()
-    #As it is currently, it does not work if we just set graph = new_graph.
-    #Therefore, we copy all the relevant attributes over.
-    #services and hosts_by_ip never change, so we don't copy these at the moment.
-    graph.paths_by_id = new_graph.paths_by_id #was copy
-    graph.removed_links = new_graph.removed_links #was copy
-    graph.removed_bridges = new_graph.removed_bridges #was copy
+    try:
+        #paths_by_id
+        for path in new_graph.paths_by_id.values():
+            original_path_links = get_original_links(graph.links + graph.removed_links, path.links)
+            path.links = original_path_links
+        graph.paths_by_id = new_graph.paths_by_id
+        #bridges
+        for bridge in new_graph.bridges.values():
+            original_bridge_links = get_original_links({**graph.bridges, **graph.removed_bridges}, bridge[0].links)
+            bridge[0].links = original_bridge_links
+        graph.bridges = new_graph.bridges
+        #links
+        original_links = get_original_links(graph.links + graph.removed_links, new_graph.links)
+        new_graph.links = original_links
+        graph.links = new_graph.links
 
-    graph.bridges = new_graph.bridges #was copy
-    graph.links = new_graph.links #was copy
-    graph.link_counter = new_graph.link_counter
-    graph.path_counter = new_graph.path_counter
-    graph.removed_links = new_graph.removed_links #was copy
-    graph.removed_bridges = new_graph.removed_bridges #was copy
+        graph.link_counter = new_graph.link_counter
+        graph.path_counter = new_graph.path_counter
+        graph.removed_links = new_graph.removed_links
+        graph.removed_bridges = new_graph.removed_bridges
+        graph.networks = new_graph.networks
 
-    graph.networks = new_graph.networks #was copy
-    graph.paths_by_id = new_graph.paths_by_id #was copy
-
-    for service in new_graph.paths:
-        if service in graph.paths:
-            current_bw = graph.paths[service].current_bandwidth
-            if not service == graph.root and isinstance(service, NetGraph.Service):
-                with graph.paths[service].lock:
+        #paths
+        for service in new_graph.paths:
+            if service in graph.paths:
+                current_bw = graph.paths[service].current_bandwidth
+                if not service == graph.root and isinstance(service, NetGraph.Service):
+                    with graph.paths[service].lock:
+                        original_path_links = get_original_links(graph.links + graph.removed_links, new_graph.paths[service].links)
+                        new_graph.paths[service].links = original_path_links
+                        graph.paths[service] = new_graph.paths[service]
+                        graph.paths[service].current_bandwidth = current_bw #the new paths have the clean maximum computed. Here we need the bookkeeping of the old path.
+                        change_loss(service, new_graph.paths[service].drop)
+                        change_latency(service, new_graph.paths[service].latency, new_graph.paths[service].jitter)
+            else: # service is now reachable after not having been reachable
+                if isinstance(service, NetGraph.Service):
+                    original_path_links = get_original_links(graph.links + graph.removed_links, new_graph.paths[service].links)
+                    new_graph.paths[service].links = original_path_links
                     graph.paths[service] = new_graph.paths[service]
-#                    print_message("setting current bandwidth to " + str(current_bw) + " from " + str(graph.paths[service].current_bandwidth))
-                    graph.paths[service].current_bandwidth = current_bw #the new paths have the clean maximum computed. Here we need the bookkeeping of the old path.
+                    graph.paths[service].current_bandwidth = 0
                     change_loss(service, new_graph.paths[service].drop)
                     change_latency(service, new_graph.paths[service].latency, new_graph.paths[service].jitter)
-        else: # service is now reachable after not having been reachable
-            if isinstance(service, NetGraph.Service):
-                graph.paths[service] = new_graph.paths[service]
-                graph.paths[service].current_bandwidth = 0
-                change_loss(service, new_graph.paths[service].drop)
-                change_latency(service, new_graph.paths[service].latency, new_graph.paths[service].jitter)
 
-    to_remove = []
-    #is a service not reachable after this change? Then set packet loss to 100%
-    for service in graph.paths:
-        if isinstance(service, NetGraph.Service) and not service in new_graph.paths:
-            to_remove.append(service)
-            change_loss(service, 1.0)
-    for service in to_remove:
-        del graph.paths[service]
+        to_remove = []
+        #is a service not reachable after this change? Then set packet loss to 100%
+        for service in graph.paths:
+            if isinstance(service, NetGraph.Service) and not service in new_graph.paths:
+                to_remove.append(service)
+                change_loss(service, 1.0)
+        for service in to_remove:
+            del graph.paths[service]
 
+    except Exception as e:
+        print_message(e)
     end = time()
     print_message("recalculated in " + str(end - start))

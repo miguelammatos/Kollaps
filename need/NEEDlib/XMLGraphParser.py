@@ -361,7 +361,7 @@ class XMLGraphParser:
             if 'name' in event.attrib and 'time' in event.attrib and 'action' in event.attrib:
                 node_name = event.attrib['name']
                 bridge_names = []
-                for bridge in graph.bridges:
+                for bridge in list(graph.bridges.keys()) + list(graph.removed_bridges.keys()):
                     bridge_names.append(bridge)
 
                 # if a bridge is scheduled
