@@ -7,9 +7,9 @@
 		<service name="server1" image="warpenguin.no-ip.org/alpineserver:1.0" replicas="50" share="false"/>
 		<service name="client2" image="warpenguin.no-ip.org/alpineclient:1.0" replicas="50" command="['server2', '0', '0']"/>
 		<service name="server2" image="warpenguin.no-ip.org/alpineserver:1.0" replicas="50" share="false"/>
-		<service name="client3" image="warpenguin.no-ip.org/alpineclient:1.0" replicas="50" command="['server1', '0', '0']"/>
+		<service name="client3" image="warpenguin.no-ip.org/alpineclient:1.0" replicas="50" command="['server3', '0', '0']"/>
 		<service name="server3" image="warpenguin.no-ip.org/alpineserver:1.0" replicas="50" share="false"/>
-		<service name="client4" image="warpenguin.no-ip.org/alpineclient:1.0" replicas="50" command="['server2', '0', '0']"/>
+		<service name="client4" image="warpenguin.no-ip.org/alpineclient:1.0" replicas="50" command="['server4', '0', '0']"/>
 		<service name="server4" image="warpenguin.no-ip.org/alpineserver:1.0" replicas="50" share="false"/>
 	</services>
 	<bridges>
@@ -21,7 +21,7 @@
                 <link origin="client2" dest="s1" latency="10" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
 				<link origin="client3" dest="s1" latency="10" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
                 <link origin="client4" dest="s1" latency="10" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
-                <link origin="s1" dest="s2" latency="10" upload="1000Mbps" download="1000Mbps" network="test_overlay"/>
+                <link origin="s1" dest="s2" latency="10" upload="2000Mbps" download="1000Mbps" network="test_overlay"/>
                 <link origin="s2" dest="server1" latency="5" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
                 <link origin="s2" dest="server2" latency="5" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
                 <link origin="s2" dest="server3" latency="5" upload="2100Mbps" download="2100Mbps" network="test_overlay"/>
@@ -37,13 +37,13 @@
 		<schedule name="server3" time="0.0" action="join" amount="50"/>
 		<schedule name="server4" time="0.0" action="join" amount="50"/>
 		
-		<schedule name="client1" time="600.0" action="crash" amount="50"/>
-		<schedule name="client2" time="600.0" action="crash" amount="50"/>		
-		<schedule name="client3" time="600.0" action="crash" amount="50"/>
-		<schedule name="client4" time="600.0" action="crash" amount="50"/>
-		<schedule name="server1" time="600.0" action="crash" amount="50"/>
-		<schedule name="server2" time="600.0" action="crash" amount="50"/>
-		<schedule name="server3" time="600.0" action="crash" amount="50"/>
-		<schedule name="server4" time="600.0" action="crash" amount="50"/>
+		<schedule name="client1" time="666.0" action="crash" amount="50"/>
+		<schedule name="client2" time="666.0" action="crash" amount="50"/>
+		<schedule name="client3" time="666.0" action="crash" amount="50"/>
+		<schedule name="client4" time="666.0" action="crash" amount="50"/>
+		<schedule name="server1" time="666.0" action="crash" amount="50"/>
+		<schedule name="server2" time="666.0" action="crash" amount="50"/>
+		<schedule name="server3" time="666.0" action="crash" amount="50"/>
+		<schedule name="server4" time="666.0" action="crash" amount="50"/>
 	</dynamic>
 </experiment>

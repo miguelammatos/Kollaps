@@ -54,7 +54,7 @@ class CommunicationsManager:
 	START_COMMAND = 4
 	ACK = 120
 	i_SIZE = struct.calcsize("<1i")
-	MAX_WORKERS = 10
+	MAX_WORKERS = 2
 	
 	
 	def __init__(self, flow_collector, graph, event_scheduler, ip=None):
@@ -127,20 +127,12 @@ class CommunicationsManager:
 						
 		
 		with open(LOCAL_IPS_FILE, 'r') as file:
-			self.local_ips = json.load(file)
-			for key, value in self.local_ips.items():
-				self.aeron_lib.addLocalSubs(int(key), len(my_starting_links), (c_uint * len(my_starting_links))(*my_starting_links))
-		
-		# with open(LOCAL_IPS_FILE, 'r') as file:
-		# 	self.local_ips = json.load(file)
-		# 	for key, value in self.local_ips.items():
-		# 		self.aeron_lib.addLocalSubs(int(key), len(value), (c_uint * len(value))(*value))
+			for line in file.readlines():
+				self.aeron_lib.addLocalSubs(int(line), len(my_starting_links), (c_uint * len(my_starting_links))(*my_starting_links))
 				
 		with open(REMOTE_IPS_FILE, 'r') as file:
-			self.remote_ips = json.load(file)
-			for key, value in self.remote_ips.items():
-				# self.aeron_lib.addRemoteSubs(int(key), len(value), (c_int * len(value))(*value))
-				self.aeron_lib.addRemoteSubs(int(key))
+			for line in file.readlines():
+				self.aeron_lib.addRemoteSubs(int(line))
 		
 		self.aeron_lib.startPolling()
 		
@@ -156,7 +148,7 @@ class CommunicationsManager:
 		# self.peer_count -= self.supervisor_count
 		#
 		# workers = CommunicationsManager.MAX_WORKERS
-		# self.process_pool = Pool(processes=workers, initializer=initialize_process, initargs=(broadcast_group,))
+		# self.process_pool = Pool(processes=workers)
 		# slice_count = int(len(broadcast_group)/workers)
 		# slice_count = slice_count if slice_count > 0 else 1
 		# self.broadcast_groups = [broadcast_group[i:i+slice_count] for i in range(0, len(broadcast_group), slice_count)]
@@ -184,31 +176,14 @@ class CommunicationsManager:
 		# print_named("(received)", "throughput: " + str(bandwidth) + " links: " + str(link_list[:link_count]))
 		self.flow_collector(bandwidth, link_list[:link_count])
 		self.received += 1
-
-
-	def broadcast_flows(self, active_paths):
-		"""
-		:param active_paths: List[NetGraph.Path]
-		:return:
-		"""
 		
-		try:
-			with self.stop_lock:
-				if len(active_paths) > 0:
-					self.produced += self.peer_count
-					
-					# TODO add_flow directly in EmulationManager.py
-					for path in active_paths:
-						links = [link.index for link in path.links]
-						self.flow_adding_func(int(path.used_bandwidth), len(links), (c_uint * len(links))(*links))
-					
-					self.aeron_lib.flush()
-				
-		except Exception as e:
-			print("[Py] " + str(e))
-			sys.stdout.flush()
-			sys.stderr.flush()
-			
+		
+	def clear_flows_to_be_sent(self):
+		self.aeron_lib.clearFlows()
+	
+	
+	def broadcast_flows(self, active_paths):
+		self.aeron_lib.flush()
 		
 	
 	def shutdown(self):

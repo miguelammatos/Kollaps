@@ -1,10 +1,21 @@
 
 from need.NEEDlib.NetGraph import NetGraph
-from need.NEEDlib.utils import print_and_fail
+from need.NEEDlib.utils import DOCKER_SOCK, print_error_named, print_and_fail
 from uuid import uuid4
+
+import docker
 
 
 class DockerComposeFileGenerator:
+	
+	shm_size = 4000000000
+	aeron_lib_path = "/home/daedalus/Documents/aeron4need/cppbuild/Release/lib/libaeronlib.so"
+	
+	pool_period = 0.05
+	iterations = 2
+	max_flow_age = 2
+	
+	
 	def __init__(self, topology_file, graph):
 		self.graph = graph  # type: NetGraph
 		self.topology_file = topology_file
@@ -14,7 +25,7 @@ class DockerComposeFileGenerator:
 		print("version: \"3.3\"")
 		print("services:")
 
-	def print_bootstrapper(self):
+	def print_bootstrapper(self, number_of_gods):
 		print("  bootstrapper:")
 		print("    image: " + self.graph.bootstrapper)
 		print("    command: [\"-s\", \"" + self.experiment_UUID + "\"]")
@@ -23,8 +34,14 @@ class DockerComposeFileGenerator:
 		print("    environment:")
 		print("      NEED_UUID: '" + self.experiment_UUID + "'")
 		print("      NEED_ORCHESTRATOR: swarm")
+		print("      NUMBER_OF_GODS: " + str(number_of_gods))
+		print("      SHM_SIZE: " + str(self.shm_size))
+		print("      AERON_LIB_PATH: " + self.aeron_lib_path)
 		print("      AERON_TERM_BUFFER_LENGTH: " + str(2*64*1024*1024))		# must be multiple of 64*1024
 		print("      AERON_IPC_TERM_BUFFER_LENGTH: " + str(2*64*1024*1024))	# must be multiple of 64*1024
+		print("      POOL_PERIOD: " + str(self.pool_period))
+		print("      ITERATIONS: " + str(self.iterations))
+		print("      MAX_FLOW_AGE: " + str(self.max_flow_age))
 		print("    labels:")
 		print("      " + "boot"+self.experiment_UUID + ": \"true\"")
 		print("    volumes:")
@@ -98,8 +115,17 @@ class DockerComposeFileGenerator:
 
 
 	def generate(self):
+		number_of_gods = 0
+		try:
+			number_of_gods = len(docker.APIClient(base_url='unix:/' + DOCKER_SOCK).nodes())
+		except Exception as e:
+			msg = "DockerComposeFileGenerator.py requires special permissions in order to view cluster state.\n"
+			msg += "please, generate the .yaml file on a manager node."
+			print_error_named("compose_generator", msg)
+			print_and_fail(e)
+		
 		self.print_header()
-		self.print_bootstrapper()
+		self.print_bootstrapper(number_of_gods)
 		for service in self.graph.services:
 			self.print_service(self.graph.services[service])
 		self.print_configs()
