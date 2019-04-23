@@ -67,10 +67,6 @@ class EventScheduler:
 
         self.path_changes.insert(0, (time, new_graph))
         self.path_changes.sort(reverse=True, key=lambda change: change[0])
-        blah = "Recomputed and stored. Current graph = " + str(new_graph) + ", time = " + str(time) + "\nPath changes:\n"
-        for graph in self.path_changes:
-            blah += str(graph[1]) + ", time = " + str(graph[0]) + "\nPath changes:\n"
-        print_message(blah)
 
     def schedule_join(self, time):
         self.events.append(Timer(time, start_experiment))
@@ -96,9 +92,7 @@ class EventScheduler:
         for i in range(len(self.graph_changes)):
             if i == len(self.graph_changes)-1 or self.graph_changes[i][TIME] < self.graph_changes[i+1][TIME]:
                 self.events.append(Timer(self.graph_changes[i][TIME], path_change, [self.graph_changes[i][GRAPHS]]))
-                print_message("scheduling an update at " + str(self.graph_changes[i][TIME]))
             else:
-                print_message("NOT scheduling an update at " + str(self.graph_changes[i][TIME]))
                 pass
 
     #Remove a link that is currently part of the graph
@@ -203,12 +197,6 @@ class EventScheduler:
         current_graph = self.get_current_graph(graph)
         new_graph = self.initialize_new_graph(current_graph)
 
-#        msg = "-------------------\nbefore link_change:\n-------------------\n"
-#        for path in current_graph.paths_by_id.values():
-#            p = path.prettyprint()
-#            if not p is None:
-#                msg += p
-
         for link in new_graph.links:
             if link.source.name == origin and link.destination.name == destination:
                 link.bandwidth_bps = bandwidth if bandwidth >= 0 else link.bandwidth_bps
@@ -217,14 +205,6 @@ class EventScheduler:
                 link.drop = float(drop) if drop >= 0 else link.drop
 
         self.recompute_and_store(new_graph, time)
-
-#        msg += "------------------\nafter link_change:\n------------------\n"
-#        for path in new_graph.paths_by_id.values():
-#            p = path.prettyprint()
-#            if not p is None:
-#                msg += p
-
-#        print_message(msg)
 
         print_message("Link " + origin + "--" + destination + " scheduled to change at " + str(time))
         self.graph_changes.append((time, [graph, new_graph]))
