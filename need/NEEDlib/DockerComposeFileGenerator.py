@@ -55,10 +55,14 @@ class DockerComposeFileGenerator:
 		print("      " + "boot"+self.experiment_UUID + ": \"true\"")
 		print("    volumes:")
 		if large_xml_file:
-			print("      - '/home/ubuntu/NEED/" + self.topology_file + ":/topology.xml'")
+			print("      - \"/home/ubuntu/NEED/" + self.topology_file + ":/topology.xml\"")
+		# 	print("      - type: bind")
+		# 	print("        source: \"/home/ubuntu/NEED/" + self.topology_file + "\"")
+		# 	print("        target: /topology.xml")
 		print("      - type: bind")
 		print("        source: /var/run/docker.sock")
 		print("        target: /var/run/docker.sock")
+
 		if not large_xml_file:
 			print("    configs:")
 			print("      - source: topology")
@@ -92,9 +96,9 @@ class DockerComposeFileGenerator:
 		print("      NEED_UUID: '" + self.experiment_UUID + "'")
 		print("      NEED_ORCHESTRATOR: swarm")
 		
-		if large_xml_file:
-			print("    volumes:")
-			print("      - '/home/ubuntu/NEED/" + self.topology_file + ":/topology.xml'")
+		# if large_xml_file:
+		# 	print("    volumes:")
+		# 	print("      - \"/home/ubuntu/NEED/" + self.topology_file + ":/topology.xml\"")
 			
 		if service_list[0].supervisor and not large_xml_file:
 			print("    configs:")
@@ -112,10 +116,24 @@ class DockerComposeFileGenerator:
 		print("")
 
 	def print_configs(self):
-		print("configs:")
-		print("  topology:")
-		print("    file: " + self.topology_file)
-		print("")
+		if not large_xml_file:
+			print("configs:")
+			print("  topology:")
+			print("    file: " + self.topology_file)
+			print("")
+		else:
+			print("volumes:")
+			print("  my_volume:")
+			print("    driver: local")
+			print("    driver_opts:")
+			print("      o: bind")
+			print("      type: none")
+			print("      device: /home/ubuntu/NEED")
+			print("")
+
+		
+		
+		
 
 	def print_networks(self):
 		network = self.graph.links[0].network
@@ -147,6 +165,5 @@ class DockerComposeFileGenerator:
 		self.print_bootstrapper(number_of_gods)
 		for service in self.graph.services:
 			self.print_service(self.graph.services[service])
-		if not large_xml_file:
-			self.print_configs()
+		self.print_configs()
 		self.print_networks()

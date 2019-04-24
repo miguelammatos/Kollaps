@@ -373,9 +373,9 @@ def docker_bootstrapper():
         try:
             bootstrapper_id = sys.argv[3]
             bootstrapper_pid = lowLevelClient.inspect_container(bootstrapper_id)["State"]["Pid"]
-            cmd = ["/bin/sh", "-c",
-                "nsenter -t " + str(bootstrapper_pid) + " -m cat " + TOPOLOGY + " | cat > " + TOPOLOGY]
-            Popen(cmd).wait()
+            # cmd = ["/bin/sh", "-c",
+            #     "nsenter -t " + str(bootstrapper_pid) + " -m cat " + TOPOLOGY + " | cat > " + TOPOLOGY]
+            # Popen(cmd).wait()
             break
 
         except Exception as e:

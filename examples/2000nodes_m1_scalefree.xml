@@ -5420,7 +5420,7 @@
 		<link origin="n1964" dest="n813" latency="12" drop="0" upload="100Mbps" network="test_overlay" />
 		<link origin="n1964" dest="n737" latency="2" drop="0" upload="100Mbps" network="test_overlay" />
 	</links>
-		<dynamic>
+	<dynamic>
 		<schedule name="n1344" time="0.0" action="join"/>
 		<schedule name="n1344" time="666.0" action="leave"/>
 		<schedule name="n1343" time="0.0" action="join"/>
