@@ -5,6 +5,17 @@ from uuid import uuid4
 
 
 class KubernetesManifestGenerator:
+    shm_size = 8000000000
+    aeron_lib_path = "/home/daedalus/Documents/aeron4need/cppbuild/Release/lib/libaeronlib.so"
+
+    threading_mode = 'SHARED'			# aeron uses 1 thread
+    # threading_mode = 'SHARED_NETWORK'	# aeron uses 2 thread
+    # threading_mode = 'DEDICATED'		# aeron uses 3 thread
+
+    pool_period = 0.05
+    iterations = 42			# doesnt matter, its here for legacy
+    max_flow_age = 2
+
     def __init__(self, topology_file, graph):
         self.graph = graph  # type: NetGraph
         self.topology_file = topology_file
@@ -62,6 +73,23 @@ class KubernetesManifestGenerator:
         print("          value: "+self.experiment_UUID)
         print("        - name: NEED_ORCHESTRATOR")
         print("          value: 'kubernetes'")
+
+        print("        - name: SHM_SIZE")
+        print("          value: '" + str(self.shm_size) + "'")
+        print("        - name: AERON_LIB_PATH")
+        print("          value: '" + self.aeron_lib_path + "'")
+        print("        - name: AERON_THREADING_MODE")
+        print("          value: '" + self.threading_mode + "'")
+        print("        - name: AERON_TERM_BUFFER_LENGTH")
+        print("          value: '" + str(2*64*1024*1024) + "'")
+        print("        - name: AERON_IPC_TERM_BUFFER_LENGTH")
+        print("          value: '" + str(2*64*1024*1024) + "'")
+        print("        - name: POOL_PERIOD")
+        print("          value: '" + str(self.pool_period) + "'")
+        print("        - name: ITERATIONS")
+        print("          value: '" + str(self.iterations) + "'")
+        print("        - name: MAX_FLOW_AGE")
+        print("          value: '" + str(self.max_flow_age) + "'")
         print("        args:")
         print("        - -g")
         print("        - "+self.experiment_UUID)
