@@ -163,9 +163,7 @@ class EmulationManager:
 				link_indices = flow[INDICES]
 				self.apply_flow(flow)
 				for index in link_indices:
-					for link in self.graph.links:
-						if link.index == index:  # graph.links[x] does not necessarily contain the link with index x anymore
-							active_links.append(link)
+					active_links.append(self.graph.links_by_index[index])
 
 				# # FIXME unnecessary counter, for testing
 				# if flow[AGE] > 0:

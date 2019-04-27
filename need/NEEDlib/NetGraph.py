@@ -22,6 +22,7 @@ class NetGraph:
         self.hosts_by_ip = {} # type: Dict[int, NetGraph.Service]
         self.bridges = {}  # type: Dict[str,List[NetGraph.Service]]
         self.links = []  # type: List[NetGraph.Link]
+        self.links_by_index = {} # type: Dict[int, NetGraph.Link] LL: only used for performance reasons in path_change
         self.link_counter = 0  # increment counter that will give each link an index
         self.path_counter = 0  # increment counter that will give each path an id
         self.removed_links = [] #LL; type: List[NetGraph.Link]
@@ -183,6 +184,7 @@ class NetGraph:
                 self.link_counter += 1
                 self.links.append(link)
                 node.attach_link(link)
+                self.links_by_index[link.index] = link
 
     def bandwidth_in_bps(self, bandwidth_string):
         if re.match(self.bandwidth_re, bandwidth_string) is None:
