@@ -126,16 +126,14 @@ class EmulationManager:
 		# Calculate RTT of this flow
 		rtt = 0
 		for index in link_indices:
-			for link in self.graph.links:
-				if link.index == index:
-					with link.lock:
-						rtt += (link.latency * 2)
+			link = self.graph.links_by_index[index]
+			with link.lock:
+				rtt += (link.latency * 2)
 
 		# Add it to the link's flows
 		for index in link_indices:
-			for link in self.graph.links:
-				if link.index == index:
-					link.flows.append((rtt, bandwidth))
+			link = self.graph.links_by_index[index]
+			link.flows.append((rtt, bandwidth))
 
 
 	def apply_bandwidth(self):

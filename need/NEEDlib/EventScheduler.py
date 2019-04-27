@@ -212,78 +212,6 @@ class EventScheduler:
         print_message("Link " + origin + "--" + destination + " scheduled to change at " + str(time))
         self.graph_changes.append((time, [graph, new_graph]))
 
-'''
-#we need these to re-install the original link objects into changed topologies
-def get_original_links(original_links, new_links, firsthalf, secondhalf):
-        indices = []
-        old_links = []
-        start = time()
-        for link in new_links:
-            inorig = False
-            for lnk in original_links:
-                if lnk.index == link.index:
-                    indices.append(link.index)
-                    inorig = True
-            if not inorig: #a new link has joined in this event
-                old_links.append(link)
-        first = time()
-        for index in indices:
-            for lnk in original_links:
-                if lnk.index == index:
-                    for link in new_links:
-                        if link.index == index:
-                            lnk.bandwidth_bps = link.bandwidth_bps
-                            lnk.latency = link.latency
-                            lnk.jitter = link.jitter
-                            lnk.drop = link.drop
-                            lnk.flows = link.flows
-                            lnk.last_flows_count = link.last_flows_count
-                    old_links.append(lnk)
-        second = time()
-        firsthalf += first - start
-        secondhalf += second - first
-        return old_links, firsthalf, secondhalf
-
-
-#we need these to re-install the original link objects into changed topologies
-def get_original_links2(original_links_dic, new_links_dic):
-        old_links = []
-        for key in new_links_dic:
-            if not key in original_links_dic:
-                old_links.append(new_links_dic[key])
-            else:
-                new = new_links_dic[key]
-                old = original_links_dic[key]
-                old.bandwidth_bps = new.bandwidth_bps
-                old.latency = new.latency
-                old.jitter = new.jitter
-                old.drop = new.drop
-                old.flows = new.flows
-                old.last_flows_count = new.last_flows_count
-                old_links.append(old)
-        return old_links
-
-def makedict(links):
-    link_dic = {}
-    for link in links:
-        link_dic[link.index] = link
-    return link_dic
-
-def update_links(new_links, links_by_index):
-    for link in new_links:
-        oldlink = links_by_index[link.index] if link.index in links_by_index else None
-        if not oldlink is None:
-            link.flows = oldlink.flows
-            link.last_flows_count = oldlink.last_flows_count
-    return new_links
-
-
-def update_links(index_list, links_by_index):
-    links = []
-    for index in index_list:
-        links.append(links_by_index[index])
-    return links
-'''
 def new_links_by_index(new, old):
     new_by_index = {}
     for index in new:
@@ -296,9 +224,10 @@ def new_links_by_index(new, old):
             new_by_index[index] = new[index]
     return new_by_index
 
-#As it is currently, it does not work if we just set graph = new_graph.
-#Therefore, we copy all the relevant attributes over.
-#services and hosts_by_ip never change, so we don't copy these at the moment.
+#We cannot simply set graph = new_graph, because we have references to new_graph in other places.
+#It is important to note that we DO NOT update all properties of the graph, only those necessary for the emulation at runtime.
+#I.e. we do not update bridges, or the links of bridges. We also do not update graph.links, as the emulation rather uses graph.paths_by_id.
+#Other properties, such as services and hosts_by_ip, never change, so we don't update these either.
 def path_change(graphs):
     start = time()
     graph = graphs[0]
@@ -315,8 +244,7 @@ def path_change(graphs):
 
         graph.links_by_index = new_links_by_index(new_graph.links_by_index, graph.links_by_index) #update necessary??
 
-        #apply paths that do exist now...
-        #... and were already in the last graph...
+        #apply paths that do exist now and *were* already in the last graph...
         new_paths_by_id = {}
         for service in new_graph.paths:
             if service in graph.paths:
@@ -344,8 +272,5 @@ def path_change(graphs):
         graph.links_by_index = new_graph.links_by_index #update necessary??
     except Exception as e:
         print_message("Error updating paths: " + str(e))
-
-
-
     end = time()
     print_message("recalculated in " + '{p:.4f}'.format(p=end - start))
