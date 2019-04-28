@@ -288,6 +288,7 @@ def resolve_hostnames():
 
 def query_until_ready():
     resolve_hostnames()
+    print_named("Dashboard", "resolved all hostnames")
     pending_nodes = []
     for node in DashboardState.hosts:
         host = DashboardState.hosts[node]

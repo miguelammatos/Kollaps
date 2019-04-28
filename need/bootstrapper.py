@@ -180,6 +180,7 @@ def kubernetes_bootstrapper():
             sys.stdout.flush()
             sleep(1)  # wait for the Kubernetes API
 
+    print_named("god", "found god_id")
 
     # next we start the Aeron Media Driver
     aeron_media_driver = None
@@ -200,10 +201,10 @@ def kubernetes_bootstrapper():
 
     resolve_ips(kubeAPIInstance, lowLevelClient)
 
+    print_named("god", "resolved all IPs")
+
     need_pods = kubeAPIInstance.list_namespaced_pod('default')
     local_containers = []
-    for container in lowLevelClient.containers():
-        local_containers.append(container["Id"])
 
     while True:
         try:
@@ -211,6 +212,10 @@ def kubernetes_bootstrapper():
 
             # check if containers need bootstrapping
             need_pods = kubeAPIInstance.list_namespaced_pod('default')
+            local_containers.clear()
+            for container in lowLevelClient.containers():
+                local_containers.append(container["Id"])
+
             for pod in need_pods.items:
                 container_id = pod.status.container_statuses[0].container_id[9:]
 

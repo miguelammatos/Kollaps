@@ -33,7 +33,6 @@ def get_own_ip(graph):
 
 
 def main():
-    
     if len(sys.argv) < 4:
         print_and_fail("Missing arguments. emucore <topology> <container id>")
     else:
@@ -68,8 +67,6 @@ def main():
 
     print_identified(graph, "Calculating shortest paths...")
     graph.calculate_shortest_paths()
-#    graph.print_links() #LL
-#    graph.print_paths() #LL
 
     print_message("Parsing dynamic event schedule...")
     scheduler = parser.parse_schedule(graph.root, graph)
