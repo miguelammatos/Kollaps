@@ -51,9 +51,6 @@ These example use the overlay driver, but ipvlan/macvlan networks are also suppo
 
 ### Setting up Docker Swarm
 
-The machine(s) have to be managers of a Docker Swarm.
-(They need to be managers so that the God containers can attach themselves to the test_network)
-
 To create a Swarm, execute on one machine:
 ```
 $docker swarm init
@@ -129,7 +126,9 @@ Syntax:
 ```
 $NEEDdeploymentGenerator topology5.xml <Orchestrator flag> > topology5.yaml
 ```
-The orchestrator flag can be `-s` for Swarm or `-k` for Kubernetes. Default: Swarm.
+The orchestrator flag can be `-s` for Swarm or `-k` for Kubernetes. Default: Swarm. 
+
+On Swarm, this command must be run on a Manager node so that the NEEDdeploymentGenerator can gather information regarding the cluster state and pass it to the bootstrappers as environment variables. This avoids all nodes requiring Manager status.
 
 Note that this must be run from the folder in which the `topology` file sits, or a parent directory.
 
