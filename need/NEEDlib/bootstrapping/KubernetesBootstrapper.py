@@ -93,6 +93,8 @@ class KubernetesBootstrapper(Bootstrapper):
                 print_error_named("god", e)
                 sys.stdout.flush()
                 sleep(1)  # wait for the Kubernetes API
+
+        print_named("god", "found god_id.")
         
         self.start_aeron_media_driver()
         
