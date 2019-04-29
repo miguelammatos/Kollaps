@@ -5,40 +5,36 @@ Clone this repo with:
 ```
 $git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/NEED.git
 ```
-
 This readme is a quick introduction to get NEED running, for further reference see the [NEED Wiki](https://github.com/miguelammatos/NEED/wiki)
 
-## Pre-requisites
-You need a machine running Linux with a recent version of Docker installed, and python 3.
+## Prerequisites
+- You need a machine running **Linux** with a recent version of **Docker** installed, and **Python 3**.
+- To run experiments, build the **NEED image**. Also install the **Python packages** in order to generate runnable deployment files (both in this repository).
+- You also need tho build the **Docker images** for the applications in your experiment. We provide some example images along with our example experiments.
+- NEED experiments rely on a container orchestrator. At the moment, **Docker Swarm** and **Kubernetes** are supported. We describe the workflow for both of these in detail below.
 
-This machine has to be a manager of a Docker Swarm.
-(it needs to be a manager so that the God container can attach itself to the test_network)
-
-To create a Swarm of 1 machine execute:
-```
-$docker swarm init
-```
-
-## Install instructions
+### Installing the Python packages
+Execute in this folder:
 ```
 $pip wheel --no-deps . .
 $pip install need-2.0-py3-none-any.whl
 ```
-Installing the python package will give you access to the NEEDdeploymentGenerator command to translate need topology descriptions into Docker Swarm Compose files on your local machine.
+Installing the python package will give you access to the `NEEDdeploymentGenerator` command to translate NEED topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine. It will also give you access to the `NDLTranslator` command, which lets you declare an experiment in a language with higher-level concepts; these are then translated into XML topology descriptions.
 
-You also need to build the need docker image, to do so execute on this folder:
+### Building the NEED image
+You also need to build the NEED Docker image. To do so, execute in this folder:
 ```
 $docker build --rm -t need:2.0 .
 ```
 
-## How to use
+### Building the application images
 Some simple experiment examples are available in the examples folder.
 
 These experiments use images that are available in https://github.com/joaoneves792/NEED_Images
 
-Before proceding you should build all the images in the folder "samples_need_2_0/" of the above repo.
+Before proceeding, you should build all the images in the folder "samples_need_2_0/" of the above repository.
 
-To avoid changing the xml example files the images should be built with the following tags:
+To avoid changing the XML example files, the images should be built with the following tags:
 
 |folder|Tag|
 |------|---|
@@ -47,75 +43,35 @@ To avoid changing the xml example files the images should be built with the foll
 |dashboard|     warpenguin.no-ip.org/dashboard:1.0 |
 |logger|        warpenguin.no-ip.org/logger:1.0 |
 
-to build each image cd into its respective folder and execute:
+To build each image, `cd` into its respective folder and execute:
 ```
 $docker build -t <Tag> .
 ```
+These example use the overlay driver, but ipvlan/macvlan networks are also supported.
 
-Experiments are described as xml files that can be converted into Docker Swarm Compose files with the NEEDdeploymentGenerator command.
+### Setting up Docker Swarm
 
-Example:
+The machine(s) have to be managers of a Docker Swarm.
+(They need to be managers so that the God containers can attach themselves to the test_network)
+
+To create a Swarm, execute on one machine:
 ```
-$NEEDdeploymentGenerator topology5.xml -s > topology5.yaml
+$docker swarm init
 ```
-
-This experiment requires the existence of an attachable network named "test_overlay".
-To create it run:
+This gives you a join command like this: `docker swarm join --token <token> <IP>:<port>`.
+If you want to run experiments on a multi-node cluster, execute this command on all the other nodes. Promote each of them to manager like this: `docker node promote <node name>`.
+The experiments in the examples folder require the existence of an attachable network named "test_overlay".
+To create it, run:
 ```
 docker network create --driver=overlay --subnet=10.1.0.0/24 test_overlay
 ```
+(Make sure to define a subnet that does not collide with other networks on your setup.)
 
-This example uses the overlay driver, but ipvlan/macvlan networks are also supported.
-
-Make sure to define a subnet that does not collide with other networks on your setup.
-
-
-The experiment can then be deployed to the Swarm with:
-```
-$docker stack deploy -c topology5.yaml 5
-```
-
-(Where 5 is an arbitrary name for the stack you are deploying)
-
-After the experiment is deployed, the dashboard should be accessible on http://127.0.0.1:8088
-
-The dashboard was designed to work even if a conventional browser is not an option
-
-You can use it with a terminal based browser like w3m or simply by issuing HTTP GET requests at http://127.0.0.1:8088/start
-and http://127.0.0.1:8088/stop with a basic tool such as curl.
-
-After the dashboard initializes you have to wait until all services report Ready.
-
-Then you can start the experiment, this will launch the applications inside the containers.
-
-Stopping an experiment will stop the applications and ensure a clean shutdown of need.
-
-After stopping an experiment you can remove the containers with:
-```
-$docker stack rm 5
-```
-
-## Note
-Removing the containers without cleanly stopping the experiment can potentially trigger a kernel memory corruption bug, leading to system instability!
-
-If you have started an experiment (services report as "running" on the dashboard) always stop it through the dashboard before removing the containers.
-
-
-
-
-# NEED on Kubernetes
-
-Since version 2.0, NEED experiments can also be run with Kubernetes as an orchestrator.
-
-### Setup
+### Setting up Kubernetes
 
 Sources: https://serverfault.com/a/684792; https://gist.github.com/alexellis/fdbc90de7691a1b9edb545c17da2d975
 
-First, disable swap on your system.
-
-Find swap volumes with `cat /proc/swaps`
-
-Then, turn off swap:
+First, disable swap on your system: find swap volumes with `cat /proc/swaps`. Then, turn off swap:
 
 ```
 $sudo swapoff --a
@@ -134,7 +90,7 @@ sudo apt-get install -qy kubeadm
 
 Do this on all nodes.
 
-### The Kubernetes master node
+#### The Kubernetes master node
 
 Only on the master node, execute:
 
@@ -143,7 +99,7 @@ $sudo sysctl net.bridge.bridge-nf-call-iptables=1
 $sudo kubeadm init --token-ttl=0
 ```
 
-The `kubeadm init` command tells you to execute the following statements. Do it:
+The `kubeadm init` command tells you to execute the following statements:
 
 ```
 $mkdir -p $HOME/.kube && \
@@ -153,11 +109,12 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 It also gives you a join command like this: `sudo kubeadm join <IP>:<PORT> --token <TOKEN> --discovery-token-ca-cert-hash sha256:<HASH>`. Use this on the worker nodes to join the cluster.
 
-Next (on the master again), install the Weavenet CNI plugin with a custom IP range:
+Next (only on the master again), install the Weavenet CNI plugin with a custom IP range:
 
 ```
 $kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')&env.IPALLOC_RANGE=10.2.0.0/24"
 ```
+Note that we also successfully tested the Calico CNI plugin.
 
 If you want to run pods on the master node, un-taint it:
 
@@ -165,34 +122,66 @@ If you want to run pods on the master node, un-taint it:
 $kubectl taint nodes --all node-role.kubernetes.io/master-
 ```
 
-### Creating manifest files for NEED experiments
+### Generating a deployment file
 
-For instructions on how to install the NEED tools like the NEEDdeploymentGenerator, see above. To generate a Docker Swarm compose file, run on a Manager node:
-
+Use the provided `NEEDdeploymentGenerator` to transform an XML experiment specification into either a Docker Compose file or a Kubernetes Manifest file.
+Syntax:
 ```
-$NEEDdeploymentGenerator topology5.xml -s > topology5.yaml
+$NEEDdeploymentGenerator topology5.xml <Orchestrator flag> > topology5.yaml
 ```
-
-To generate a Kubernetes manifest file, however, run:
-
-```
-$NEEDdeploymentGenerator topology5.xml -k > topology5.yaml
-```
+The orchestrator flag can be `-s` for Swarm or `-k` for Kubernetes. Default: Swarm.
 
 Note that this must be run from the folder in which the `topology` file sits, or a parent directory.
 
-### Running a NEED experiment on Kubernetes
+### Deploying an experiment
 
-Navigate to the folder where your generated manifest yaml sits, and execute:
+On Swarm, deploy the generated file like so:
+
+```
+$docker stack deploy -c topology5.yaml 5
+```
+
+(Where 5 is an arbitrary name for the stack you are deploying)
+
+On Kubernetes, like so:
 
 ```
 $kubectl apply -f topology5.yaml
 ```
 
-To access the dashboard, run `$kubectl get pods -o wide` and find the dashboard pod. Copy the IP address shown and open <IP>:8088 in your browser.
+### Interacting with an experiment
 
-To remove all components for the experiment, run:
+Your main ways of interacting with the experiment are starting and stopping it and monitoring its progress. `exec`ing into the containers is not described in detail here.
 
+It is easiest to interact with the Dashboard through a conventional browser, but it was designed to work even when that is not an option. You can also use a terminal based browser like w3m or simply issue HTTP GET requests with a basic tool such as curl.
+
+After deploying the Compose/Manifest file, the containers are started up and establish a connection to the Dashboard. As soon as all containers are shown as **ready**, you can **start** the experiment. Click **start** or `curl <dashboard IP>:8088/start` to start the experiment. This will launch the applications inside the containers.
+
+#### On Swarm
+
+On Swarm, the Dashboard is accessible on http://127.0.0.1:8088.
+
+#### On Kubernetes
+
+On Kubernetes, there is no port mapping from the container to the host. To find the allocated IP address of the dashboard, run `$kubectl get pods -o wide` and find the dashboard pod. Copy the IP address shown and open `<IP>:8088` in your browser.
+
+### Safely remove an experiment
+
+Clicking "stop" will stop the applications and ensure a clean shutdown of NEED. On the command line, `curl http://<Dashboard IP>:8088/stop`.
+
+On Swarm, remove the containers with:
+```
+$docker stack rm 5
+```
+(Where 5 is the name you gave the deployment).
+
+On Kubernetes:
 ```
 $kubectl delete -f topology5.yaml
 ```
+
+#### Note
+
+Removing the containers without cleanly stopping the experiment can potentially trigger a kernel memory corruption bug, leading to system instability!
+
+If you have started an experiment (services report as "running" on the dashboard), always stop it through the dashboard/on the command line before removing the containers.
