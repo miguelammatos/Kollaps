@@ -9,6 +9,7 @@ setup(name='need',
       packages=['need', 'need.NEEDlib', 'need.TCAL'],
       install_requires=[
           'dnspython',
+          'docker',
           'kubernetes',
           'netifaces'
       ],
