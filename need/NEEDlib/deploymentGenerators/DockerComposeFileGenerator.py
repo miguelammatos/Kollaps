@@ -1,10 +1,11 @@
 
-from need.NEEDlib.NetGraph import NetGraph
-from need.NEEDlib.utils import DOCKER_SOCK, print_error_named, print_and_fail, get_short_id
-from uuid import uuid4
-import random
-
 import docker
+import os
+
+from uuid import uuid4
+
+from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.utils import DOCKER_SOCK, print_error_named, print_and_fail
 
 
 large_xml_file = True
@@ -44,7 +45,7 @@ class DockerComposeFileGenerator:
 		print("      " + "boot"+self.experiment_UUID + ": \"true\"")
 		print("    volumes:")
 		if large_xml_file:
-			print("      - \"/home/ubuntu/NEED/" + self.topology_file + ":/topology.xml\"")
+			print("      - '" + os.path.abspath(self.topology_file) + ":/topology.xml'")
 		print("      - type: bind")
 		print("        source: /var/run/docker.sock")
 		print("        target: /var/run/docker.sock")

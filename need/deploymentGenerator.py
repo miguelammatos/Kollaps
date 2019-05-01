@@ -31,21 +31,22 @@ def main():
     pool_period = 0.05
     max_flow_age = 2
     
+    output = ""
     
     topology_file = sys.argv[1]
     # TODO use argparse to support other orchestrators
-    orchestrator = "kubernetes" if sys.argv[2] == "-k" else "docker"
+    orchestrator = "kubernetes" if sys.argv[2] == "-k" else "swarm"
     graph = NetGraph()
 
     XMLGraphParser(topology_file, graph).fill_graph()
-    print("Graph has " + str(len(graph.links)) + " links.", file=sys.stderr)
+    output += "Graph has " + str(len(graph.links)) + " links.\n"
     service_count = 0
     
     for hosts in graph.services:
         for host in graph.services[hosts]:
             service_count += 1
             
-    print("      has " + str(service_count) + " hosts.", file=sys.stderr)
+    output += "      has " + str(service_count) + " hosts.\n"
 
     if len(graph.links) > SHORT_LIMIT:
         print_and_fail("Topology has too many links: " + str(len(graph.links)))
@@ -69,7 +70,9 @@ def main():
     
     if generator is not None:
         generator.generate(pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length)
-        print("Experiment UUID: " + generator.experiment_UUID, file=sys.stdout)
+        output += "Experiment UUID: " + generator.experiment_UUID
+        print(output, file=sys.stderr)
+        
     else:
         print("Failed to find a suitable generator.", file=sys.stderr)
 

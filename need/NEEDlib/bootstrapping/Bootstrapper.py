@@ -27,6 +27,11 @@ class Bootstrapper(object):
         self.instance_count = 0
         
         
+    def init_clients(self, high_level_client, low_level_client):
+        self.high_level_client = high_level_client
+        self.low_level_client = low_level_client
+        
+        
     def start_aeron_media_driver(self):
         try:
             self.aeron_media_driver = Popen('/usr/bin/Aeron/aeronmd')

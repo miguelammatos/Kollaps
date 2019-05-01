@@ -6,7 +6,13 @@ setup(name='need',
       description='Decentralized network emulator',
       url='https://github.com/miguelammatos/NEED.git',
       author='Joao Neves, Paulo Gouveia, Luca Liechti',
-      packages=['need', 'need.NEEDlib', 'need.TCAL'],
+      packages=[
+          'need',
+          'need.NEEDlib.deploymentGenerators',
+          'need.NEEDlib.bootstrapping',
+          'need.NEEDlib',
+          'need.TCAL'
+      ],
       install_requires=[
           'dnspython',
           'docker',

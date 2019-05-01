@@ -64,7 +64,7 @@ def main():
     if graph.root is None:
         print_and_fail("Failed to identify current service instance in topology!")
     print_message("We are " + graph.root.name + "@" + ownIP)
-
+    
     print_identified(graph, "Calculating shortest paths...")
     graph.calculate_shortest_paths()
 

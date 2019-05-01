@@ -24,7 +24,7 @@ def collect_usage(ip, sent_bytes, qlen):  # qlen: number of packets in the qdisc
 
 
 class EmulationManager:
-
+	
 	# Generic loop tuning
 	ERROR_MARGIN = 0.01	# in percent
 	POOL_PERIOD = float(getenv('POOL_PERIOD', 0.05))		# in seconds

@@ -46,7 +46,7 @@ class SwarmBootstrapper(Bootstrapper):
                 env = inspect_result["Config"]["Env"]
             
                 print_message("[Py (bootstrapper)] ip: " + str(socket.gethostbyname(socket.gethostname())))
-            
+                
                 # create a "God" container that is in the host's Pid namespace
                 self.high_level_client.containers.run(image=boot_image,
                                                       command=["-g", label, str(us.id)],
@@ -80,8 +80,9 @@ class SwarmBootstrapper(Bootstrapper):
         while True:
             try:
                 bootstrapper_pid = self.low_level_client.inspect_container(bootstrapper_id)["State"]["Pid"]
-                cmd = ["/bin/sh", "-c",
-                    "nsenter -t " + str(bootstrapper_pid) + " -m cat " + TOPOLOGY + " | cat > " + TOPOLOGY]
+                cmd = ["/bin/sh",
+                       "-c",
+                       "nsenter -t " + str(bootstrapper_pid) + " -m cat " + TOPOLOGY + " | cat > " + TOPOLOGY]
                 Popen(cmd).wait()
                 break
         
@@ -97,13 +98,14 @@ class SwarmBootstrapper(Bootstrapper):
             inspect_result = self.low_level_client.inspect_container(container_id)
             pid = inspect_result["State"]["Pid"]
         
-            cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard",
+            cmd = ["nsenter", "-t", str(pid),
+                   "-n", "/usr/bin/python3", "/usr/bin/NEEDDashboard",
                    TOPOLOGY]
             dashboard_instance = Popen(cmd)
         
             self.instance_count += 1
             print_named("god", "Dashboard bootstrapped.")
-            self.already_bootstrapped[container.id] = dashboard_instance
+            self.already_bootstrapped[container_id] = dashboard_instance
     
         except:
             print_error_named("god", "! failed to bootstrap dashboard.")
@@ -115,14 +117,15 @@ class SwarmBootstrapper(Bootstrapper):
             inspect_result = self.low_level_client.inspect_container(container_id)
             pid = inspect_result["State"]["Pid"]
         
-            cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDLogger",
+            cmd = ["nsenter", "-t", str(pid),
+                   "-n", "/usr/bin/python3", "/usr/bin/NEEDLogger",
                    TOPOLOGY]
             dashboard_instance = Popen(cmd)
         
             self.instance_count += 1
             print("[Py (god)] Logger bootstrapped.")
             sys.stdout.flush()
-            self.already_bootstrapped[container.id] = dashboard_instance
+            self.already_bootstrapped[container_id] = dashboard_instance
     
         except:
             print_error_named("god", "! failed to bootstrap logger.")
@@ -136,30 +139,34 @@ class SwarmBootstrapper(Bootstrapper):
         
             print_named("god", "Bootstrapping " + container.name + " ...")
         
-            cmd = ["nsenter", "-t", str(pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore",
-                   TOPOLOGY, str(id), str(pid)]
+            cmd = ["nsenter",
+                   "-t", str(pid),
+                   "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore",
+                   TOPOLOGY, str(container_id), str(pid)]
             emucore_instance = Popen(cmd)
         
             self.instance_count += 1
             print_named("god", "Done bootstrapping " + container.name)
-            self.already_bootstrapped[container.id] = emucore_instance
+            self.already_bootstrapped[container_id] = emucore_instance
     
         except:
             print_error_named("god", "! App container bootstrapping failed... will try again.")
 
 
     def bootstrap(self, mode, label, bootstrapper_id):
-        print_named("Bootstrapper", "Swarm bootstrapping started...")
         
         if mode == "-s":
+            # we are the bootstrapper
+            print_named("Bootstrapper", "Swarm bootstrapping started...")
             self.start_god_container(label)
             
         else:
-            # We are the God container
+            # we are the God container
+            print_named("God", "bootstrapping all containers with label " + label + ".")
             
             # first thing to do is copy over the topology
             # FIXME PG check why this was erasing the topology.xml file
-            # self.copy_topology(low_level_client, bootstrapper_id)
+            # self.copy_topology(self.low_level_client, bootstrapper_id)
             
             # next we start the Aeron Media Driver
             self.start_aeron_media_driver()

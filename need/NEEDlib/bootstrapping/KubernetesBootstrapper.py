@@ -80,6 +80,7 @@ class KubernetesBootstrapper(Bootstrapper):
     
     def bootstrap(self, mode, label, bootstrapper_id):
         print_named("Bootstrapper", "Kubernetes bootstrapping started...")
+        print_named("Bootstrapper", "bootstrapping all containers with label " + label + ".")
         
         god_id = None  # get this, it will be argv[3]
         while not god_id:
@@ -109,7 +110,7 @@ class KubernetesBootstrapper(Bootstrapper):
             try:
                 # running container counter, we stop the god if there are 0 same experiment containers running
                 running = 0
-        
+                
                 # check if containers need bootstrapping
                 need_pods = self.high_level_client.list_namespaced_pod('default')
                 local_containers.clear()
