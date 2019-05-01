@@ -1,7 +1,9 @@
 
-from need.NEEDlib.NetGraph import NetGraph
-from need.NEEDlib.utils import print_and_fail
+from kubernetes import client, config
 from uuid import uuid4
+
+from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.utils import print_and_fail, print_error_named
 
 
 class KubernetesManifestGenerator:
@@ -206,10 +208,20 @@ class KubernetesManifestGenerator:
         print("data:")
         print("  topology.xml: \"" + topo.replace("\n", "\\n").replace("\t", "\\t").replace("\"", "\\\"") + "\"")
 
-    def generate(self):
+    def generate(self, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length):
+        number_of_gods = 0
+        try:
+            number_of_gods = len(client.CoreV1Api().list_node().to_dict()["items"])
+            
+        except Exception as e:
+            msg = "DockerComposeFileGenerator.py requires special permissions in order to view cluster state.\n"
+            msg += "please, generate the .yaml file on a manager node."
+            print_error_named("compose_generator", msg)
+            print_and_fail(e)
+        
         self.print_roles()
         print("---")
-        self.print_bootstrapper()
+        self.print_bootstrapper(number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length)
         print("---")
         for service in self.graph.services:
             self.print_service(self.graph.services[service])
