@@ -1,9 +1,11 @@
 
+import os
+
 from kubernetes import client, config
 from uuid import uuid4
 
 from need.NEEDlib.NetGraph import NetGraph
-from need.NEEDlib.utils import print_and_fail, print_error_named
+from need.NEEDlib.utils import print_and_fail, print_error_named, print_named
 
 
 class KubernetesManifestGenerator:
@@ -211,12 +213,15 @@ class KubernetesManifestGenerator:
     def generate(self, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length):
         number_of_gods = 0
         try:
+            if os.getenv('KUBERNETES_SERVICE_HOST'):
+                config.load_incluster_config()
+            else:
+                config.load_kube_config()
+            
             number_of_gods = len(client.CoreV1Api().list_node().to_dict()["items"])
             
+            
         except Exception as e:
-            msg = "DockerComposeFileGenerator.py requires special permissions in order to view cluster state.\n"
-            msg += "please, generate the .yaml file on a manager node."
-            print_error_named("compose_generator", msg)
             print_and_fail(e)
         
         self.print_roles()
