@@ -66,7 +66,7 @@ class KubernetesBootstrapper(Bootstrapper):
         try:
             container_pid = self.low_level_client.inspect_container(container_id)["State"]["Pid"]
         
-            cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore",
+            cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/bin/NEEDemulationManager",
                    TOPOLOGY, str(container_id), str(container_pid)]
             emucore_instance = Popen(cmd)
         

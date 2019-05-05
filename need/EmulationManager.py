@@ -1,9 +1,10 @@
 #! /usr/bin/python
+
 from need.NEEDlib.NetGraph import NetGraph
 from need.NEEDlib.XMLGraphParser import XMLGraphParser
-from need.NEEDlib.EmulationManager import EmulationManager
+from need.NEEDlib.EmulationCore import EmulationCore
 from need.NEEDlib.utils import ENVIRONMENT, int2ip, ip2int, setup_container
-from need.NEEDlib.utils import print_and_fail, print_message, print_identified, print_named
+from need.NEEDlib.utils import print_and_fail, print_message, print_identified
 
 from signal import signal, SIGTERM
 import socket
@@ -74,7 +75,7 @@ def main():
     signal(SIGTERM, lambda signum, frame: exit(0))
 
     print_message("Initializing network emulation...")
-    manager = EmulationManager(graph, scheduler)
+    manager = EmulationCore(graph, scheduler)
     manager.initialize()
     print_identified(graph, "Waiting for command to start experiment")
     sys.stdout.flush()

@@ -141,7 +141,7 @@ class SwarmBootstrapper(Bootstrapper):
         
             cmd = ["nsenter",
                    "-t", str(pid),
-                   "-n", "/usr/bin/python3", "/usr/bin/NEEDemucore",
+                   "-n", "/usr/bin/python3", "/usr/bin/NEEDemulationManager",
                    TOPOLOGY, str(container_id), str(pid)]
             emucore_instance = Popen(cmd)
         

@@ -1,7 +1,7 @@
 #!/bin/sh
 
-pwdesktop=nope
-pwlaptop=nope
+pwdesktop=leviathan
+pwlaptop=jetblack
 
 ########### reset kubernetes ########################################################################
 
