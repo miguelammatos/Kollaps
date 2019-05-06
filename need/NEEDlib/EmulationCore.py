@@ -16,15 +16,15 @@ if sys.version_info >= (3, 0):
 	
 
 # Global variable used within the callback to TCAL
-emuManager = None  # type: EmulationManager
+emuManager = None  # type: EmulationCore
 
 
 def collect_usage(ip, sent_bytes, qlen):  # qlen: number of packets in the qdisc, max is txqueuelen
 	emuManager.collect_own_flow(ip, sent_bytes)
 
 
-class EmulationManager:
-
+class EmulationCore:
+	
 	# Generic loop tuning
 	ERROR_MARGIN = 0.01	# in percent
 	POOL_PERIOD = float(getenv('POOL_PERIOD', 0.05))		# in seconds
@@ -46,12 +46,12 @@ class EmulationManager:
 		self.last_time = 0
 		# self.delayed_flows = 0
 		
-		EmulationManager.POOL_PERIOD = float(environ.get(ENVIRONMENT.POOL_PERIOD, str(EmulationManager.POOL_PERIOD)))
-		EmulationManager.ITERATIONS_TO_INTEGRATE = int(environ.get(ENVIRONMENT.ITERATION_COUNT,
-																   str(EmulationManager.ITERATIONS_TO_INTEGRATE)))
+		EmulationCore.POOL_PERIOD = float(environ.get(ENVIRONMENT.POOL_PERIOD, str(EmulationCore.POOL_PERIOD)))
+		EmulationCore.ITERATIONS_TO_INTEGRATE = int(environ.get(ENVIRONMENT.ITERATION_COUNT,
+																   str(EmulationCore.ITERATIONS_TO_INTEGRATE)))
 		
-		print_message("Pool Period: " + str(EmulationManager.POOL_PERIOD))
-		# print_message("Iteration Count: " + str(EmulationManager.ITERATIONS_TO_INTEGRATE))
+		print_message("Pool Period: " + str(EmulationCore.POOL_PERIOD))
+		# print_message("Iteration Count: " + str(EmulationCore.ITERATIONS_TO_INTEGRATE))
 		
 		self.check_flows_time_delta = 0
 		# We need to give the callback a reference to ourselves (kind of hackish...)
@@ -91,8 +91,8 @@ class EmulationManager:
 		
 		try:
 			while True:
-				# for i in range(EmulationManager.ITERATIONS_TO_INTEGRATE):		# CHANGED iteration count
-				sleep_time = EmulationManager.POOL_PERIOD - (time() - last_time)
+				# for i in range(EmulationCore.ITERATIONS_TO_INTEGRATE):		# CHANGED iteration count
+				sleep_time = EmulationCore.POOL_PERIOD - (time() - last_time)
 				
 				if sleep_time > 0.0:
 					sleep(sleep_time)
@@ -157,7 +157,7 @@ class EmulationManager:
 			flow = self.flow_accumulator[key]
 
 			# TODO recheck age of flows, old packets
-			if flow[AGE] < EmulationManager.MAX_FLOW_AGE:
+			if flow[AGE] < EmulationCore.MAX_FLOW_AGE:
 				link_indices = flow[INDICES]
 				self.apply_flow(flow)
 				for index in link_indices:
@@ -216,8 +216,8 @@ class EmulationManager:
 						path.current_bandwidth = max_bandwidth  # if its less then we now for sure it is correct
 					else:
 						#  if it is more then we have to be careful, it might be a spike due to lost metadata
-						path.current_bandwidth = EmulationManager.ONE_MINUS_ALPHA * path.current_bandwidth + \
-												 EmulationManager.ALPHA * max_bandwidth
+						path.current_bandwidth = EmulationCore.ONE_MINUS_ALPHA * path.current_bandwidth + \
+												 EmulationCore.ALPHA * max_bandwidth
 					service = path.links[-1].destination
 					PathEmulation.change_bandwidth(service, path.current_bandwidth)
 
@@ -254,7 +254,7 @@ class EmulationManager:
 			path = self.graph.paths[host]
 			
 			# Check if this is an active flow
-			if throughput <= (path.max_bandwidth * EmulationManager.ERROR_MARGIN):
+			if throughput <= (path.max_bandwidth * EmulationCore.ERROR_MARGIN):
 				path.used_bandwidth = 0
 				return
 			

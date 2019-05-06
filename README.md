@@ -128,7 +128,8 @@ $NEEDdeploymentGenerator topology5.xml <Orchestrator flag> > topology5.yaml
 ```
 The orchestrator flag can be `-s` for Swarm or `-k` for Kubernetes. Default: Swarm. 
 
-On Swarm, this command must be run on a Manager node so that the NEEDdeploymentGenerator can gather information regarding the cluster state and pass it to the bootstrappers as environment variables. This avoids all nodes requiring Manager status.
+On either orchestrator, this command must be run on a Manager/Master node so that the NEEDdeploymentGenerator can gather information regarding the cluster state and pass it to the bootstrappers as environment variables. 
+This avoids all nodes requiring both Manager/Master status and full knowledge of the containers running on the cluster before the experiment can be started.
 
 Note that this must be run from the folder in which the `topology` file sits, or a parent directory.
 

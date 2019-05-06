@@ -1,10 +1,11 @@
 
-from need.NEEDlib.NetGraph import NetGraph
-from need.NEEDlib.utils import DOCKER_SOCK, print_error_named, print_and_fail, get_short_id
-from uuid import uuid4
-import random
-
 import docker
+import os
+
+from uuid import uuid4
+
+from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.utils import DOCKER_SOCK, print_error_named, print_and_fail
 
 
 large_xml_file = True
@@ -12,28 +13,18 @@ large_xml_file = True
 
 class DockerComposeFileGenerator:
 	
-	shm_size = 8000000000
-	aeron_lib_path = "/home/daedalus/Documents/aeron4need/cppbuild/Release/lib/libaeronlib.so"
-	
-	threading_mode = 'SHARED'			# aeron uses 1 thread
-	# threading_mode = 'SHARED_NETWORK'	# aeron uses 2 thread
-	# threading_mode = 'DEDICATED'		# aeron uses 3 thread
-
-	pool_period = 0.05
-	iterations = 42			# doesnt matter, its here for legacy
-	max_flow_age = 2
-	
-	
 	def __init__(self, topology_file, graph):
 		self.graph = graph  # type: NetGraph
 		self.topology_file = topology_file
 		self.experiment_UUID = str(uuid4())
 		
+		
 	def print_header(self):
 		print("version: \"3.3\"")
 		print("services:")
-
-	def print_bootstrapper(self, number_of_gods):
+		
+		
+	def print_bootstrapper(self, number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length):
 		print("  bootstrapper:")
 		print("    image: " + self.graph.bootstrapper)
 		print("    command: [\"-s\", \"" + self.experiment_UUID + "\"]")
@@ -43,26 +34,22 @@ class DockerComposeFileGenerator:
 		print("      NEED_UUID: '" + self.experiment_UUID + "'")
 		print("      NEED_ORCHESTRATOR: swarm")
 		print("      NUMBER_OF_GODS: " + str(number_of_gods))
-		print("      SHM_SIZE: " + str(self.shm_size))
-		print("      AERON_LIB_PATH: " + self.aeron_lib_path)
-		print("      AERON_THREADING_MODE: " + self.threading_mode)
-		print("      AERON_TERM_BUFFER_LENGTH: " + str(2*64*1024*1024))		# must be multiple of 64*1024
-		print("      AERON_IPC_TERM_BUFFER_LENGTH: " + str(2*64*1024*1024))	# must be multiple of 64*1024
-		print("      POOL_PERIOD: " + str(self.pool_period))
-		print("      ITERATIONS: " + str(self.iterations))
-		print("      MAX_FLOW_AGE: " + str(self.max_flow_age))
+		print("      POOL_PERIOD: " + str(pool_period))
+		print("      MAX_FLOW_AGE: " + str(max_flow_age))
+		print("      SHM_SIZE: " + str(shm_size))
+		print("      AERON_LIB_PATH: " + aeron_lib_path)
+		print("      AERON_THREADING_MODE: " + threading_mode)
+		print("      AERON_TERM_BUFFER_LENGTH: " + str(aeron_term_buffer_length))
+		print("      AERON_IPC_TERM_BUFFER_LENGTH: " + str(aeron_ipc_term_buffer_length))
 		print("    labels:")
 		print("      " + "boot"+self.experiment_UUID + ": \"true\"")
 		print("    volumes:")
 		if large_xml_file:
-			print("      - \"/home/ubuntu/NEED/" + self.topology_file + ":/topology.xml\"")
-		# 	print("      - type: bind")
-		# 	print("        source: \"/home/ubuntu/NEED/" + self.topology_file + "\"")
-		# 	print("        target: /topology.xml")
+			print("      - '" + os.path.abspath(self.topology_file) + ":/topology.xml'")
 		print("      - type: bind")
 		print("        source: /var/run/docker.sock")
 		print("        target: /var/run/docker.sock")
-
+		
 		if not large_xml_file:
 			print("    configs:")
 			print("      - source: topology")
@@ -95,10 +82,6 @@ class DockerComposeFileGenerator:
 		print("    environment:")
 		print("      NEED_UUID: '" + self.experiment_UUID + "'")
 		print("      NEED_ORCHESTRATOR: swarm")
-		
-		# if large_xml_file:
-		# 	print("    volumes:")
-		# 	print("      - \"/home/ubuntu/NEED/" + self.topology_file + ":/topology.xml\"")
 			
 		if service_list[0].supervisor and not large_xml_file:
 			print("    configs:")
@@ -114,26 +97,14 @@ class DockerComposeFileGenerator:
 			print("      - outside")
 
 		print("")
-
+		
 	def print_configs(self):
 		if not large_xml_file:
 			print("configs:")
 			print("  topology:")
 			print("    file: " + self.topology_file)
 			print("")
-		else:
-			print("volumes:")
-			print("  my_volume:")
-			print("    driver: local")
-			print("    driver_opts:")
-			print("      o: bind")
-			print("      type: none")
-			print("      device: /home/ubuntu/NEED")
-			print("")
-
-		
-		
-		
+			
 
 	def print_networks(self):
 		network = self.graph.links[0].network
@@ -150,7 +121,7 @@ class DockerComposeFileGenerator:
 		print("")
 
 
-	def generate(self):
+	def generate(self, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length):
 		number_of_gods = 0
 		try:
 			number_of_gods = len(docker.APIClient(base_url='unix:/' + DOCKER_SOCK).nodes())
@@ -162,7 +133,7 @@ class DockerComposeFileGenerator:
 			print_and_fail(e)
 		
 		self.print_header()
-		self.print_bootstrapper(number_of_gods)
+		self.print_bootstrapper(number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length)
 		for service in self.graph.services:
 			self.print_service(self.graph.services[service])
 		self.print_configs()

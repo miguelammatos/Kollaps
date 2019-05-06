@@ -1,21 +1,14 @@
 
-from need.NEEDlib.NetGraph import NetGraph
-from need.NEEDlib.utils import print_and_fail
+import os
+
+from kubernetes import client, config
 from uuid import uuid4
+
+from need.NEEDlib.NetGraph import NetGraph
+from need.NEEDlib.utils import print_and_fail, print_error_named, print_named
 
 
 class KubernetesManifestGenerator:
-    shm_size = 8000000000
-    aeron_lib_path = "/home/daedalus/Documents/aeron4need/cppbuild/Release/lib/libaeronlib.so"
-
-    threading_mode = 'SHARED'			# aeron uses 1 thread
-    # threading_mode = 'SHARED_NETWORK'	# aeron uses 2 thread
-    # threading_mode = 'DEDICATED'		# aeron uses 3 thread
-
-    pool_period = 0.05
-    iterations = 42			# doesnt matter, its here for legacy
-    max_flow_age = 2
-
     def __init__(self, topology_file, graph):
         self.graph = graph  # type: NetGraph
         self.topology_file = topology_file
@@ -50,8 +43,8 @@ class KubernetesManifestGenerator:
         print("  kind: ClusterRole")
         print("  name: listpods")
         print("  apiGroup: rbac.authorization.k8s.io")
-
-    def print_bootstrapper(self):
+        
+    def print_bootstrapper(self, number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length):
         print("apiVersion: extensions/v1beta1")
         print("kind: DaemonSet")
         print("metadata:")
@@ -73,23 +66,22 @@ class KubernetesManifestGenerator:
         print("          value: "+self.experiment_UUID)
         print("        - name: NEED_ORCHESTRATOR")
         print("          value: 'kubernetes'")
-
-        print("        - name: SHM_SIZE")
-        print("          value: '" + str(self.shm_size) + "'")
-        print("        - name: AERON_LIB_PATH")
-        print("          value: '" + self.aeron_lib_path + "'")
-        print("        - name: AERON_THREADING_MODE")
-        print("          value: '" + self.threading_mode + "'")
-        print("        - name: AERON_TERM_BUFFER_LENGTH")
-        print("          value: '" + str(2*64*1024*1024) + "'")
-        print("        - name: AERON_IPC_TERM_BUFFER_LENGTH")
-        print("          value: '" + str(2*64*1024*1024) + "'")
+        print("        - name: NUMBER_OF_GODS")
+        print("          value: '" + str(number_of_gods) + "'")
         print("        - name: POOL_PERIOD")
-        print("          value: '" + str(self.pool_period) + "'")
-        print("        - name: ITERATIONS")
-        print("          value: '" + str(self.iterations) + "'")
+        print("          value: '" + str(pool_period) + "'")
         print("        - name: MAX_FLOW_AGE")
-        print("          value: '" + str(self.max_flow_age) + "'")
+        print("          value: '" + str(max_flow_age) + "'")
+        print("        - name: SHM_SIZE")                      # on kubernetes we don't need to create a God container
+        print("          value: '" + str(shm_size) + "'")      # so this is not being used
+        print("        - name: AERON_LIB_PATH")
+        print("          value: '" + str(aeron_lib_path) + "'")
+        print("        - name: AERON_THREADING_MODE")
+        print("          value: '" + str(threading_mode) + "'")
+        print("        - name: AERON_TERM_BUFFER_LENGTH")
+        print("          value: '" + str(aeron_term_buffer_length) + "'")
+        print("        - name: AERON_IPC_TERM_BUFFER_LENGTH")
+        print("          value: '" + str(aeron_ipc_term_buffer_length) + "'")
         print("        args:")
         print("        - -g")
         print("        - "+self.experiment_UUID)
@@ -218,10 +210,23 @@ class KubernetesManifestGenerator:
         print("data:")
         print("  topology.xml: \"" + topo.replace("\n", "\\n").replace("\t", "\\t").replace("\"", "\\\"") + "\"")
 
-    def generate(self):
+    def generate(self, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length):
+        number_of_gods = 0
+        try:
+            if os.getenv('KUBERNETES_SERVICE_HOST'):
+                config.load_incluster_config()
+            else:
+                config.load_kube_config()
+            
+            number_of_gods = len(client.CoreV1Api().list_node().to_dict()["items"])
+            
+            
+        except Exception as e:
+            print_and_fail(e)
+        
         self.print_roles()
         print("---")
-        self.print_bootstrapper()
+        self.print_bootstrapper(number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length)
         print("---")
         for service in self.graph.services:
             self.print_service(self.graph.services[service])
