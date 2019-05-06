@@ -1,7 +1,7 @@
 #!/bin/sh
 
-pwdesktop=leviathan
-pwlaptop=jetblack
+pwdesktop=nope
+pwlaptop=nope
 
 ########### reset kubernetes ########################################################################
 
@@ -68,7 +68,7 @@ docker build --rm -t need:2.0 .
 
 # cd ~/Documents/NEED/
 # 
-NEEDdeploymentGenerator examples/topology5.xml -s > topology5.yaml
+NEEDdeploymentGenerator examples/topology5.xml -k > topology5.yaml
 # NEEDdeploymentGenerator examples/topology100.xml -s > topology100.yaml && \
 # NEEDdeploymentGenerator examples/topology200.xml -s > topology200.yaml && \
 # NEEDdeploymentGenerator examples/topology400.xml -s > topology400.yaml
