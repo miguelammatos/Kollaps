@@ -19,7 +19,7 @@ Execute in this folder:
 $pip wheel --no-deps . .
 $pip install need-2.0-py3-none-any.whl
 ```
-Installing the python package will give you access to the `NEEDdeploymentGenerator` command to translate NEED topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine. It will also give you access to the `NDLTranslator` command, which lets you declare an experiment in a language with higher-level concepts; these are then translated into XML topology descriptions.
+Installing the python package will give you access to the `NEEDdeploymentGenerator` command to translate NEED topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine. It will also give you access to the `ThunderstormTranslator` command, which lets you declare an experiment in a language with higher-level concepts; these are then translated into XML topology descriptions.
 
 ### Building the NEED image
 You also need to build the NEED Docker image. To do so, execute in this folder:

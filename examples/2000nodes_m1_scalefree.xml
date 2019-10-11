@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<experiment boot="need:2.0">
+<experiment boot="kollaps:1.0">
 	<services>
 		<service name="dashboard" image="warpenguin.no-ip.org/dashboard:vm" supervisor="true" port="8088"/>
 		<service name="n1344" image="warpenguin.no-ip.org/pingclient:vm" command="['n738', '600', '86']" />

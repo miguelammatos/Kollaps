@@ -1,36 +1,38 @@
 
 from setuptools import setup
 
-setup(name='need',
-      version='2.0',
+setup(name='kollaps',
+      version='1.0',
       description='Decentralized network emulator',
       url='https://github.com/miguelammatos/NEED.git',
       author='Joao Neves, Paulo Gouveia, Luca Liechti',
       packages=[
-          'need',
-          'need.NEEDlib.deploymentGenerators',
-          'need.NEEDlib.bootstrapping',
-          'need.NEEDlib',
-          'need.TCAL'
+          'kollaps',
+          'kollaps.Kollapslib.deploymentGenerators',
+          'kollaps.Kollapslib.bootstrapping',
+          'kollaps.Kollapslib.ThunderStorm',
+          'kollaps.Kollapslib',
+          'kollaps.TCAL'
       ],
       install_requires=[
           'dnspython',
           'docker',
           'kubernetes',
-          'netifaces'
+          'netifaces',
+          'ply'
       ],
       include_package_data=True,
       package_data={
-          'need.TCAL': ['libTCAL.so'],
-          'need': ['static/css/*', 'static/js/*',  'templates/*.html'],
+          'kollaps.TCAL': ['libTCAL.so'],
+          'kollaps': ['static/css/*', 'static/js/*',  'templates/*.html'],
       },
       entry_points={
-          'console_scripts': ['NEEDdeploymentGenerator=need.deploymentGenerator:main',
-                              'NEEDDashboard=need.Dashboard:main',
-                              'NEEDLogger=need.Logger:main',
-                              'NEEDemulationManager=need.EmulationManager:main',
-                              'NEEDbootstrapper=need.bootstrapper:main',
-                              'NDLTranslator=need.NDLTranslator:main'],
+          'console_scripts': ['KollapsDeploymentGenerator=kollaps.deploymentGenerator:main',
+                              'KollapsDashboard=kollaps.Dashboard:main',
+                              'KollapsLogger=kollaps.Logger:main',
+                              'KollapsEmulationManager=kollaps.EmulationManager:main',
+                              'Kollapsbootstrapper=kollaps.bootstrapper:main',
+                              'ThunderstormTranslator=kollaps.ThunderstormTranslator:main'],
       },
       zip_safe=False)
       

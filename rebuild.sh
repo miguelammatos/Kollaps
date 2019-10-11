@@ -1,6 +1,6 @@
 #!/bin/sh
 
-pwdesktop=nope
+pwdesktop=leviathan
 pwlaptop=nope
 
 ########### reset kubernetes ########################################################################
@@ -43,9 +43,10 @@ docker rm $(docker ps -aq)
 cd ~/Documents/NEED/
 
 pip3 wheel --no-deps . . && \
-echo $pwdesktop | sudo -S pip3 install --force-reinstall need-2.0-py3-none-any.whl && \
-docker build --rm -t need:2.0 .
-# docker build --no-cache --rm -t need:2.0 .
+# echo $pwdesktop | sudo -S pip3 install --force-reinstall kollaps-1.0-py3-none-any.whl && \
+pip3 install --force-reinstall kollaps-1.0-py3-none-any.whl && \
+docker build --rm -t kollaps:1.0 .
+# docker build --no-cache --rm -t kollaps:2.0 .
 
 
 #################################################################################################
@@ -68,7 +69,7 @@ docker build --rm -t need:2.0 .
 
 # cd ~/Documents/NEED/
 # 
-NEEDdeploymentGenerator examples/topology5.xml -k > topology5.yaml
+KollapsDeploymentGenerator examples/topology5.xml -s > topology5.yaml
 # NEEDdeploymentGenerator examples/topology100.xml -s > topology100.yaml && \
 # NEEDdeploymentGenerator examples/topology200.xml -s > topology200.yaml && \
 # NEEDdeploymentGenerator examples/topology400.xml -s > topology400.yaml
