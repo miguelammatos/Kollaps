@@ -1,30 +1,30 @@
-# NEED
+# Kollaps
 Decentralized container based network emulator
 
 Clone this repo with:
 ```
-$git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/NEED.git
+$git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/Kollaps.git
 ```
-This readme is a quick introduction to get NEED running, for further reference see the [NEED Wiki](https://github.com/miguelammatos/NEED/wiki)
+This readme is a quick introduction to get Kollaps running, for further reference see the [Kollaps Wiki](https://github.com/miguelammatos/Kollaps/wiki)
 
 ## Prerequisites
 - You need a machine running **Linux** with a recent version of **Docker** installed, and **Python 3**.
-- To run experiments, build the **NEED image**. Also install the **Python packages** in order to generate runnable deployment files (both in this repository).
+- To run experiments, build the **Kollaps image**. Also install the **Python packages** in order to generate runnable deployment files (both in this repository).
 - You also need tho build the **Docker images** for the applications in your experiment. We provide some example images along with our example experiments.
-- NEED experiments rely on a container orchestrator. At the moment, **Docker Swarm** and **Kubernetes** are supported. We describe the workflow for both of these in detail below.
+- Kollaps experiments rely on a container orchestrator. At the moment, **Docker Swarm** and **Kubernetes** are supported. We describe the workflow for both of these in detail below.
 
 ### Installing the Python packages
 Execute in this folder:
 ```
 $pip wheel --no-deps . .
-$pip install need-2.0-py3-none-any.whl
+$pip install kollaps-1.0-py3-none-any.whl
 ```
-Installing the python package will give you access to the `NEEDdeploymentGenerator` command to translate NEED topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine. It will also give you access to the `ThunderstormTranslator` command, which lets you declare an experiment in a language with higher-level concepts; these are then translated into XML topology descriptions.
+Installing the python package will give you access to the `KollapsDeploymentGenerator` command to translate Kollaps topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine. It will also give you access to the `ThunderstormTranslator` command, which lets you declare an experiment in a language with higher-level concepts; these are then translated into XML topology descriptions.
 
-### Building the NEED image
-You also need to build the NEED Docker image. To do so, execute in this folder:
+### Building the Kollaps image
+You also need to build the Kollaps Docker image. To do so, execute in this folder:
 ```
-$docker build --rm -t need:2.0 .
+$docker build --rm -t kollaps:1.0 .
 ```
 
 ### Building the application images
@@ -32,7 +32,7 @@ Some simple experiment examples are available in the examples folder.
 
 These experiments use images that are available in https://github.com/joaoneves792/NEED_Images
 
-Before proceeding, you should build all the images in the folder "samples_need_2_0/" of the above repository.
+Before proceeding, you should build all the images in the folder "samples/" of the above repository.
 
 To avoid changing the XML example files, the images should be built with the following tags:
 
@@ -121,14 +121,14 @@ $kubectl taint nodes --all node-role.kubernetes.io/master-
 
 ### Generating a deployment file
 
-Use the provided `NEEDdeploymentGenerator` to transform an XML experiment specification into either a Docker Compose file or a Kubernetes Manifest file.
+Use the provided `KollapsDeploymentGenerator` to transform an XML experiment specification into either a Docker Compose file or a Kubernetes Manifest file.
 Syntax:
 ```
-$NEEDdeploymentGenerator topology5.xml <Orchestrator flag> > topology5.yaml
+$KollapsDeploymentGenerator topology5.xml <Orchestrator flag> > topology5.yaml
 ```
 The orchestrator flag can be `-s` for Swarm or `-k` for Kubernetes. Default: Swarm. 
 
-On either orchestrator, this command must be run on a Manager/Master node so that the NEEDdeploymentGenerator can gather information regarding the cluster state and pass it to the bootstrappers as environment variables. 
+On either orchestrator, this command must be run on a Manager/Master node so that the KollapsDeploymentGenerator can gather information regarding the cluster state and pass it to the bootstrappers as environment variables. 
 This avoids all nodes requiring both Manager/Master status and full knowledge of the containers running on the cluster before the experiment can be started.
 
 Note that this must be run from the folder in which the `topology` file sits, or a parent directory.
