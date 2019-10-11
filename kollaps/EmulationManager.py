@@ -7,6 +7,7 @@ from kollaps.Kollapslib.utils import ENVIRONMENT, int2ip, ip2int, setup_containe
 from kollaps.Kollapslib.utils import print_and_fail, print_message, print_identified
 
 from signal import signal, SIGTERM
+from os import getenv
 import socket
 import sys
 
@@ -81,8 +82,11 @@ def main():
     sys.stdout.flush()
     sys.stderr.flush()
 
-    # Enter the emulation loop
-    manager.emulation_loop()
+    if getenv('RUNTIME_EMULATION', 'true') != 'false':
+        # Enter the emulation loop
+        manager.emulation_loop()
+        
+        
 
 if __name__ == '__main__':
     main()

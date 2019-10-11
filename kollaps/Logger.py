@@ -2,7 +2,7 @@
 import time
 import socket
 import json
-from os import environ
+from os import environ, getenv
 from threading import Lock
 
 from kollaps.Kollapslib.CommunicationsManager import CommunicationsManager
@@ -76,4 +76,5 @@ def main():
         time.sleep(sleep_time)
 
 if __name__ == "__main__":
-    main()
+    if getenv('RUNTIME_EMULATION', 'true') != 'false':
+        main()

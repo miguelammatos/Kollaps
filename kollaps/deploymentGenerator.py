@@ -12,10 +12,11 @@ from kollaps.Kollapslib.utils import print_message, print_error, print_and_fail
 
 
 def main():
-    if len(sys.argv) != 3:
+    if not (len(sys.argv) == 3 or len(sys.argv) == 4):
         msg = "Usage: deploymentGenerator.py <input topology> <orchestrator> > <output compose file>\n" \
-             + "    <orchestrator> can be -s for Docker Swarm or -k for Kubernetes"
-        
+             + "    <orchestrator> can be -s for Docker Swarm or -k for Kubernetes" \
+             + "    optionally use -d to deactivate bandwidth emulation at runtime."
+
         print_and_fail(msg)
         
     
@@ -33,9 +34,14 @@ def main():
     
     output = ""
     
+    # TODO use argparse to check for flags and arguments properly
+    
     topology_file = sys.argv[1]
-    # TODO use argparse to support other orchestrators
+    
     orchestrator = "kubernetes" if sys.argv[2] == "-k" else "swarm"
+    
+    bw_emulation = False if (len(sys.argv) > 3 and sys.argv[3] == "-d") else True
+
     graph = NetGraph()
 
     XMLGraphParser(topology_file, graph).fill_graph()
@@ -69,7 +75,7 @@ def main():
         pass
     
     if generator is not None:
-        generator.generate(pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length)
+        generator.generate(pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length, bw_emulation)
         output += "Experiment UUID: " + generator.experiment_UUID
         print(output, file=sys.stderr)
         

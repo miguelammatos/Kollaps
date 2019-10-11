@@ -44,7 +44,7 @@ class KubernetesManifestGenerator:
         print("  name: listpods")
         print("  apiGroup: rbac.authorization.k8s.io")
         
-    def print_bootstrapper(self, number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length):
+    def print_bootstrapper(self, number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length, bw_emulation):
         print("apiVersion: extensions/v1beta1")
         print("kind: DaemonSet")
         print("metadata:")
@@ -66,6 +66,9 @@ class KubernetesManifestGenerator:
         print("          value: "+self.experiment_UUID)
         print("        - name: NEED_ORCHESTRATOR")
         print("          value: 'kubernetes'")
+        if bw_emulation is False:
+            print("        - name: RUNTIME_EMULATION")
+            print("          value: 'false'")
         print("        - name: NUMBER_OF_GODS")
         print("          value: '" + str(number_of_gods) + "'")
         print("        - name: POOL_PERIOD")
@@ -210,7 +213,7 @@ class KubernetesManifestGenerator:
         print("data:")
         print("  topology.xml: \"" + topo.replace("\n", "\\n").replace("\t", "\\t").replace("\"", "\\\"") + "\"")
 
-    def generate(self, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length):
+    def generate(self, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length, bw_emulation=True):
         number_of_gods = 0
         try:
             if os.getenv('KUBERNETES_SERVICE_HOST'):
@@ -226,7 +229,7 @@ class KubernetesManifestGenerator:
         
         self.print_roles()
         print("---")
-        self.print_bootstrapper(number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length)
+        self.print_bootstrapper(number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length, bw_emulation)
         print("---")
         for service in self.graph.services:
             self.print_service(self.graph.services[service])

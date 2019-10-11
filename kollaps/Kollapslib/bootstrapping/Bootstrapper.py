@@ -3,6 +3,7 @@
 import socket
 import random
 
+from os import getenv
 from subprocess import Popen
 from multiprocessing import Process
 from time import sleep
@@ -33,20 +34,22 @@ class Bootstrapper(object):
         
         
     def start_aeron_media_driver(self):
-        try:
-            self.aeron_media_driver = Popen('/usr/bin/Aeron/aeronmd')
-            print_named("god", "started aeron_media_driver.")
-
-        except Exception as e:
-            print_error("[Py (god)] failed to start aeron media driver.")
-            print_and_fail(e)
+        if getenv('RUNTIME_EMULATION', 'true') != 'false':
+            try:
+                self.aeron_media_driver = Popen('/usr/bin/Aeron/aeronmd')
+                print_named("god", "started aeron_media_driver.")
+        
+            except Exception as e:
+                print_error("[Py (god)] failed to start aeron media driver.")
+                print_and_fail(e)
     
     
     def terminate_aeron_media_driver(self):
-        if self.aeron_media_driver:
-            self.aeron_media_driver.terminate()
-            print_named("god", "aeron_media_driver terminating...")
-            self.aeron_media_driver.wait()
+        if getenv('RUNTIME_EMULATION', 'true') != 'false':
+            if self.aeron_media_driver:
+                self.aeron_media_driver.terminate()
+                print_named("god", "aeron_media_driver terminating...")
+                self.aeron_media_driver.wait()
             
     
     def broadcast_ips(self, sender_sock, random_number):

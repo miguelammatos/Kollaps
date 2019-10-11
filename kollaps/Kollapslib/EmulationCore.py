@@ -58,7 +58,8 @@ class EmulationCore:
 		global emuManager
 		emuManager = self
 		
-		self.comms = CommunicationsManager(self.collect_flow, self.graph, self.scheduler)
+		if getenv('RUNTIME_EMULATION', 'true') != 'false':
+			self.comms = CommunicationsManager(self.collect_flow, self.graph, self.scheduler)
 		
 		
 	def initialize(self):
@@ -75,7 +76,8 @@ class EmulationCore:
 				if not serviceinstance in self.graph.paths and not serviceinstance.supervisor:
 					PathEmulation.disablePath(serviceinstance)
 					
-		PathEmulation.register_usage_callback(collect_usage)
+		if getenv('RUNTIME_EMULATION', 'true') != 'false':
+			PathEmulation.register_usage_callback(collect_usage)
 
 
 	# What check_active_flows does is call PathEmulation.update_usage(), which calls TCAL.update_usage(), which calls TC_updateUsage().

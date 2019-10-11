@@ -24,7 +24,7 @@ class DockerComposeFileGenerator:
 		print("services:")
 		
 		
-	def print_bootstrapper(self, number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length):
+	def print_bootstrapper(self, number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length, bw_emulation):
 		print("  bootstrapper:")
 		print("    image: " + self.graph.bootstrapper)
 		print("    command: [\"-s\", \"" + self.experiment_UUID + "\"]")
@@ -34,6 +34,8 @@ class DockerComposeFileGenerator:
 		print("      NEED_UUID: '" + self.experiment_UUID + "'")
 		print("      NEED_ORCHESTRATOR: swarm")
 		print("      NUMBER_OF_GODS: " + str(number_of_gods))
+		if bw_emulation is False:
+			print("      RUNTIME_EMULATION: 'false'")
 		print("      POOL_PERIOD: " + str(pool_period))
 		print("      MAX_FLOW_AGE: " + str(max_flow_age))
 		print("      SHM_SIZE: " + str(shm_size))
@@ -121,7 +123,7 @@ class DockerComposeFileGenerator:
 		print("")
 
 
-	def generate(self, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length):
+	def generate(self, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length, bw_emulation=True):
 		number_of_gods = 0
 		try:
 			number_of_gods = len(docker.APIClient(base_url='unix:/' + DOCKER_SOCK).nodes())
@@ -133,7 +135,7 @@ class DockerComposeFileGenerator:
 			print_and_fail(e)
 		
 		self.print_header()
-		self.print_bootstrapper(number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length)
+		self.print_bootstrapper(number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length, bw_emulation)
 		for service in self.graph.services:
 			self.print_service(self.graph.services[service])
 		self.print_configs()

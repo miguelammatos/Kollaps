@@ -101,30 +101,6 @@ class CommunicationsManager:
 		self.callback = c_callback  # keep reference so it does not get garbage collected
 		self.aeron_lib.registerCallback(self.callback)
 		
-		
-		# broadcast_group = []
-		# for service in self.graph.services:
-		# 	hosts = self.graph.services[service]
-		# 	for host in hosts:
-		# 		if host != self.graph.root:
-		# 			self.peer_count += 1
-		# 			broadcast_group.append(int2ip(host.ip))
-		# 		if host.supervisor:
-		# 			self.supervisor_count += 1
-		# self.peer_count -= self.supervisor_count
-
-		# workers = CommunicationsManager.MAX_WORKERS
-		# self.process_pool = Pool(processes=workers)
-		# slice_count = int(len(broadcast_group)/workers)
-		# slice_count = slice_count if slice_count > 0 else 1
-		# self.broadcast_groups = [broadcast_group[i:i+slice_count] for i in range(0, len(broadcast_group), slice_count)]
-
-		# self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		# self.sock.bind(('0.0.0.0', CommunicationsManager.UDP_PORT))
-
-		# self.thread = Thread(target=self.receive_flows)
-		# self.thread.daemon = True
-		# self.thread.start()
 
 		self.dashboard_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.dashboard_socket.bind(('0.0.0.0', CommunicationsManager.TCP_PORT))

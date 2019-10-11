@@ -346,9 +346,12 @@ def main():
 
 
     DashboardState.graph = graph
-    startupThread = Thread(target=query_until_ready)
-    startupThread.daemon = True
-    startupThread.start()
+    
+    if getenv('RUNTIME_EMULATION', 'true') != 'false':
+        startup_thread = Thread(target=query_until_ready)
+        startup_thread.daemon = True
+        startup_thread.start()
+        
     app.run(host='0.0.0.0', port=8088)
 
 
