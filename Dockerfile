@@ -21,6 +21,7 @@ RUN pacman -Sy --noconfirm \
     python \
     python-pip \
     make \
+    gettext \
     flex \
     bison \
     gcc \
