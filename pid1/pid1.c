@@ -8,7 +8,7 @@
 #include <signal.h>
 
 /*PID1
- *Special init process for NEED
+ *Special init process for Kollaps
  *Required to prevent "ragnarok" events from leaving behind zombie containers
  *The main purpose is launching the GOD and reaping all children upon its death
  */
