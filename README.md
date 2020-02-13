@@ -5,7 +5,8 @@ Clone this repo with:
 ```
 $git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/Kollaps.git
 ```
-This readme is a quick introduction to get Kollaps running, for further reference see the [Kollaps Wiki](https://github.com/miguelammatos/Kollaps/wiki)
+This readme is a quick introduction to get Kollaps running. 
+For further reference and details, check out the [Kollaps Wiki](https://github.com/miguelammatos/Kollaps/wiki)
 
 ## Prerequisites
 - You need a machine running **Linux** with a recent version of **Docker** installed, and **Python 3**.
