@@ -1,26 +1,31 @@
 # Kollaps
 Decentralized container based network emulator
 
-Clone this repo with:
-```
-$git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/Kollaps.git
-```
-This readme is a quick introduction to get Kollaps running. 
+
+This README is a quick introduction to run experiments with Kollaps and Thunderstorm.
+Kollaps is the decentralized network emulator while Thunderstorm is the high-level language to specify experiments.
 For further reference and details, check out the [Kollaps Wiki](https://github.com/miguelammatos/Kollaps/wiki)
 
 ## Prerequisites
+- Clone this repo with:
+```
+$git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/Kollaps.git
+```
 - You need a machine running **Linux** with a recent version of **Docker** installed, and **Python 3**.
-- To run experiments, build the **Kollaps image**. Also install the **Python packages** in order to generate runnable deployment files (both in this repository).
-- You also need tho build the **Docker images** for the applications in your experiment. We provide some example images along with our example experiments.
+- To run experiments, you need to build the **Kollaps tools** to generate runnable deployment files and the  **Kollaps image** as detailed below.
+- You also need to build the **Docker images** for the applications in your experiment. We provide some example images along with our example experiments.
 - Kollaps experiments rely on a container orchestrator. At the moment, **Docker Swarm** and **Kubernetes** are supported. We describe the workflow for both of these in detail below.
 
-### Installing the Python packages
-Execute in this folder:
+### Installing the Kollaps tools
+Execute in the root folder (where this README is found):
 ```
-$pip wheel --no-deps . .
-$pip install kollaps-1.0-py3-none-any.whl
+$pip3 wheel --no-deps . .
+$pip3 install kollaps-1.0-py3-none-any.whl
 ```
-Installing the python package will give you access to the `KollapsDeploymentGenerator` command to translate Kollaps topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine. It will also give you access to the `ThunderstormTranslator` command, which lets you declare an experiment in a language with higher-level concepts; these are then translated into XML topology descriptions.
+This installs the following tools:
+- `KollapsDeploymentGenerator` that translate Kollaps topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine.
+- `ThunderstormTranslator` command, which lets you declare an experiment in a language with higher-level concepts which are then translated into XML topology descriptions.
+- Note that the examples below assume both tools are in your PATH, which might require restarting your shell.
 
 ### Building the Kollaps image
 You also need to build the Kollaps Docker image. To do so, execute in this folder:
@@ -28,135 +33,88 @@ You also need to build the Kollaps Docker image. To do so, execute in this folde
 $docker build --rm -t kollaps:1.0 .
 ```
 
+And also build the dashboard image, which allows to control the experiments.
+
+```
+$ cd images/dashboard/
+$docker build --rm -t kollaps/dashboard:1.0 .
+```
+
 ### Building the application images
-Some simple experiment examples are available in the examples folder.
 
-These experiments use images that are available in https://github.com/joaoneves792/NEED_Images
+With the Kollaps tools and Kollaps images built, the next step is to build the images of the application under testing and define the network topology.
+For simplicity, we provide multiple examples in the *examples* directory.
 
-Before proceeding, you should build all the images in the folder "samples/" of the above repository.
+We will detail the iPerf3 experiment found in the *examples/iperf3* directory.
 
-To avoid changing the XML example files, the images should be built with the following tags:
+```
+$cd examples/iperf3/
+```
 
-|folder|Tag|
-|------|---|
-|alpineclient|  warpenguin.no-ip.org/alpineclient:1.0 |
-|alpineserver|  warpenguin.no-ip.org/alpineserver:1.0 |
-|dashboard|     warpenguin.no-ip.org/dashboard:1.0 |
-|logger|        warpenguin.no-ip.org/logger:1.0 |
-
-To build each image, `cd` into its respective folder and execute:
+To build each image, `cd` into its respective directory and execute:
 ```
 $docker build -t <Tag> .
 ```
-These example use the overlay driver, but ipvlan/macvlan networks are also supported.
+as follows:
 
-### Setting up Docker Swarm
+|folder|Tag|
+|------|---|
+|iperf3-client|  kollaps/iperf3-client:1.0 |
+|iperf3-server|  kollaps/iperf3-server:1.0 |
 
-To create a Swarm, execute on one machine:
-```
-$docker swarm init
-```
-This gives you a join command like this: `docker swarm join --token <token> <IP>:<port>`.
-If you want to run experiments on a multi-node cluster, execute this command on all the other nodes. Promote each of them to manager like this: `docker node promote <node name>`.
-The experiments in the examples folder require the existence of an attachable network named "test_overlay".
-To create it, run:
-```
-docker network create --driver=overlay --subnet=10.1.0.0/24 test_overlay
-```
-(Make sure to define a subnet that does not collide with other networks on your setup.)
 
-### Setting up Kubernetes
 
-Sources: https://serverfault.com/a/684792; https://gist.github.com/alexellis/fdbc90de7691a1b9edb545c17da2d975
+The next step is to specify the topology.
 
-First, disable swap on your system: find swap volumes with `cat /proc/swaps`. Then, turn off swap:
-
-```
-$sudo swapoff --a
-```
-
-Comment out any of the volumes found before in `/etc/fstab` and reboot your system.
-
-Then, install Kubernetes:
-
-```
-$curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && \
-echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list && \
-sudo apt-get update -q && \
-sudo apt-get install -qy kubeadm
-```
-
-Do this on all nodes.
-
-#### The Kubernetes master node
-
-Only on the master node, execute:
-
-```
-$sudo sysctl net.bridge.bridge-nf-call-iptables=1
-$sudo kubeadm init --token-ttl=0
-```
-
-The `kubeadm init` command tells you to execute the following statements:
-
-```
-$mkdir -p $HOME/.kube && \
-sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && \
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
-```
-
-It also gives you a join command like this: `sudo kubeadm join <IP>:<PORT> --token <TOKEN> --discovery-token-ca-cert-hash sha256:<HASH>`. Use this on the worker nodes to join the cluster.
-
-Next (only on the master again), install the Weavenet CNI plugin with a custom IP range:
-
-```
-$kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')&env.IPALLOC_RANGE=10.2.0.0/24"
-```
-Note that we also successfully tested the Calico CNI plugin.
-
-If you want to run pods on the master node, un-taint it:
-
-```
-$kubectl taint nodes --all node-role.kubernetes.io/master-
-```
-
-### Generating a deployment file
+#### Generating a deployment file
 
 Use the provided `KollapsDeploymentGenerator` to transform an XML experiment specification into either a Docker Compose file or a Kubernetes Manifest file.
-Syntax:
-```
-$KollapsDeploymentGenerator topology5.xml <Orchestrator flag> > topology5.yaml
-```
-The orchestrator flag can be `-s` for Swarm or `-k` for Kubernetes. Default: Swarm. 
 
-On either orchestrator, this command must be run on a Manager/Master node so that the KollapsDeploymentGenerator can gather information regarding the cluster state and pass it to the bootstrappers as environment variables. 
+This assumes a working Docker Swarm or Kubernetes environment.
+See [here](Orchestrators.md) for brief setup instructions.
+
+The file *examples/iperf3/topology.xml* is provided as an example.
+This example assumes the existence of a network named *kollaps_network*.
+Create one (see [here](Orchestrators.md)) or update the xml file accordingly.
+
+```
+
+$KollapsDeploymentGenerator topology.xml <orchestrator> > experiment.yaml
+```
+The orchestrator flag can be `-s` for Docker Swarm or `-k` for Kubernetes.
+
+On either orchestrator, this command must be run on a Manager/Master node so that the KollapsDeploymentGenerator can gather information regarding the cluster state and pass it to the bootstrappers as environment variables.
 This avoids all nodes requiring both Manager/Master status and full knowledge of the containers running on the cluster before the experiment can be started.
 
 Note that this must be run from the folder in which the `topology` file sits, or a parent directory.
+The resulting Compse/Manifest YAML file is directly deployable in Docker Swarm or Kubernetes and can be further customised as needed.
 
 ### Deploying an experiment
 
-On Swarm, deploy the generated file like so:
+To deploy the generated file on Docker Swarm:
 
 ```
-$docker stack deploy -c topology5.yaml 5
+$docker stack deploy -c experiment.yaml experiment
 ```
 
-(Where 5 is an arbitrary name for the stack you are deploying)
+(Where "experiment" is an arbitrary name for the stack you are deploying)
 
-On Kubernetes, like so:
+To deploy the generated file in Kubernetes:
 
 ```
-$kubectl apply -f topology5.yaml
+$kubectl apply -f experiment.yaml
 ```
 
 ### Interacting with an experiment
 
-Your main ways of interacting with the experiment are starting and stopping it and monitoring its progress. `exec`ing into the containers is not described in detail here.
+Your main ways of interacting with the experiment are starting and stopping it and monitoring its progress.
+You can also `exec` into the containers as needed but we do not detail this here.
 
-It is easiest to interact with the Dashboard through a conventional browser, but it was designed to work even when that is not an option. You can also use a terminal based browser like w3m or simply issue HTTP GET requests with a basic tool such as curl.
+The easiest way to interact with the experiments is through the *dashboard* through a web browser.
+However, the dashboard was designed with the CLI in mind and can be interacted with through a terminal based browser like w3m or simply through HTTP GET requests with a basic tool such as curl.
+The dashboard is available by default on *<dashboardIP:8088>*.
 
-After deploying the Compose/Manifest file, the containers are started up and establish a connection to the Dashboard. As soon as all containers are shown as **ready**, you can **start** the experiment. Click **start** or `curl <dashboard IP>:8088/start` to start the experiment. This will launch the applications inside the containers.
+After deploying the Compose/Manifest file, the containers are started up and establish a connection to the Dashboard. As soon as all containers are shown as **ready**, you can **start** the experiment. Click **start** or `curl <dashboard IP>:8088/start` to start the experiment. This will launch the applications inside the containers (by invoking the respective entrypoints).
 
 #### On Swarm
 
@@ -168,21 +126,15 @@ On Kubernetes, there is no port mapping from the container to the host. To find 
 
 ### Safely remove an experiment
 
-Clicking "stop" will stop the applications and ensure a clean shutdown of NEED. On the command line, `curl http://<Dashboard IP>:8088/stop`.
+Clicking "stop" will stop the applications and ensure a clean shutdown of the experiment. On the command line, `curl http://<Dashboard IP>:8088/stop`.
 
 On Swarm, remove the containers with:
 ```
-$docker stack rm 5
+$docker stack rm experiment
 ```
-(Where 5 is the name you gave the deployment).
+(where experiment is the name you gave the deployment).
 
 On Kubernetes:
 ```
-$kubectl delete -f topology5.yaml
+$kubectl delete -f experiment.yaml
 ```
-
-#### Note
-
-Removing the containers without cleanly stopping the experiment can potentially trigger a kernel memory corruption bug, leading to system instability!
-
-If you have started an experiment (services report as "running" on the dashboard), always stop it through the dashboard/on the command line before removing the containers.

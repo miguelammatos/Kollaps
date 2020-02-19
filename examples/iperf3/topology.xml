@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<experiment boot="kollaps:1.0">
+	<services>
+		<!-- definition of the services (containers),  -->
+		<!-- kollaps dashboard to controll the experiments, should be present in all deployments -->
+		<service name="dashboard" image="kollaps/dashboard:1.0" supervisor="true" port="8088"/>
+		<!-- iperf clients -->
+		<!-- <service name="client1" image="kollaps/iperf3-client:1.0" command="['server', '0', '0']"/> -->
+
+		<!-- the "command" can be used to pass parameters to the container entrypoints.
+		     In this example we are passsing "server" which will be used to discover the IPs
+                     of the servers at run time -->
+		<service name="client1" image="kollaps/iperf3-client:1.0" command="['server']"/>
+		<service name="client2" image="kollaps/iperf3-client:1.0" command="['server']"/>
+		<service name="client3" image="kollaps/iperf3-client:1.0" command="['server']"/>
+		<!-- iperf server, declared once, but three instances will be started, see below -->
+		<service name="server" image="kollaps/iperf3-server:1.0" share="false"/>
+	</services>
+	<bridges>
+		<!-- definition of the network elements (routers and switches) -->
+                <bridge name="s1"/>
+                <bridge name="s2"/>
+	</bridges>
+        <links>
+		<!-- definition of the links, the "network" should match the name of an existing container network -->
+                <link origin="client1" dest="s1" latency="10" upload="100Mbps" download="100Mbps" network="kollaps_network"/>
+                <link origin="client2" dest="s1" latency="5" upload="100Mbps" download="100Mbps" network="kollaps_network"/>
+                <link origin="client3" dest="s1" latency="5" upload="10Mbps" download="10Mbps" network="kollaps_network"/>
+                <link origin="s1" dest="s2" latency="10" upload="50Mbps" download="50Mbps" network="kollaps_network"/>
+                <link origin="s2" dest="server" latency="5" upload="100Mbps" download="100Mbps" network="kollaps_network"/>
+	</links>
+	<dynamic>
+		<!-- schedulle the dynamics of the experiment. These apply to services and links, see documentation for more details.
+		     This section can be ommited in which case all the services will be started at the beginning of the experiment -->
+		<schedule name="client1" time="0.0" action="join"/>
+		<schedule name="client2" time="0.0" action="join"/>
+		<schedule name="client3" time="0.0" action="join"/>
+		<!-- were we start three instances of the "server" service --> 
+		<schedule name="server"  time="0.0" action="join" amount="3"/>
+		
+		<schedule name="client1" time="120.0" action="crash"/>
+		<schedule name="client2" time="120.0" action="crash"/>
+		<schedule name="client3" time="120.0" action="crash"/>
+		<schedule name="server"  time="120.0" action="leave" amount="3"/>
+	</dynamic>
+</experiment>
