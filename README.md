@@ -19,8 +19,8 @@ $git clone --branch master --depth 1 --recurse-submodules https://github.com/mig
 ### Installing the Kollaps tools
 Execute in the root folder (where this README is found):
 ```
-$pip3 wheel --no-deps . .
-$pip3 install kollaps-1.0-py3-none-any.whl
+$ pip3 wheel --no-deps . .
+$ pip3 install kollaps-1.0-py3-none-any.whl
 ```
 This installs the following tools:
 - `KollapsDeploymentGenerator` that translate Kollaps topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine.
@@ -30,14 +30,14 @@ This installs the following tools:
 ### Building the Kollaps image
 You also need to build the Kollaps Docker image. To do so, execute in this folder:
 ```
-$docker build --rm -t kollaps:1.0 .
+$ docker build --rm -t kollaps:1.0 .
 ```
 
 And also build the dashboard image, which allows to control the experiments.
 
 ```
 $ cd images/dashboard/
-$docker build --rm -t kollaps/dashboard:1.0 .
+$ docker build --rm -t kollaps/dashboard:1.0 .
 ```
 
 ### Building the application images
@@ -48,12 +48,12 @@ For simplicity, we provide multiple examples in the *examples* directory.
 We will detail the iPerf3 experiment found in the *examples/iperf3* directory.
 
 ```
-$cd examples/iperf3/
+$ cd examples/iperf3/
 ```
 
 To build each image, `cd` into its respective directory and execute:
 ```
-$docker build -t <Tag> .
+$ docker build -t <Tag> .
 ```
 as follows:
 
@@ -79,7 +79,7 @@ Create one (see [here](Orchestrators.md)) or update the xml file accordingly.
 
 ```
 
-$KollapsDeploymentGenerator topology.xml <orchestrator> > experiment.yaml
+$ KollapsDeploymentGenerator topology.xml <orchestrator> > experiment.yaml
 ```
 The orchestrator flag can be `-s` for Docker Swarm or `-k` for Kubernetes.
 
@@ -94,7 +94,7 @@ The resulting Compse/Manifest YAML file is directly deployable in Docker Swarm o
 To deploy the generated file on Docker Swarm:
 
 ```
-$docker stack deploy -c experiment.yaml experiment
+$ docker stack deploy -c experiment.yaml experiment
 ```
 
 (Where "experiment" is an arbitrary name for the stack you are deploying)
@@ -102,7 +102,7 @@ $docker stack deploy -c experiment.yaml experiment
 To deploy the generated file in Kubernetes:
 
 ```
-$kubectl apply -f experiment.yaml
+$ kubectl apply -f experiment.yaml
 ```
 
 ### Interacting with an experiment
@@ -130,11 +130,11 @@ Clicking "stop" will stop the applications and ensure a clean shutdown of the ex
 
 On Swarm, remove the containers with:
 ```
-$docker stack rm experiment
+$ docker stack rm experiment
 ```
 (where experiment is the name you gave the deployment).
 
 On Kubernetes:
 ```
-$kubectl delete -f experiment.yaml
+$ kubectl delete -f experiment.yaml
 ```
