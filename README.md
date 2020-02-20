@@ -19,6 +19,7 @@ $git clone --branch master --depth 1 --recurse-submodules https://github.com/mig
 ### Installing the Kollaps tools
 Execute in the root folder (where this README is found):
 ```
+$ sudo apt install python3-pip
 $ pip3 wheel --no-deps . .
 $ pip3 install kollaps-1.0-py3-none-any.whl
 ```
