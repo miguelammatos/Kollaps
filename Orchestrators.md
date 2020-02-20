@@ -8,7 +8,7 @@ $docker swarm init
 ```
 This gives you a join command like this: `docker swarm join --token <token> <IP>:<port>`.
 If you want to run experiments on a multi-node cluster, execute this command on all the other nodes. Promote each of them to manager like this: `docker node promote <node name>`.
-The experiments in the examples folder require the existence of an attachable network named "test_overlay".
+The experiments in the examples folder require the existence of an attachable network named "kollaps_network".
 To create it, run:
 ```
 docker network create --driver=overlay --subnet=10.1.0.0/24 kollaps_network
