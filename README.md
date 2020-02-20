@@ -31,6 +31,7 @@ This installs the following tools:
 ### Building the Kollaps image
 You also need to build the Kollaps Docker image. To do so, execute in this folder:
 ```
+$ sudo apt install docker.io
 $ docker build --rm -t kollaps:1.0 .
 ```
 
