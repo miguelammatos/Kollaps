@@ -116,6 +116,10 @@ The dashboard is available by default on *<dashboardIP:8088>*.
 
 After deploying the Compose/Manifest file, the containers are started up and establish a connection to the Dashboard. As soon as all containers are shown as **ready**, you can **start** the experiment. Click **start** or `curl <dashboard IP>:8088/start` to start the experiment. This will launch the applications inside the containers (by invoking the respective entrypoints).
 
+After this point the experiment will run, following the schedule in the topology description file, if any.
+You can observe/measure the performance of the application using the usual tools.
+In the iPerf example we are using, some coarse grained information is available under */var/log/* in each container.
+
 #### On Swarm
 
 On Swarm, the Dashboard is accessible on http://127.0.0.1:8088.
