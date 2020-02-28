@@ -1,5 +1,5 @@
-# Kollaps
-Decentralized container based network emulator
+# Kollaps: Decentralized container based network emulator
+=====
 
 
 This README is a quick introduction to run experiments with Kollaps and Thunderstorm.
