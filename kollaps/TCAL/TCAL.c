@@ -24,7 +24,7 @@
 #include "TC.h"
 #include "TCAL.h"
 
-//TODO now that we controll the environment in NEED we no longer need libutc, so we can go back to calling tc directly
+//TODO now that we controll the environment in Kollaps we no longer need libutc, so we can go back to calling tc directly
 
 
 Destination* hosts = NULL;

@@ -259,7 +259,7 @@ void TC_initDestination(Destination *dest) {
         /*char p[] = "0.00001%";
         char r[] = "0.00001%";
         ARG("loss")ARG("gemodel")ARG(p)ARG(r)
-         FOR FUTURE REFERENCE (regarding NEED):
+         FOR FUTURE REFERENCE (regarding Kollaps):
          If you want to get loss behaviour like real-world buffers filling,
          than Gilbert model is not enough, it has to be coordinated with bw throttling.
          TCP reacts to loss by reducing throughput, but it will always try to be on the edge of packet loss

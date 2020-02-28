@@ -216,12 +216,12 @@ class NetGraph:
 
     def resolve_hostnames(self):
 
-        orchestrator = os.getenv('NEED_ORCHESTRATOR', 'swarm')
+        orchestrator = os.getenv('KOLLAPS_ORCHESTRATOR', 'swarm')
         if orchestrator == 'kubernetes':
             # kubernetes version
             # we are only talking to the kubernetes API
 
-            experimentUUID = environ.get('NEED_UUID', '')
+            experimentUUID = environ.get('KOLLAPS_UUID', '')
             config.load_incluster_config()
             kubeAPIInstance = client.CoreV1Api()
             need_pods = kubeAPIInstance.list_namespaced_pod('default')
@@ -260,7 +260,7 @@ class NetGraph:
             # So to get the names to resolve properly we need to force to use dockers internal nameserver
             # 127.0.0.11
 
-            experimentUUID = environ.get('NEED_UUID', '')
+            experimentUUID = environ.get('KOLLAPS_UUID', '')
             docker_resolver = dns.resolver.Resolver(configure=False)
             docker_resolver.nameservers = ['127.0.0.11']
             for service in self.services:

@@ -11,7 +11,7 @@ n=$((${#host}-1))
 host_id="${host:$n:1}"
 
 #obtain the service identifier
-service="$1-$NEED_UUID"
+service="$1-$KOLLAPS_UUID"
 
 echo ID $host_id >> /tmp/log
 echo Service $service >> /tmp/log
