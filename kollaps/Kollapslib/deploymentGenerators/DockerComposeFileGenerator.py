@@ -46,8 +46,8 @@ class DockerComposeFileGenerator:
 		print("    deploy:")
 		print("      mode: global")
 		print("    environment:")
-		print("      NEED_UUID: '" + self.experiment_UUID + "'")
-		print("      NEED_ORCHESTRATOR: swarm")
+		print("      KOLLAPS_UUID: '" + self.experiment_UUID + "'")
+		print("      KOLLAPS_ORCHESTRATOR: swarm")
 		print("      NUMBER_OF_GODS: " + str(number_of_gods))
 		if bw_emulation is False:
 			print("      RUNTIME_EMULATION: 'false'")
@@ -75,14 +75,14 @@ class DockerComposeFileGenerator:
 			print("        gid: '0'")
 			print("        mode: 0555")
 		print("    networks:")
-		print("      - NEEDnet")
+		print("      - KollapsNet")
 		print("")
 
 	def print_service(self, service_list):
 		print("  " + service_list[0].name + "-" + self.experiment_UUID + ":")
 		print("    image: " + service_list[0].image)
 		if not service_list[0].supervisor:
-			print('    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/NEED_hang; exec /bin/sh <> /tmp/NEED_hang #"]')
+			print('    entrypoint: ["/bin/sh", "-c", "mkfifo /tmp/Kollaps_hang; exec /bin/sh <> /tmp/Kollaps_hang #"]')
 		if service_list[0].command is not None:
 			print("    command: " + service_list[0].command)
 		if service_list[0].supervisor_port > 0:
@@ -97,8 +97,8 @@ class DockerComposeFileGenerator:
 		if not service_list[0].supervisor:
 			print("      endpoint_mode: dnsrr")
 		print("    environment:")
-		print("      NEED_UUID: '" + self.experiment_UUID + "'")
-		print("      NEED_ORCHESTRATOR: swarm")
+		print("      KOLLAPS_UUID: '" + self.experiment_UUID + "'")
+		print("      KOLLAPS_ORCHESTRATOR: swarm")
 			
 		if service_list[0].supervisor and not large_xml_file:
 			print("    configs:")
@@ -109,7 +109,7 @@ class DockerComposeFileGenerator:
 			print("        mode: 0555")
 			
 		print("    networks:")
-		print("      - NEEDnet")
+		print("      - KollapsNet")
 		if service_list[0].supervisor:
 			print("      - outside")
 
@@ -130,7 +130,7 @@ class DockerComposeFileGenerator:
 				print_and_fail("Multiple network support is not yet implemented!")
 
 		print("networks:")
-		print("  NEEDnet:")
+		print("  KollapsNet:")
 		print("    external:")
 		print("      name: " + network)
 		print("  outside:")

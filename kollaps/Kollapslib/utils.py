@@ -44,8 +44,8 @@ GOD_IPS_SHARE_PORT = 55555
 class ENVIRONMENT:
 	NETWORK_INTERFACE = 'NETWORK_INTERFACE'
 	BROADCAST = 'BROADCAST_ADDRESS'
-	POOL_PERIOD = 'NEED_POOL_PERIOD'
-	ITERATION_COUNT = 'NEED_ITERATION_COUNT'
+	POOL_PERIOD = 'KOLLAPS_POOL_PERIOD'
+	ITERATION_COUNT = 'KOLLAPS_ITERATION_COUNT'
 
 
 class CONTAINER:
@@ -58,8 +58,6 @@ class CONTAINER:
 
 
 def start_experiment():
-	# Temporary hack to start the experiment
-	#subprocess.run('echo "done" > /tmp/readypipe', shell=True)
 	inspect = CONTAINER.ll.inspect_container(CONTAINER.id)
 	cmd = inspect['Config']['Cmd']
 	image = inspect['Image']
@@ -75,10 +73,9 @@ def start_experiment():
 		command = ' '.join(entrypoint)
 	else:
 		command = ' '.join(entrypoint + cmd)
-	#arg = ['/bin/sh'] + ['-c'] + [command]
 	command.replace('"', '\\"')
 	command.replace("'", "\\'")
-	arg = ['echo ' + command + ' > /tmp/NEED_hang']
+	arg = ['echo ' + command + ' > /tmp/Kollaps_hang']
 	print_message(arg[0])
 	CONTAINER.container.exec_run(['/bin/sh'] + ['-c'] + arg, detach=True)
 

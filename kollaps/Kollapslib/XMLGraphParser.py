@@ -281,7 +281,7 @@ class XMLGraphParser:
         XMLtree = ET.parse(self.file)
         root = XMLtree.getroot()
         if root.tag != 'experiment':
-            print_and_fail('Not a valid NEED topology file, root is not <experiment>')
+            print_and_fail('Not a valid Kollaps topology file, root is not <experiment>')
 
         if 'boot' not in root.attrib:
             print_and_fail('<experiment boot="?"> The experiment needs a valid boostrapper image name')
@@ -330,7 +330,7 @@ class XMLGraphParser:
         XMLtree = ET.parse(self.file)
         root = XMLtree.getroot()
         if root.tag != 'experiment':
-            print_and_fail('Not a valid NEED topology file, root is not <experiment>')
+            print_and_fail('Not a valid Kollaps topology file, root is not <experiment>')
 
         dynamic = None
 
