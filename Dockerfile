@@ -1,7 +1,5 @@
-
 # base/archlinux is deprecated; replaced with archlinux/base
 FROM archlinux/base:latest
-
 
 # Yes we are using archlinux
 # Crazy right? Why not debian or ubuntu or alpine?
@@ -62,6 +60,3 @@ RUN make -C /Kollaps/pid1 && \
 
 
 ENTRYPOINT ["/usr/bin/pid1", "/usr/bin/python3", "-m", "kollaps.bootstrapper"]
-
-
-#RUN git clone --branch master --depth 1 --recurse-submodules git@NEED:joaoneves792/NEED.git ;\

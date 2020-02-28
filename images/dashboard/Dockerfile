@@ -1,5 +1,3 @@
-# FROM alpine:3.8
-# FROM warpenguin.no-ip.org/alpineclient:1.0
 FROM alpine:3.9
 
 

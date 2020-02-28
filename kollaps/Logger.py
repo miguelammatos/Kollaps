@@ -29,7 +29,7 @@ import sys
 if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
 
-LOG_FILE = "/var/log/NEED_LOG.json"
+LOG_FILE = "/var/log/Kollaps_LOG.json"
 DEFAULT_INTERVAL = 1.0
 
 class LoggerState:

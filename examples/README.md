@@ -1,4 +1,4 @@
-#Kollaps examples
+# Kollaps examples
 
 This folder contains several example images to illustrate the usage of Kollaps.
 
