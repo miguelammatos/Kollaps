@@ -40,7 +40,7 @@ def main():
         bootstrapper_id = sys.argv[3] if len(sys.argv) > 3 else None
     
         bootstrapper = None
-        orchestrator = os.getenv('NEED_ORCHESTRATOR', 'swarm')
+        orchestrator = os.getenv('KOLLAPS_ORCHESTRATOR', 'swarm')
         
         if orchestrator == 'kubernetes':
             bootstrapper = KubernetesBootstrapper()

@@ -217,9 +217,9 @@ def startExperiment():
 
 
 def resolve_hostnames():
-    experimentUUID = environ.get('NEED_UUID', '')
+    experimentUUID = environ.get('KOLLAPS_UUID', '')
     
-    orchestrator = getenv('NEED_ORCHESTRATOR', 'swarm')
+    orchestrator = getenv('KOLLAPS_ORCHESTRATOR', 'swarm')
     if orchestrator == 'kubernetes':
         config.load_incluster_config()
         kubeAPIInstance = client.CoreV1Api()
