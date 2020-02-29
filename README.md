@@ -29,7 +29,7 @@ This is the recommended and quickest way to get Kollaps running, you just need t
 docker build --rm -f dockerfiles/Kollaps -t kollaps:1.0 .
 docker build -f dockerfiles/DeploymentGenerator -t kollaps-deployment-generator:1.0 .
 ```
-Now you are ready to test [some applications](examples/README.md).
+Now you are ready to test [some applications](examples/).
 
 ### Installation from Source <a name="source">
 
@@ -48,4 +48,4 @@ This installs the following tools:
 - `ThunderstormTranslator` command, which lets you declare an experiment in a language with higher-level concepts which are then translated into XML topology descriptions.
 Note that the examples below assume both tools are in your PATH, which might require restarting your shell.
 
-The rest of the procedure to test applications is depicted [here](experiments/README.md).
+The rest of the procedure to test applications is depicted [here](examples/).
