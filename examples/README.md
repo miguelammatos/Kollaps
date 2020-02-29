@@ -19,8 +19,7 @@ This folder contains several example images to illustrate the usage of Kollaps.
 We provide two convenience scripts in order to generate the required images for each application together with their deployment file.
 Note that you will need to have the `kollaps` and `kollapsdeploymentgenerator` images available, to build them follow the instructions in the [main repository](https://github.com/miguelammatos/Kollaps).
 
-<a name="topology"/>
-#### Generating a topology file:
+#### Generating a topology file: <a name="topology"/>
 
 Inside each application's folder, you will find a sample `topology.xml` that specifies the topology to be emulated.
 Feel free to modify those at will, in particular, if you are interested in experimenting with different network shapes, modify the `<bridges>` and `links` section.
@@ -36,8 +35,7 @@ Or the following one for **Kubernetes** (note that we just change the flag):
 ./KollapsDeploymentGenerator ./<app_name>/topology.xml -k <your_experiment_name>.yaml
 ```
 
-<a name="app"/>
-**Building an application:**
+#### Building an application: <a name="app"/>
 
 Now you are ready to build the service images to launch and emulate your application with Kollaps.
 In order to build the images run:
@@ -46,8 +44,7 @@ In order to build the images run:
 ```
 where the supported app names are `iperf3` and `redis` which we describe in more detail [below](#available-apps).
 
-<a name="deploy"/>
-#### Deploying an experiment:
+#### Deploying an experiment: <a name="deploy"/>
 
 Lastly, you just need to deploy the experiment.
 
@@ -61,8 +58,7 @@ If you are using **Kubernetes**:
 kubectl apply -f experiment.yaml
 ```
 
-<a name="interacting"/>
-* Interacting with a running experiment:
+#### Interacting with a running experiment: <a name="interacting"/>
 
 The easiest way to interact with the experiments is through the *dashboard* through a web browser.
 You can also `exec` into the containers as needed but we do not detail this here.
@@ -78,8 +74,7 @@ On Swarm, the Dashboard is accessible on `http://127.0.0.1:8088`.
 
 On Kubernetes, there is no port mapping from the container to the host. To find the allocated IP address of the dashboard, run `$kubectl get pods -o wide` and find the dashboard pod. Copy the IP address shown and open `<IP>:8088` in your browser.
 
-<a name="stop"/>
-* Safely stopping an experiment:
+#### Safely stopping an experiment: <a name="stop"/>
 
 Clicking "stop" will stop the applications and ensure a clean shutdown of the experiment. On the command line, `curl http://<Dashboard IP>:8088/stop`.
 
@@ -97,15 +92,12 @@ $ kubectl delete -f <your_experiment_name>.yaml
 
 Currently we have two available sample applications, feel free to PR for more.
 
-<a name="iperf3"/>
-* iPerf3:
+#### iPerf3: <a name="iperf3"/>
 
 In this experiment (in the default setting) we set up three [iPerf3](https://iperf.fr/) clients which will connect to three different iPerf3 servers. Each client will try to saturate the bandwidth for 100 seconds and stop.
 
 Check the shell scripts under the *iperf3-client* and *iperf3-server* directory for further details.
 
-
-<a name="redis"/>
-* Redis:
+#### Redis: <a name="redis"/>
 
 redis: experiment that uses the Redis database
