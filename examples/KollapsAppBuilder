@@ -1,0 +1,47 @@
+#!/bin/bash
+SCRIPT_NAME=$0
+
+function usage {
+    echo "usage: $SCRIPT_NAME <app_dir>"
+    echo "  -app_dir                    name of the app to build: redis, iperf3"
+    echo "  -h/--help                   display this help message."
+    exit 1
+}
+
+if [ "$#" -ne 1 ];
+then
+    echo "Illegal number of parameters!"
+    usage
+fi
+
+if [[ ! -d "$1" ]];
+then
+    echo "Not supported app: $1."
+    usage
+fi
+
+if [[ ! -d "utils" ]];
+then
+    echo "Utils directory not found! Make sure you are running the script from the examples' home directory."
+    exit 1
+fi
+
+case $1 in
+    "iperf3")
+        echo "Building images for the iPerf3 application..."
+        docker build -f iperf3/iperf3-client/Dockerfile -t kollaps/iperf3-client:1.0 iperf3/iperf3-client
+        docker build -f iperf3/iperf3-server/Dockerfile -t kollaps/iperf3-server:1.0 iperf3/iperf3-server
+        ;;
+
+    "redis")
+        echo "Building images for the Redis application..."
+        ;;
+
+    *)
+        echo "Not supported app: $1."
+        usage
+        ;;
+esac
+
+echo "Building helper images..."
+docker build -f utils/dashboard/Dockerfile -t kollaps/dashboard:1.0 utils/dashboard/
