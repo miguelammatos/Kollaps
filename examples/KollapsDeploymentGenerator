@@ -1,0 +1,57 @@
+#!/bin/bash
+SCRIPT_NAME=$0
+
+function usage {
+    echo "usage: $SCRIPT_NAME <topology_file.xml> <orchestrator> <experiment_file.yaml>"
+    echo "  -topology_file.xml          path to the input topology file."
+    echo "  -orchestrator               -s for swarm, -k for kubernetes."
+    echo "  -<experiment_file.yaml>     desired name for the compose yaml file."
+    echo "  -h/--help                   display this help message."
+    exit 1
+}
+
+if [ "$#" -ne 3 ];
+then
+    echo "Illegal number of parameters!"
+    usage
+fi
+
+if [[ $1 != *.xml ]];
+then
+    echo "First parameter must be an xml file!"
+    usage
+fi
+
+if [[ $2 != "-k" && $2 != "-s" ]];
+then
+    echo "Specify a valid orchestrator flag: -s for Swarm or -k for Kubernetes."
+    usage
+fi
+
+if [[ $3 != *.yaml ]];
+then
+    echo "Experiment name must have the yaml extension!"
+    usage
+fi
+
+if [[ -d "tmp_result" ]];
+then
+    DIR_EXISTS=true
+else
+    DIR_EXISTS=false
+    mkdir tmp_result
+fi
+
+docker run --rm \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v "$(pwd)/$1":"$(pwd)/$1" \
+    -v "$(pwd)/tmp_result":"/result/" \
+    kollaps-deployment-generator:1.0 \
+    bash -c "KollapsDeploymentGenerator $(pwd)/$1 $2 > /result/$3"
+
+mv "tmp_result/$3" .
+
+if [ "$DIR_EXISTS" = false ]
+then
+    rm -rf tmp_result
+fi
