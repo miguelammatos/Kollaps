@@ -1,10 +1,8 @@
 ## Kollaps Example Applications
-=====
 
 This folder contains several example images to illustrate the usage of Kollaps.
 
-=====
-**Table of Contents:**
+### Table of Contents:
 1. [Basic usage](#basic-usage)
   * [Generating a topology file](#topology)
   * [Building an application](#app)
@@ -14,10 +12,9 @@ This folder contains several example images to illustrate the usage of Kollaps.
 2. [Available Applications](#available-apps)
   * [iPerf3](#iperf)
   * [Redis](#redis)
-=====
 
-<a name="basic-usage"/>
-**1. Basic Usage:**
+
+### 1. Basic Usage: <a name="basic-usage"/>
 
 We provide two convenience scripts in order to generate the required images for each application together with their deployment file.
 Note that you will need to have the `kollaps` and `kollapsdeploymentgenerator` images available, to build them follow the instructions in the [main repository](https://github.com/miguelammatos/Kollaps).
@@ -96,8 +93,7 @@ On Kubernetes:
 $ kubectl delete -f <your_experiment_name>.yaml
 ```
 
-<a name="iperf3"/>
-**2. Available Applications:**
+### 2. Available Applications: <a name="iperf3"/>
 
 Currently we have two available sample applications, feel free to PR for more.
 
