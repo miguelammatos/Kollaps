@@ -4,14 +4,14 @@ This folder contains several example images to illustrate the usage of Kollaps.
 
 ### Table of Contents:
 1. [Basic usage](#basic-usage)
-  * [Generating a topology file](#topology)
-  * [Building an application](#app)
-  * [Deploying an experiment](#deploy)
-  * [Interacting with a running experiment](#interacting)
-  * [Safely stopping an experiment](#stop)
+    * [Generating a topology file](#topology)
+    * [Building an application](#app)
+    * [Deploying an experiment](#deploy)
+    * [Interacting with a running experiment](#interacting)
+    * [Safely stopping an experiment](#stop)
 2. [Available Applications](#available-apps)
-  * [iPerf3](#iperf)
-  * [Redis](#redis)
+    * [iPerf3](#iperf3)
+    * [Redis](#redis)
 
 
 ### 1. Basic Usage: <a name="basic-usage"/>
@@ -20,7 +20,7 @@ We provide two convenience scripts in order to generate the required images for 
 Note that you will need to have the `kollaps` and `kollapsdeploymentgenerator` images available, to build them follow the instructions in the [main repository](https://github.com/miguelammatos/Kollaps).
 
 <a name="topology"/>
-* Generating a topology file:
+#### Generating a topology file:
 
 Inside each application's folder, you will find a sample `topology.xml` that specifies the topology to be emulated.
 Feel free to modify those at will, in particular, if you are interested in experimenting with different network shapes, modify the `<bridges>` and `links` section.
@@ -37,7 +37,7 @@ Or the following one for **Kubernetes** (note that we just change the flag):
 ```
 
 <a name="app"/>
-* Building an application:
+**Building an application:**
 
 Now you are ready to build the service images to launch and emulate your application with Kollaps.
 In order to build the images run:
@@ -47,7 +47,7 @@ In order to build the images run:
 where the supported app names are `iperf3` and `redis` which we describe in more detail [below](#available-apps).
 
 <a name="deploy"/>
-* Deploying an experiment:
+#### Deploying an experiment:
 
 Lastly, you just need to deploy the experiment.
 
