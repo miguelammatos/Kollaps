@@ -4,7 +4,7 @@ from setuptools import setup
 setup(name='kollaps',
       version='1.0',
       description='Decentralized network emulator',
-      url='https://github.com/miguelammatos/NEED.git',
+      url='https://github.com/miguelammatos/Kollaps.git',
       author='Joao Neves, Paulo Gouveia, Luca Liechti',
       packages=[
           'kollaps',
