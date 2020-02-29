@@ -1,4 +1,4 @@
-# Kollaps: Decentralized container based network emulator
+## Kollaps: Decentralized Container Based Network Emulator
 
 This README is a quick introduction to get up and running with Kollaps and Thunderstorm.
 Kollaps is the decentralized network emulator while Thunderstorm is the high-level language to specify experiments.
@@ -16,7 +16,7 @@ To do so, we recommend following Docker's instructions, we include links for [Ub
 
 Secondly, you just need to clone this repository with it's dependencies using the following command:
 ```
-$git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/Kollaps.git
+git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/Kollaps.git
 ```
 
 Lastly, you will need to set up your orchestrator of choice, currently both **Docker Swarm** and **Kubernetes** are supported.
@@ -29,15 +29,12 @@ This is the recommended and quickest way to get Kollaps running, you just need t
 docker build --rm -f dockerfiles/Kollaps -t kollaps:1.0 .
 docker build -f dockerfiles/DeploymentGenerator -t kollaps-deployment-generator:1.0 .
 ```
+Now you are ready to test [some applications](examples/README.md).
 
 ### Installation from Source <a name="source">
 
 You need a machine running **Linux** with a recent version of **Docker** installed, and **Python 3**.
-To run experiments, you need to build the **Kollaps tools** to generate runnable deployment files and the  **Kollaps image** as detailed below.
-You also need to build the **Docker images** for the applications in your experiment.
-We provide some example images along with our example experiments.
-Kollaps experiments rely on a container orchestrator. At the moment, **Docker Swarm** and **Kubernetes** are supported.
-We describe the workflow for both of these in detail below.
+To run experiments, you need to build the **Kollaps tools** to generate runnable deployment files.
 
 **Installing the Kollaps tools:**
 
@@ -50,3 +47,5 @@ This installs the following tools:
 - `KollapsDeploymentGenerator` that translate Kollaps topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine.
 - `ThunderstormTranslator` command, which lets you declare an experiment in a language with higher-level concepts which are then translated into XML topology descriptions.
 Note that the examples below assume both tools are in your PATH, which might require restarting your shell.
+
+The rest of the procedure to test applications is depicted [here](experiments/README.md).
