@@ -7,24 +7,25 @@ You may also want to check the project's [website](https://angainor.science/koll
 
 ### Table of Contents:
 0. [Prerequisites](#pre)
-1. [Installation Using Docker](#docker-install)
-2. [Insalling from source](#source)
+1. [Installation using Docker images](#docker-install)
+2. [Installation from source](#source)
 
 ### Prerequisites <a name="pre">
-Regardless of what installation method you choose, you will need to have `docker` installed.
-To do so, we recommend following Docker's instructions, we include links for [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/) and [macOS](https://docs.docker.com/docker-for-mac/install/).
+Regardless of what installation method you choose, you will need to have `docker` correctly installed and running on your nodes.
+To do so, we recommend following Docker's instructions. Check the official instructions for [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/) and [macOS](https://docs.docker.com/docker-for-mac/install/).
 
-Secondly, you just need to clone this repository with it's dependencies using the following command:
+Secondly, you just need to clone this repository and its dependencies:
 ```
 git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/Kollaps.git
 ```
 
-Lastly, you will need to set up your orchestrator of choice, currently both **Docker Swarm** and **Kubernetes** are supported.
+Lastly, you will need to set-up your container orchestrator of choice.
+Currently we support both **Docker Swarm** and **Kubernetes**.
 For more information check out [this file](Orchestrators.md).
     
 ### Installation Using Docker <a name="docker-install">
 
-This is the recommended and quickest way to get Kollaps running, you just need to build the two following images:
+This is the recommended and quickest way to get Kollaps running. It only requires to build the two Docker images, as follows:
 ```
 docker build --rm -f dockerfiles/Kollaps -t kollaps:1.0 .
 docker build -f dockerfiles/DeploymentGenerator -t kollaps-deployment-generator:1.0 .
@@ -48,4 +49,4 @@ This installs the following tools:
 - `ThunderstormTranslator` command, which lets you declare an experiment in a language with higher-level concepts which are then translated into XML topology descriptions.
 Note that the examples below assume both tools are in your PATH, which might require restarting your shell.
 
-The rest of the procedure to test applications is depicted [here](examples/).
+The rest of the procedure to test applications is described [here](examples/).
