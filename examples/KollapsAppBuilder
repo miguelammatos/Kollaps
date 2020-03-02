@@ -33,6 +33,12 @@ case $1 in
         docker build -f iperf3/iperf3-server/Dockerfile -t kollaps/iperf3-server:1.0 iperf3/iperf3-server
         ;;
 
+    "memcached")
+        echo "Building images for the memcacehd application..."
+        docker build -f memcached/memtier-client/Dockerfile -t kollaps/memtier-client:1.0 memcached/memtier-client
+        docker build -f memcached/memcached-server/Dockerfile -t kollaps/memcached-server:1.0 memcached/memcached-server
+        ;;
+
     "redis")
         echo "Building images for the Redis application..."
         ;;
