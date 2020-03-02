@@ -50,7 +50,7 @@ Lastly, you just need to deploy the experiment.
 
 If you are using **Docker Swarm** as orchestrator:
 ```
-docker stack deploy <your_experiment_name>.yaml <deployment_name>
+docker stack deploy -c <your_experiment_name>.yaml <deployment_name>
 ```
 
 If you are using **Kubernetes**:
