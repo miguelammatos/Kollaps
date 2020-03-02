@@ -21,7 +21,7 @@ git clone --branch master --depth 1 --recurse-submodules https://github.com/migu
 
 Lastly, you will need to set-up your container orchestrator of choice.
 Currently we support both **Docker Swarm** and **Kubernetes**.
-For more information check out [this file](Orchestrators.md).
+It is important to define certain environmental variables, follow the instructions from [this file](Orchestrators.md).
     
 ### Installation Using Docker <a name="docker-install">
 
