@@ -37,8 +37,8 @@ def main():
     
     shm_size = 8000000000
     aeron_lib_path = "/home/daedalus/Documents/aeron4need/cppbuild/Release/lib/libaeronlib.so"
-    aeron_term_buffer_length = 2*64*1024*1024           # must be multiple of 64*1024
-    aeron_ipc_term_buffer_length = 2*64*1024*1024   	# must be multiple of 64*1024
+    aeron_term_buffer_length = 64*1024*1024           # must be multiple of 64*1024
+    aeron_ipc_term_buffer_length = 64*1024*1024   	# must be multiple of 64*1024
 
     threading_mode = 'SHARED'             # aeron uses 1 thread
     # threading_mode = 'SHARED_NETWORK'   # aeron uses 2 threads

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<experiment boot="kollaps:1.0">
+	<services>
+		<service name="dashboard" image="kollaps/dashboard:1.0" supervisor="true" port="8088"/>
+
+		<service name="s-oregon" image="kollaps/memcached-server:1.0" share="false"/>
+		<service name="c-oregon1" image="kollaps/memtier-client:1.0" command="['s-oregon']"/>
+		<service name="c-oregon2" image="kollaps/memtier-client:1.0" command="['s-oregon']"/>
+		<service name="c-oregon3" image="kollaps/memtier-client:1.0" command="['s-ireland']"/>
+
+		<service name="s-ireland" image="kollaps/memcached-server:1.0" share="false"/>
+		<service name="c-ireland1" image="kollaps/memtier-client:1.0" command="['s-ireland']"/>
+		<service name="c-ireland2" image="kollaps/memtier-client:1.0" command="['s-ireland']"/>
+		<service name="c-ireland3" image="kollaps/memtier-client:1.0" command="['s-oregon']"/>
+
+		<service name="s-sydney" image="kollaps/memcached-server:1.0" share="false"/>
+		<service name="c-sydney1" image="kollaps/memtier-client:1.0" command="['s-sydney']"/>
+		<service name="c-sydney2" image="kollaps/memtier-client:1.0" command="['s-sydney']"/>
+		<service name="c-sydney3" image="kollaps/memtier-client:1.0" command="['s-saopaulo']"/>
+
+		<service name="s-saopaulo" image="kollaps/memcached-server:1.0" share="false"/>
+		<service name="c-saopaulo1" image="kollaps/memtier-client:1.0" command="['s-saopaulo']"/>
+		<service name="c-saopaulo2" image="kollaps/memtier-client:1.0" command="['s-saopaulo']"/>
+		<service name="c-saopaulo3" image="kollaps/memtier-client:1.0" command="['s-sydney']"/>
+
+	</services>
+	<bridges>
+                <bridge name="ireland"/>
+                <bridge name="saopaulo"/>
+                <bridge name="oregon"/>
+                <bridge name="sydney"/>
+	</bridges>
+        <links>
+                <link origin="c-ireland1" dest="ireland" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+								<link origin="c-ireland2" dest="ireland" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+								<link origin="c-ireland3" dest="ireland" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+                <link origin="s-ireland" dest="ireland" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+
+                <link origin="c-saopaulo1" dest="saopaulo" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+								<link origin="c-saopaulo2" dest="saopaulo" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+								<link origin="c-saopaulo3" dest="saopaulo" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+                <link origin="s-saopaulo" dest="saopaulo" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+
+                <link origin="c-oregon1" dest="oregon" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+								<link origin="c-oregon2" dest="oregon" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+								<link origin="c-oregon3" dest="oregon" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+                <link origin="s-oregon" dest="oregon" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+
+                <link origin="c-sydney1" dest="sydney" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+								<link origin="c-sydney2" dest="sydney" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+								<link origin="c-sydney3" dest="sydney" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+                <link origin="s-sydney" dest="sydney" latency="1"  upload="1Gbps" download="1Gbps" network="kollaps_network"/>
+
+
+
+		<link origin="ireland" dest="saopaulo" latency="105" jitter="7.071" upload="100Mbps" network="kollaps_network"/>
+		<link origin="ireland" dest="oregon" latency="85" jitter="7.778" upload="100Mbps" network="kollaps_network"/>
+		<link origin="ireland" dest="sydney" latency="170" jitter="7.778" upload="100Mbps" network="kollaps_network"/>
+
+		<link origin="saopaulo" dest="ireland" latency="104" jitter="9.899" upload="100Mbps" network="kollaps_network"/>
+		<link origin="saopaulo" dest="oregon" latency="108" jitter="13.435" upload="100Mbps" network="kollaps_network"/>
+		<link origin="saopaulo" dest="sydney" latency="179" jitter="2.828" upload="100Mbps" network="kollaps_network"/>
+
+		<link origin="oregon" dest="ireland" latency="85" jitter="9.899" upload="100Mbps" network="kollaps_network"/>
+		<link origin="oregon" dest="saopaulo" latency="108" jitter="7.778" upload="100Mbps" network="kollaps_network"/>
+		<link origin="oregon" dest="sydney" latency="102" jitter="4.950" upload="100Mbps" network="kollaps_network"/>
+
+		<link origin="sydney" dest="ireland" latency="168" jitter="18.385" upload="100Mbps" network="kollaps_network"/>
+		<link origin="sydney" dest="saopaulo" latency="179" jitter="2.828" upload="100Mbps" network="kollaps_network"/>
+		<link origin="sydney" dest="oregon" latency="102" jitter="7.071" upload="100Mbps" network="kollaps_network"/>
+
+
+        </links>
+</experiment>
+
