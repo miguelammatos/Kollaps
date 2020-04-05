@@ -33,6 +33,7 @@ then
     echo "Experiment name must have the yaml extension!"
     usage
 fi
+OUT_FILE=$(basename $FILE)
 
 if [[ -d "tmp_result" ]];
 then
@@ -47,9 +48,9 @@ docker run --rm \
     -v "$(pwd)/$1":"$(pwd)/$1" \
     -v "$(pwd)/tmp_result":"/result/" \
     kollaps-deployment-generator:1.0 \
-    bash -c "KollapsDeploymentGenerator $(pwd)/$1 $2 > /result/$3"
+    bash -c "KollapsDeploymentGenerator $(pwd)/$1 $2 > /result/$OUT_FILE"
 
-mv "tmp_result/$3" .
+mv "tmp_result/$OUT_FILE" $3
 
 if [ "$DIR_EXISTS" = false ]
 then
