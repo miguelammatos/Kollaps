@@ -3,7 +3,26 @@
 This README is a quick introduction to get up and running with Kollaps and Thunderstorm.
 Kollaps is the decentralized network emulator while Thunderstorm is the high-level language to specify experiments.
 For further reference and details, check out the [Kollaps Wiki](https://github.com/miguelammatos/Kollaps/wiki).
-You may also want to check the project's [website](https://angainor.science/kollaps).
+You may also want to check the project's [website](https://angainor.science/kollaps). 
+Please cite the following paper if you use Kollaps:
+```
+@inproceedings{10.1145/3342195.3387540,
+author = {Gouveia, Paulo and Neves, Jo\~{a}o and Segarra, Carlos and Liechti, Luca and Issa, Shady and Schiavoni, Valerio and Matos, Miguel},
+title = {Kollaps: Decentralized and Dynamic Topology Emulation},
+year = {2020},
+isbn = {9781450368827},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3342195.3387540},
+doi = {10.1145/3342195.3387540},
+booktitle = {Proceedings of the Fifteenth European Conference on Computer Systems},
+articleno = {Article 23},
+numpages = {16},
+keywords = {emulation, dynamic network topology, experimental reproducibility, distributed systems, containers},
+location = {Heraklion, Greece},
+series = {EuroSys ’20}
+}
+```
 
 ### Table of Contents:
 0. [Prerequisites](#pre)
