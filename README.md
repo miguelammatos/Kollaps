@@ -3,8 +3,16 @@
 This README is a quick introduction to get up and running with Kollaps and Thunderstorm.
 Kollaps is the decentralized network emulator while Thunderstorm is the high-level language to specify experiments.
 
-For an overview of the system check the [short](https://youtu.be/0BjpxDGFVHI) and  [long](https://youtu.be/zaV6K5mD-30) talks done at  [Eurosys'20](https://www.eurosys2020.org/). 
+#### Videos
 
+A series of videos about Kollaps and Thunderstorm is available [here](https://www.youtube.com/playlist?list=PL23ipsN00zBWMWsTcpkc6B0lAH5pfIwCa).
+Check the technical presentations we did at [Eurosys'20](https://youtu.be/Gqvi4WQro2I) and the tutorial presentation at [DISCOTEC'20](https://youtu.be/j5vqLQjtyQo).
+
+*The tutorial below can also be followed in a step-by-step guides available [here](https://youtu.be/GMFvWBTZJ1M) and [here](https://youtu.be/zA18Y9SC2xs).*
+
+
+
+#### Paper
 Check below for a quick introduction on how to get Kollaps running - more details are available in the [Wiki](https://github.com/miguelammatos/Kollaps/wiki).
 
 The paper describing the system in detail is available [here](https://dl.acm.org/doi/abs/10.1145/3342195.3387540).
