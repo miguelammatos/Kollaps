@@ -12,6 +12,7 @@ RUN pacman -Sy --noconfirm \
     flex \
     gcc \
     gettext \
+    glibc \
     grep \
     iproute2 \
     iputils \
@@ -40,8 +41,8 @@ RUN make -C /Kollaps/pid1 && \
     pip3 --no-cache-dir wheel --no-deps -w /Kollaps /Kollaps && \
     pip3 --no-cache-dir install /Kollaps/kollaps-1.0-py3-none-any.whl && \
     rm -rf /Kollaps && \
-    pip3 --no-cache-dir uninstall -y setuptools wheel pip && \
-    pacman -R --noconfirm make gcc flex bison pkgconf && \
-    pacman -Scc --noconfirm
+    pip3 --no-cache-dir uninstall -y setuptools wheel pip
+    #pacman -R --noconfirm make gcc flex bison pkgconf && \
+    #pacman -Scc --noconfirm
 
 ENTRYPOINT ["/usr/bin/pid1", "/usr/bin/python3", "-m", "kollaps.bootstrapper"]

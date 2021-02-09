@@ -58,6 +58,7 @@ It is important to properly define the environment, follow the instructions from
 
 This is the recommended and quickest way to get Kollaps running. It only requires to build the two Docker images, as follows:
 ```
+export DOCKER_BUILDKIT=1
 docker build --rm -f dockerfiles/Kollaps -t kollaps:1.0 .
 docker build -f dockerfiles/DeploymentGenerator -t kollaps-deployment-generator:1.0 .
 ```
