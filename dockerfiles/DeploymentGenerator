@@ -8,6 +8,7 @@ RUN pacman -Sy --noconfirm \
     bison \
     flex \
     gcc \
+    glibc \
     make \
     pkgconf \
     python \
@@ -20,6 +21,6 @@ RUN pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netiface
     pip3 --no-cache-dir install /Kollaps/kollaps-1.0-py3-none-any.whl && \
     rm -rf /Kollaps && \
     mkdir /result && \
-    pip3 --no-cache-dir uninstall -y setuptools wheel pip && \
-    pacman -R --noconfirm make gcc flex bison pkgconf && \
-    pacman -Scc --noconfirm
+    pip3 --no-cache-dir uninstall -y setuptools wheel pip
+    #pacman -R --noconfirm make gcc flex bison pkgconf && \
+    #pacman -Scc --noconfirm
