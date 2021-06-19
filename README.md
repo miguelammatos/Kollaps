@@ -11,6 +11,7 @@ the docker images, and run experiments locally in a docker swarm.
 When checking out the code, make sure you install the submodules as well:
 ```
 git clone --branch master --depth 1 --recurse-submodules https://github.com/miguelammatos/Kollaps.git
+cd Kollaps
 ```
 
 Then build the docker images:
@@ -36,8 +37,11 @@ cd examples
 # Deploy experiment
 docker stack deploy -c topology.yaml kollaps_example
 
-# Open a browser and navigate to localhost:8088
+# Open a browser and navigate to http://127.0.0.1:8088/
 # Click `start` when all experiments are `ready`
+
+# Remove the experiment
+docker stack rm kollaps_example
 ```
 
 ### Cite the work

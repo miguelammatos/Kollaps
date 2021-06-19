@@ -1,4 +1,4 @@
-FROM archlinux/base:latest
+FROM archlinux:latest
 
 WORKDIR /
 
