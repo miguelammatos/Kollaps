@@ -70,7 +70,7 @@ Or cite it:
 
 ### Other links
 
-+ [Exmaples](./examples/README.md) - list of example applications to test Kollaps.
++ [Examples](./examples/README.md) - list of example applications to test Kollaps.
 + [Installation](./docs/install.md) - step by step installation guide.
 + [Orchestrators](./docs/orchestrators.md) - container orchestrators supported in Kollaps.
 + [Videos](./docs/videos.md) - a collection of talks and tutorials.
