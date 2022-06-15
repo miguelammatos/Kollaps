@@ -24,9 +24,9 @@
 #include <unistd.h>
 #include <time.h>
 #include <dlfcn.h>
-
 #include <stdarg.h>
 
+    
 void callback(unsigned int ip, unsigned long bytes){
 	printf("%d %d\n", ip, bytes);
 }
@@ -39,6 +39,10 @@ int main(int argc, char** argv){
     ip = htonl(addr.s_addr);
     printf("%s\n", argv[1]);
     printf("%ud\n", ip);
+
+    char map_path[64];
+    sprintf(map_path, "/sys/fs/bpf/tc/globals/usage%s","123");
+    bpf_obj_get(map_path);
   
     
     void (*init)(short);

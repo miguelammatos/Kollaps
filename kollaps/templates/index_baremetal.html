@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+ 
+<head>
+    <title>Kollaps Dashboard</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <meta http-equiv="refresh" content="2"/>
+</head>
+ 
+<body>
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul>
+                    <li class="pull-left" role="presentation" id="active"><a href="/">Home</a></li>
+                    <li class="pull-left" role="presentation"><a href="/graph">Graph</a></li>
+                    <li class="pull-right" role="presentation"><a href="/stop">STOP</a></li>
+                    <li class="pull-right" role="presentation"><a href="/start">START</a></li>
+                    <li class="pull-right" role="presentation"><a href="/initialize">INITIALIZE BAREMETAL</a></li>
+
+                </ul>
+            </nav>
+        </div>
+
+        {% if stopping %}
+        <div class="header half">
+            <p>Stopping experiment...</p>
+        </div>
+        {% endif %}
+
+        {% if (lost_packets > -1) %}
+        <div class="header half">
+            <p>Experiment stopped.</p>
+            <p>Lost metadata:{{'%0.5f'| format(lost_packets*100|float)}}%</p>
+            {% if (max_gap > -1) %}
+            <p>Max gap:{{max_gap}}ms</p>
+            <p>Max gap average:{{max_gap_avg}}ms</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="main">
+            <div class="container">
+                <table>
+                    <tr>
+                        <th>Hostname</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                    </tr>
+                    {% for key, host in hosts.items() %}
+                    <tr>
+                        <td>{{host.name}}</td>
+                        <td>{{host.ip}}</td>
+                        <td>{{host.status}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+ 
+        <footer class="footer">
+            <p>Kollaps 2020</p>
+        </footer>
+ 
+    </div>
+</body>
+ 
+</html>

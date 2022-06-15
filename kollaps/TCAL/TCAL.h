@@ -23,7 +23,7 @@ typedef struct netif{
 }netif;
 
 
-void init(unsigned short controllPort, int txqueuelen);
+void init(unsigned short controllPort, int txqueuelen,unsigned int ip);
 
 void initDestination(unsigned int ip, int bandwidth, float latency, float jitter, float packetLoss);
 void changeBandwidth(unsigned int ip, int bandwidth);

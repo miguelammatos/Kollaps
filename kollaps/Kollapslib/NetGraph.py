@@ -23,7 +23,7 @@ import re
 import os
 import dns.resolver
 
-from kollaps.Kollapslib.utils import print_and_fail, ip2int
+from kollaps.Kollapslib.utils import print_and_fail, ip2int,ip2intbig
 
 import sys
 if sys.version_info >= (3, 0):
@@ -37,11 +37,12 @@ class NetGraph:
         self.hosts_by_ip = {} # type: Dict[int, NetGraph.Service]
         self.bridges = {}  # type: Dict[str,List[NetGraph.Service]]
         self.links = []  # type: List[NetGraph.Link]
-        self.links_by_index = {} # type: Dict[int, NetGraph.Link] LL: only used for performance reasons in path_change
+        self.links_by_index = {} # type: Dict[int, NetGraph.Link]
         self.link_counter = 0  # increment counter that will give each link an index
         self.path_counter = 0  # increment counter that will give each path an id
         self.removed_links = [] #LL; type: List[NetGraph.Link]
         self.removed_bridges = {} #LL; type: Dict[str,List[NetGraph.Service]]; list has length at most 1
+        self.hosts_by_bigip = {}
 
         self.networks = []  # type: List[str]
         self.supervisors = []  # type: List[NetGraph.Service]
@@ -52,6 +53,7 @@ class NetGraph:
 
         self.bandwidth_re = re.compile("([0-9]+)([KMG])bps")
         self.bootstrapper = ""  # type: str
+        self.age = 0
 
     class Node(object):
         def __init__(self, name, shared):
@@ -70,12 +72,18 @@ class NetGraph:
             self.image = image
             self.command = command
             self.ip = 167772161  # to be filled in later (this is just a value that can safely be converted to an IP)
+            self.machinename = ""
             self.replica_id = 0 # to be filled in later (after we sort by ip)
             self.replica_count = count
             self.last_bytes = 0  # number of bytes sent to this service
             self.supervisor = False
             self.supervisor_port = 0
             self.reuse_ip = reuse
+            self.time_passed = 0
+            self.count = 0
+            self.controllername = ""
+            self.topology_file = ""
+            self.kollaps_folder = ""
 
     class Bridge(Node):
         def __init__(self, name):
@@ -105,7 +113,7 @@ class NetGraph:
             self.network = network
 
     class Path(object):
-        def __init__(self, links, id, used_bandwidth=0):
+        def __init__(self, links, id, used_bandwidth=1):
             self.links = links  # type: List[NetGraph.Link]
             self.id = id
             self.lock = Lock()
@@ -203,9 +211,11 @@ class NetGraph:
 
     def bandwidth_in_bps(self, bandwidth_string):
         if re.match(self.bandwidth_re, bandwidth_string) is None:
-            print_and_fail("Bandwidth is not properly specified, accepted values must be: [0-9]+[KMG]bps")
+            print_and_fail("Bandwidth is not properly specified, accepted values must be: [1-9]+[KMG]bps")
         results = re.findall(self.bandwidth_re, bandwidth_string)
         base = results[0][0]
+        if int(base) == 0:
+            print_and_fail("Bandwidth is not properly specified, accepted values must be: [1-9]+[KMG]bps")
         multiplier = results[0][1]
         if multiplier == 'K':
             return int(base)*1000
@@ -278,9 +288,24 @@ class NetGraph:
                 ips.sort()  # needed for deterministic behaviour
                 for i in range(len(hosts)):
                     int_ip = ip2int(ips[i])
+                    big_int_ip = ip2intbig(ips[i])
                     hosts[i].ip = int_ip
                     hosts[i].replica_id = i
                     self.hosts_by_ip[int_ip] = hosts[i]
+                    self.hosts_by_bigip[big_int_ip] = hosts[i]
+
+    def put_ips(self):
+        ips = []
+        for service in self.services:
+            hosts = self.services[service]
+
+            for i in range(len(hosts)):
+                int_ip = ip2int(hosts[i].ip)
+                big_int_ip = ip2intbig(hosts[i].ip)
+                hosts[i].ip = int_ip
+                hosts[i].replica_id = i
+                self.hosts_by_ip[int_ip] = hosts[i]
+                self.hosts_by_bigip[big_int_ip] = hosts[i]
 
 
     def calculate_shortest_paths(self):

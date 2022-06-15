@@ -28,8 +28,6 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <math.h>
-
-
 #include "TC.h"
 #include "tc_common.h"
 #include "tc_core.h"
@@ -40,6 +38,7 @@
 #include "TCAL_utils.h"
 
 #include "Destination.h"
+
 
 
 extern void (*usageCallback)(unsigned int, unsigned long, unsigned int);
@@ -72,7 +71,7 @@ int oneline = 0;
 #define PARENT {ARG("parent")};
 #define HTB_HANDLE {ARG("4:0")};
 #define PROTOCOL_IP {ARG("protocol")ARG("ip")};
-#define PRINT { for(int i=0;i<argc;i++){printf("%s ", argv[i]);}printf("\n");}
+//#define PRINT { for(int i=0;i<argc;i++){printf("%s ", argv[i]);}printf("\n");}
 
 #define NEED__MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -82,7 +81,10 @@ int oneline = 0;
 
 unsigned short freePort = 0;
 
-void TC_init(unsigned short controllPort, int txqlen) {
+unsigned int ip = 0;
+
+void TC_init(unsigned short controllPort, int txqlen,unsigned int myip) {
+    ip = myip;
     freePort = controllPort;
     tc_core_init();
     open_rtnl(&rth_persistent);
@@ -114,7 +116,7 @@ void init_interface(unsigned int if_index){
     //Create the prio qdisc
     //This automatically creates 3 classes 1:1 1:2 and 1:3 with different priorities
     ADD_DEV ARG("root")ARG("handle")ARG("1:0")ARG("prio")
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     do_qdisc(argc, argv);
     close_rtnl(&rth);
@@ -123,7 +125,7 @@ void init_interface(unsigned int if_index){
     //Create the htb qdisc
     //Attach it to the lowest priority 1:3
     ADD_DEV ARG("parent")ARG("1:3")ARG("handle") HTB_HANDLE ARG("htb")ARG("default")ARG("1")
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     do_qdisc(argc, argv);
     close_rtnl(&rth);
@@ -134,7 +136,7 @@ void init_interface(unsigned int if_index){
     ADD_DEV
     ARG("parent") HTB_HANDLE ARG("prio")ARG("2")ARG("handle")ARG("e00:") PROTOCOL_IP
     ARG("u32")ARG("divisor")ARG("256")
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     do_filter(argc, argv, NULL, 0);
     close_rtnl(&rth);
@@ -146,7 +148,7 @@ void init_interface(unsigned int if_index){
     PROTOCOL_IP PARENT HTB_HANDLE ARG("prio")ARG("2")
     ARG("u32")ARG("ht")ARG("800::")ARG("match")ARG("ip")ARG("dst")ARG("any")ARG("hashkey")ARG("mask")
     ARG(FIRST_HASH_MASK)ARG("at")ARG("16")ARG("link")ARG("e00:")
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     do_filter(argc, argv, NULL, 0);
     close_rtnl(&rth);
@@ -157,7 +159,7 @@ void init_interface(unsigned int if_index){
     ADD_DEV
     PARENT ARG("1:0")ARG("prio")ARG("1") PROTOCOL_IP
     ARG("u32")ARG("match")ARG("ip")ARG("dport")ARG(controllPort_buf)ARG("0xffff")ARG("flowid")ARG("1:1")
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     do_filter(argc, argv, NULL, 0);
     close_rtnl(&rth);
@@ -168,7 +170,7 @@ void init_interface(unsigned int if_index){
     ADD_DEV
     PARENT ARG("1:0")ARG("prio")ARG("2") PROTOCOL_IP
     ARG("u32")ARG("match")ARG("ip")ARG("src")ARG("any")ARG("flowid")ARG("1:3")
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     do_filter(argc, argv, NULL, 0);
     close_rtnl(&rth);
@@ -193,7 +195,7 @@ void TC_initDestination(Destination *dest) {
     //Check if this interface has been initialized
     ARG("get")ARG("dev")ARG(netiface)PARENT ARG("1:0")ARG("prio")ARG("1")
     ARG("handle")ARG("800:")PROTOCOL_IP ARG("u32")
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     int status = (do_filter(argc, argv, NULL, 0));
     close_rtnl(&rth);
@@ -224,7 +226,7 @@ void TC_initDestination(Destination *dest) {
     PARENT HTB_HANDLE ARG("classid")ARG(htb_class_handle)
     ARG("htb")ARG("rate")ARG(bandwidth)ARG("ceil")ARG(bandwidth)
     ARG("quantum")ARG(quantum)
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     do_class(argc, argv);
     close_rtnl(&rth);
@@ -266,7 +268,7 @@ void TC_initDestination(Destination *dest) {
          if there is no loss, it will rapidly scale up again, simply using p and r will result in a lot of variation
          but fluctuations will be very fast, (and not over long periods of time like in real life)*/
     }
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     do_qdisc(argc, argv);
     close_rtnl(&rth);
@@ -296,7 +298,7 @@ void TC_initDestination(Destination *dest) {
     //Check if second level hashtable exists
     ARG("get")ARG("dev")ARG(netiface)PARENT HTB_HANDLE ARG("prio")ARG("2")
     ARG("handle")ARG(second_ht_handle)PROTOCOL_IP ARG("u32")
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     status = (do_filter(argc, argv, NULL, 0));
     close_rtnl(&rth);
@@ -306,7 +308,7 @@ void TC_initDestination(Destination *dest) {
 
         ADD_DEV PARENT HTB_HANDLE ARG("prio") ARG("2") ARG("handle") ARG(second_ht_handle)PROTOCOL_IP
         ARG("u32") ARG("divisor") ARG("256")
-        PRINT
+        //PRINT
         open_rtnl(&rth);
         do_filter(argc, argv, NULL, 0);
         close_rtnl(&rth);
@@ -315,7 +317,7 @@ void TC_initDestination(Destination *dest) {
         ADD_DEV PARENT HTB_HANDLE PROTOCOL_IP ARG("prio") ARG("2")
         ARG("u32") ARG("ht") ARG(first_ht_handle) ARG("match") ARG("ip") ARG("dst") ARG("any") ARG("hashkey")
         ARG("mask")ARG(SECOND_HASH_MASK)ARG("at")ARG("16")ARG("link")ARG(second_ht_handle)
-        PRINT
+        //PRINT
         open_rtnl(&rth);
         do_filter(argc, argv, NULL, 0);
         close_rtnl(&rth);
@@ -326,7 +328,7 @@ void TC_initDestination(Destination *dest) {
     ADD_DEV
     PARENT HTB_HANDLE PROTOCOL_IP ARG("prio")ARG("2")ARG("u32")ARG("ht")ARG(final_ht_handle)
     ARG("match")ARG("u32")ARG(hexIp)ARG("0xffffffff")ARG("at")ARG("16")ARG("flowid")ARG(htb_class_handle)
-    PRINT
+    //PRINT
     open_rtnl(&rth);
     do_filter(argc, argv, NULL, 0);
     close_rtnl(&rth);
@@ -367,6 +369,7 @@ int update_class(const struct sockaddr_nl *who,
     int len = n->nlmsg_len;
     struct rtattr *tb[TCA_MAX + 1];
 
+    //printf(" I am %d and got a len with %d \n",ip,len);
     if (n->nlmsg_type != RTM_NEWTCLASS && n->nlmsg_type != RTM_DELTCLASS) {
         //"Not a class\n"
         return 0;
@@ -392,7 +395,6 @@ int update_class(const struct sockaddr_nl *who,
         struct tc_stats st = {};
         memcpy(&st, RTA_DATA(tb[TCA_STATS]), NEED__MIN(RTA_PAYLOAD(tb[TCA_STATS]), sizeof(st)));
         unsigned int handle = TC_H_MIN(t->tcm_handle);
-
         Destination *d;
         HASH_FIND(hh_h, hostsByHandle, &handle, sizeof(int), d);
         if(d->usage != st.bytes || d->queuelen != st.qlen) {
@@ -539,5 +541,6 @@ void TC_changeNetem(Destination *dest){
 
     if (rtnl_talk(&rth_persistent, &req.n, NULL) < 0)
         printf("failed to comunicate with tc\n");
+
     return;
 }

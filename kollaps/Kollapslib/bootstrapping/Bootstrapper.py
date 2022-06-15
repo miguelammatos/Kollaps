@@ -17,6 +17,7 @@
 #
 import socket
 import random
+import os
 
 from os import getenv
 from subprocess import Popen
@@ -41,30 +42,42 @@ class Bootstrapper(object):
         self.aeron_media_driver = None
         self.already_bootstrapped = {}
         self.instance_count = 0
+        self.rust_handler = None
+        self.heaptracker = False
         
         
     def init_clients(self, high_level_client, low_level_client):
         self.high_level_client = high_level_client
         self.low_level_client = low_level_client
         
-        
-    def start_aeron_media_driver(self):
+
+    def start_rust_handler(self,containercount):
         if getenv('RUNTIME_EMULATION', 'true') != 'false':
             try:
-                self.aeron_media_driver = Popen('/usr/bin/Aeron/aeronmd')
-                print_named("god", "started aeron_media_driver.")
+                #creates files and start manager
+                open("/file.lock","x")
+                open("/tmp/topoinfo","x")
+                open("/tmp/topoinfodashboard","x")
+                cmd = ["/usr/bin/communicationmanager",str(containercount),"0.0.0.0"]
+                self.rust_handler = Popen(cmd)
+                print_named("god", "started rust handler.")
         
             except Exception as e:
-                print_error("[Py (god)] failed to start aeron media driver.")
+                print_error("[Py (god)] failed to start rust handler.")
                 print_and_fail(e)
-    
-    
-    def terminate_aeron_media_driver(self):
-        if getenv('RUNTIME_EMULATION', 'true') != 'false':
-            if self.aeron_media_driver:
-                self.aeron_media_driver.terminate()
-                print_named("god", "aeron_media_driver terminating...")
-                self.aeron_media_driver.wait()
+
+    #add container id to file
+    def add_id_container(self,id):
+        print_named("god","writing id" + id)
+        file = open("/tmp/topoinfo", "a")
+        file.write(id+"\n")
+        file.close()
+
+    #add the id of the dashboard
+    def add_dashboard_id_container(self,id):
+        file= open("/tmp/topoinfodashboard", "a")
+        file.write(id+"\n")
+        file.close()
             
     
     def broadcast_ips(self, sender_sock, random_number):

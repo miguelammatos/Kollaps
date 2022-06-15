@@ -1,4 +1,4 @@
-#
+    #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from locale import DAY_1
 import socket
 import struct
 from os import environ, getenv
@@ -26,13 +27,16 @@ from kubernetes import client, config
 
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, json
 
-from kollaps.Kollapslib.CommunicationsManager import CommunicationsManager
 from kollaps.Kollapslib.NetGraph import NetGraph
 from kollaps.Kollapslib.XMLGraphParser import XMLGraphParser
-from kollaps.Kollapslib.utils import int2ip, ip2int
+from kollaps.Kollapslib.utils import int2ip, ip2int, setup_container, CONTAINER, BYTE_LIMIT
 from kollaps.Kollapslib.utils import print_message, print_error, print_and_fail, print_named
 
 import sys
+import libcommunicationcore
+import pathlib
+
+from openssh_wrapper import SSHConnection
 if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
 
@@ -49,25 +53,51 @@ class DashboardState:
     largest_produced_gap_average = -1
     lost_packets = -1
     comms = None  # type: CommunicationsManager
-    stopping = False
     ready = False
+    initialized = False
     running = False
+    stopping = False
+    mode = None
+    UDP_PORT = 7073
+    TCP_PORT = 7073
+    STOP_COMMAND = 1
+    SHUTDOWN_COMMAND = 2
+    READY_COMMAND = 3
+    START_COMMAND = 4
+    ACK = 120
+    ip = ""
+    controller = None
+    topology_file = ""
+    kollaps_folder = ""
 
 
 class Host:
-    def __init__(self, hostname, name):
+    def __init__(self, name, machinename):
         self.name = name
-        self.hostname = hostname
+        self.machinename = machinename
         self.ip = 'Unknown'
         self.status = 'Down'
+        self.socket = None
+        self.ssh = None
+        self.topology_file = ""
+        self.kollaps_folder = ""
+
+class RustComms:
+    def __init__(self,collect_flow):
+        self.collect_flow = collect_flow
 
 
-def get_own_ip(graph):
+    def receive_flow(self, bandwidth, link_count, link_list):
+        self.collect_flow(bandwidth, link_list[:link_count])
+
+
+def get_own_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     last_ip = None
     # Connect to at least 2 to avoid using our loopback ip
-    for int_ip in graph.hosts_by_ip:
-        s.connect((int2ip(int_ip), 1))
+    for service,host in DashboardState.hosts.items():
+        print_message("ip is" + str(host.ip))
+        s.connect((int2ip(host.ip), 1))
         new_ip = s.getsockname()[0]
         if new_ip == last_ip:
             break
@@ -79,12 +109,20 @@ def get_own_ip(graph):
 def main_page():
     with DashboardState.lock:
         if DashboardState.graph is not None:
-            answer = render_template('index.html',
-                                     hosts=DashboardState.hosts,
-                                     stopping=DashboardState.stopping,
-                                     max_gap=DashboardState.largest_produced_gap,
-                                     max_gap_avg=DashboardState.largest_produced_gap_average,
-                                     lost_packets=DashboardState.lost_packets)
+            if DashboardState.mode == "baremetal":
+                answer = render_template('index_baremetal.html',
+                                        hosts=DashboardState.hosts,
+                                        stopping=DashboardState.stopping,
+                                        max_gap=DashboardState.largest_produced_gap,
+                                        max_gap_avg=DashboardState.largest_produced_gap_average,
+                                        lost_packets=DashboardState.lost_packets)
+            else:
+                answer = render_template('index.html',
+                                        hosts=DashboardState.hosts,
+                                        stopping=DashboardState.stopping,
+                                        max_gap=DashboardState.largest_produced_gap,
+                                        max_gap_avg=DashboardState.largest_produced_gap_average,
+                                        lost_packets=DashboardState.lost_packets)
             return answer
 
 @app.route('/stop')
@@ -97,75 +135,114 @@ def start():
     Thread(target=startExperiment, daemon=False).start()
     return redirect(url_for('main_page'))
 
+@app.route('/initialize')
+def initialize():
+    Thread(target=initialize, daemon=False).start()
+    return redirect(url_for('main_page'))
+
+
 @app.route('/flows')
 def flows():
     with DashboardState.lock:
-        answer = render_template('flows.html', flows=DashboardState.flows, graph=DashboardState.graph)
-        DashboardState.flows.clear()
+        if DashboardState.mode == "baremetal":
+            answer = render_template('flows_baremetal.html', flows=DashboardState.flows, graph=DashboardState.graph)
+            DashboardState.flows.clear()
+        else:
+            answer = render_template('flows.html', flows=DashboardState.flows, graph=DashboardState.graph)
+            DashboardState.flows.clear()
         return answer
 
 @app.route('/graph')
 def graph():
-    return render_template('graph.html', graph=DashboardState.graph)
+    if DashboardState.mode == "baremetal":
+            return render_template('graph_baremetal.html', graph=DashboardState.graph)
+    else:        
+        return render_template('graph.html', graph=DashboardState.graph)
 
+
+def initialize():
+    with DashboardState.lock:
+        if DashboardState.stopping:
+            return
+
+    pending_nodes = []
+    for node in DashboardState.hosts:
+        host = DashboardState.hosts[node]
+        if node.supervisor:
+            continue
+        pending_nodes.append(host)
+
+    while pending_nodes:
+        host = pending_nodes.pop()
+        try:
+            command = 'cd '+ host.kollaps_folder + ';nohup sh start.sh ' + host.topology_file + " > foo.out 2> foo.err < /dev/null &"
+            print(command)
+            ret = host.ssh.run(command)
+            print(ret.stdout)
+            host.status = "Initialized"
+        except OSError as e:
+            print_error(e)
+            pending_nodes.insert(0, host)
+            sleep(0.5)
+
+
+    command = 'cd '+ DashboardState.kollaps_folder + ';sudo ./controller ' + DashboardState.topology_file +" ready"
+    print(command)
+    result = DashboardState.controller.run(command)
+    print_named("Controller",result)
+
+    with DashboardState.lock:
+        DashboardState.initialized = True
 
 def stopExperiment():
     with DashboardState.lock:
-        if DashboardState.stopping or not DashboardState.ready:
-            return
+        if DashboardState.mode =="baremetal":
+            if DashboardState.stopping:
+                return
         else:
-            DashboardState.stopping = True
+            if DashboardState.stopping or not DashboardState.ready:
+                return
+    
+
     produced = 0
     received = 0
-    gaps = []
 
     to_kill = []
+    if DashboardState.mode == "baremetal":
+        command = 'cd ' + DashboardState.kollaps_folder +';sudo ./controller ' + DashboardState.topology_file + " stop"
+        print(command)
+        result = DashboardState.controller.run(command)
+        print_named("Controller",result)
+        for node in DashboardState.hosts:
+            host = DashboardState.hosts[node]
+            if node.supervisor:
+                continue
+            host.status = 'Stopped'
+        return
+
+    DashboardState.stopping = True
+
     for node in DashboardState.hosts:
         host = DashboardState.hosts[node]
         if node.supervisor:
             continue
         to_kill.append(host)
-    to_stop = to_kill[:]
-
-    # Stop all services
-    while to_stop:
-        host = to_stop.pop()
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(2)
-            s.connect((host.ip, CommunicationsManager.TCP_PORT))
-            s.send(struct.pack("<1B", CommunicationsManager.STOP_COMMAND))
-            s.close()
-            
-        except OSError as e:
-            print_error(e)
-            to_stop.insert(0, host)
-            sleep(0.5)
-
-    # Collect sent/received statistics and shutdown
     while to_kill:
         host = to_kill.pop()
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(2)
-            s.connect((host.ip, CommunicationsManager.TCP_PORT))
-            s.send(struct.pack("<1B", CommunicationsManager.SHUTDOWN_COMMAND))
-            data = s.recv(64)
-            if len(data) < struct.calcsize("<3Q"):
-                s.close()
-                print_message("Got less than 24 bytes for counters.")
-                to_kill.insert(0, host)
-                continue
-                
-            s.send(struct.pack("<1B", CommunicationsManager.ACK))
-            s.close()
-            data_tuple = struct.unpack("<3Q", data)
-            produced += data_tuple[0]
-            received += data_tuple[2]
+            print_message("host is " + host.name + " sent")
+            host.socket.send(struct.pack("<1B", DashboardState.SHUTDOWN_COMMAND))
+            # data = host.socket.recv(4096)
+            host.socket.close()
+            # data_tuple = struct.unpack("<LL", data)
+            # print_named("Dashboard received: ",data_tuple)
+            # produced += data_tuple[0]
+            # received += data_tuple[1]
+
             with DashboardState.lock:
                 host.status = 'Down'
                 continue
-                
+
         except OSError as e:
             print_error("timed out\n" + str(e))
             to_kill.insert(0, host)
@@ -185,32 +262,43 @@ def stopExperiment():
 
 def startExperiment():
     with DashboardState.lock:
-        if DashboardState.stopping or not DashboardState.ready:
-            return
+        if DashboardState.mode == "baremetal":
+            if not DashboardState.initialized:
+                return
+        else:
+            if DashboardState.stopping or not DashboardState.ready:
+                return
 
-    pending_nodes = []
-    for node in DashboardState.hosts:
-        host = DashboardState.hosts[node]
-        if node.supervisor:
-            continue
-        pending_nodes.append(host)
-
-    while pending_nodes:
-        host = pending_nodes.pop()
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(2)
-            s.connect((host.ip, CommunicationsManager.TCP_PORT))
-            s.send(struct.pack("<1B", CommunicationsManager.START_COMMAND))
-            s.close()
-            with DashboardState.lock:
-                host.status = 'Running'
+    if DashboardState.mode == "baremetal":
+        command = 'cd '+ DashboardState.kollaps_folder + ';sudo ./controller ' + DashboardState.topology_file + " start"
+        print(command)
+        result = DashboardState.controller.run(command)
+        print_named("Controller",result)
+        for node in DashboardState.hosts:
+            host = DashboardState.hosts[node]
+            if node.supervisor:
                 continue
-                
-        except OSError as e:
-            print_error(e)
-            pending_nodes.insert(0, host)
-            sleep(0.5)
+            
+    else:
+        pending_nodes = []
+        for node in DashboardState.hosts:
+            host = DashboardState.hosts[node]
+            if node.supervisor:
+                continue
+            pending_nodes.append(host)
+
+        while pending_nodes:
+                host = pending_nodes.pop()
+                try:
+                    host.socket.send(struct.pack("<1B", DashboardState.START_COMMAND))
+                    with DashboardState.lock:
+                        host.status = 'Running'
+                        continue
+                    
+                except OSError as e:
+                    print_error(e)
+                    pending_nodes.insert(0, host)
+                    sleep(0.5)
 
     with DashboardState.lock:
         DashboardState.running = True
@@ -253,9 +341,10 @@ def resolve_hostnames():
             ips.sort()  # needed for deterministic behaviour
             for i in range(len(service_instances)):
                 service_instances[i].ip = ip2int(ips[i])
-                
+
             for i, host in enumerate(service_instances):
                 if host.supervisor:
+                    DashboardState.ip = ips[i]
                     continue
                     
                 with DashboardState.lock:
@@ -295,11 +384,26 @@ def resolve_hostnames():
                     DashboardState.hosts[host].ip = ips[i]
                     DashboardState.hosts[host].status = 'Pending'
 
+    start_rust()
 
-    # We can only instantiate the CommunicationsManager after the graphs root has been set
-    own_ip = socket.gethostbyname(socket.gethostname())
-    DashboardState.comms = CommunicationsManager(collect_flow, DashboardState.graph, None, own_ip)
 
+def start_rust():
+    link_count = len(DashboardState.graph.links)
+
+    if DashboardState.graph.root is None:
+        print_named("dashboard","STARTED RUST")
+        libcommunicationcore.start(CONTAINER.id,"dashboard",0,link_count)
+    
+    
+    if link_count <= BYTE_LIMIT:
+        print_message("Started reading with u8")
+        libcommunicationcore.start_polling_u8()
+
+    else:
+        print_message("Started reading with u16")
+        libcommunicationcore.start_polling_u16()
+
+    libcommunicationcore.register_communicationmanager(RustComms(collect_flow))
 
 def query_until_ready():
     resolve_hostnames()
@@ -310,30 +414,74 @@ def query_until_ready():
         if node.supervisor:
             continue
         pending_nodes.append(host)
-    
     while pending_nodes:
         host = pending_nodes.pop()
+        sleep(0.05)
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(2)
-            s.connect((host.ip, CommunicationsManager.TCP_PORT))
-            s.send(struct.pack("<1B", CommunicationsManager.READY_COMMAND))
+            #s.settimeout(2)
+            print_named("Dashboard", "connecting to " + str(host.ip))
+            s.connect((host.ip, DashboardState.TCP_PORT))
+            print_named("Dashboard", "connected to " + str(host.ip))
+            s.send(struct.pack("<1B", DashboardState.READY_COMMAND))
+            print_named("Dashboard", "sent to " + str(host.ip))
             data = s.recv(64)
-            s.close()
-            if data != struct.pack("<1B", CommunicationsManager.ACK):
+            print_named("Dashboard", "received from " + str(host.ip))
+            if data != struct.pack("<1B", DashboardState.ACK):
                 pending_nodes.insert(0, host)
+                s.close()
             with DashboardState.lock:
                 host.status = 'Ready'
+                host.socket = s
                 continue
         
         except OSError as e:
             print_error(e)
+            print_named("dashboard","Failed to connect to " + host.name)
             pending_nodes.insert(0, host)
+            s.close()
             sleep(1)
     
     with DashboardState.lock:
         DashboardState.ready = True
+        
+    print_named("dashboard", "Access dashboard here: " + "http://" + str(DashboardState.ip) + ":8088")
     print_named("dashboard", "Dashboard: ready!")  # PG
+
+def controller_ready():
+
+    pending_nodes = []
+    for node in DashboardState.hosts:
+        host = DashboardState.hosts[node]
+        if node.supervisor:
+            continue
+        pending_nodes.append(host)
+    
+    while pending_nodes:
+        host = pending_nodes.pop()
+        try:
+            conn = SSHConnection(host.machinename)
+            host.ssh = conn
+            ret = conn.run("whoami")
+            print(ret)
+            with DashboardState.lock:
+                host.status = 'Ready'
+                host.socket = client
+                continue
+        except Exception as e:
+            print_error(e)
+            print_named("dashboard","Failed to connect to " + host.machinename)
+            pending_nodes.insert(0, host)
+            sleep(1)
+    
+    conn = SSHConnection(DashboardState.controllername)
+    DashboardState.controller = conn
+    command = ("whoami")
+    ret = DashboardState.controller.run(command)
+    #send ready command to controller
+    print_named("Dashboard", "Controller and host machines: up!")  # PG
+
+    return
 
 
 def collect_flow(bandwidth, links):
@@ -342,23 +490,59 @@ def collect_flow(bandwidth, links):
         DashboardState.flows[key] = (links[0], links[-1], int(bandwidth/1000))
     return True
 
+def add_dashboard_id(id):
+        file= open("/tmp/topoinfodashboard", "a")
+        file.write(id+"\n")
+        file.close()
 
-def main():
-    if len(sys.argv) != 2:
-        topology_file = "/topology.xml"
-    else:
-        topology_file = sys.argv[1]
-
+def baremetal_deployment():
+    topology_file = sys.argv[1]
+    DashboardState.mode = "baremetal"
+    DashboardState.topology_file = topology_file
     graph = NetGraph()
-    XMLGraphParser(topology_file, graph).fill_graph()
+    XMLGraphParser(topology_file, graph,"baremetal").fill_graph()
+
+    with DashboardState.lock:
+        for service in graph.services:
+            for i, host in enumerate(graph.services[service]):
+                if host.supervisor:
+                    DashboardState.controllername = host.controllername
+                    continue
+                print_named("dashboard","Host has name " + host.machinename + " and ip " + host.ip)
+                DashboardState.hosts[host] = Host(host.name, host.machinename)
+                DashboardState.hosts[host].ip = host.ip
+                DashboardState.hosts[host].topology_file = host.topology_file
+                DashboardState.hosts[host].kollaps_folder = host.kollaps_folder
+                if DashboardState.controllername == host.machinename:
+                    DashboardState.topology_file = host.topology_file
+                    DashboardState.kollaps_folder = host.kollaps_folder
+
+
+
+    DashboardState.graph = graph
+    
+    if getenv('RUNTIME_EMULATION', 'true') != 'false':
+        startup_thread = Thread(target=controller_ready)
+        startup_thread.daemon = True
+        startup_thread.start()
+        
+    app.run(host='0.0.0.0', port=8088)
+
+def container_deployment():
+    
+    topology_file = "/topology.xml"
+
+    DashboardState.mode = "container"
+    setup_container(sys.argv[2], sys.argv[3])
+    graph = NetGraph()
+    XMLGraphParser(topology_file, graph,"container").fill_graph()
 
     with DashboardState.lock:
         for service in graph.services:
             for i, host in enumerate(graph.services[service]):
                 if host.supervisor:
                     continue
-                DashboardState.hosts[host] = Host(host.name, host.name + "." + str(i))
-
+                DashboardState.hosts[host] = Host(host.name, host.machinename)
 
     DashboardState.graph = graph
     
@@ -369,6 +553,12 @@ def main():
         
     app.run(host='0.0.0.0', port=8088)
 
+def main():
+    if len(sys.argv) == 2:
+         baremetal_deployment()
+    else:
+         container_deployment()
+    return 
 
 if __name__ == "__main__":
     main()

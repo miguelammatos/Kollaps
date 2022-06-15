@@ -1,26 +1,31 @@
-FROM archlinux:latest
+FROM ubuntu:21.10
 
 WORKDIR /
 
-RUN pacman -Sy --noconfirm \
-    archlinux-keyring  && \
-    pacman -Sy --noconfirm \
-    bison \
-    flex \
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y\
     gcc \
-    glibc \
+    flex \
+    bison \ 
+    gettext \
+    grep \
+    iproute2 \
+    iptables \
     make \
     pkgconf \
     python \
-    python-pip
+    python3-pip \
+    && apt-get clean -y
 
-ADD ./ /Kollaps/
+ADD ./kollaps /Kollaps/kollaps
 
-RUN pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netifaces && \
+ADD ./setup.py /Kollaps/setup.py
+
+ADD /kube/ /root/.kube
+
+RUN pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netifaces netaddr pyroute2 && \
     pip3 --no-cache-dir wheel --no-deps -w /Kollaps /Kollaps && \
     pip3 --no-cache-dir install /Kollaps/kollaps-1.0-py3-none-any.whl && \
     rm -rf /Kollaps && \
     mkdir /result && \
     pip3 --no-cache-dir uninstall -y setuptools wheel pip
-    #pacman -R --noconfirm make gcc flex bison pkgconf && \
-    #pacman -Scc --noconfirm

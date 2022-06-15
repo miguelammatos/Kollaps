@@ -30,6 +30,8 @@ from signal import pause
 from kollaps.Kollapslib.bootstrapping.Bootstrapper import Bootstrapper
 from kollaps.Kollapslib.utils import print_message, print_error, print_and_fail, print_named, print_error_named
 from kollaps.Kollapslib.utils import DOCKER_SOCK, TOPOLOGY
+from kollaps.Kollapslib.NetGraph import NetGraph
+from kollaps.Kollapslib.XMLGraphParser import XMLGraphParser
 
 
 class SwarmBootstrapper(Bootstrapper):
@@ -38,7 +40,6 @@ class SwarmBootstrapper(Bootstrapper):
         # Connect to the local docker daemon
         high_level_client = docker.DockerClient(base_url='unix:/' + DOCKER_SOCK)
         low_level_client = docker.APIClient(base_url='unix:/' + DOCKER_SOCK)
-        
         Bootstrapper.__init__(self, high_level_client, low_level_client)
         
 
@@ -74,9 +75,10 @@ class SwarmBootstrapper(Bootstrapper):
                                                       environment=env,
                                                       volumes_from=[us.id],
                                                       # network_mode="container:"+us.id,  # share the network stack with this container
-                                                      # network='test_overlay',
+                                                      #network='test_overlay',
                                                       labels=["god" + label],
-                                                      detach=True)
+                                                      detach=True,
+                                                      cap_add = ["NET_ADMIN"])
                                                     # stderr=True,
                                                     # stdout=True)
             
@@ -112,10 +114,13 @@ class SwarmBootstrapper(Bootstrapper):
             container_id = container.id
             inspect_result = self.low_level_client.inspect_container(container_id)
             pid = inspect_result["State"]["Pid"]
+            self.add_dashboard_id_container(container_id)
         
             cmd = ["nsenter", "-t", str(pid),
-                   "-n", "/usr/bin/python3", "/usr/bin/KollapsDashboard",
-                   TOPOLOGY]
+                   "-n", "/usr/bin/python3", "/usr/local/bin/KollapsDashboard",
+                   TOPOLOGY, str(container_id), str(pid)]
+
+
             dashboard_instance = Popen(cmd)
         
             self.instance_count += 1
@@ -126,24 +131,24 @@ class SwarmBootstrapper(Bootstrapper):
             print_error_named("god", "! failed to bootstrap dashboard.")
 
 
-    def bootstrap_logger(self, container):
-        try:
-            container_id = container.id
-            inspect_result = self.low_level_client.inspect_container(container_id)
-            pid = inspect_result["State"]["Pid"]
+    # def bootstrap_logger(self, container):
+    #     try:
+    #         container_id = container.id
+    #         inspect_result = self.low_level_client.inspect_container(container_id)
+    #         pid = inspect_result["State"]["Pid"]
         
-            cmd = ["nsenter", "-t", str(pid),
-                   "-n", "/usr/bin/python3", "/usr/bin/KollapsLogger",
-                   TOPOLOGY]
-            dashboard_instance = Popen(cmd)
+    #         cmd = ["nsenter", "-t", str(pid),
+    #                "-n", "/usr/bin/python3", "/usr/local/bin/KollapsLogger",
+    #                TOPOLOGY]
+    #         dashboard_instance = Popen(cmd)
         
-            self.instance_count += 1
-            print("[Py (god)] Logger bootstrapped.")
-            sys.stdout.flush()
-            self.already_bootstrapped[container_id] = dashboard_instance
+    #         self.instance_count += 1
+    #         print("[Py (god)] Logger bootstrapped.")
+    #         sys.stdout.flush()
+    #         self.already_bootstrapped[container_id] = dashboard_instance
     
-        except:
-            print_error_named("god", "! failed to bootstrap logger.")
+    #     except:
+    #         print_error_named("god", "! failed to bootstrap logger.")
 
 
     def bootstrap_app_container(self, container):
@@ -151,23 +156,33 @@ class SwarmBootstrapper(Bootstrapper):
             container_id = container.id
             inspect_result = self.low_level_client.inspect_container(container_id)
             pid = inspect_result["State"]["Pid"]
-        
+
             print_named("god", "Bootstrapping " + container.name + " ...")
-        
+            print_named("god", "Writing " + container_id + " ...")
+            self.add_id_container(str(container_id))
+
+            # if not self.heaptracker:
+            #     cmd = ["nsenter",
+            #         "-t", str(pid),
+            #         "-n","heaptrack","/usr/bin/emulationcore", str(container_id), str(pid),"docker"]
+            #     emucore_instance = Popen(cmd)
+            #     self.heaptracker = True
+            # else:
             cmd = ["nsenter",
-                   "-t", str(pid),
-                   "-n", "/usr/bin/python3", "/usr/bin/KollapsEmulationManager",
-                   TOPOLOGY, str(container_id), str(pid)]
+                    "-t", str(pid),
+                    "-n", "/usr/bin/emulationcore", str(container_id), str(pid),"docker"]
+
             emucore_instance = Popen(cmd)
-        
+
             self.instance_count += 1
             print_named("god", "Done bootstrapping " + container.name)
             self.already_bootstrapped[container_id] = emucore_instance
-    
+
         except:
             print_error_named("god", "! App container bootstrapping failed... will try again.")
 
 
+    
     def bootstrap(self, mode, label, bootstrapper_id):
         
         if mode == "-s":
@@ -179,15 +194,18 @@ class SwarmBootstrapper(Bootstrapper):
             # we are the God container
             print_named("God", "bootstrapping all containers with label " + label + ".")
             
-            # first thing to do is copy over the topology
-            # FIXME PG check why this was erasing the topology.xml file
-            # self.copy_topology(self.low_level_client, bootstrapper_id)
-            
-            # next we start the Aeron Media Driver
-            self.start_aeron_media_driver()
-            
             # find IPs of all God containers in the cluster
-            self.resolve_ips(int(os.getenv('NUMBER_OF_GODS', 0)))
+            gods = self.resolve_ips(int(os.getenv('NUMBER_OF_GODS', 0)))
+
+            graph = NetGraph()
+            parser = XMLGraphParser(TOPOLOGY, graph,"container")
+            parser.fill_graph()
+            containercount = 0
+            for item in graph.services.items():
+                containercount = containercount + len(graph.services[item[0]])
+
+            #start communicationamanger
+            self.start_rust_handler(containercount)
             
             while True:
                 try:
@@ -217,24 +235,28 @@ class SwarmBootstrapper(Bootstrapper):
                                     self.bootstrap_app_container(container)
                                    
                             except:
+                                #print("Not setup " + container.id)
                                 pass  # container is probably not fully set up
         
                         # Check for bootstrapper termination
                         if container.id == bootstrapper_id and container.status == "running":
+                            #print("Terminated boostrapp")
                             running += 1
         
                     # Do some reaping
+                    #print("Started reaping")
                     for key in self.already_bootstrapped:
                         self.already_bootstrapped[key].poll()
+                    #print("Done reaping")
         
                     # Clean up and stop
                     if running == 0:
+                        #print("Stop")
                         for key in self.already_bootstrapped:
                             if self.already_bootstrapped[key].poll() is not None:
                                 self.already_bootstrapped[key].kill()
                                 self.already_bootstrapped[key].wait()
 
-                        self.terminate_aeron_media_driver()
 
                         sys.stdout.flush()
                         print_named("god", "God terminated.")
@@ -243,8 +265,10 @@ class SwarmBootstrapper(Bootstrapper):
                     sleep(5)
         
                 except Exception as e:
+                    print("Got exception")
                     sys.stdout.flush()
                     print_error(e)
                     sleep(5)
                     continue
-                
+    
+        

@@ -20,7 +20,7 @@ from kubernetes import client, config
 from uuid import uuid4
 
 from kollaps.Kollapslib.NetGraph import NetGraph
-from kollaps.Kollapslib.utils import print_and_fail, print_error_named, print_named
+from kollaps.Kollapslib.utils import print_and_fail, print_error_named, print_message, print_named
 
 
 class KubernetesManifestGenerator:
@@ -52,7 +52,7 @@ class KubernetesManifestGenerator:
         print("  name: listpods")
         print("subjects:")
         print("- kind: ServiceAccount")
-        print("  name: need-listpods")
+        print("  name: kollaps-listpods")
         print("  namespace: default")
         print("roleRef:")
         print("  kind: ClusterRole")
@@ -60,17 +60,20 @@ class KubernetesManifestGenerator:
         print("  apiGroup: rbac.authorization.k8s.io")
         
     def print_bootstrapper(self, number_of_gods, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length, bw_emulation):
-        print("apiVersion: extensions/v1beta1")
+        print("apiVersion: apps/v1")
         print("kind: DaemonSet")
         print("metadata:")
         print("  name: bootstrapper")
         print("  labels:")
         print("    boot"+self.experiment_UUID + ": \"true\"")
         print("spec:")
+        print("  selector:")
+        print("    matchLabels:")
+        print("      app: bootstrapper")
         print("  template:")
         print("    metadata:")
         print("      labels:")
-        print("        app: Kollaps-bootstrapper")
+        print("        app: bootstrapper")
         print("        boot"+self.experiment_UUID + ": \"true\"")
         print("    spec:")
         print("      containers:")
@@ -90,22 +93,13 @@ class KubernetesManifestGenerator:
         print("          value: '" + str(pool_period) + "'")
         print("        - name: MAX_FLOW_AGE")
         print("          value: '" + str(max_flow_age) + "'")
-        print("        - name: SHM_SIZE")                      # on kubernetes we don't need to create a God container
-        print("          value: '" + str(shm_size) + "'")      # so this is not being used
-        print("        - name: AERON_LIB_PATH")
-        print("          value: '" + str(aeron_lib_path) + "'")
-        print("        - name: AERON_THREADING_MODE")
-        print("          value: '" + str(threading_mode) + "'")
-        print("        - name: AERON_TERM_BUFFER_LENGTH")
-        print("          value: '" + str(aeron_term_buffer_length) + "'")
-        print("        - name: AERON_IPC_TERM_BUFFER_LENGTH")
-        print("          value: '" + str(aeron_ipc_term_buffer_length) + "'")
         print("        args:")
         print("        - -g")
         print("        - "+self.experiment_UUID)
         print("        securityContext:")
         print("          capabilities:")
         print("            add: [\"NET_ADMIN\", \"SYS_ADMIN\"]")
+        print("          privileged: true")
         print("        volumeMounts:")
         print("        - name: docker-socket")
         print("          mountPath: /var/run/docker.sock")
@@ -115,7 +109,7 @@ class KubernetesManifestGenerator:
         print("          subPath: topology.xml")
         print("        - name: dshm")
         print("          mountPath: /dev/shm")
-        print("      serviceAccountName: need-listpods")
+        print("      serviceAccountName: kollaps-listpods")
         print("      hostPID: true")
         print("      volumes:")
         print("      - name: dshm")
@@ -175,7 +169,7 @@ class KubernetesManifestGenerator:
                 print("    - name: topology")
                 print("      mountPath: /topology.xml")
                 print("      subPath: topology.xml")
-                print("  serviceAccountName: need-listpods")
+                print("  serviceAccountName: kollaps-listpods")
                 print("  volumes:")
                 print("  - name: topology")
                 print("    configMap:")

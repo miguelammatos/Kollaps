@@ -59,7 +59,7 @@ def main():
 
     graph = NetGraph()
 
-    XMLGraphParser(topology_file, graph).fill_graph()
+    XMLGraphParser(topology_file, graph,"container").fill_graph()
     output += "Graph has " + str(len(graph.links)) + " links.\n"
     service_count = 0
     

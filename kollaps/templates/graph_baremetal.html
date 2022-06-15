@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+ 
+<head>
+    <title>Kollaps Dashboard</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <script type="text/javascript" src="/static/js/vis.js"></script>
+</head>
+ 
+<body>
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul>
+                  <li class="pull-left" role="presentation" id="active"><a href="/">Home</a></li>
+                  <li class="pull-right" role="presentation"><a href="/getlogs">GET LOGS</a></li>
+                  <li class="pull-left" role="presentation"><a href="/flows">Active flows</a></li>
+                  <li class="pull-left" role="presentation"><a href="/graph">Graph</a></li>
+                  <li class="pull-right" role="presentation"><a href="/stop">STOP</a></li>
+                  <li class="pull-right" role="presentation"><a href="/start">START</a></li>
+                  <li class="pull-right" role="presentation"><a href="/initialize">INITIALIZE BAREMETAL</a></li>
+                  <li class="pull-right" role="presentation"><a href="/install">INSTALL KOLLAPS</a></li>
+
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main">
+            <div class="container" id="graph">
+
+            </div>
+        </div>
+        <script type="text/javascript">
+          // create an array with nodes
+          var nodes = new vis.DataSet([
+          {% for key, hosts in graph.services.items() %}
+            {% for host in hosts %}
+              {id: '{{host.__hash__()}}', label: '{{host.hostname}}', shape: 'box', color:'#97C2FC'},
+            {% endfor %}
+          {% endfor %}
+          {% for key, hosts in graph.bridges.items() %}
+            {% for host in hosts %}
+              {id: '{{host.__hash__()}}', label: '{{host.hostname|truncate(10, True)}}', shape: 'circle', color:'#7BE141'},
+            {% endfor %}
+          {% endfor %}
+          ]);
+
+          // create an array with edges
+          var edges = new vis.DataSet([
+          {% for link in graph.links %}
+            {from: '{{link.source.__hash__()}}', to: '{{link.destination.__hash__()}}', arrows:'to', label: '{{link.bandwidth}}/{{link.latency}}ms', font: {align: 'bottom'}},
+          {% endfor %}
+          ]);
+
+          // create a network
+          var container = document.getElementById('graph');
+          var data = {
+            nodes: nodes,
+            edges: edges
+          };
+          var options = {};
+          var network = new vis.Network(container, data, options);
+        </script>
+
+        <footer class="footer">
+            <p>Kollaps 2020</p>
+        </footer>
+ 
+    </div>
+</body>
+ 
+</html>

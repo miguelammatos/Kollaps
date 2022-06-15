@@ -18,28 +18,34 @@ import xml.etree.ElementTree as ET
 from random import choice, randint, seed, randrange
 from string import ascii_letters
 
-from kollaps.Kollapslib.utils import print_and_fail, print_message
+from kollaps.Kollapslib.utils import print_and_fail, print_identified, print_message
 from kollaps.Kollapslib.NetGraph import NetGraph
-from kollaps.Kollapslib.EventScheduler import EventScheduler
 
 import sys
 if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
 
 class XMLGraphParser:
-    def __init__(self, file, graph):
+    def __init__(self, file, graph,mode):
         self.file = file
         self.graph = graph  # type: NetGraph
         self.supervisors = []  # type: List[NetGraph.Service]
+        self.mode = mode
 
     def parse_services(self, experiment, services):
         for service in services:
             if service.tag != 'service':
                 print_and_fail('Invalid tag inside <services>: ' + service.tag)
-            if 'name' not in service.attrib or 'image' not in service.attrib:
-                print_and_fail('A service needs a name and an image attribute.')
-            if not service.attrib['name'] or not service.attrib['image']:
-                print_and_fail('A service needs a name and an image attribute.')
+            if self.mode == "container":
+                if 'name' not in service.attrib or 'image' not in service.attrib:
+                    print_and_fail('A service needs a name and an image attribute.')
+                if not service.attrib['name'] or not service.attrib['image']:
+                    print_and_fail('A service needs a name and an image attribute.')
+            if self.mode == "baremetal":
+                if 'name' not in service.attrib:
+                    print_and_fail('A service needs a name.')
+                if not service.attrib['name']:
+                    print_and_fail('A service needs a name.')
 
 
             command = None
@@ -70,12 +76,28 @@ class XMLGraphParser:
             replicas = self.calulate_required_replicas(service.attrib['name'], replicas, experiment, reuse)
 
             for i in range(replicas):
-                    srv = self.graph.new_service(
-                        service.attrib['name'], service.attrib['image'], command, shared, reuse, replicas)
+                    srv = None
+                    if self.mode == "container":
+                        srv = self.graph.new_service(service.attrib['name'], service.attrib['image'], command, shared, reuse, replicas)
+                    if self.mode == "baremetal":
+                        srv = self.graph.new_service(service.attrib['name'], "none", command, shared, reuse, replicas)
+                        if "ip" in service.attrib:
+                            srv.ip = service.attrib['ip']
+                        if "machinename" in service.attrib:
+                            srv.machinename = service.attrib["machinename"]
+                            if 'kollaps_folder' not in service.attrib:
+                                print_and_fail('In baremetal must provide the location of the folder containing kollaps binaries in the remote machine')
+                            srv.kollaps_folder = service.attrib["kollaps_folder"]
+                            if not supervisor:
+                                if 'topology_file' not in service.attrib:
+                                    print_and_fail('In baremetal must provide the name of the topology file in the remote machine')
+                                srv.topology_file = service.attrib["topology_file"]
                     if supervisor:
                         self.supervisors.append(srv)
                         srv.supervisor_port = supervisor_port
                         srv.supervisor = True
+                        if "controllername" in service.attrib:
+                            srv.controllername = service.attrib['controllername']
 
     def parse_bridges(self, root):
         for bridge in root:
@@ -99,13 +121,22 @@ class XMLGraphParser:
         for link in root:
             if link.tag != 'link':
                 print_and_fail('Invalid tag inside <links>: ' + link.tag)
-            if 'origin' not in link.attrib or 'dest' not in link.attrib or 'latency' not in link.attrib or \
-                    'upload' not in link.attrib or 'network' not in link.attrib:
-                print_and_fail("Incomplete link description.")
+            if self.mode == "container":
+                if 'origin' not in link.attrib or 'dest' not in link.attrib or 'latency' not in link.attrib or \
+                        'upload' not in link.attrib or 'network' not in link.attrib:
+                    print_and_fail("Incomplete link description.")
+            if self.mode == "baremetal":
+                if 'origin' not in link.attrib or 'dest' not in link.attrib or 'latency' not in link.attrib or \
+                    'upload' not in link.attrib:
+                    print_and_fail("Incomplete link description.")
 
             source_nodes = self.graph.get_nodes(link.attrib['origin'])
             destination_nodes = self.graph.get_nodes(link.attrib['dest'])
 
+            if self.mode == "container":
+                network = link.attrib['network']
+            if self.mode == "baremetal":
+                network = "baremetal"
             jitter = 0
             if 'jitter' in link.attrib:
                 jitter = link.attrib['jitter']
@@ -122,57 +153,57 @@ class XMLGraphParser:
                 dst_meta_bridge = self.create_meta_bridge()
                 # create a link between both meta bridges
                 self.graph.new_link(src_meta_bridge, dst_meta_bridge, link.attrib['latency'],
-                                    jitter, drop, link.attrib['upload'], link.attrib['network'])
+                                    jitter, drop, link.attrib['upload'], network)
                 if bidirectional:
                     self.graph.new_link(dst_meta_bridge, src_meta_bridge, link.attrib['latency'],
-                                    jitter, drop, link.attrib['download'], link.attrib['network'])
+                                    jitter, drop, link.attrib['download'], network)
                 # connect source to src meta bridge
                 self.graph.new_link(link.attrib['origin'], src_meta_bridge, 0,
-                                    0, 0.0, link.attrib['upload'], link.attrib['network'])
+                                    0, 0.0, link.attrib['upload'], network)
                 if bidirectional:
                     self.graph.new_link(src_meta_bridge, link.attrib['origin'], 0,
-                                    0, 0.0, link.attrib['download'], link.attrib['network'])
+                                    0, 0.0, link.attrib['download'], network)
                 # connect destination to dst meta bridge
                 self.graph.new_link(dst_meta_bridge, link.attrib['dest'], 0,
-                                    0, 0.0, link.attrib['upload'], link.attrib['network'])
+                                    0, 0.0, link.attrib['upload'], network)
                 if bidirectional:
                     self.graph.new_link(link.attrib['dest'], dst_meta_bridge, 0,
-                                    0, 0.0, link.attrib['download'], link.attrib['network'])
+                                    0, 0.0, link.attrib['download'], network)
             elif source_nodes[0].shared_link:
                 meta_bridge = self.create_meta_bridge()
                 # create a link between meta bridge and destination
                 self.graph.new_link(meta_bridge, link.attrib['dest'], link.attrib['latency'],
-                                    jitter, drop, link.attrib['upload'], link.attrib['network'])
+                                    jitter, drop, link.attrib['upload'], network)
                 if bidirectional:
                     self.graph.new_link(link.attrib['dest'], meta_bridge, link.attrib['latency'],
-                                    jitter, drop, link.attrib['download'], link.attrib['network'])
+                                    jitter, drop, link.attrib['download'], network)
                 # connect origin to meta bridge
                 self.graph.new_link(link.attrib['origin'], meta_bridge, 0,
-                                    0, 0.0, link.attrib['upload'], link.attrib['network'])
+                                    0, 0.0, link.attrib['upload'], network)
                 if bidirectional:
                     self.graph.new_link(meta_bridge, link.attrib['origin'], 0,
-                                    0, 0.0, link.attrib['download'], link.attrib['network'])
+                                    0, 0.0, link.attrib['download'], network)
             elif destination_nodes[0].shared_link:
                 meta_bridge = self.create_meta_bridge()
                 # create a link between origin and meta_bridge
                 self.graph.new_link(link.attrib['origin'], meta_bridge, link.attrib['latency'],
-                                    jitter, drop, link.attrib['upload'], link.attrib['network'])
+                                    jitter, drop, link.attrib['upload'], network)
                 if bidirectional:
                     self.graph.new_link(meta_bridge, link.attrib['origin'], link.attrib['latency'],
-                                    jitter, drop, link.attrib['download'], link.attrib['network'])
+                                    jitter, drop, link.attrib['download'], network)
                 # connect meta bridge to destination
                 self.graph.new_link(meta_bridge, link.attrib['dest'], 0,
-                                    0, 0.0, link.attrib['upload'], link.attrib['network'])
+                                    0, 0.0, link.attrib['upload'], network)
                 if bidirectional:
                     self.graph.new_link(link.attrib['dest'], meta_bridge, 0,
-                                    0, 0.0, link.attrib['download'], link.attrib['network'])
+                                    0, 0.0, link.attrib['download'], network)
             else:
                 # Regular case create a link between origin and destination
                 self.graph.new_link(link.attrib['origin'], link.attrib['dest'], link.attrib['latency'],
-                                jitter, drop, link.attrib['upload'], link.attrib['network'])
+                                jitter, drop, link.attrib['upload'], network)
                 if bidirectional:
                     self.graph.new_link(link.attrib['dest'], link.attrib['origin'], link.attrib['latency'],
-                                jitter, drop, link.attrib['download'], link.attrib['network'])
+                                jitter, drop, link.attrib['download'], network)
 
     def calulate_required_replicas(self, service, hardcoded_count, root, reuse):
         dynamic = None
@@ -321,233 +352,3 @@ class XMLGraphParser:
         for service in self.supervisors:
             self.graph.set_supervisor(service)
 
-
-    def parse_schedule(self, service, graph):
-        """
-        :param service: NetGraph.Service
-        :return:
-        """
-        XMLtree = ET.parse(self.file)
-        root = XMLtree.getroot()
-        if root.tag != 'experiment':
-            print_and_fail('Not a valid Kollaps topology file, root is not <experiment>')
-
-        dynamic = None
-
-        for child in root:
-            if child.tag == 'dynamic':
-                if dynamic is not None:
-                    print_and_fail("Only one <dynamic> block is allowed.")
-                dynamic = child
-
-        scheduler = EventScheduler()
-        first_join = -1.0
-        first_leave = float('inf')
-
-        # if there is no dynamic block than this instance joins straight away
-        if dynamic is None:
-            scheduler.schedule_join(0.0)
-            return scheduler
-
-        seed(12345)
-        replicas = []
-        for i in range(service.replica_count):
-            replicas.append([False, False, False])  # Joined = False, Disconnected = False, Used = False
-
-        # indexes for replicas entries
-        JOINED = 0
-        DISCONNECTED = 1
-        USED = 2
-
-        # there is a dynamic block, so check if there is anything scheduled for us
-        for event in dynamic:
-            if event.tag != 'schedule':
-                print_and_fail("Only <schedule> is allowed inside <dynamic>")
-
-            # parse time of event
-            time = 0.0
-            try:
-                time = float(event.attrib['time'])
-                if time < 0.0:
-                    print_and_fail("time attribute must be a positive number")
-            except ValueError as e:
-                print_and_fail("time attribute must be a valid real number")
-
-            if 'name' in event.attrib and 'time' in event.attrib and 'action' in event.attrib:
-                node_name = event.attrib['name']
-                bridge_names = []
-                for bridge in list(graph.bridges.keys()) + list(graph.removed_bridges.keys()):
-                    bridge_names.append(bridge)
-
-                # if a bridge is scheduled
-                if node_name in bridge_names:
-                    if event.attrib['action'] == 'join':
-                        scheduler.schedule_bridge_join(time, graph, node_name)
-                    elif event.attrib['action'] == 'leave':
-                        scheduler.schedule_bridge_leave(time, graph, node_name)
-                    continue
-
-                # parse name of service. only process actions that target us
-                if node_name != service.name:
-                    continue
-
-                # parse amount of replicas affected
-                amount = 1
-                if 'amount' in event.attrib:
-                    amount = int(event.attrib['amount'])
-
-                # parse action
-                if event.attrib['action'] == 'join':
-                    for i in range(amount):
-                        available = False
-                        id = 0
-                        # Pick a random replica
-                        while(not available):
-                            id = randrange(0, service.replica_count)
-                            available = not replicas[id][JOINED]
-                            if not service.reuse_ip:
-                                available = available and not replicas[id][USED]
-
-                        # Mark the state
-                        replicas[id][JOINED] = True
-                        if not service.reuse_ip:
-                            replicas[id][USED] = True
-
-                        # if its us, schedule the action
-                        if service.replica_id == id:
-                            scheduler.schedule_join(time)
-                            print_message(service.name + " replica " + str(service.replica_id) + " scheduled to join at " + str(time))
-                        if first_join < 0.0:
-                            first_join = time
-
-                elif event.attrib['action'] == 'leave' or event.attrib['action'] == 'crash':
-                    for i in range(amount):
-                        up = False
-                        id = 0
-                        # Pick a random replica
-                        while(not up):
-                            id = randrange(0, service.replica_count)
-                            up = replicas[id][JOINED]
-
-                        # Mark the state
-                        replicas[id][JOINED] = False
-
-                        # if its us, schedule the action
-                        if service.replica_id == id:
-                            if event.attrib['action'] == 'leave':
-                                scheduler.schedule_leave(time)
-                                print_message(service.name + " replica " + str(service.replica_id) +
-                                        " scheduled to leave at " + str(time))
-                            elif event.attrib['action'] == 'crash':
-                                scheduler.schedule_crash(time)
-                                print_message(service.name + " replica " + str(service.replica_id) +
-                                        " scheduled to crash at " + str(time))
-                        if first_leave > time:
-                            first_leave = time
-
-                elif event.attrib['action'] == 'reconnect':
-                    for i in range(amount):
-                        disconnected = False
-                        id = 0
-                        # Pick a random replica
-                        while(not disconnected):
-                            id = randrange(0, service.replica_count)
-                            disconnected = replicas[id][DISCONNECTED]
-
-                        # Mark the state
-                        replicas[id][DISCONNECTED] = False
-
-                        # if its us, schedule the action
-                        if service.replica_id == id:
-                            print_message(service.name + " replica " + str(service.replica_id) +
-                                    " scheduled to reconnect at " + str(time))
-                            scheduler.schedule_reconnect(time)
-
-                elif event.attrib['action'] == 'disconnect':
-                    for i in range(amount):
-                        connected = False
-                        id = 0
-                        # Pick a random replica
-                        while(not connected):
-                            id = randrange(0, service.replica_count)
-                            connected = replicas[id][JOINED] and not replicas[id][DISCONNECTED]
-
-                        # Mark the state
-                        replicas[id][DISCONNECTED] = True
-
-                        # if its us, schedule the action
-                        if service.replica_id == id:
-                            print_message(service.name + " replica " + str(service.replica_id) +
-                                    " scheduled to disconnect at " + str(time))
-                            scheduler.schedule_disconnect(time)
-                else:
-                    print_and_fail("Unrecognized action: " + event.attrib['action'] +
-                         " , allowed actions are join, leave, crash, disconnect, reconnect")
-
-            #Do something dynamically with a link
-            elif 'origin' in event.attrib and 'dest' in event.attrib and 'time' in event.attrib:
-
-                #parse origin and destination
-                origin = event.attrib['origin']
-                destination = event.attrib['dest']
-
-                if 'action' in event.attrib: #link is joining or leaving
-                    if event.attrib['action'] == 'leave':
-                        scheduler.schedule_link_leave(time, graph, origin, destination)
-                    elif event.attrib['action'] == 'join':
-                        #Link is already defined but has been removed before
-                        if not 'upload' in event.attrib or not 'latency' in event.attrib:
-                            scheduler.schedule_link_join(time, graph, origin, destination)
-                        #A completely new link with defined properties joins
-                        elif not 'upload' in event.attrib and not 'latency' in event.attrib and not 'network' in event.attrib:
-                            print_and_fail("Link description incomplete. For a new link, you must provide at least latency, upload, and network attributes.")
-                        else:
-                            bandwidth = event.attrib['upload']
-                            latency = float(event.attrib['latency'])
-                            drop = 0
-                            if 'drop' in event.attrib:
-                                drop = float(event.attrib['drop'])
-                            jitter = 0
-                            if 'jitter' in event.attrib:
-                                jitter = float(event.attrib['jitter'])
-                            network = event.attrib['network']
-
-                            scheduler.schedule_new_link(time, graph, origin, destination, latency, jitter, drop, bandwidth, network)
-                            if 'download' in event.attrib:
-                                bandwidth = event.attrib['download']
-                                scheduler.schedule_new_link(time, graph, destination, origin, latency, jitter, drop, bandwidth, network)
-
-                    else:
-                        print_and_fail("Unrecognized action for link: " + event.attrib['action'] + ", allowed are join and leave")
-
-                else: #properties of link are changing
-                    bandwidth = -1
-                    if 'upload' in event.attrib:
-                        bandwidth = graph.bandwidth_in_bps(event.attrib['upload'])
-                    latency = -1
-                    if 'latency' in event.attrib:
-                        latency = float(event.attrib['latency'])
-                    drop = -1
-                    if 'drop' in event.attrib:
-                        drop = float(event.attrib['drop'])
-                    jitter = -1
-                    if 'jitter' in event.attrib:
-                        jitter = float(event.attrib['jitter'])
-
-                    scheduler.schedule_link_change(time, graph, origin, destination, bandwidth, latency, jitter, drop)
-
-            else:
-                print_and_fail(
-                    '<schedule> must have either name, time and action attributes,' +
-                    ' or link origin dest and properties attributes')
-
-        # deal with auto join
-        if first_join < 0.0:
-            print_message(service.name + " scheduled to join at " + str(0.0))
-            scheduler.schedule_join(0.0)
-        if first_leave < first_join:
-            print_and_fail("Dynamic: service " + service.name + " leaves before having joined")
-
-        scheduler.schedule_graph_changes()
-
-        return scheduler

@@ -101,3 +101,7 @@ Check the shell scripts under the *iperf3-client* and *iperf3-server* directory 
 #### Redis: <a name="redis"/>
 
 redis: experiment that uses the Redis database
+
+#### Ping: <a name="ping"/>
+
+In this experiment nodes will ping each other.

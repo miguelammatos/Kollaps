@@ -21,7 +21,7 @@ from uuid import uuid4
 
 from kollaps.Kollapslib.NetGraph import NetGraph
 from kollaps.Kollapslib.utils import DOCKER_SOCK, print_error_named, print_and_fail
-
+from kollaps.Kollapslib.XMLGraphParser import XMLGraphParser
 
 large_xml_file = True
 
@@ -32,8 +32,7 @@ class DockerComposeFileGenerator:
 		self.graph = graph  # type: NetGraph
 		self.topology_file = topology_file
 		self.experiment_UUID = str(uuid4())
-		
-		
+
 	def print_header(self):
 		print("version: \"3.3\"")
 		print("services:")
@@ -53,14 +52,12 @@ class DockerComposeFileGenerator:
 			print("      RUNTIME_EMULATION: 'false'")
 		print("      POOL_PERIOD: " + str(pool_period))
 		print("      MAX_FLOW_AGE: " + str(max_flow_age))
-		print("      SHM_SIZE: " + str(shm_size))
-		print("      AERON_LIB_PATH: " + aeron_lib_path)
-		print("      AERON_THREADING_MODE: " + threading_mode)
-		print("      AERON_TERM_BUFFER_LENGTH: " + str(aeron_term_buffer_length))
-		print("      AERON_IPC_TERM_BUFFER_LENGTH: " + str(aeron_ipc_term_buffer_length))
 		print("    labels:")
 		print("      " + "boot"+self.experiment_UUID + ": \"true\"")
 		print("    volumes:")
+		print("      - '" + "/lib/modules:/lib/modules/'")
+		print("      - '" + "/usr/src:/usr/src/'")
+		print("      - '" + "/sys/:/sys/'")
 		if large_xml_file:
 			print("      - '" + os.path.abspath(self.topology_file) + ":/topology.xml'")
 		print("      - type: bind")
@@ -140,6 +137,8 @@ class DockerComposeFileGenerator:
 
 	def generate(self, pool_period, max_flow_age, threading_mode, shm_size, aeron_lib_path, aeron_term_buffer_length, aeron_ipc_term_buffer_length, bw_emulation=True):
 		number_of_gods = 0
+		XMLGraphParser(self.topology_file, self.graph,"container")
+		
 		try:
 			number_of_gods = len(docker.APIClient(base_url='unix:/' + DOCKER_SOCK).nodes())
 			

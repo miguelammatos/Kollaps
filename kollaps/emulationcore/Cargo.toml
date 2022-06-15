@@ -1,0 +1,27 @@
+[package]
+name = "emulationcore"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+libc = "0.2"
+tokio = { version = "1.17.0", features = ["full"] }
+redbpf = {path = "redbpf/redbpf", features = ["load"]}
+monitor = { path = "./monitor" }
+libloading = "0.7.3"
+roxmltree = "0.14.1"
+random-string = "1.0"
+regex = "1"
+pnet = "0.29.0"
+ipnetwork = "0.18.0"
+trust-dns-resolver = "*"
+rand = "0.8.4"
+rand_pcg = "0.3.1"
+docker-api = "0.8"
+subprocess = "0.2.8"
+kube = { version = "0.69.0", features = ["runtime", "derive"] }
+k8s-openapi = { version = "0.14.0", features = ["v1_22"] }
+futures = "0.3.21"
+elementtree = "0.7.0"

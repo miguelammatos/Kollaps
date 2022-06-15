@@ -10,9 +10,9 @@
 		<!-- the "command" can be used to pass parameters to the container entrypoints.
 		     In this example we are passsing "server" which will be used to discover the IPs
                      of the servers at run time -->
-		<service name="client1" image="kollaps/iperf3-client:1.0" command="['server']"/>
-		<service name="client2" image="kollaps/iperf3-client:1.0" command="['server']"/>
-		<service name="client3" image="kollaps/iperf3-client:1.0" command="['server']"/>
+		<service name="client1" image="kollaps/iperf3-client:1.0" command="['server','1']"/>
+		<service name="client2" image="kollaps/iperf3-client:1.0" command="['server','2']"/>
+		<service name="client3" image="kollaps/iperf3-client:1.0" command="['server','3']"/>
 		<!-- iperf server, declared once, but three instances will be started, see below -->
 		<service name="server" image="kollaps/iperf3-server:1.0" share="false"/>
 	</services>

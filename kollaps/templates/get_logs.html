@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <title>Kollaps Dashboard</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul>
+                    <li class="pull-left" role="presentation" id="active"><a href="/">Home</a></li>
+                    <li class="pull-right" role="presentation"><a href="/getlogs">GET LOGS</a></li>
+                    <li class="pull-left" role="presentation"><a href="/flows">Active flows</a></li>
+                    <li class="pull-left" role="presentation"><a href="/graph">Graph</a></li>
+                    <li class="pull-right" role="presentation"><a href="/stop">STOP</a></li>
+                    <li class="pull-right" role="presentation"><a href="/start">START</a></li>
+                    <li class="pull-right" role="presentation"><a href="/initialize">INITIALIZE BAREMETAL</a></li>
+                    <li class="pull-right" role="presentation"><a href="/install">INSTALL KOLLAPS</a></li>
+
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main">
+            <div class="container">
+                <table>
+                    <tr>
+                        <th>Host</th>
+                        <th>Path of Logfile</th>
+                    </tr>
+                    {% for key,host in hosts.items() %}
+                    <tr>
+                        <td> 
+                            {{host.name}}
+                        </td>
+                        <td>
+                          {{host.pathtologfile}}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Kollaps 2020</p>
+        </footer>
+
+    </div>
+</body>
+
+</html>

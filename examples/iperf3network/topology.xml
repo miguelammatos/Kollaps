@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<experiment boot="kollaps:1.0">
+	<services>
+		<service name="dashboard" image="kollaps/dashboard:1.0" supervisor="true" port="8088" />
+		<service name="client1" image="kollaps/iperf3-network:1.0" command="['1','3']" />
+		<service name="client2" image="kollaps/iperf3-network:1.0" command="['2','3']" />
+		<service name="client3" image="kollaps/iperf3-network:1.0" command="['3','3']" />
+	</services>
+	<bridges>
+		<bridge name="s1" />
+	</bridges>
+	<links>
+		<link origin="client1" dest="s1" latency="5" upload="666Mbps" download="666Mbps" network="kollaps_network" />
+		<link origin="client2" dest="s1" latency="5" upload="666Mbps" download="666Mbps" network="kollaps_network" />
+		<link origin="client3" dest="s1" latency="5" upload="666Mbps" download="666Mbps" network="kollaps_network" />
+	</links>
+	<dynamic>
+		<schedule name="client1" time="0" action="join" />
+		<schedule name="client2" time="0" action="join" />
+		<schedule name="client3" time="0" action="join" />
+		<schedule name="client1" time="300" action="crash" />
+		<schedule name="client2" time="300" action="crash" />
+		<schedule name="client3" time="300" action="crash" />
+	</dynamic>
+</experiment>

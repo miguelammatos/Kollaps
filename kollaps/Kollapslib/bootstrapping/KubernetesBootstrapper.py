@@ -27,6 +27,8 @@ from subprocess import Popen
 from time import sleep
 from signal import pause
 
+from kollaps.Kollapslib.NetGraph import NetGraph
+from kollaps.Kollapslib.XMLGraphParser import XMLGraphParser
 from kollaps.Kollapslib.bootstrapping.Bootstrapper import Bootstrapper
 from kollaps.Kollapslib.utils import print_message, print_error, print_and_fail, print_named, print_error_named
 from kollaps.Kollapslib.utils import DOCKER_SOCK, TOPOLOGY
@@ -47,8 +49,9 @@ class KubernetesBootstrapper(Bootstrapper):
         try:
             container_id = pod.status.container_statuses[0].container_id[9:]
             container_pid = self.low_level_client.inspect_container(container_id)["State"]["Pid"]
+            self.add_dashboard_id_container(container_id)
         
-            cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/bin/KollapsDashboard", TOPOLOGY]
+            cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/local/bin/KollapsDashboard", TOPOLOGY,str(container_id),str(container_pid)]
             dashboard_instance = Popen(cmd)
         
             self.instance_count += 1
@@ -80,9 +83,11 @@ class KubernetesBootstrapper(Bootstrapper):
     def bootstrap_app_container(self, pod, container_id):
         try:
             container_pid = self.low_level_client.inspect_container(container_id)["State"]["Pid"]
-        
-            cmd = ["nsenter", "-t", str(container_pid), "-n", "/usr/bin/python3", "/usr/bin/KollapsEmulationManager",
-                   TOPOLOGY, str(container_id), str(container_pid)]
+            self.add_id_container(str(container_id))
+
+            cmd = ["nsenter",
+                    "-t", str(container_pid),
+                    "-n", "/usr/bin/emulationcore", str(container_id), str(container_pid),"kubernetes"]
             emucore_instance = Popen(cmd)
         
             self.instance_count += 1
@@ -106,13 +111,11 @@ class KubernetesBootstrapper(Bootstrapper):
                         god_id = pod.status.container_statuses[0].container_id[9:]
     
             except Exception as e:
-                print_error_named("god", e)
+                #print_error_named("god", e)
                 sys.stdout.flush()
                 sleep(1)  # wait for the Kubernetes API
 
         print_named("god", "found god_id.")
-        
-        self.start_aeron_media_driver()
         
         # find IPs of all God containers in the cluster
         self.resolve_ips(int(os.getenv('NUMBER_OF_GODS', 0)))
@@ -120,6 +123,15 @@ class KubernetesBootstrapper(Bootstrapper):
         
         kollaps_pods = self.high_level_client.list_namespaced_pod('default')
         local_containers = []
+
+        graph = NetGraph()
+        parser = XMLGraphParser(TOPOLOGY, graph,"container")
+        parser.fill_graph()
+        containercount = 0
+        for item in graph.services.items():
+            containercount = containercount + len(graph.services[item[0]])
+
+        self.start_rust_handler(containercount)
             
         while True:
             try:
@@ -171,8 +183,6 @@ class KubernetesBootstrapper(Bootstrapper):
                         if self.already_bootstrapped[key].poll() is not None:
                             self.already_bootstrapped[key].kill()
                             self.already_bootstrapped[key].wait()
-                            
-                    self.terminate_aeron_media_driver()
                     
                     sys.stdout.flush()
                     print_named("god", "God terminated.")

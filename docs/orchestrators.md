@@ -16,6 +16,28 @@ docker network create --driver=overlay --subnet=10.1.0.0/24 kollaps_network
 (Make sure to define a subnet that does not collide with other networks on your setup.)
 
 
+### Setting up Baremetal
+
+To create a baremetal deployment, a specific topology file has to be created, steps are described [here](https://github.com/miguelammatos/kollaps-private/wiki/Baremetal-experiments#topology-description)
+
+After creating the topology file, you must put the baremetal folder (kollaps/baremetal) in the directories specified in the .xml on the remote machines
+
+After setting up the remote machines, install Kollaps locally running:
+
+```
+sh localinstall.sh
+```
+
+And now you are ready to emulate network states on your remote machines, start the Dashboard with
+
+```
+python3 kollaps/Dashboard *directory of topology*
+```
+
+
+The dashboard has small differences in baremetal, the commands description can be seen [here](https://github.com/miguelammatos/kollaps-private/wiki/Baremetal-experiments#dashboard)
+
+If in the remote machines the network devices have names different than eth0, please change it in the start.sh script located inside the baremetal folder.
 
 ### Setting up Kubernetes
 
@@ -45,8 +67,8 @@ Do this on all nodes.
 Only on the master node, execute:
 
 ```
-$sudo sysctl net.bridge.bridge-nf-call-iptables=1
-$sudo kubeadm init --token-ttl=0
+sudo sysctl net.bridge.bridge-nf-call-iptables=1
+sudo kubeadm init --token-ttl=0
 ```
 
 The `kubeadm init` command tells you to execute the following statements:
@@ -55,6 +77,8 @@ The `kubeadm init` command tells you to execute the following statements:
 $mkdir -p $HOME/.kube && \
 sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && \
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
+mkdir kube
+cp $HOME/.kube/config kube/config
 ```
 
 It also gives you a join command like this: `sudo kubeadm join <IP>:<PORT> --token <TOKEN> --discovery-token-ca-cert-hash sha256:<HASH>`. Use this on the worker nodes to join the cluster.

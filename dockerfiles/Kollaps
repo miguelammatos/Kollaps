@@ -1,48 +1,66 @@
-FROM archlinux:latest
+FROM ubuntu:21.10
 
 WORKDIR /
 
 # Location of netem distribution files on archlinux
-ENV TC_LIB_DIR "/usr/share/tc/"
 
-RUN pacman -Sy --noconfirm \
-    archlinux-keyring  && \
-    pacman -Sy --noconfirm \
-    bison \
-    flex \
+ARG openssl_arch=linux-x86_64
+ENV DEBIAN_FRONTEND=noninteractive \
+    TC_LIB_DIR=/usr/lib/tc/
+    #JEMALLOC_SYS_WITH_MALLOC_CONF=background_thread:true,narenas:1,tcache:false,dirty_decay_ms:0,muzzy_decay_ms:0,abort_conf:true
+    
+RUN CONFIG_BPF=y \
+    CONFIG_BPF_SYSCALL=y \
+    CONFIG_NET_CLS_BPF=m \
+    CONFIG_NET_ACT_BPF=m \
+    CONFIG_BPF_JIT=y \ 
+    CONFIG_HAVE_BPF_JIT=y \
+    CONFIG_HAVE_EBPF_JIT=y \
+    CONFIG_BPF_EVENTS=y \
+    CONFIG_IKHEADERS=y \
+    CONFIG_NET_SCH_SFQ=m \
+    CONFIG_NET_ACT_POLICE=m \
+    CONFIG_NET_ACT_GACT=m \
+    CONFIG_DUMMY=m \
+    CONFIG_VXLAN=m
+    
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y\
     gcc \
+    flex \
+    bison \ 
     gettext \
-    glibc \
     grep \
     iproute2 \
-    iputils \
     iptables \
     make \
     pkgconf \
     python \
-    python-pip \
-    tcpdump 
+    python3-pip \
+    vim \
+    && apt-get clean -y
 
-ADD ./ /Kollaps/
+ADD ./pid1 /Kollaps/pid1
 
-RUN tar -C /Kollaps/ -zxvf Kollaps/Aeron.tar.gz && \
-  cp -r /Kollaps/Aeron/binaries /usr/bin/Aeron && \
-    mkdir -p /home/daedalus/Documents/aeron4need/cppbuild/Release/ && \
-    cp -r /Kollaps/Aeron/lib /home/daedalus/Documents/aeron4need/cppbuild/Release/lib && \
-    cp /Kollaps/Aeron/usr/lib/libbsd.so.0.9.1 /usr/lib/libbsd.so.0.9.1 && \
-    cp /Kollaps/Aeron/usr/lib/libbsd.so.0 /usr/lib/libbsd.so.0 && \
-    rm -f Aeron.tar.gz
+ADD ./kollaps/ /Kollaps/kollaps
 
-# LL: only added kubernetes in l.33
+ADD ./setup.py /Kollaps/setup.py
+
 RUN make -C /Kollaps/pid1 && \
     cp /Kollaps/pid1/pid1 /usr/bin/pid1 && \
     make -C /Kollaps/kollaps/TCAL -j8 && \
-    pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netifaces && \
+    pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netifaces openssh_wrapper netaddr && \
     pip3 --no-cache-dir wheel --no-deps -w /Kollaps /Kollaps && \
     pip3 --no-cache-dir install /Kollaps/kollaps-1.0-py3-none-any.whl && \
+    cp /Kollaps/kollaps/TCAL/libTCAL.so /usr/local/bin/libTCAL.so && \
+    cp -R /Kollaps/kollaps/rustbinaries/communicationmanager /usr/bin/communicationmanager  && \
+    cp -R /Kollaps/kollaps/rustbinaries/emulationcore /usr/bin/emulationcore  && \
+    cp /Kollaps/kollaps/rustbinaries/libcommunicationcore.so /usr/local/bin/libcommunicationcore.so && \   
     rm -rf /Kollaps && \
-    pip3 --no-cache-dir uninstall -y setuptools wheel pip
-    #pacman -R --noconfirm make gcc flex bison pkgconf && \
-    #pacman -Scc --noconfirm
+    pip3 --no-cache-dir uninstall -y setuptools wheel pip3
+
+
+WORKDIR /
 
 ENTRYPOINT ["/usr/bin/pid1", "/usr/bin/python3", "-m", "kollaps.bootstrapper"]

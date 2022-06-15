@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<experiment boot="kollaps:1.0">
+	<services>
+		<service name="dashboard" image="kollaps/dashboard:1.0" supervisor="true" port="8088"/>
+		<service name="n1" image="kollaps/ping-client:1.0" command="['n2', '30', '30']" />
+		<service name="n2" image="kollaps/ping-client:1.0" command="['n1', '30', '30']" />
+    </services>
+    <bridges>
+		<bridge name="b1"/>
+    </bridges>
+    <links>
+		<link origin="n1" dest="b1" latency="14" drop="0" upload="100Mbps" network="kollaps_network" />
+        <link origin="b1" dest="n2" latency="14" drop="0" upload="100Mbps" network="kollaps_network" />
+		<link origin="n2" dest="b1" latency="14" drop="0" upload="100Mbps" network="kollaps_network" />
+        <link origin="b1" dest="n1" latency="14" drop="0" upload="100Mbps" network="kollaps_network" />
+
+    </links>    
+
+    <dynamic>
+		<!-- schedulle the dynamics of the experiment. These apply to services and links, see documentation for more details.
+		     This section can be ommited in which case all the services will be started at the beginning of the experiment -->
+		<schedule name="n1" time="0.0" action="join"/>
+		<schedule name="n2" time="0.0" action="join"/>
+		
+		<schedule name="n1" time="666.0" action="crash"/>
+		<schedule name="n2" time="120.0" action="crash"/>
+    </dynamic>
+</experiment>

@@ -21,9 +21,9 @@ import string
 import random
 import socket
 import docker
+import os
 from subprocess import Popen
 from time import sleep
-
 
 BYTE_LIMIT = 255
 SHORT_LIMIT = 65535
@@ -55,53 +55,102 @@ class CONTAINER:
 	ll = None  # type: docker.APIClient
 	container = None
 	process = None
-
+	startscript = ""
+	stopscript = ""
+	handlerpid = 0
+	rustcomms = None
+	core = None
+	links_index = None
 
 def start_experiment():
-	inspect = CONTAINER.ll.inspect_container(CONTAINER.id)
-	cmd = inspect['Config']['Cmd']
-	image = inspect['Image']
-	image_inspect = CONTAINER.ll.inspect_image(image)
-	entrypoint = image_inspect['Config']['Entrypoint']
-	if entrypoint is None:
-		entrypoint = [""]
-	if cmd is None:
-		cmd = image_inspect['Config']['Cmd']
-	elif len(cmd) == 0:
-		cmd = image_inspect['Config']['Cmd']
-	if cmd is None:
-		command = ' '.join(entrypoint)
+	if CONTAINER.startscript != "":
+		start_experiment_baremetal()
 	else:
-		command = ' '.join(entrypoint + cmd)
-	command.replace('"', '\\"')
-	command.replace("'", "\\'")
-	arg = ['echo ' + command + ' > /tmp/Kollaps_hang']
-	print_message(arg[0])
-	CONTAINER.container.exec_run(['/bin/sh'] + ['-c'] + arg, detach=True)
+		inspect = CONTAINER.ll.inspect_container(CONTAINER.id)
+		cmd = inspect['Config']['Cmd']
+		image = inspect['Image']
+		image_inspect = CONTAINER.ll.inspect_image(image)
+		entrypoint = image_inspect['Config']['Entrypoint']
+		if entrypoint is None:
+			entrypoint = [""]
+		if cmd is None:
+			cmd = image_inspect['Config']['Cmd']
+		elif len(cmd) == 0:
+			cmd = image_inspect['Config']['Cmd']
+		if cmd is None:
+			command = ' '.join(entrypoint)
+		else:
+			command = ' '.join(entrypoint + cmd)
+		command.replace('"', '\\"')
+		command.replace("'", "\\'")
+		arg = ['echo ' + command + ' > /tmp/Kollaps_hang']
+		print_message("['/bin/sh']" + "['-c']" + str(arg))
+		#CONTAINER.container.exec_run(['/bin/sh'] + ['-c'] + arg, detach=True)
 
+def start_experiment_baremetal():
+	print_message("Starting script with name " + CONTAINER.startscript)
+	cmd = [CONTAINER.startscript]
+	Popen(cmd)
+
+def setup_rustcomms(rustcomms):
+	CONTAINER.rustcomms = rustcomms
 
 def stop_experiment():
+	if CONTAINER.handlerpid != 0:
+		try:
+			# if user inserted stop script
+			if CONTAINER.stopscript != "":
+				print_message("stopping script with pid " + str(CONTAINER.scriptpid))
+				cmd = [CONTAINER.stopscript]
+				Popen(cmd)
+			print_message("stopping handler with pid " + str(CONTAINER.handlerpid))
+			Popen(
+				["sudo" ,"kill",str(CONTAINER.handlerpid)]
+			).wait()
+			print_message("stopped handler with pid " + str(CONTAINER.handlerpid))
+		except Exception as e:
+			print_error("[Py (god)] failed to stop experiment.")
+			print_and_fail(e)
 	# kill all but pid 1 (this might create zombies)
-	Popen(
+	else:
+		Popen(
 		["nsenter", "-t", str(CONTAINER.pid), "-p", "-m", "/bin/sh", "-c", "kill -2 -1"]
-	).wait()
-	return
+		).wait()
+		return
 
 
 def crash_experiment():
-	# kill all but pid 1 (this might create zombies)
-	Popen(
-		["nsenter", "-t", str(CONTAINER.pid), "-p", "-m", "/bin/sh", "-c", "kill -9 -1"]
-	).wait()
-	return
+	#if CONTAINER.handlerpid != 0:
+		#kill all but pid 1 (this might create zombies)
+	if CONTAINER.handlerpid == 0:
+		CONTAINER.rustcomms.mark_shutdown()
+		print_message("SENDING CRASH MESSAGE TO RUST")
+		CONTAINER.rustcomms.flush_shutdown()
+		# Popen(
+		# 	["nsenter", "-t", str(CONTAINER.pid), "-p", "-m", "/bin/sh", "-c", "kill -9 -1"]
+		# ).wait()
+		return
 
 
-def setup_container(id, pid):
+def setup_container(id,pid):
 	CONTAINER.id = id
-	CONTAINER.pid = pid
+	#for baremetal pid is rustmanager
 	CONTAINER.client = docker.DockerClient(base_url='unix:/' + DOCKER_SOCK)
 	CONTAINER.ll = docker.APIClient(base_url='unix:/' + DOCKER_SOCK)
 	CONTAINER.container = CONTAINER.client.containers.get(id)
+	CONTAINER.pid = pid
+
+def setup_baremetal(handlerpid,startscript,stopscript):
+	CONTAINER.handlerpid = handlerpid
+	CONTAINER.startscript = startscript
+	CONTAINER.stopscript = stopscript
+
+
+def setup_script(script):
+	CONTAINER.script = script
+
+def setup_pid(pid):
+	CONTAINER.pid = pid
 
 
 def ip2int(addr):
@@ -110,6 +159,14 @@ def ip2int(addr):
 
 def int2ip(addr):
 	return socket.inet_ntoa(struct.pack("!I", addr))
+
+
+def ip2intbig(addr):
+	return struct.unpack("<I", socket.inet_aton(addr))[0]
+
+
+def int2ipbig(addr):
+	return socket.inet_ntoa(struct.pack("<I", addr))
 
 
 def get_short_id(size=4, chars=string.ascii_uppercase + string.digits):
@@ -132,6 +189,19 @@ def get_own_ip(graph):
 		last_ip = new_ip
 	return last_ip
 
+def add_ip(ip):
+    print_named("god","writing ip " + str(ip))
+    file = open("/tmp/topoinfo", "a")
+    file.write(str(ip)+"\n")
+    file.close()
+
+def write_ips(graph):
+	file = open("/remote_ips.txt", "a")
+	own_ip = get_own_ip(graph)
+	for int_ip in graph.hosts_by_ip:
+		if int_ip != ip2int(own_ip):
+			file.write(str(int_ip)+"\n")
+	file.close()
 
 def print_error(message):
 	print("ERROR: " + str(message), file=sys.stderr)
@@ -160,10 +230,9 @@ def print_identified(graph, msg):
 
 def print_and_fail(msg):
 	message = msg.message if hasattr(msg, 'message') else msg
-
 	print("An error occured, terminating!", file=sys.stderr)
 	print("Error Message: " + str(message), file=sys.stderr)
 	sys.stdout.flush()
 	sys.stderr.flush()
-	sleep(10)
+	sleep(1)
 	exit(-1)

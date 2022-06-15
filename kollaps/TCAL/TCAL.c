@@ -36,9 +36,9 @@ unsigned int handleCounter = 5;
 void (*usageCallback)(unsigned int, unsigned long, unsigned int) = NULL;
 
 
-void init(unsigned short controllPort, int txqueuelen){
+void init(unsigned short controllPort, int txqueuelen,unsigned int myip){
     needControllPort = controllPort;
-    TC_init(controllPort, txqueuelen);
+    TC_init(controllPort, txqueuelen,myip);
 }
 
 void initDestination(unsigned int ip, int bandwidth, float latency, float jitter, float packetLoss){
@@ -55,6 +55,7 @@ void initDestination(unsigned int ip, int bandwidth, float latency, float jitter
         existing_if = (netif*)malloc(sizeof(netif));
         existing_if->if_index = dest->if_index;
         LL_PREPEND(interfaces, existing_if);
+        //printf("The interface is: %x\n",dest->if_index);
     }
 
 }
@@ -83,7 +84,7 @@ void changeLatency(unsigned int ip, float latency, float jitter){
 void updateUsage(){
     netif* ifelem;
     LL_FOREACH(interfaces, ifelem){
-        TC_updateUsage(ifelem->if_index);
+        TC_updateUsage(ifelem ->if_index);
     }
 }
 
