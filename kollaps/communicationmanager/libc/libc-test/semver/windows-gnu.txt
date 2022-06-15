@@ -1,7 +1,0 @@
-STDERR_FILENO
-STDIN_FILENO
-STDOUT_FILENO
-max_align_t
-strcasecmp
-strncasecmp
-wmemchr

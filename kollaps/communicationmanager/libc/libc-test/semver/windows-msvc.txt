@@ -1,4 +1,0 @@
-EOTHER
-memccpy
-stricmp
-strnicmp
