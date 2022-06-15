@@ -26,6 +26,11 @@ Initialise the swarm and create an overlay network:
 docker swarm init
 docker network create --driver=overlay --subnet=10.1.0.0/24 kollaps_network
 ```
+For topologies with more then 257 services use:
+```
+docker network create --driver=overlay --subnet=11.1.0.0/20 kollaps_network
+```
+
 
 Lastly run a simple experiment:
 ```
@@ -43,6 +48,7 @@ docker stack deploy -c topology.yaml kollaps_example
 # Remove the experiment
 docker stack rm kollaps_example
 ```
+
 
 ### Cite the work
 
@@ -70,9 +76,8 @@ Or cite it:
 
 ### Other links
 
-+ [Exmaples](./examples/README.md) - list of example applications to test Kollaps.
 + [Installation](./docs/install.md) - step by step installation guide.
-+ [Orchestrators](./docs/orchestrators.md) - container orchestrators supported in Kollaps.
++ [Orchestrators](./docs/orchestrators.md) - container orchestrators supported in Kollaps, and new in 2.0 Baremetal
++ [Examples](./examples/README.md) - list of example applications to test Kollaps.
 + [Videos](./docs/videos.md) - a collection of talks and tutorials.
 + [Wiki](https://github.com/miguelammatos/Kollaps/wiki) - project's wiki page.
-
