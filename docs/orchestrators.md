@@ -77,7 +77,6 @@ The `kubeadm init` command tells you to execute the following statements:
 $mkdir -p $HOME/.kube && \
 sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && \
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
-mkdir kube
 cp $HOME/.kube/config kube/config
 ```
 
