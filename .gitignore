@@ -117,3 +117,7 @@ ENV/
 rebuild.sh
 trace_dumps/*
 
+
+kube/config
+
+!libcommunicationcore.so
