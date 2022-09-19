@@ -35,16 +35,14 @@ Or the following one for **Kubernetes** (note that we just change the flag):
 ./KollapsDeploymentGenerator ./<app_name>/topology.xml -k <your_experiment_name>.yaml
 ```
 
-#### Building an application: <a name="app"/>
+#### Deploying an experiment: <a name="deploy"/>
 
-Now you are ready to build the service images to launch and emulate your application with Kollaps.
-In order to build the images run:
+The images referenced by the .xml must already be built using `dockerbuild`, if you are using the supported applications(iperf3,redis,memcached) they can be built using the KollapsAppBuilder.
+
 ```
+cd examples
 ./KollapsAppBuilder <app_name>
 ```
-where the supported app names are `iperf3` and `redis` which we describe in more detail [below](#available-apps).
-
-#### Deploying an experiment: <a name="deploy"/>
 
 Lastly, you just need to deploy the experiment.
 
