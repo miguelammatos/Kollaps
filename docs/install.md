@@ -18,8 +18,8 @@ It is important to properly define the environment, follow the instructions from
 This is the recommended and quickest way to get Kollaps running. It only requires to build the two Docker images, as follows:
 ```
 export DOCKER_BUILDKIT=1
-docker build --rm -f dockerfiles/Kollaps -t kollaps:1.0 .
-docker build -f dockerfiles/DeploymentGenerator -t kollaps-deployment-generator:1.0 .
+docker build --rm -f dockerfiles/Kollaps -t kollaps:2.0 .
+docker build -f dockerfiles/DeploymentGenerator -t kollaps-deployment-generator:2.0 .
 ```
 Now you are ready to test [some applications](../examples/).
 
@@ -33,7 +33,7 @@ To run experiments, you need to build the **Kollaps tools** to generate runnable
 Execute in the root folder (where this README is found):
 ```
 $ pip3 wheel --no-deps . .
-$ pip3 install kollaps-1.0-py3-none-any.whl
+$ pip3 install kollaps-2.0-py3-none-any.whl
 ```
 This installs the following tools:
 - `KollapsDeploymentGenerator` that translate Kollaps topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine.

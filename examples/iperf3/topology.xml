@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<experiment boot="kollaps:1.0">
+<experiment boot="kollaps:2.0">
 	<services>
 		<!-- definition of the services (containers),  -->
 		<!-- kollaps dashboard to controll the experiments, should be present in all deployments -->

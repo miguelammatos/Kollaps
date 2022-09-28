@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='kollaps',
-      version='1.0',
+      version='2.0',
       description='Decentralized network emulator',
       url='https://github.com/miguelammatos/Kollaps.git',
       author='Joao Neves, Paulo Gouveia, Luca Liechti',

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<experiment boot="kollaps:1.0">
+<experiment boot="kollaps:2.0">
 	<services>
 		<service name="dashboard" image="kollaps/dashboard:1.0" supervisor="true" port="8088" />
 		<service name="client1" image="kollaps/iperf3-network:1.0" command="['1','3']" />

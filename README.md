@@ -17,8 +17,8 @@ cd Kollaps
 Then build the docker images:
 ```
 export DOCKER_BUILDKIT=1
-docker build --rm -f dockerfiles/Kollaps -t kollaps:1.0 .
-docker build -f dockerfiles/DeploymentGenerator -t kollaps-deployment-generator:1.0 .
+docker build --rm -f dockerfiles/Kollaps -t kollaps:2.0 .
+docker build -f dockerfiles/DeploymentGenerator -t kollaps-deployment-generator:2.0 .
 ```
 
 Initialise the swarm and create an overlay network:

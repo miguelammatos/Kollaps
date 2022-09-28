@@ -52,7 +52,7 @@ RUN make -C /Kollaps/pid1 && \
     make -C /Kollaps/kollaps/TCAL -j8 && \
     pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netifaces openssh_wrapper netaddr && \
     pip3 --no-cache-dir wheel --no-deps -w /Kollaps /Kollaps && \
-    pip3 --no-cache-dir install /Kollaps/kollaps-1.0-py3-none-any.whl && \
+    pip3 --no-cache-dir install /Kollaps/kollaps-2.0-py3-none-any.whl && \
     cp /Kollaps/kollaps/TCAL/libTCAL.so /usr/local/bin/libTCAL.so && \
     cp -R /Kollaps/kollaps/rustbinaries/communicationmanager /usr/bin/communicationmanager  && \
     cp -R /Kollaps/kollaps/rustbinaries/emulationcore /usr/bin/emulationcore  && \
