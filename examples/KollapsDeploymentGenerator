@@ -47,7 +47,7 @@ docker run --rm \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v "$(pwd)/$1":"$(pwd)/$1" \
     -v "$(pwd)/tmp_result":"/result/" \
-    kollaps-deployment-generator:1.0 \
+    kollaps-deployment-generator:2.0 \
     bash -c "KollapsDeploymentGenerator $(pwd)/$1 $2 > /result/$OUT_FILE"
 
 mv "tmp_result/$OUT_FILE" $3
