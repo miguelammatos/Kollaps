@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 libc = "0.2"
-tokio = { version = "1.17.0", features = ["full"] }
+tokio = { version = "1.18.4", features = ["full"] }
 redbpf = {version = "2.3.0", features = ["load"]}
 monitor = { path = "./monitor" }
 libloading = "0.7.3"
