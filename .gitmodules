@@ -10,6 +10,3 @@
 	path = kollaps/communicationcore/redbpf
 	url = https://github.com/sebastiaoamaro/redbpf
 
-[submodule "kollaps/emulationcore/redbpf"]
-	path = kollaps/emulationcore/redbpf
-	url = https://github.com/sebastiaoamaro/redbpf

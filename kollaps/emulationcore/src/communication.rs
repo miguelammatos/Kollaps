@@ -1,3 +1,18 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
+
+//    http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 use std::sync::{Arc, Mutex};
 use std::fs::OpenOptions;
 use std::io::prelude::*;
@@ -5,7 +20,6 @@ use std::fs::File;
 use std::ffi::CString;
 use crate::state::{State};
 use std::thread;
-// use crate::aux::{print_message};
 
 struct Message{
     //content has first entry number of flows, then the info of each flow[bw,len(link),linkid1,linkid2,...]
@@ -288,6 +302,10 @@ fn start_polling_u16(state:Arc<Mutex<State>>,readpipe:Arc<Mutex<Option<File>>>){
     let mut receive_buffer = vec![0;512];
 
         loop{
+
+            // if state.lock().unwrap().name.clone() != "server"{
+            //     print_message(state.lock().unwrap().name.clone(),"STARTED READING".to_string());
+            // }
             readpipe.lock().unwrap().as_ref().unwrap().read(&mut receive_buffer).map_err(|err| println!("{:?}", err)).ok();
 
             let mut recv_ptr = 0;
@@ -316,11 +334,21 @@ fn start_polling_u16(state:Arc<Mutex<State>>,readpipe:Arc<Mutex<Option<File>>>){
                         ids.push(get_uint16(&receive_buffer,recv_ptr));
                         recv_ptr+=2;
                     }
-    
+                    
+                    // if state.lock().unwrap().name.clone() != "server"{
+                    //     print_message(state.lock().unwrap().name.clone(),"STARTED CRF".to_string());
+                    // }
                     callreceive_flow_16(state.clone(),bandwidth,link_count,ids);
+                    // if state.lock().unwrap().name.clone() != "server"{
+                    //     print_message(state.lock().unwrap().name.clone(),"DONE CRF".to_string());
+                    // }
     
                 }
             }
+            // if state.lock().unwrap().name.clone() != "server"{
+            //     print_message(state.lock().unwrap().name.clone(),"DONE READING".to_string());
+            // }
+            
         }
         
     });
@@ -344,13 +372,11 @@ fn get_uint32(buffer:&Vec<u8>,index:usize) -> u32{
 
 fn callreceive_flow_u8(state:Arc<Mutex<State>>,bandwidth:u32,link_count:usize,ids:Vec<u8>){
 
-    let mut unlocked_state = state.lock().unwrap();
-    unlocked_state.get_current_graph().lock().unwrap().collect_flow_u8(bandwidth as f32,link_count,ids.clone());
+    state.lock().unwrap().get_current_graph().lock().unwrap().collect_flow_u8(bandwidth as f32,link_count,ids.clone());
 
 }
 
 fn callreceive_flow_16(state:Arc<Mutex<State>>,bandwidth:u32,link_count:usize,ids:Vec<u16>){
 
-    let mut unlocked_state = state.lock().unwrap();
-    unlocked_state.get_current_graph().lock().unwrap().collect_flow_u16(bandwidth as f32,link_count,ids.clone());
+    state.lock().unwrap().get_current_graph().lock().unwrap().collect_flow_u16(bandwidth as f32,link_count,ids.clone());
 }

@@ -1,3 +1,18 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
+
+//    http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 use std::env;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -12,6 +27,7 @@ use std::io::prelude::*;
 use std::thread;
 use std::io::{BufRead, BufReader};
 use roxmltree::Document;
+use emulationcore::aux::print_message;
 
 
 fn main() {
@@ -60,15 +76,18 @@ async fn process_command(topology_file:String,command:String)->Result<()>{
     
         for ip in ips{
 
-            let ip_with_port;
+            let mut ip_with_port;
             if ip == parser.controller_ip{
-                ip_with_port = format!("0.0.0.0{}",":7073");
+                continue;
             } 
             else{
                 ip_with_port = format!("{}{}",ip,":7073");
             }          
             remote_ips.push(ip_with_port.clone());
             file.write_all(format!("{}\n",ip_with_port.clone()).as_bytes()).expect("Unable to write data");
+
+            ip_with_port = format!("0.0.0.0{}",":7073");
+            remote_ips.push(ip_with_port.clone());
         }
 
 
@@ -176,12 +195,12 @@ async fn process_command(topology_file:String,command:String)->Result<()>{
             thread::sleep(sleeptime);
             for (i,remote_ip) in remote_ips.clone().iter().enumerate(){
                 if !(ips_connected.contains(&i)){
-                    //print_message(format!("CONNECTING TO {}",remote_ip.clone()));
+                    print_message("controller".to_string(),format!("CONNECTING TO {}",remote_ip.clone()));
                     let stream = TcpStream::connect(remote_ip.clone()).await;
                     match stream{
                         Ok(stream)=> {
                             streams.push(stream);
-                            //print_message(format!("CONNECTED TO {}",remote_ip.clone()));
+                            print_message("controller".to_string(),format!("CONNECTED TO {}",remote_ip.clone()));
                             ips_connected.push(i.clone());
                         },
                         Err(e)=> println!("{}",e.to_string()),
@@ -195,6 +214,7 @@ async fn process_command(topology_file:String,command:String)->Result<()>{
         buffer[0] = shutdown_command;
 
         for mut stream in streams{
+            print_message("controller".to_string(),"Wrote to stream".to_string());
             stream.write(&buffer).await?;
         }
     }

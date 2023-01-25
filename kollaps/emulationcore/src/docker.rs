@@ -1,8 +1,25 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
+
+//    http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//use docker_api::Exec;
 use docker_api::ExecContainerOpts;
 use futures::StreamExt;
 use subprocess::PopenConfig;
 use subprocess::Popen;
 use subprocess::Redirection;
+//use docker_api::opts::ExecCreateOpts;
 
 static mut COMMAND_STRING:Option<String> = None;
 
@@ -10,12 +27,17 @@ static mut COMMAND_STRING:Option<String> = None;
 pub async fn start_experiment(id:String){
 
     get_command_string(id.clone()).await;
+
     let docker = docker_api::Docker::unix("/var/run/docker.sock");
 
     let container = docker.containers().get(id);
 
     let command_string;
     unsafe{
+        if COMMAND_STRING.as_ref().is_none() || COMMAND_STRING.as_ref().unwrap().is_empty(){
+            println!("Leaving start experiment nothing to do");
+            return
+        }
         command_string= COMMAND_STRING.as_ref().unwrap().clone().
         as_mut_str().replace('"',"\"").as_mut_str().replace("'","\\'");
     }
@@ -25,13 +47,8 @@ pub async fn start_experiment(id:String){
 
     args.push("/bin/sh");
     args.push("-c");
-
-    let mut command;
-    command = format!("echo{}",command_string);
-
-    command = format!("{} > /tmp/Kollaps_hang",command);
-
-    args.push(&command);
+ 
+    args.push(&command_string);
     
 
     let opts = ExecContainerOpts::builder()
@@ -44,6 +61,26 @@ pub async fn start_experiment(id:String){
 
     //run command
     stream.next().await;
+
+    // // Create Opts with specified command
+    // let opts = ExecCreateOpts::builder()
+    //     .command(args)
+    //     .attach_stdout(true)
+    //     .attach_stderr(true)
+    //     .build();
+
+    // let exec = Exec::create(docker, &container.id(), &opts).await;
+
+
+    // println!("CREATED EXEC");
+
+    // let mut stream = exec.as_ref().unwrap().start().next().await;
+
+    // println!("EXEC RUNNING");
+
+    // println!("{:#?}", exec.as_ref().unwrap().inspect().await);
+
+    // println!("RUNNING COMMAND");
 }
 //Retrieve the command to run
 pub async fn get_command_string(id:String){
@@ -68,7 +105,7 @@ pub async fn get_command_string(id:String){
                     let entrypoint = image_config.entrypoint;
 
                     if entrypoint.is_none(){
-
+                        return
                     }
 
                     if container_config.cmd.is_none(){
@@ -84,7 +121,7 @@ pub async fn get_command_string(id:String){
                     }else{
                         command.extend(container_config.cmd.as_ref().unwrap());
                     }
-
+                    
                     for string in entrypoint.unwrap(){
                         command_string = format!("{} {}",command_string,string);
                     }
@@ -104,8 +141,6 @@ pub async fn get_command_string(id:String){
     unsafe{
         COMMAND_STRING = Some(command_string.clone());
     }
-
-    println!("COMMAND_STRING is {}", command_string.clone());
 
 }
 

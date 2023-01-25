@@ -1,9 +1,25 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
+
+//    http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 use std::sync::{Arc, Mutex};
 use crate::graph::{Graph};
 use crate::elements::{Link,Path,Flowu8,Flowu16};
 use crate::emulation::{Emulation};
 use std::io::Result;
-use crate::aux::print_message;
+use crate::aux::{print_message};
+
 //Represents the State of the Emulation
 pub struct State{
     pub age: usize, //Age represents which graph we currently have, a dynamic event that changes paths represent a new age
@@ -15,7 +31,7 @@ pub struct State{
     pub emulation:Arc<Mutex<Emulation>>, //object that handles TC
     pub id:String,
     pub link_count:u32,
-    pub tc_changes:u32
+
 
 }
 
@@ -32,11 +48,12 @@ impl State {
             emulation: Arc::new(Mutex::new(Emulation::new())),
             id:id,
             link_count:0,
-            tc_changes:0
+
         }
     }
-    pub fn init(&mut self,ip:u32) -> Result<()> {
 
+    //Here we setup the TC qdisc to emulate the network state
+    pub fn init(&mut self,ip:u32) -> Result<()> {
 
         self.emulation.lock().unwrap().init(ip);
 
@@ -44,12 +61,17 @@ impl State {
         
         let activepaths = self.get_current_graph().lock().unwrap().graph_root.as_ref().unwrap().lock().unwrap().activepaths.clone();
 
+        let mut opened_paths = vec![];
 
+
+        //If we do not have active paths we do not know which paths need to be shaped so we shape all
         if activepaths.len() == 0{
             let mut paths = self.get_current_graph().lock().unwrap().paths.clone();
             for (id,path) in paths.iter_mut(){
 
-                if self.get_current_graph().lock().unwrap().bridges_by_name.contains_key(&path.lock().unwrap().finish.clone()){
+                let service_name = &path.lock().unwrap().finish.clone();
+
+                if self.get_current_graph().lock().unwrap().bridges_by_name.contains_key(service_name){
                     continue;
                 }
                 let bandwidth = (path.lock().unwrap().max_bandwidth.clone() / 1000.0) as u32;
@@ -67,23 +89,26 @@ impl State {
                 // else is a path to another container
                 }else{
                     self.emulation.lock().unwrap().initialize_path(ip,bandwidth,latency,jitter,drop);
+                    opened_paths.push(service_name.clone());
                 }
         
             }
 
             for (ip,_id) in ips{
                 if self.get_current_graph().lock().unwrap().ip_to_path_id.get(&ip).is_none(){
-                    self.emulation.lock().unwrap().disable_path(ip);   
+                    //self.emulation.lock().unwrap().disable_path(ip);   
                 }
             }
 
+            
+
         }
+        //If we do know active paths, we only shape those paths
         else{
 
             let mut opened_paths = vec![];
             //opens from me to them
             for service_name in activepaths{
-                //print_message(self.name.clone(),format!("Active path is {}",service_name.clone()).to_string());
                 let ip = self.get_current_graph().lock().unwrap().services_by_name.get(&service_name).unwrap()[0].lock().unwrap().ip;
 
                 let path_id = self.get_current_graph().lock().unwrap().ip_to_path_id.get(&ip).unwrap().clone();
@@ -205,6 +230,7 @@ impl State {
     //Increments the age and updates the new structures with older emulation metadata
     pub fn increment_age(&mut self){
 
+        print_message(self.name.clone(),"Started changing properties".to_string());
         self.path_changes();
         self.collect_old_usages();
 
@@ -250,11 +276,15 @@ impl State {
                             if new_path.is_none(){
                                 continue;
                             }
-
                             
                             let new_path = new_path.unwrap().clone();
 
-                            if self.get_graph_with_age(age+1).lock().unwrap().bridges_by_name.contains_key(&new_path.lock().unwrap().finish.clone()){
+                            let start = &new_path.lock().unwrap().start.clone();
+
+                            let finish = &new_path.lock().unwrap().finish.clone();
+
+                            if self.get_graph_with_age(age+1).lock().unwrap().bridges_by_name.contains_key(finish){
+                                print_message(self.name.clone(),"Continued".to_string());
                                 continue;
                             }
         
@@ -265,18 +295,12 @@ impl State {
                             let new_latency = new_path.lock().unwrap().latency.clone();
                             let new_jitter = new_path.lock().unwrap().jitter.clone();
                             let new_loss = new_path.lock().unwrap().drop.clone();
-                            
-
-
-                            print_message(self.name.clone(),format!("IP IS {}",ip).to_string());
-                            print_message(self.name.clone(),format!("LATENCY IS {}",new_latency).to_string());
-                            print_message(self.name.clone(),format!("JITTER IS {}",new_jitter).to_string());
-                            print_message(self.name.clone(),format!("LOSS IS {}",new_loss).to_string());
+                            print_message(self.name.clone(),format!("Changed path from {} to {} and new latency is {}",start,finish,new_latency.clone()));
                             self.emulation.lock().unwrap().change_loss(*ip,new_loss);
-                            self.emulation.lock().unwrap().change_latency(*ip,new_latency,new_jitter);
 
-
-        
+                            if new_latency != 0.0{
+                                self.emulation.lock().unwrap().change_latency(*ip,new_latency,new_jitter);
+                            }        
                         },
                         None =>{
                         
@@ -287,10 +311,9 @@ impl State {
                     continue;
                 }
             };
-            
+
         }
-
-
+        print_message(self.name.clone(),"Done Changes".to_string());
 
     }
     
@@ -341,11 +364,12 @@ impl State {
 
         let mut ips_and_bandwidths = vec![];
         
-        //active_paths might be useless
         //add info about our flows
-        //println!("Active path ids are {:?}",self.active_paths_ids);
         
         let active_paths_ids = self.active_paths_ids.clone();
+
+        //print_message(self.name.clone(),format!("Active paths ids size is {}",active_paths_ids.len().clone()));
+
         for path_id in &active_paths_ids{
             let path = self.get_path(*path_id).unwrap().clone();
             let links =  path.lock().unwrap().links.clone();
@@ -364,6 +388,8 @@ impl State {
 
         //add info about other flows
         let flow_keys = self.get_flow_keys();
+
+        // print_message(self.name.clone(),format!("Flows size is {}",flow_keys.len().clone()));
         for key in flow_keys{
 
             if self.link_count <=255{
@@ -390,7 +416,7 @@ impl State {
             }
         }
 
-        //print_message(self.name.clone(),format!("We have this many active_path_ids {}",active_links_ids.len().clone()).to_string());
+        //print_message(self.name.clone(),format!("We have this many active_links_ids {}",active_links_ids.len().clone()).to_string());
 
         //Calculations
 
@@ -417,10 +443,10 @@ impl State {
 
                 //calculate our bandwidth
                 let bandwidth_bps = link.lock().unwrap().bandwidth;
-
                 let value = 1.0/link_flows[0][rtt];
-
+                
                 let max_bandwidth_element = (value / rtt_reverse_sum) * bandwidth_bps;
+
                 //calculated our bandwidth push to vector
                 max_bandwidth_on_link.push(max_bandwidth_element);
 
@@ -443,7 +469,6 @@ impl State {
                     max_bandwidth_on_link.push(max_bandwidth_element);
 
                     //check if a flow is hungry (wants more than its allocated share)
-
                     if flow[bw] > max_bandwidth_on_link[position]{
 
 
@@ -455,6 +480,7 @@ impl State {
 
                         spare_bw-= flow[bw]
                     }
+
                 }
                 //we get a share of the spare proportional to our RTT
                 let normalized_share = our_share / hungry_usage_sum;
@@ -501,13 +527,14 @@ impl State {
 
                 ips_and_bandwidths.push(ip_and_bandwidth);
 
-
+                //print_message(self.name.clone(),format!("want to change bw to {}",new_bandwidth))    ;
                 self.emulation.lock().unwrap().change_bandwidth(ip,new_bandwidth as u32);
 
-                self.tc_changes +=1;
             }   
 
         }
+
+        //print_message(self.name.clone(),format!("tc changes {}",self.tc_changes.clone()));
 
         for id in active_links_ids.clone(){
             self.clear_link(id as u16);
@@ -515,6 +542,7 @@ impl State {
         
     }
 
+    //Add flow received from CM to our state"   
     pub fn apply_flow_u8(&mut self,key:&String){
         let flow = self.get_flow_u8(key);
 
@@ -523,13 +551,13 @@ impl State {
 
         let mut pathrtt = 0.0;
         //calculate RTT
-        for index in &link_indices{
-            let link = self.get_link(*index as u16);
+        for index in link_indices.clone(){
+            let link = self.get_link(index as u16);
             pathrtt+= link.lock().unwrap().latency * 2.0;
         }
 
-        for index in &link_indices{
-            let link = self.get_link(*index as u16);
+        for index in link_indices.clone(){
+            let link = self.get_link(index as u16);
             
             let mut flow = vec![];
 
@@ -542,7 +570,7 @@ impl State {
         }
 
     }
-
+    //Add flow received from CM to our state
     pub fn apply_flow_u16(&mut self,key:&String){
         let flow = self.get_flow_u16(key);
 
@@ -551,13 +579,13 @@ impl State {
 
         let mut pathrtt = 0.0;
         //calculate RTT
-        for index in &link_indices{
-            let link = self.get_link(*index as u16);
+        for index in link_indices.clone(){
+            let link = self.get_link(index as u16);
             pathrtt+= link.lock().unwrap().latency * 2.0;
         }
 
-        for index in &link_indices{
-            let link = self.get_link(*index as u16);
+        for index in link_indices.clone(){
+            let link = self.get_link(index as u16);
             
             let mut flow = vec![];
 

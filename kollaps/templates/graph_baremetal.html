@@ -19,7 +19,6 @@
                   <li class="pull-right" role="presentation"><a href="/stop">STOP</a></li>
                   <li class="pull-right" role="presentation"><a href="/start">START</a></li>
                   <li class="pull-right" role="presentation"><a href="/initialize">INITIALIZE BAREMETAL</a></li>
-                  <li class="pull-right" role="presentation"><a href="/install">INSTALL KOLLAPS</a></li>
 
                 </ul>
             </nav>
@@ -35,12 +34,12 @@
           var nodes = new vis.DataSet([
           {% for key, hosts in graph.services.items() %}
             {% for host in hosts %}
-              {id: '{{host.__hash__()}}', label: '{{host.hostname}}', shape: 'box', color:'#97C2FC'},
+              {id: '{{host.__hash__()}}', label: '{{host.name}}', shape: 'box', color:'#97C2FC'},
             {% endfor %}
           {% endfor %}
           {% for key, hosts in graph.bridges.items() %}
             {% for host in hosts %}
-              {id: '{{host.__hash__()}}', label: '{{host.hostname|truncate(10, True)}}', shape: 'circle', color:'#7BE141'},
+              {id: '{{host.__hash__()}}', label: '{{host.name|truncate(10, True)}}', shape: 'circle', color:'#7BE141'},
             {% endfor %}
           {% endfor %}
           ]);

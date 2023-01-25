@@ -5,12 +5,12 @@ edition = '2018'
 
 [dependencies]
 cty = "0.2"
-redbpf-macros = {path = "../redbpf/redbpf-macros"}
-redbpf-probes = {path = "../redbpf/redbpf-probes"}
+redbpf-macros = {version = "2.3"}
+redbpf-probes = {version = "2.3"}
 memoffset = "0.6.1"
 
 [build-dependencies]
-cargo-bpf = { version = "2.0", default-features = false }
+cargo-bpf = { version = "2.3", default-features = false }
 
 [features]
 default = []

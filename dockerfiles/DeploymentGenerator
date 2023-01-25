@@ -28,4 +28,5 @@ RUN pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netiface
     pip3 --no-cache-dir install /Kollaps/kollaps-2.0-py3-none-any.whl && \
     rm -rf /Kollaps && \
     mkdir /result && \
-    pip3 --no-cache-dir uninstall -y setuptools wheel pip
+    pip3 --no-cache-dir uninstall -y setuptools wheel pip && \
+    apt-get remove -y gcc make flex bison 

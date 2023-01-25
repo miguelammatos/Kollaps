@@ -1,3 +1,18 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
+
+//    http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -87,11 +102,15 @@ impl Graph {
 
     pub fn insert_service(&mut self,hostname:String,shared:bool,reuse:bool,replicas:u32,ip:Option<u32>,paths:Vec<String>,script:Option<&str>) {
         let mut service = Service::new(hostname.clone(),shared,reuse,replicas);
+
         if !script.is_none(){
             service.script = script.unwrap().to_string();
         }
+
         service.set_activepaths(paths);
+
         let service_locked = Arc::new(Mutex::new(service));
+
         match self.services_by_name.get_mut(&hostname){
             Some(services)=>services.push(Arc::clone(&service_locked)),
             None=>{
@@ -108,8 +127,6 @@ impl Graph {
             service_locked.lock().unwrap().ip = ip.unwrap();
             self.services.insert(ip.unwrap(),service_locked);
         }
-        //assign when its given an ip
-        //self.services.insert(0,Arc::clone(&service_locked));    
     }
 
     pub fn insert_bridge(&mut self, hostname:String,ip:Option<u32>){
@@ -117,6 +134,7 @@ impl Graph {
 
 
         if ip.is_none(){
+            //generate random IP to put be able to put bridges in the map
             let mut ip_gen:u32 = 0;
 
             let mut rng = rand::thread_rng();
@@ -250,37 +268,37 @@ impl Graph {
         }
     } 
 
-    // pub fn print_state(&mut self){
+    pub fn print_graph(&mut self){
 
-    //     // for (name, services) in &self.services_by_name {
-    //     //     for service in services{
-    //     //         let service = service.lock().unwrap();
-    //     //         println!("Service with ip {}, hostname {}, command {}, image {}, shared {}, reuse {}, replicas {}, replica_id {}, supervisor {},supervisor_port {}", 
-    //     //      service.ip,service.hostname,service.command,service.image,service.shared,service.reuse,service.replicas,service.replica_id,service.supervisor,service.supervisor_port);
-    //     //     }
-    //     // }
-    //     // for (name, bridges) in &self.bridges_by_name {
-    //     //     for bridge in bridges{
-    //     //         let bridge = bridge.lock().unwrap();
-    //     //         println!("Bridge with name {}",bridge.hostname);
-    //     //     }
-    //     // }
-    //     // for (id, link) in &self.links {
-    //     //       link.lock().unwrap().print();
-    //     // }
+    //     for (name, services) in &self.services_by_name {
+    //         for service in services{
+    //             let service = service.lock().unwrap();
+    //             println!("Service with ip {}, hostname {}, command {}, image {}, shared {}, reuse {}, replicas {}, replica_id {}, supervisor {},supervisor_port {}", 
+    //          service.ip,service.hostname,service.command,service.image,service.shared,service.reuse,service.replicas,service.replica_id,service.supervisor,service.supervisor_port);
+    //         }
+    //     }
+    //     for (name, bridges) in &self.bridges_by_name {
+    //         for bridge in bridges{
+    //             let bridge = bridge.lock().unwrap();
+    //             println!("Bridge with name {}",bridge.hostname);
+    //         }
+    //     }
+        // for (id, link) in &self.links {
+        //       link.lock().unwrap().print();
+        // }
 
-    //     for (_id, path) in &self.paths {
-    //          path.lock().unwrap().print();
+        // for (_id, path) in &self.paths {
+        //      path.lock().unwrap().print();
+        // }
+
+    //     for (ip, id) in &self.ip_to_path_id {
+    //          println!("ip is {} and id is {}",ip,id);
     //     }
 
-    // //     for (ip, id) in &self.ip_to_path_id {
-    // //          println!("ip is {} and id is {}",ip,id);
-    // //     }
-
-    // //     for (id, ip) in &self.path_id_to_ip {
-    // //         println!("id is {} and ip is {}",id,ip);
-    // //    }
-    // }
+    //     for (id, ip) in &self.path_id_to_ip {
+    //         println!("id is {} and ip is {}",id,ip);
+    //    }
+    }
 
     //gets the last amount of bytes sent to an ip
     pub fn get_lastbytes(&mut self, ip:&u32) -> u32{
@@ -453,7 +471,7 @@ impl Graph {
     //Processes usages received from eBPF
     pub fn process_usage(&mut self,ip:u32,throughput:f32) -> bool{
 
-        let errormargin = 0.05;
+        let errormargin = 0.01;
         let path_id = match self.ip_to_path_id.get_mut(&ip) {
             Some(path_id) => path_id,
             None => return false //error
@@ -491,18 +509,13 @@ impl Graph {
             for (_key,flow) in &self.flow_accumulator_u8{
                 let flow = flow.lock().unwrap();
                 age = age + flow.age;
-                //println!("Flow with key {:?} and bandwidth {:.1} with age {}",
-                    //flow.link_indices,flow.bandwidth,flow.age);
             }
         }else{
             for (_key,flow) in &self.flow_accumulator_u16{
                 let flow = flow.lock().unwrap();
                 age = age + flow.age;
-                //println!("Flow with key {:?} and bandwidth {:.1} with age {}",
-                    //flow.link_indices,flow.bandwidth,flow.age);
             }
         }
-        // is_usefull = age != 0 || self.flow_accumulator_keys.len() == 0;
 
         is_usefull = age != 0;
 
@@ -582,33 +595,6 @@ impl Graph {
             }
         }
     }
-
-    // pub fn remove_node(&mut self,ip:u32){
-
-    //    match self.services.get(&ip){
-    //         Some(service) => {
-    //             let name = service.lock().unwrap().hostname.clone();
-
-    //             for key in self.flow_accumulator_keys.clone(){
-    //                 let source_link_id = &key[0..1];
-
-    //                 let source_link_id_u32: u32 = source_link_id.parse().unwrap();
-
-    //                 let link = self.links.get(&source_link_id_u32).unwrap();
-
-    //                 if link.lock().unwrap().source.lock().unwrap().hostname == name{
-    //                     println!("DELETING ENTRY");
-    //                     let mut flow = self.flow_accumulator.get_mut(&key).unwrap().lock().unwrap();
-
-    //                     flow.bandwidth = 0.0;
-    //                     flow.age = 1;
-    //                 }
-    //             }
-    //         },
-    //         None => return
-    //     };
-
-    // }
 
     //get ips of containers
     pub fn resolve_hostnames_docker(&mut self){

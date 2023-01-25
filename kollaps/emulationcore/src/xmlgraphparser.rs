@@ -1,3 +1,18 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
+
+//    http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 use crate::state::{State};
 use std::sync::{Arc, Mutex};
 use roxmltree::{Node};
@@ -471,6 +486,10 @@ impl XMLGraphParser{
             let both_shared = source_node_shared_link && destination_node_shared_link;
 
             let latency:f32  = link.attribute("latency").unwrap().parse().unwrap();
+
+            if latency == 0.0{
+                println!("Warning: Latency in a path between two containers/machines/VMs can not be 0, make sure one of the links in the path has a latency bigger than 0");
+            }
             let upload = link.attribute("upload").unwrap();
             let upload = self.parse_bandwidth(upload.to_string());
             let mut download = 0.0;
@@ -899,6 +918,12 @@ impl XMLGraphParser{
                     let mut jitter = -1.0;
                     if event.has_attribute("jitter"){
                         jitter = event.attribute("jitter").unwrap().parse().unwrap();
+                    }
+
+                    if event.has_attribute("download"){
+                                
+                        let download_bw = self.parse_bandwidth(event.attribute("download").unwrap().to_string());
+                        scheduler.schedule_link_change(time,destination.clone(),origin.clone(),latency,jitter,drop,download_bw);
                     }
 
                     scheduler.schedule_link_change(time,origin.clone(),destination.clone(),latency,jitter,drop,bandwidth);

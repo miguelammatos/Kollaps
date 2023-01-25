@@ -38,7 +38,6 @@ RUN apt-get update \
     pkgconf \
     python3 \
     python3-pip \
-    vim \
     && apt-get clean -y
 
 ADD ./pid1 /Kollaps/pid1
@@ -58,8 +57,8 @@ RUN make -C /Kollaps/pid1 && \
     cp -R /Kollaps/kollaps/rustbinaries/emulationcore /usr/bin/emulationcore  && \
     cp /Kollaps/kollaps/rustbinaries/libcommunicationcore.so /usr/local/bin/libcommunicationcore.so && \   
     rm -rf /Kollaps && \
-    pip3 --no-cache-dir uninstall -y setuptools wheel pip3
-
+    pip3 --no-cache-dir uninstall -y setuptools wheel pip3 && \
+    apt-get remove -y gcc make flex bison
 
 WORKDIR /
 

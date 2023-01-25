@@ -1,3 +1,18 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
+
+//    http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 use crate::state::State;
 use std::sync::Mutex;
 use std::sync::Arc;
@@ -7,7 +22,7 @@ use std::thread;
 use crate::docker::start_experiment;
 use crate::docker::stop_experiment;
 use tokio::runtime::Handle;
-use crate::aux::{start_script};
+use crate::aux::{start_script,print_message};
 
 pub struct EventScheduler{
     pub events:Vec<Event>,
@@ -16,7 +31,8 @@ pub struct EventScheduler{
     pub pid:u32,
     pub tokiohandler:Option<Handle>,
     orchestrator:String,
-    pub script:String
+    pub script:String,
+    pub name:String
 
 }
 
@@ -24,6 +40,7 @@ impl EventScheduler{
     pub fn new(state:Arc<Mutex<State>>,orchestrator:String) -> EventScheduler{
         EventScheduler{
             events:vec![],
+            name:"".to_string(),
             state:state,
             timebetweenevents:vec![],
             pid:0,
@@ -235,7 +252,6 @@ impl EventScheduler{
 
     pub fn schedule_link_change(&mut self,time:f32,origin:String,destination:String,latency:f32,jitter:f32,drop:f32,bandwidth:f32){
     
-
         self.state.lock().unwrap().insert_graph();
 
         for (_id,link) in self.state.lock().unwrap().get_graph().lock().unwrap().links.iter_mut(){
@@ -255,6 +271,8 @@ impl EventScheduler{
                 if drop >= 0.0{
                     link.lock().unwrap().drop = drop;
                 }
+
+                //print_message(self.name.clone(),format!("origin is {} and dest is {} and new latency is {}",origin,destination,latency).to_string());
             }
 
         }
@@ -276,11 +294,11 @@ impl EventScheduler{
 
     }
 
-    pub fn print_events(&mut self){
-        for event in self.events.iter(){
-            println!("id {} and time {}", event.id,event.time);
-        }
-    }
+    // pub fn print_events(&mut self){
+    //     for event in self.events.iter(){
+    //         println!("id {} and time {}", event.id,event.time);
+    //     }
+    // }
 
     pub fn start(&mut self){
         println!("Started experiment");
@@ -303,7 +321,8 @@ impl EventScheduler{
                         }
                     }
                     else{
-                        self.tokiohandler.as_ref().unwrap().spawn(async {start_experiment(id).await});
+                        self.tokiohandler.as_ref().unwrap().spawn(async move{start_experiment(id).await});
+                        print_message(self.name.clone(), "Started my script".to_string());
                     }
                     //task::spawn(start_experiment(self.state.lock().unwrap().id.clone()));
                 }
@@ -312,7 +331,6 @@ impl EventScheduler{
                     stop_experiment(self.pid.clone());
                 }
                 if self.events[count].id == 1{
-                    println!("Incremented AGE");
                     self.state.lock().unwrap().increment_age();
                 }
 

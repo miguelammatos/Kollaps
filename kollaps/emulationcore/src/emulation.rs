@@ -1,8 +1,24 @@
-use libloading::{Library, Symbol};
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
 
+//    http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+use libloading::{Library, Symbol};
+use crate::aux::print_and_fail;
 //Interacts with TC library
 pub struct Emulation{
     library:Library,
+    pub name:String
 
 }
 
@@ -12,6 +28,7 @@ impl Emulation{
         unsafe{
             Emulation{
                 library:Library::new("/usr/local/bin/libTCAL.so").unwrap(),
+                name:"".to_string()
             }
         }
     }
@@ -26,7 +43,12 @@ impl Emulation{
     }
 
     pub fn initialize_path(&mut self, destinationip:u32,bandwidth:u32,latency:f32,jitter:f32,drop:f32){
+
+        if latency==0.0{
+            print_and_fail("Error: Shutting down. latency between two nodes can not be 0".to_string());
+        }
         unsafe{
+
             let initdestination: Symbol< unsafe extern fn(u32,u32,f32,f32,f32)> = self.library.get(b"initDestination").unwrap();
 
             initdestination(destinationip,bandwidth,latency,jitter,drop);
@@ -34,16 +56,20 @@ impl Emulation{
 
     }
 
-    pub fn disable_path(&mut self, destinationip:u32){
-        unsafe{
+    // pub fn disable_path(&mut self, destinationip:u32){
+    //     unsafe{
+            
+    //         let initdestination: Symbol< unsafe extern fn(u32,u32,f32,f32,f32)> = self.library.get(b"initDestination").unwrap();
+    //         initdestination(destinationip,10000,1.0,0.0,1.0);
+    //     }
 
-            let initdestination: Symbol< unsafe extern fn(u32,u32,f32,f32,f32)> = self.library.get(b"initDestination").unwrap();
-            initdestination(destinationip,10000,1.0,0.0,1.0);
-        }
-
-    }
+    // }
 
     pub fn change_bandwidth(&mut self, ip:u32,bandwidth:u32){
+
+        if bandwidth==0{
+            print_and_fail("Tried to change bandwidth to 0".to_string());
+        }
         unsafe{
             let changebw: Symbol< unsafe extern fn(u32,u32)> = self.library.get(b"changeBandwidth").unwrap();
             changebw(ip,bandwidth/1000);

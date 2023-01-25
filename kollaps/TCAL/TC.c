@@ -36,6 +36,7 @@
 #include "linux/pkt_sched.h"
 #include "utils.h"
 #include "TCAL_utils.h"
+#include <time.h>
 
 #include "Destination.h"
 
@@ -193,6 +194,7 @@ void TC_initDestination(Destination *dest) {
     netiface = strdup(ll_index_to_name(dest->if_index));
 
     //Check if this interface has been initialized
+
     ARG("get")ARG("dev")ARG(netiface)PARENT ARG("1:0")ARG("prio")ARG("1")
     ARG("handle")ARG("800:")PROTOCOL_IP ARG("u32")
     //PRINT
@@ -220,7 +222,6 @@ void TC_initDestination(Destination *dest) {
     char *quantum = (char*)malloc(sizeof(char)*(size+1));
     snprintf(quantum, size+1, "%d", (int)q);
 
-
     //Create the htb class for imposing the bandwidth limit
     ADD_DEV
     PARENT HTB_HANDLE ARG("classid")ARG(htb_class_handle)
@@ -232,8 +233,7 @@ void TC_initDestination(Destination *dest) {
     close_rtnl(&rth);
     argc = 0;
     free(quantum);
-
-
+    fflush(stdout);
     char* latency = NULL; //
     char* loss = NULL;
     char* jitter = NULL;

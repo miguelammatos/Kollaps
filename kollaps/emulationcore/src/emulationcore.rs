@@ -36,7 +36,6 @@ use tokio::runtime::Handle;
 use roxmltree::Document;
 
 
-
 pub struct EmulationCore{
     id:String,
     ip:u32,
@@ -62,6 +61,8 @@ impl EmulationCore{
         let state = Arc::new(Mutex::new(State::new(id.clone())));
         let eventscheduler = Arc::new(Mutex::new(EventScheduler::new(state.clone(),orchestrator.clone())));
         let mut communication = Communication::new(id.clone());
+
+        //If it is baremetal we can not start pipes here because they block waiting for CM
         if orchestrator != "baremetal"{
             communication.init();
         }
@@ -104,6 +105,7 @@ impl EmulationCore{
 
         //Create the initial graph
         self.state.lock().unwrap().insert_graph();
+        self.state.lock().unwrap().name = self.name.clone();
 
         let mut parser = XMLGraphParser::new(self.state.clone(),"baremetal".to_string());
 
@@ -131,10 +133,7 @@ impl EmulationCore{
         //Graph related operation
         self.state.lock().unwrap().get_current_graph().lock().unwrap().set_graph_root_baremetal(self.networkdevice.clone());
 
-        self.state.lock().unwrap().get_current_graph().lock().unwrap().calculate_shortest_paths();
-        //Calculate properties of paths
-        self.state.lock().unwrap().get_current_graph().lock().unwrap().calculate_properties();
-        self.name = self.state.lock().unwrap().get_current_graph().lock().unwrap().get_name().clone();
+        self.calculate_paths();
 
         //Parse dynamic events
         parser.parse_schedule(self.scheduler.clone(),root);
@@ -151,14 +150,12 @@ impl EmulationCore{
         print_message(self.name.clone(),"STARTING TC".to_string());
         self.state.lock().unwrap().init(self.ip).map_err(|err| println!("{:?}", err)).ok();
         
-        print_message(self.name.clone(),"STARTING  COMMS".to_string());
 
         self.comms.lock().unwrap().ip = self.ip.clone();
         self.comms.lock().unwrap().id = self.ip.clone().to_string();
         self.comms.lock().unwrap().init();
         self.comms.lock().unwrap().start_polling(self.state.clone(),self.link_count);
         
-        print_message(self.name.clone(),"STARTED COMMS".to_string());
         
         //create variables to send to thread
         let scheduler = self.scheduler.clone();
@@ -169,24 +166,13 @@ impl EmulationCore{
     }
 
     pub fn start_cm(&mut self,service_count:usize) -> Popen{
-        OpenOptions::new()
-        .write(true)
-        .create(true)
-        .append(true)
-        .open("/tmp/topoinfodashboard")
-        .unwrap();
-        let mut topoinfo = OpenOptions::new()
-        .write(true)
-        .create(true)
-        .append(true)
-        .open("/tmp/topoinfo")
-        .unwrap();
-        let mut remote_ips = OpenOptions::new()
-        .write(true)
-        .create(true)
-        .append(true)
-        .open("/remote_ips.txt")
-        .unwrap();
+        //Create auxiliary files, CM reads from these files, dashboard is not relevant we just create an empty file
+
+        OpenOptions::new().write(true).create(true).append(true).open("/tmp/topoinfodashboard").unwrap();
+        
+        let mut topoinfo = OpenOptions::new().write(true).create(true).append(true).open("/tmp/topoinfo").unwrap();
+
+        let mut remote_ips = OpenOptions::new().write(true).create(true).append(true).open("/remote_ips.txt").unwrap();
 
         for (ip,_) in self.state.lock().unwrap().get_current_graph().lock().unwrap().services.iter(){
             if ip != &self.ip{
@@ -207,12 +193,14 @@ impl EmulationCore{
         print_message(self.name.clone(),"GOT PID".to_string());
         return process;
     }
+    
 
     pub fn init(&mut self){
 
         print_message(self.name.clone(),format!("Started EC with ID {}",self.id));
 
-        //Create the initial graph
+        //Parse the topology
+        //self.state.lock().unwrap().name = self.name.clone();
         self.state.lock().unwrap().insert_graph();
 
         let mut parser = XMLGraphParser::new(self.state.clone(),"container".to_string());
@@ -225,26 +213,26 @@ impl EmulationCore{
 
         parser.fill_graph(root.clone());
 
-
         let sleeptime = time::Duration::from_millis(2000);
         thread::sleep(sleeptime);
 
         //Get ips of all containers
+
         if self.orchestrator == "docker"{
             self.state.lock().unwrap().get_current_graph().lock().unwrap().resolve_hostnames_docker();
         }else{
+            //Need new runtime because kubernetes library uses block_on
             let basic_rt = runtime::Builder::new_multi_thread().worker_threads(1).enable_all().build().unwrap();
             let graph = self.state.lock().unwrap().get_current_graph().clone();
             basic_rt.block_on(async {resolve_hostnames_kubernetes(graph).await}).map_err(|err| println!("{:?}", err)).ok();
         }
 
         self.state.lock().unwrap().get_current_graph().lock().unwrap().set_graph_root();
-        self.state.lock().unwrap().get_current_graph().lock().unwrap().calculate_shortest_paths();
-        // //Calculate properties of paths
-        self.state.lock().unwrap().get_current_graph().lock().unwrap().calculate_properties();
-        self.name = self.state.lock().unwrap().get_current_graph().lock().unwrap().get_name().clone();
-        self.state.lock().unwrap().name = self.name.clone();
-        
+        self.calculate_paths();
+        //Set name for debug
+        self.scheduler.lock().unwrap().name = self.name.clone();
+        self.state.lock().unwrap().emulation.lock().unwrap().name = self.name.clone();
+
 
         //Parse dynamic events
         parser.parse_schedule(self.scheduler.clone(),root.clone());
@@ -260,9 +248,11 @@ impl EmulationCore{
         self.link_count = (self.state.lock().unwrap().get_current_graph().lock().unwrap().links.keys().len() + removed_links_len) as u32;
 
 
+        //Start communication
         self.comms.lock().unwrap().start_polling(self.state.clone(),self.link_count);
 
         self.state.lock().unwrap().set_link_count(self.link_count);
+
 
         let pid = self.pid.clone();
 
@@ -272,24 +262,29 @@ impl EmulationCore{
 
         let shutdown = self.shutdown.clone();
 
-
-        thread::spawn(move || {accept_loop(scheduler,pid,start,shutdown)});
-
-        
         self.ip = get_own_ip(None);
-        print_message(self.name.clone(),format!("GOT MY IP"));
 
+        //Start TC structures
         self.state.lock().unwrap().init(self.ip).map_err(|err| println!("{:?}", err)).ok();
-        print_message(self.name.clone(),format!("DONE TC"));
 
         self.comms.lock().unwrap().ip = self.ip.clone();
 
+        self.state.lock().unwrap().get_current_graph().lock().unwrap().print_graph();
+
+        thread::spawn(move || {accept_loop(scheduler,pid,start,shutdown)});
+        
         print_message(self.name.clone(),format!("EC with ID {} is now ON",self.id));
+    }
+
+    pub fn calculate_paths(&mut self){
+        self.state.lock().unwrap().get_current_graph().lock().unwrap().calculate_shortest_paths();
+        self.state.lock().unwrap().get_current_graph().lock().unwrap().calculate_properties();
+        self.name = self.state.lock().unwrap().get_current_graph().lock().unwrap().get_name().clone();
+        self.state.lock().unwrap().name = self.name.clone();
     }
 
     pub async fn setup_ebpf(&mut self){
         let usages = self.usages.clone();
-
         tokio::spawn(async {get_local_usage(usages).await});
     }
 
@@ -304,22 +299,17 @@ impl EmulationCore{
         self.lasttime = Some(Instant::now());
         self.check_active_flows();
 
-        // let mut values = vec![];
         loop{
 
-            // if !*self.start.lock().unwrap(){
-            //     let sleeptime = 0.05;
-            //     thread::sleep(Duration::from_secs_f64(sleeptime));
-            //     continue;
-            // }
+            //wait for the experiment to start, not relevant if not debugging
             if *self.shutdown.lock().unwrap(){
-                // values.sort();
-                // let mid = values.len()/2;
-                // let average = values.iter().sum::<i32>() as f32 / values.len() as f32;
-                // print_message(self.name.clone(),format!("tc changes {}",self.state.lock().unwrap().tc_changes.clone()));
-                // print_message(self.name.clone(),format!("AVERAGE is {}",average));
-                // print_message(self.name.clone(),format!("MEDIAN is {}",values[mid]));
+                println!("SHUTDOWN");
                 break;
+            }
+            if !*self.start.lock().unwrap(){
+                let sleeptime = 0.05;
+                thread::sleep(Duration::from_secs_f64(sleeptime));
+                continue;
             }
             let sleeptime = self.poolperiod - (self.lasttime.unwrap().elapsed().as_millis() as f64)/1000.0;
 
@@ -327,10 +317,9 @@ impl EmulationCore{
                 //print_message(self.name.clone(),format!("Sleeping for {:.}",sleeptime).to_string());
                 thread::sleep(Duration::from_secs_f64(sleeptime));
             }
-
-            // let start = Instant::now();
             
             self.state.lock().unwrap().clear_paths();
+
 
             self.check_active_flows();
 
@@ -338,32 +327,20 @@ impl EmulationCore{
 
             self.state.lock().unwrap().calculate_bandwidth();
 
-            // let duration = start.elapsed();
 
-            // let difference = duration.as_millis();
-
-            // values.push(difference as i32);
-            
         }
     }
     
 
-    fn check_active_flows(&mut self){
-        self.retrieve_usages();
-    }
-
     //Read from local usages map
-    fn retrieve_usages(&mut self){
-
+    fn check_active_flows(&mut self){
         let usage = self.usages.lock().unwrap().clone();
         let iter = usage.iter();
         for (ip,bytes) in iter{
-
-            let mut unlocked_state = self.state.lock().unwrap();
         
-            let last_bytes  = unlocked_state.get_current_graph().lock().unwrap().get_lastbytes(&ip);
+            let last_bytes  = self.state.lock().unwrap().get_current_graph().lock().unwrap().get_lastbytes(&ip);
 
-            unlocked_state.get_current_graph().lock().unwrap().set_lastbytes(&ip,*bytes);
+            self.state.lock().unwrap().get_current_graph().lock().unwrap().set_lastbytes(&ip,*bytes);
 
             let delta_bytes;
             if last_bytes > *bytes{
@@ -373,19 +350,19 @@ impl EmulationCore{
             }    
             let delta_time = self.lasttime.unwrap().elapsed().as_millis() as f32;
 
-
+            
+            //let bits:u128 = (delta_bytes * 8).into();
             let bits = delta_bytes * 8;
             let throughput = bits as f32 / (delta_time/1000.0);
             
-            let useful = unlocked_state.get_current_graph().lock().unwrap().process_usage(*ip,throughput).clone();
+            let useful = self.state.lock().unwrap().get_current_graph().lock().unwrap().process_usage(*ip,throughput).clone();
 
             if useful{ 
-                //print_message(self.name.clone(),"INSERTED PATH".to_string()); 
-                unlocked_state.insert_active_path_id(*ip);
+                self.state.lock().unwrap().insert_active_path_id(*ip);
             }
-
-
+            
         }
+
         self.lasttime = Some(Instant::now());
         
     }
@@ -393,27 +370,31 @@ impl EmulationCore{
     //Sends metadata to CM
     fn broadcast_flows(&mut self){
 
-        let mut unlocked_state = self.state.lock().unwrap();
-
-        let active_paths = unlocked_state.get_active_paths().clone();
+        //Retrieve paths the node sent bytes to
+        let active_paths = self.state.lock().unwrap().get_active_paths().clone();
 
         if active_paths.len() > 0{
             for path in active_paths{
+
                 let bandwidth = path.lock().unwrap().used_bandwidth.clone() as u32;
+  
                 let len_links = path.lock().unwrap().links.len().clone() as u16;
-                if len_links == 0{
-                    println!("SOMETHING TRULY WRONG");
-                }
+
                 let links = path.lock().unwrap().links.clone();
+
+
                 if self.link_count <=255{
                     self.comms.lock().unwrap().add_flow_u8(bandwidth,len_links,links);
                 }
                 else{
                     self.comms.lock().unwrap().add_flow_u16(bandwidth,len_links,links);
                 }
+
             }
 
+
             self.comms.lock().unwrap().flush();
+
         }
     
     }
@@ -433,13 +414,14 @@ async fn get_local_usage(usages:Arc<Mutex<HashMap<u32,u32>>>){
             raw_fds.push(sock_raw_fd);
         }
     }
+    //Read from the map how many bytes we sent other hosts
     while let Some((name, events)) = loaded.events.next().await {
         match name.as_str() {
             "perf_events" => {
                 for event in events {
                     let message = unsafe { ptr::read(event.as_ptr() as *const message) }; 
-                        let mut map = usages.lock().unwrap();
-                        map.insert(message.dst,message.bytes);
+                        usages.lock().unwrap().insert(message.dst,message.bytes);
+                        //println!("Read from kernel {} {}",message.dst,message.bytes);
                 }
             }
             _ => {}
@@ -495,7 +477,7 @@ fn receive_commands(mut stream:TcpStream,eventscheduler:Arc<Mutex<EventScheduler
                 if buf[0] == start_command{
                     let ev = eventscheduler.clone();
                     thread::spawn(move || start_events(ev));
-                    *start.lock().unwrap() = true;
+                    *start.lock().unwrap() = true;  
                     
                 }
             }
@@ -530,7 +512,6 @@ pub async fn resolve_hostnames_kubernetes(graph:Arc<Mutex<Graph>>) -> Result<()>
 
             let pods: Api<Pod> = Api::default_namespaced(client);
             for p in pods.list(&ListParams::default()).await? {
-                //println!("pod name is {} and service name is {} ", p.name(),name);
                 let key = "KOLLAPS_UUID";
                 let uuid = match env::var(key) {
                     Ok(val) => Some(val),
@@ -600,9 +581,12 @@ fn receive_commands_baremetal(mut stream:TcpStream,eventscheduler:Arc<Mutex<Even
     stream.read(&mut buf).map_err(|err| println!("{:?}", err)).ok();
     if buf[0] == shutdown_command{
         
-        *shutdown.lock().unwrap() = true;
         cm_process.lock().unwrap().kill().map_err(|err| println!("{:?}", err)).ok();
+        print!("SHUTDOWN CM");
         eventscheduler.lock().unwrap().state.lock().unwrap().emulation.lock().unwrap().tear_down();
+        print!("TEARDOWN");
+        *shutdown.lock().unwrap() = true;
+        print!("SHUTDOWN FLAG ON");
 
     }
     if buf[0] == ready_command{

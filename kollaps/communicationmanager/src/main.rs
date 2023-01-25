@@ -1,3 +1,18 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
+
+//    http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 use std::fs::OpenOptions;
 use std::io::prelude::*; 
 use std::thread;
@@ -16,7 +31,6 @@ mod select;
 use crate::select::{FdSet,select};
 mod aux;
 use crate::aux::{print_message,has_dashboard,retrieve_local_ids,retrieve_remote_ips,get_containers,clone_pipes,wait_for_pipe_creation,get_uint16,put_uint16};
-
 fn main()-> Result<()>{
 
     let containercount = env::args()
@@ -336,6 +350,9 @@ async fn start_message_exchange(vector_ids:Vec<String>,remote_ips:Vec<String>,da
     }
     
     let mut fd_set = FdSet::new();
+
+    let mut fd_set_error = FdSet::new();
+
     let mut vector_fd = vec![];
     for pipe in &pipes_read{
         let fd = pipe.as_raw_fd();
@@ -345,18 +362,19 @@ async fn start_message_exchange(vector_ids:Vec<String>,remote_ips:Vec<String>,da
         max = fd.max(max);
     }
     print_message("STARTED EXCHANGE ALL SET".to_string()).expect("Couldn't add to file");
-    //let mut read = 0;
-    //let mut wrote = 0;
+
     loop{
         let mut buffer = [0; 512];
         match select(
             max + 1,
             Some(&mut fd_set),                               // read
             None,                                            // write
-            None,                                            // error
-            None,) // timeout
+            None,                         // error//
+//            Some(&make_timeval(time::Duration::from_millis(0))))
+            None) // timeout
             {
             Ok(_res) => {
+
                 for i in vector_fd.clone() {
 
                     if (fd_set).is_set(i) {
@@ -366,24 +384,23 @@ async fn start_message_exchange(vector_ids:Vec<String>,remote_ips:Vec<String>,da
 
                         //read from ipe
                         pipes_read[*position.unwrap()].read(&mut buffer).map_err(|err| print_message(format!("{:?}", err)).expect("Couldn't add to file")).ok();
-                        //read = read + 1;
                         //write to vector that contains every pipe but the container it read from
-                        for pipe in &vector_pipes_id[*position.unwrap()]{
-                            {
+                        for pipe in &vector_pipes_id[*position.unwrap()]{ 
+
                                 pipe.lock().unwrap().write(&buffer);
-                            }
-                            //wrote = wrote + 1;
                         }
                         //write to remote hosts
                         for mut stream in &streams{
+                            //print_message("Writing to a stream".to_string());
                             let _n = stream.write_all(&buffer).await?;
+                            stream.flush();
                         }
+
         
                         fd_set.set(i);
                     }
                     fd_set.set(i);
                 }
-                //print_message(format!("Wrote {} and read {} ",wrote,read));
     
             }
             Err(err) => {
@@ -407,15 +424,14 @@ async fn remote_producer(mut stream:TcpStream,local_ids:Vec<String>) {
                 Ok(n) if n == 0 => return,
                 Ok(n) => n,
                 Err(e) => {
-                    eprintln!("failed to read from socket; err = {:?}", e);
+                    print_message(format!("failed to read from socket; err = {:?}", e));
                     return;
                 }
             };
 
             for pipe in &containers{
-                {
-                    pipe.lock().unwrap().write(&buffer);
-                }
+
+                pipe.lock().unwrap().write(&buffer);
             }
         }
 
