@@ -295,7 +295,7 @@ impl State {
                             let new_latency = new_path.lock().unwrap().latency.clone();
                             let new_jitter = new_path.lock().unwrap().jitter.clone();
                             let new_loss = new_path.lock().unwrap().drop.clone();
-                            print_message(self.name.clone(),format!("Changed path from {} to {} and new latency is {}",start,finish,new_latency.clone()));
+                            print_message(self.name.clone(),format!("Changed path from {} to {} and new latency is {} and new drop is {}",start,finish,new_latency.clone(),new_loss.clone()));
                             self.emulation.lock().unwrap().change_loss(*ip,new_loss);
 
                             if new_latency != 0.0{

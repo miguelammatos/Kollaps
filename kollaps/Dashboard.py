@@ -147,10 +147,9 @@ def flows():
     with DashboardState.lock:
         if DashboardState.mode == "baremetal":
             answer = render_template('flows_baremetal.html', flows=DashboardState.flows, graph=DashboardState.graph)
-            DashboardState.flows.clear()
         else:
             answer = render_template('flows.html', flows=DashboardState.flows, graph=DashboardState.graph)
-            DashboardState.flows.clear()
+            #DashboardState.flows.clear()
         return answer
 
 @app.route('/graph')

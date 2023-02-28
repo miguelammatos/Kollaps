@@ -1,0 +1,38 @@
+FROM ubuntu:22.04
+
+
+WORKDIR /
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y\
+    grep \
+    ssh \
+    pkgconf \
+    python3 \
+    python3-pip \
+    && apt-get clean -y
+
+ADD ./kollaps /Kollaps/kollaps
+
+ADD ./baremetal/.ssh /root/.ssh/
+
+ADD ./baremetal /Kollaps/baremetal
+
+ADD ./setup.py /Kollaps/setup.py
+
+ADD /kube/ /root/.kube
+
+RUN cp /Kollaps/kollaps/rustbinaries/libcommunicationcore.so /Kollaps/kollaps/libcommunicationcore.so
+
+RUN pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netifaces openssh_wrapper netaddr && \
+    pip3 --no-cache-dir wheel --no-deps -w /Kollaps /Kollaps && \
+    pip3 --no-cache-dir install /Kollaps/kollaps-2.0-py3-none-any.whl && \
+    mkdir /result && \
+    pip3 --no-cache-dir uninstall -y setuptools wheel pip && \
+    apt-get remove -y gcc make flex bison 
+
+
+WORKDIR /Kollaps/
+ENTRYPOINT ["python3","kollaps/Dashboard.py","baremetal/topology.xml"]
+
+#docker run -d  --network host dashboard:2.0

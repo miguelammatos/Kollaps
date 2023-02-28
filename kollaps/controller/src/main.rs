@@ -73,12 +73,13 @@ async fn process_command(topology_file:String,command:String)->Result<()>{
         .append(true)
         .open("/ips.txt")
         .unwrap();
+
     
         for ip in ips{
 
             let mut ip_with_port;
             if ip == parser.controller_ip{
-                continue;
+                ip_with_port = format!("0.0.0.0{}",":7073");
             } 
             else{
                 ip_with_port = format!("{}{}",ip,":7073");
@@ -86,8 +87,6 @@ async fn process_command(topology_file:String,command:String)->Result<()>{
             remote_ips.push(ip_with_port.clone());
             file.write_all(format!("{}\n",ip_with_port.clone()).as_bytes()).expect("Unable to write data");
 
-            ip_with_port = format!("0.0.0.0{}",":7073");
-            remote_ips.push(ip_with_port.clone());
         }
 
 
@@ -99,12 +98,10 @@ async fn process_command(topology_file:String,command:String)->Result<()>{
             thread::sleep(sleeptime);
             for (i,remote_ip) in remote_ips.clone().iter().enumerate(){
                 if !(ips_connected.contains(&i)){
-                    println!("CONNECTING TO {}",remote_ip.clone());
                     let stream = TcpStream::connect(remote_ip.clone()).await;
                     match stream{
                         Ok(stream)=> {
                             streams.push(stream);
-                            println!("CONNECTED TO {}",remote_ip.clone());
                             ips_connected.push(i.clone());
                         },
                         Err(e)=> println!("{}",e.to_string()),
@@ -147,12 +144,10 @@ async fn process_command(topology_file:String,command:String)->Result<()>{
             thread::sleep(sleeptime);
             for (i,remote_ip) in remote_ips.clone().iter().enumerate(){
                 if !(ips_connected.contains(&i)){
-                    //print_message(format!("CONNECTING TO {}",remote_ip.clone()));
                     let stream = TcpStream::connect(remote_ip.clone()).await;
                     match stream{
                         Ok(stream)=> {
                             streams.push(stream);
-                            //print_message(format!("CONNECTED TO {}",remote_ip.clone()));
                             ips_connected.push(i.clone());
                         },
                         Err(e)=> println!("{}",e.to_string()),
@@ -195,12 +190,10 @@ async fn process_command(topology_file:String,command:String)->Result<()>{
             thread::sleep(sleeptime);
             for (i,remote_ip) in remote_ips.clone().iter().enumerate(){
                 if !(ips_connected.contains(&i)){
-                    print_message("controller".to_string(),format!("CONNECTING TO {}",remote_ip.clone()));
                     let stream = TcpStream::connect(remote_ip.clone()).await;
                     match stream{
                         Ok(stream)=> {
                             streams.push(stream);
-                            print_message("controller".to_string(),format!("CONNECTED TO {}",remote_ip.clone()));
                             ips_connected.push(i.clone());
                         },
                         Err(e)=> println!("{}",e.to_string()),
@@ -214,7 +207,6 @@ async fn process_command(topology_file:String,command:String)->Result<()>{
         buffer[0] = shutdown_command;
 
         for mut stream in streams{
-            print_message("controller".to_string(),"Wrote to stream".to_string());
             stream.write(&buffer).await?;
         }
     }

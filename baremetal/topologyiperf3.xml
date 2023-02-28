@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<experiment boot="kollaps:1.0">
+	<services>
+		<service name="dashboard" supervisor="true" port="8088" controllername = "cervino-2.maas" controller_ip = "172.28.30.247"/>
+		<service name="client" machinename = "cervino-2.maas" ip = "172.28.30.247" kollaps_folder = "/home/ubuntu/kollaps-private/baremetal" topology_file = "topologyiperf3.xml" script = "client.sh"/>
+        <service name="server" machinename = "cervino-3.maas" ip = "172.28.30.122" kollaps_folder = "/home/ubuntu/kollaps-private/baremetal" topology_file = "topologyiperf3.xml" script = "server.sh"/>
+	</services>
+	<links>
+			<link origin="client" dest="server" latency="1" download = "100Mbps" upload="100Mbps"/>
+
+	</links>
+
+	<dynamic>
+
+		<schedule name="client" time="0.0" action="join"/>
+        <schedule name="server" time="0.0" action="join"/>
+
+		
+	</dynamic>
+</experiment>

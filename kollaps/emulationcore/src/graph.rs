@@ -488,10 +488,17 @@ impl Graph {
 
         let path_used_bandwidth = path.lock().unwrap().used_bandwidth;
 
-        if throughput <= (path_max_bandwidth * errormargin) && throughput != 0.0{
+        //if throughput <= (path_max_bandwidth * errormargin) && throughput != 0.0{
+
+        if throughput == 0.0 && path.lock().unwrap().used_bandwidth == 0.0{
             return false;
         }
-
+        if throughput == 0.0{
+            return true;
+        }
+        if throughput <= (path_max_bandwidth * errormargin){
+            return false;
+        }
 
         let percentage_variation;
 
@@ -521,7 +528,7 @@ impl Graph {
 
 
         //if it changed by more than 5% it is relevant
-        if percentage_variation > 5.0 || is_usefull {
+        if percentage_variation > 5.0 || is_usefull{
             path.lock().unwrap().used_bandwidth = throughput;
             return true;
         }

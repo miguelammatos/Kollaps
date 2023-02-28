@@ -20,20 +20,32 @@ docker network create --driver=overlay --subnet=10.1.0.0/24 kollaps_network
 
 To create a baremetal deployment, a specific topology file has to be created, steps are described [here](https://github.com/miguelammatos/kollaps-private/wiki/Baremetal-experiments#topology-description)
 
-After creating the topology file, you must put the baremetal folder (kollaps/baremetal) in the directories specified in the .xml on the remote machines
+After creating the topology file, you must put the baremetal folder (Kollaps/baremetal) in the directories specified in the .xml on the remote machines
 
-After setting up the remote machines, install Kollaps locally running:
-
-```
-sh localinstall.sh
-```
-
-And now you are ready to emulate network states on your remote machines, start the Dashboard with
+After setting up the remote machines, we must setup the Dashboard container, for the container to have ssh access to the remote machines we must put the ~/.ssh/ folder in the baremetal/ directory. 
 
 ```
-python3 kollaps/Dashboard *directory of topology*
+cp -R ~/.ssh/ baremetal/
 ```
 
+Now lets build the container with
+```
+docker build -f dockerfiles/Dashboard -t dashboard:2.0 .
+```
+
+And now you are ready to emulate network states on your remote machines, start the Dashboard with where #DIR is the absolute directory of the topology you want to emulate.
+
+```
+docker run -d -v #DIR:/Kollaps/baremetal/topology.xml --name kollapsdashboard --network host dashboard:2.0
+```
+
+When you are finished run
+
+```
+docker stop kollapsdashboard && docker rm kollapsdashboard
+```
+
+The Dashboard will be available at 0.0.0.0:8088
 
 The dashboard has small differences in baremetal, the commands description can be seen [here](https://github.com/miguelammatos/kollaps-private/wiki/Baremetal-experiments#dashboard)
 
@@ -74,7 +86,7 @@ sudo kubeadm init --token-ttl=0
 The `kubeadm init` command tells you to execute the following statements:
 
 ```
-$mkdir -p $HOME/.kube && \
+mkdir -p $HOME/.kube && \
 sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && \
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 cp $HOME/.kube/config kube/config
@@ -85,12 +97,12 @@ It also gives you a join command like this: `sudo kubeadm join <IP>:<PORT> --tok
 Next (only on the master again), install the Weavenet CNI plugin with a custom IP range:
 
 ```
-$kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')&env.IPALLOC_RANGE=10.2.0.0/24"
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')&env.IPALLOC_RANGE=10.2.0.0/24"
 ```
 Note that we also successfully tested the Calico CNI plugin.
 
 If you want to run pods on the master node, un-taint it:
 
 ```
-$kubectl taint nodes --all node-role.kubernetes.io/master-
+kubectl taint nodes --all node-role.kubernetes.io/master-
 ```

@@ -192,6 +192,7 @@ class KubernetesBootstrapper(Bootstrapper):
 
             except Exception as e:
                 sys.stdout.flush()
+                print("Found error")
                 print_error(e)
                 sleep(5)
                 continue

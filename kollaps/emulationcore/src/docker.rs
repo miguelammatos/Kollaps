@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//use docker_api::Exec;
-use docker_api::ExecContainerOpts;
+use docker_api::Exec;
+//use docker_api::ExecContainerOpts;
 use futures::StreamExt;
 use subprocess::PopenConfig;
 use subprocess::Popen;
 use subprocess::Redirection;
-//use docker_api::opts::ExecCreateOpts;
+use docker_api::opts::ExecCreateOpts;
 
 static mut COMMAND_STRING:Option<String> = None;
 
@@ -51,36 +51,32 @@ pub async fn start_experiment(id:String){
     args.push(&command_string);
     
 
-    let opts = ExecContainerOpts::builder()
-        .cmd(args)
-        .attach_stdout(true)
-        .attach_stderr(true)
-        .build();
-    
-    let mut stream = container.exec(&opts);
-
-    //run command
-    stream.next().await;
-
-    // // Create Opts with specified command
-    // let opts = ExecCreateOpts::builder()
-    //     .command(args)
+    // let opts = ExecContainerOpts::builder()
+    //     .cmd(args)
     //     .attach_stdout(true)
     //     .attach_stderr(true)
     //     .build();
+    
+    // let mut stream = container.exec(&opts);
 
-    // let exec = Exec::create(docker, &container.id(), &opts).await;
+    // //run command
+    // stream.next().await;
+
+    // Create Opts with specified command
+    let opts = ExecCreateOpts::builder()
+        .command(args)
+        .attach_stdout(true)
+        .attach_stderr(true)
+        .build();
+
+    let exec = Exec::create(docker, &container.id(), &opts).await;
 
 
-    // println!("CREATED EXEC");
+    let mut stream = exec.as_ref().unwrap().start().next().await;
 
-    // let mut stream = exec.as_ref().unwrap().start().next().await;
 
-    // println!("EXEC RUNNING");
+    //println!("{:#?}", exec.as_ref().unwrap().inspect().await);
 
-    // println!("{:#?}", exec.as_ref().unwrap().inspect().await);
-
-    // println!("RUNNING COMMAND");
 }
 //Retrieve the command to run
 pub async fn get_command_string(id:String){
@@ -95,31 +91,31 @@ pub async fn get_command_string(id:String){
 
             let image = container_config.image;
 
-            let docker_image = docker.images().get(image);
+            let docker_image = docker.images().get(image.unwrap());
 
             let mut command = vec![];
             match docker_image.inspect().await{
                 Ok(image) =>{
-                    let image_config = image.config;
+                    let image_config = image.config.as_ref();
 
-                    let entrypoint = image_config.entrypoint;
+                    let entrypoint = image_config.unwrap().entrypoint.clone();
 
                     if entrypoint.is_none(){
                         return
                     }
 
                     if container_config.cmd.is_none(){
-                        if !image_config.cmd.is_none(){
-                            command.extend(image_config.cmd.as_ref().unwrap());
+                        if !image_config.unwrap().cmd.is_none(){
+                            command.extend(image_config.unwrap().cmd.as_ref().unwrap().clone());
                         }
                     }
 
                     else if container_config.cmd.as_ref().unwrap().len() == 0{
-                        if !image_config.cmd.is_none(){
-                            command.extend(image_config.cmd.as_ref().unwrap());
+                        if !image_config.unwrap().cmd.is_none(){
+                            command.extend(image_config.unwrap().cmd.as_ref().unwrap().clone());
                         }
                     }else{
-                        command.extend(container_config.cmd.as_ref().unwrap());
+                        command.extend(container_config.cmd.as_ref().unwrap().clone());
                     }
                     
                     for string in entrypoint.unwrap(){
@@ -132,10 +128,10 @@ pub async fn get_command_string(id:String){
 
                     
                 },
-                Err(e) => eprintln!("Error: {}", e),
+                Err(e) => eprintln!("Error in command string: {}", e),
             }
         },
-        Err(e) => eprintln!("Error: {}", e),
+        Err(e) => eprintln!("Error in command_string: {}", e),
     };
 
     unsafe{

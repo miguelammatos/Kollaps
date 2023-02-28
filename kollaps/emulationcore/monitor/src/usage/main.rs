@@ -64,7 +64,7 @@ fn measure_tcp_lifetime(skb: SkBuff) -> SkBuffResult {
                 time.set(&dst.addr, &currenttime);
             }
             Some(oldtime) => {
-                if currenttime - oldtime > 25000000 {
+                if currenttime - oldtime > 50000000 {
                     match usage.get(&dst.addr) {
                         None => usage.set(&dst.addr, &len),
                         Some(value) => {

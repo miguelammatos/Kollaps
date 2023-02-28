@@ -347,7 +347,7 @@ impl EmulationCore{
                 delta_bytes = *bytes;
             }else{
                 delta_bytes = bytes - last_bytes;
-            }    
+            }
             let delta_time = self.lasttime.unwrap().elapsed().as_millis() as f32;
 
             
