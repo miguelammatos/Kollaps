@@ -4,7 +4,7 @@
 
 To create a Swarm, execute on one machine:
 ```
-$docker swarm init
+docker swarm init
 ```
 This gives you a join command like this: `docker swarm join --token <token> <IP>:<port>`.
 If you want to run experiments on a multi-node cluster, execute this command on all the other nodes. Promote each of them to manager like this: `docker node promote <node name>`.
@@ -58,7 +58,7 @@ Sources: https://serverfault.com/a/684792; https://gist.github.com/alexellis/fdb
 First, disable swap on your system: find swap volumes with `cat /proc/swaps`. Then, turn off swap:
 
 ```
-$sudo swapoff --a
+sudo swapoff --a
 ```
 
 Comment out any of the volumes found before in `/etc/fstab` and reboot your system.
