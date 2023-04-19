@@ -114,7 +114,6 @@ Note that we also successfully tested the Calico CNI plugin.
 If you want to run pods on the master node, un-taint it:
 
 ```
-<<<<<<< HEAD
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 ```
 
