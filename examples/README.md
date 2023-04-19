@@ -39,6 +39,12 @@ Or the following one for **Kubernetes** (note that we just change the flag):
 
 The images referenced by the .xml must already be built using `dockerbuild`, if you are using the supported applications(iperf3,redis,memcached) they can be built using the KollapsAppBuilder.
 
+If using kubernetes run before building the apps:
+
+```
+eval $(minikube docker-env)  
+```
+
 ```
 cd examples
 ./KollapsAppBuilder <app_name>
@@ -70,7 +76,7 @@ You can observe/measure the performance of the application using the usual tools
 
 On Swarm, the Dashboard is accessible on `http://127.0.0.1:8088`.
 
-On Kubernetes, there is no port mapping from the container to the host. To find the allocated IP address of the dashboard, run `$kubectl get pods -o wide` and find the dashboard pod. Copy the IP address shown and open `<IP>:8088` in your browser.
+On Kubernetes, there is no port mapping from the container to the minikube. To find the allocated IP address of the dashboard, run `minikube ip` and . Copy the IP address shown and open `<IP>:30007` in your browser.
 
 #### Safely stopping an experiment: <a name="stop"/>
 
