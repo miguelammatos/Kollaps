@@ -3,7 +3,7 @@ SCRIPT_NAME=$0
 
 function usage {
     echo "usage: $SCRIPT_NAME <app_dir>"
-    echo "  -app_dir                    name of the app to build: redis, iperf3,memcached and ping"
+    echo "  -app_dir                    name of the app to build: redis, iperf3,iperf3network,memcached and ping"
     echo "  -h/--help                   display this help message."
     exit 1
 }
@@ -32,13 +32,20 @@ case $1 in
         docker build -f iperf3/iperf3-client/Dockerfile -t kollaps/iperf3-client:1.0 iperf3/iperf3-client
         docker build -f iperf3/iperf3-server/Dockerfile -t kollaps/iperf3-server:1.0 iperf3/iperf3-server
         ;;
+
+    "cassandra")
+        echo "Building images for the cassandra application..."
+        docker build -f cassandra/client/Dockerfile -t kollaps/cassandraclient:1.0 cassandra/client
+        docker build -f cassandra/server/Dockerfile -t kollaps/cassandraserver:1.0 cassandra/server
+        ;;
+
     "iperf3network")
         echo "Building images for the iPerf3network application..."
         docker build -f iperf3network/Dockerfile -t kollaps/iperf3-network:1.0 iperf3network/
         ;;
 
     "memcached")
-        echo "Building images for the memcacehd application..."
+        echo "Building images for the memcached application..."
         docker build -f memcached/memtier-client/Dockerfile -t kollaps/memtier-client:1.0 memcached/memtier-client
         docker build -f memcached/memcached-server/Dockerfile -t kollaps/memcached-server:1.0 memcached/memcached-server
         ;;

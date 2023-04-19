@@ -18,9 +18,11 @@ import sys
 import ast
 import random
 import datetime
+import socket
+import struct
 from xml.etree import ElementTree as ET
 from xml.dom import minidom
-from kollaps.Kollapslib.Thunderstorm.Parser import BootstrapperDeclaration, NodeDeclaration, BridgeDeclaration, LinkDeclaration, EventDeclaration
+from kollaps.Kollapslib.ThunderStorm.Parser import BootstrapperDeclaration, NodeDeclaration, BridgeDeclaration, LinkDeclaration, EventDeclaration,BaremetalNodeAuxDeclaration
 
 if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
@@ -31,6 +33,7 @@ bridges = []
 links = []
 nodenames = []
 bridgenames = []
+baremetalextras = []
 
 churn_event_types = ["join", "leave", "crash", "churn", "disconnect", "reconnect"]
 churn_events = []
@@ -49,6 +52,9 @@ connected = {}
 
 topology = ET.Element("experiment")
 
+def int2ip(addr):
+	return socket.inet_ntoa(struct.pack("!I", addr))
+
 def getRandomMoments(start, end, quantity):
     moments = []
     for i in range(quantity):
@@ -65,6 +71,8 @@ def order(declarations):
                 sys.exit(-1)
         elif isinstance(dec, NodeDeclaration):
             nodes.append(dec)
+        elif isinstance(dec,BaremetalNodeAuxDeclaration):
+            baremetalextras.append(dec)
         elif isinstance(dec, BridgeDeclaration):
             bridges.append(dec)
         elif isinstance(dec, LinkDeclaration):
@@ -157,10 +165,26 @@ def addNodes():
         if "share_reuse" in attrs:
             for attrib in getattr(node, "share_reuse"):
                 n.attrib[attrib[1]] = "true"
+
+        baremetal_spec = find_baremetalspec(image[0])
+        
+        if baremetal_spec is not None:
+            n.attrib["ip"] = str(int2ip(baremetal_spec.ip))
+            n.attrib["machinename"] = baremetal_spec.machinename
+            n.attrib["kollaps_folder"] = baremetal_spec.folder
+            n.attrib["topology_file"] = baremetal_spec.topologyfile
+            n.attrib["script"] = baremetal_spec.script
+            print(baremetal_spec.ip)
         ### for testing only, can be removed in the end ###
 #        if "tags" in dir(node):
 #            n.attrib["tags"] = getattr(node, "tags")
 
+def find_baremetalspec(nodename):
+    for spec in baremetalextras:
+        if nodename == spec.name:
+            return spec
+    return None
+        
 def addBridges():
     bridges_element = ET.SubElement(topology, "bridges")
 
@@ -198,6 +222,8 @@ def addLinks():
         ### for testing only, can be removed in the end ###
 #        if "tags" in dir(link):
 #            l.attrib["tags"] = getattr(link, "tags")
+
+
 
 #finds all entities of a certain type with at least one of any number of defined tags
 def get_tagged_elements(element_type, selected_tags):
@@ -480,7 +506,6 @@ def ndl_generate(declarations, seed=12345):
     checkValidity()
     makeXML()
     addInfo(seed)
-
     ugly_xml = ET.tostring(topology, encoding='utf-8', method='xml')
     reparsed = minidom.parseString(ugly_xml)
     return reparsed.toprettyxml(indent="    ")

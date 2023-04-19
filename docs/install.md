@@ -1,7 +1,7 @@
 ## Step-by-step installation
 
 ### Prerequisites <a name="pre">
-Regardless of what installation method you choose, you will need to have `docker` correctly installed and running on your nodes.
+Regardless of what orchestration method you choose, you will need to have `docker` correctly installed and running on your nodes.
 To do so, we recommend following Docker's instructions. Check the official instructions for [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/) and [macOS](https://docs.docker.com/docker-for-mac/install/).
 
 Secondly, you just need to clone this repository and its dependencies:

@@ -57,7 +57,8 @@ reserved = {
     'churn': 'CHURN',
     'replace': 'REPLACE',
     'flap': 'FLAP',
-    'percentage': 'PERCENTAGE'
+    'percentage': 'PERCENTAGE',
+    'ip' : 'IP'
 }
 tokens = ['ID', 'INSTANT', 'INTEGER', 'FLOAT', 'LINKINSTANCE', 'COMMANDS', 'EQ'] + list(reserved.values())
 
@@ -97,6 +98,7 @@ t_QUIT = r'quit'
 t_CHURN = r'churn'
 t_REPLACE = r'replace'
 t_FLAP = r'flap'
+t_IP = r'ip'
 
 def t_INSTANT(t):
     r'([0-9]*d)?([0-9]*h)?([0-9]*m)?([0-9]+(\.[0-9]+)?s)?(?<=[0-9](d|h|m|s))' #positive lookbehind
@@ -148,6 +150,11 @@ def t_ID(t):
     t.type = reserved.get(t.value, 'ID')
     return t
 
+def t_ALL(t):
+    r'^(?!\s*$).+'
+    t.type = reserved.get(t.value,'ALL')
+
+
 t_ignore = " \t"
 
 def t_error(t):
@@ -175,6 +182,9 @@ class LinkDeclaration(ThunderstormDeclaration):
 class EventDeclaration(ThunderstormDeclaration):
     pass
 
+class BaremetalNodeAuxDeclaration(ThunderstormDeclaration):
+    pass
+
 class Time:
     def __init__(self, start, end):
         self.start = start
@@ -186,7 +196,8 @@ def p_declaration(p):
                      | multi_bridge_declaration
                      | bridge_declaration
                      | link_declaration
-                     | event_declaration'''
+                     | event_declaration
+                     | ip_declaration'''
     p[0] = p[1]
 
 def p_bootstrapper_declaration(p):
@@ -221,12 +232,26 @@ def p_node_declaration_element(p):
 
 
 def p_image_declaration(p):
-    '''image_declaration : SERVICE ID IMAGE EQ ID
+    '''image_declaration : SERVICE ID IMAGE EQ ID 
                          | image_declaration replica_declaration'''
     if len(p) == 6:
         p[0] = ["image"] + [p[2], p[5]]
     else:
         p[0] = p[1] + [p[2]]
+
+def p_ip_declaration(p):
+    '''ip_declaration : SERVICE ID IP EQ INTEGER ID ID ID ID
+                      | ip_declaration'''
+    node = BaremetalNodeAuxDeclaration()
+    setattr(node,"name",p[2])
+    setattr(node,"ip",p[5])
+    setattr(node,"machinename",p[6])
+    setattr(node,"folder",p[7])
+    setattr(node,"topologyfile",p[8])
+    setattr(node,"script",p[9])
+
+    p[0] = node
+
 
 def p_supervisor_declaration(p):
     '''supervisor_declaration : SUPERVISOR

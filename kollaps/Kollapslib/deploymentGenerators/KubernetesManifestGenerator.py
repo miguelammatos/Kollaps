@@ -125,7 +125,8 @@ class KubernetesManifestGenerator:
         print("      hostNetwork: true")
 
     def print_service(self, service_list):
-        if not service_list[0].supervisor:
+
+        if service_list[0].supervisor:
             print("apiVersion: v1")
             print("kind: Service")
             print("metadata:")
@@ -133,10 +134,25 @@ class KubernetesManifestGenerator:
             print("  labels:")
             print("    app: Kollaps"+service_list[0].name)
             print("spec:")
+            print("  ports:")
+            print("    - port: 8088")
+            print("      targetPort: 8088")
+            print("      nodePort: 30007")
+            print("  selector:")
+            print("    app: Kollaps"+service_list[0].name)
+            print("  type: NodePort")
+            print("---")
+        if not service_list[0].supervisor:
+            print("apiVersion: v1")
+            print("kind: Service")
+            print("metadata:")
+            print("  name: "+service_list[0].name + "-" + self.experiment_UUID)
+            print("spec:")
             print("  clusterIP: None")
             print("  selector:")
             print("    app: Kollaps"+service_list[0].name)
             print("---")
+
 
         if(len(service_list) == 1):
             print("apiVersion: v1")

@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from kollaps.Kollapslib.Thunderstorm.Parser import ndl_parse
-from kollaps.Kollapslib.Thunderstorm.Generator import ndl_generate
+from kollaps.Kollapslib.ThunderStorm.Generator import ndl_generate
+from kollaps.Kollapslib.ThunderStorm.Parser import ndl_parse
 
 import sys
+import argparse
 if sys.version_info >= (3, 0):
     from typing import Dict, List, Tuple
 
@@ -26,7 +27,13 @@ parsed_declarations = []
 
 def main():
     try:
-        with open(sys.argv[1], 'r') as file:
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("input",help="input")
+        parser.add_argument("-s","--seed",default=12345,type=int,help="seed")
+        parser.add_argument("-f","--filename",default=None,type=str,help="baremetal ips,machinename,foldername,script")
+        opt=parser.parse_args()
+        with open(opt.input, 'r') as file:
             declarations = file.readlines()
     except IOError:
         print("Error reading file. Exiting.")
@@ -35,17 +42,29 @@ def main():
         if len(line.strip()) > 0 and not line.strip()[0] == '#':
             try:
                 parsed_declarations.append(ndl_parse(line.strip()))
+                continue
             except:
                 print("Could not parse line: \"" + line.strip() + "\". Skipping.")
                 continue
+    if opt.filename !=None:
+        auxiliarylines = open(opt.filename).readlines()
+        for line in auxiliarylines:
+            if len(line.strip()) > 0 and not line.strip()[0] == '#':
+                try:
+                    parsed_declarations.append(ndl_parse(line.strip()))
 
-    s=12345
-    if len(sys.argv) > 3 and sys.argv[2] == "-s":
-        try:
-            s = int(sys.argv[3])
-        except:
-            print("Illegal seed, not an int. Using standard seed of 12345.")
-    print(ndl_generate(parsed_declarations, seed=s))
+                    # print(ndl_parse(line.strip()).name)
+                    # print(ndl_parse(line.strip()).ip)
+                    # print(ndl_parse(line.strip()).machinename)
+                    # print(ndl_parse(line.strip()).folder)
+
+                except:
+                    print("Could not parse line: \"" + line.strip() + "\". Skipping.")
+                    continue
+    
+
+    print(ndl_generate(parsed_declarations,opt.seed ))
+
 
 if __name__ == "__main__":
     main()
