@@ -32,8 +32,8 @@ To run experiments, you need to build the **Kollaps tools** to generate runnable
 
 Execute in the root folder (where this README is found):
 ```
-$ pip3 wheel --no-deps . .
-$ pip3 install kollaps-2.0-py3-none-any.whl
+pip3 wheel --no-deps . .
+pip3 install kollaps-2.0-py3-none-any.whl
 ```
 This installs the following tools:
 - `KollapsDeploymentGenerator` that translate Kollaps topology descriptions into Docker Swarm Compose files or Kubernetes Manifest files on your local machine.
