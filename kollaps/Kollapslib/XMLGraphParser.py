@@ -36,16 +36,17 @@ class XMLGraphParser:
         for service in services:
             if service.tag != 'service':
                 print_and_fail('Invalid tag inside <services>: ' + service.tag)
+            if 'name' not in service.attrib:
+                print_and_fail('A service needs a name attribute.')
+            if "_" in service.attrib['name']:
+                print_and_fail('A service name can not have a underscore _.')
             if self.mode == "container":
-                if 'name' not in service.attrib or 'image' not in service.attrib:
-                    print_and_fail('A service needs a name and an image attribute.')
+                if 'image' not in service.attrib:
+                    print_and_fail('A service an image attribute.')
                 if not service.attrib['name'] or not service.attrib['image']:
                     print_and_fail('A service needs a name and an image attribute.')
-            if self.mode == "baremetal":
-                if 'name' not in service.attrib:
-                    print_and_fail('A service needs a name.')
-                if not service.attrib['name']:
-                    print_and_fail('A service needs a name.')
+#            if self.mode == "baremetal":
+
 
 
             command = None
