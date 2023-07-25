@@ -15,4 +15,4 @@ sudo rm /ips.txt
 # cd ..
 # cd ..
 sudo cp libTCAL.so /usr/local/bin/libTCAL.so
-sudo ./emulationcore $1 communicationmanager eno1 baremetal
+sudo ./emulationcore $1 communicationmanager eth0 baremetal

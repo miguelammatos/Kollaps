@@ -330,6 +330,9 @@ impl EventScheduler{
                 if self.events[count].id == 3{
                     stop_experiment(self.pid.clone());
                 }
+                if self.events[count].id == 2{
+                    stop_experiment(self.pid.clone());
+                }
                 if self.events[count].id == 1{
                     self.state.lock().unwrap().increment_age();
                 }
@@ -338,7 +341,7 @@ impl EventScheduler{
                     self.state.lock().unwrap().emulation.lock().unwrap().disconnect();
                 }
 
-                if self.events[count].id == 4{
+                if self.events[count].id == 5{
                     self.state.lock().unwrap().emulation.lock().unwrap().reconnect();
                 }
                 if count == self.events.len() - 1{

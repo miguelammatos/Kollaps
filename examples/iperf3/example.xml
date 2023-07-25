@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<experiment boot="kollaps:2.0">
+    <services>
+    	<service name="dashboard" image="kollaps/dashboard:1.0" supervisor="true" port="8088"/>
+        <service name="client1" image="kollaps/iperf3-client:1.0" command="['server','1']"/>
+        <service name="client2" image="kollaps/iperf3-client:1.0" command="['server','2']"/>
+        <service name="client3" image="kollaps/iperf3-client:1.0" command="['server','3']"/>
+        <service name="server" image="kollaps/iperf3-server:1.0" replicas ="3"/>
+    </services>
+    <bridges>
+        <bridge name="s1"/>
+        <bridge name="s2"/>
+    </bridges>
+    <links>
+        <link origin="client1" dest="s1" latency="1" upload="10Gbps" download="10Gbps" network="kollaps_network"/>
+        <link origin="client2" dest="s1" latency="1" upload="10Gbps" download="10Gbps" network="kollaps_network"/>
+        <link origin="client3" dest="s1" latency="1" upload="10Mbps" download="10Gbps" network="kollaps_network"/>
+        <link origin="s1" dest="s2" latency="25" upload="50Mbps" download="50Mbps" drop="0.01" network="kollaps_network"/>
+        <link origin="s2" dest="server" latency="5" upload="10Gbps" download="10Gbps" network="kollaps_network"/>
+    </links>
+</experiment>

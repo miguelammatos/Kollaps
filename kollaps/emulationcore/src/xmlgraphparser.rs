@@ -827,7 +827,7 @@ impl XMLGraphParser{
 
                             id = rng.gen_range(0..root.lock().unwrap().replicas) as usize;
 
-                            connected = replicas[id][disconnected] && replicas[id][disconnected];
+                            connected = replicas[id][joined] && !(replicas[id][disconnected]);
 
                             if connected{
                                 break;
