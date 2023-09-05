@@ -4,6 +4,12 @@ This README is a quick introduction to get up and running with Kollaps and Thund
 Kollaps is the decentralized network emulator while Thunderstorm is the high-level language to specify experiments.
 Kollaps currently only functions in machines with the Linux Kernel (minimium version:5.15.0) due to the usage of both eBPF and Linux traffic control.
 
+### Documentation
+For extra documentation on how to use Kollaps you can check our [website](https://kollaps.dev/).
+
+### Contact Us
+If you want to discuss or have problems using Kollaps, we have a discord channel, join us [here](https://discord.gg/cHMphzMMUZ).
+
 ### Quick Start
 
 The easier way to get up and running with Kollaps is to clone the project, build
@@ -75,10 +81,10 @@ Or cite it:
 }
 ```
 
-### Other links
+<!-- ### Other links
 
 + [Installation](./docs/install.md) - step by step installation guide.
 + [Orchestrators](./docs/orchestrators.md) - container orchestrators supported in Kollaps, and new in 2.0 Baremetal
 + [Examples](./examples/README.md) - list of example applications to test Kollaps.
 + [Videos](./docs/videos.md) - a collection of talks and tutorials.
-+ [Wiki](https://github.com/miguelammatos/Kollaps/wiki) - project's wiki page.
++ [Wiki](https://github.com/miguelammatos/Kollaps/wiki) - project's wiki page. -->
