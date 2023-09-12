@@ -3,7 +3,7 @@
 This README is a quick introduction to get up and running with Kollaps and Thunderstorm.
 Kollaps is the decentralized network emulator while Thunderstorm is the high-level language to specify experiments.
 Kollaps currently only functions in machines with the Native Linux Kernel (minimium version:5.15.0) due to the usage of both eBPF and Linux traffic control.
-Deployments over WLS will not work due to technical limitations on WSL itself.
+##### Deployments over WLS will not work due to technical limitations on WSL itself.
 
 ### Documentation
 For extra documentation on how to use Kollaps you can check our [website](https://kollaps.dev/).
