@@ -406,10 +406,6 @@ impl Graph {
 
         self.link_counter = old_graph.lock().unwrap().link_counter.clone();
 
-        self.ip_to_path_id = old_graph.lock().unwrap().ip_to_path_id.clone();
-
-        self.path_id_to_ip = old_graph.lock().unwrap().path_id_to_ip.clone();
-
         self.graph_root = old_graph.lock().unwrap().graph_root.clone();
 
     }

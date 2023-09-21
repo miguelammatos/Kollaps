@@ -207,23 +207,17 @@ impl State {
 
     pub fn shrink_maps(&mut self){
         for graph in self.graphs.iter_mut(){
-            graph.lock().unwrap().services.shrink_to_fit();
-            graph.lock().unwrap().paths.shrink_to_fit();
-            graph.lock().unwrap().links.shrink_to_fit();
-            graph.lock().unwrap().bridges.shrink_to_fit();
-            graph.lock().unwrap().services_by_name.shrink_to_fit();
-            graph.lock().unwrap().bridges_by_name.shrink_to_fit();
-            graph.lock().unwrap().ip_to_path_id.shrink_to_fit();
-            graph.lock().unwrap().path_id_to_ip.shrink_to_fit();
-
-            // println!("capacity is {}",graph.lock().unwrap().services.capacity());
-            // println!("capacity is {}",graph.lock().unwrap().paths.capacity());
-            // println!("capacity is {}",graph.lock().unwrap().links.capacity());
-            // println!("capacity is {}",graph.lock().unwrap().bridges.capacity());
-            // println!("capacity is {}",graph.lock().unwrap().services_by_name.capacity());
-            // println!("capacity is {}",graph.lock().unwrap().bridges_by_name.capacity());
-            // println!("capacity is {}",graph.lock().unwrap().ip_to_path_id.capacity());
-            // println!("capacity is {}",graph.lock().unwrap().path_id_to_ip.capacity());
+            let mut graph = graph.lock().unwrap();
+            {
+                graph.services.shrink_to_fit();
+                graph.paths.shrink_to_fit();
+                graph.links.shrink_to_fit();
+                graph.bridges.shrink_to_fit();
+                graph.services_by_name.shrink_to_fit();
+                graph.bridges_by_name.shrink_to_fit();
+                graph.ip_to_path_id.shrink_to_fit();
+                graph.path_id_to_ip.shrink_to_fit();
+            }
         }
     }
     
@@ -252,15 +246,42 @@ impl State {
         //Get old ip_to_path_ids (can be cloned just u32 values)
         let old_ip_to_path_ids = self.get_graph_with_age(age).lock().unwrap().ip_to_path_id.clone();
 
+        for (ip,id) in &old_ip_to_path_ids{
+            match ip_to_path_ids.get(&ip){
+                Some(new_id)=>{
+                    continue;
+                }None=>{
+                    let root_ip = self.get_current_graph().lock().unwrap().graph_root.as_ref().unwrap().lock().unwrap().ip;
+                    if root_ip == *ip{
+                        continue;
+                    }
+                    let new_path = self.get_graph_with_age(age).lock().unwrap().get_path(*id);
+
+                    let new_path = new_path.unwrap().clone();
+
+                    let start = &new_path.lock().unwrap().start.clone();
+
+                    let finish = &new_path.lock().unwrap().finish.clone();
+
+                    if self.get_graph_with_age(age  ).lock().unwrap().bridges_by_name.contains_key(finish){
+                        continue;
+                    }
+
+                    print_message(self.name.clone(),format!("Blocked path from {} to {}",start,finish));
+                    self.emulation.lock().unwrap().change_loss(*ip,1.0);
+
+                }
+            }
+        }
+
         //Iterate through the new ones
         for (ip,id) in &ip_to_path_ids{
-            //Check old ones to see if there was a path to the IP
-
+            //If it is the connection to myself skip
             let root_ip = self.get_current_graph().lock().unwrap().graph_root.as_ref().unwrap().lock().unwrap().ip;
-
             if root_ip == *ip{
                 continue;
             }
+            //Check old ones to see if there was a path to the IP
             match old_ip_to_path_ids.get(&ip){
                 
                 //If there was get old bandwidth values
@@ -270,6 +291,7 @@ impl State {
 
                             let used_bandwidth = path.lock().unwrap().used_bandwidth.clone();
                             let current_bandwidth = path.lock().unwrap().current_bandwidth.clone();
+                            
                             
                             let new_path = self.get_graph_with_age(age+1).lock().unwrap().get_path(*id);
 
@@ -303,12 +325,32 @@ impl State {
                             }        
                         },
                         None =>{
-                        
-                        }
+                       }
                     }
                 },
                 None=>{
-                    continue;
+                    
+                    let new_path = self.get_graph_with_age(age+1).lock().unwrap().get_path(*id);
+
+                    let new_path = new_path.unwrap().clone();
+
+                    let start = &new_path.lock().unwrap().start.clone();
+
+                    let finish = &new_path.lock().unwrap().finish.clone();
+
+                    if self.get_graph_with_age(age+1).lock().unwrap().bridges_by_name.contains_key(finish){
+                        continue;
+                    }
+
+                    let new_latency = new_path.lock().unwrap().latency.clone();
+                    let new_jitter = new_path.lock().unwrap().jitter.clone();
+                    let new_loss = new_path.lock().unwrap().drop.clone();
+                    print_message(self.name.clone(),format!("New path from {} to {} and new latency is {} and new drop is {}",start,finish,new_latency.clone(),new_loss.clone()));
+                    self.emulation.lock().unwrap().change_loss(*ip,new_loss);
+
+                    if new_latency != 0.0{
+                        self.emulation.lock().unwrap().change_latency(*ip,new_latency,new_jitter);
+                    }
                 }
             };
 
@@ -389,7 +431,6 @@ impl State {
         //add info about other flows
         let flow_keys = self.get_flow_keys();
 
-        // print_message(self.name.clone(),format!("Flows size is {}",flow_keys.len().clone()));
         for key in flow_keys{
 
             if self.link_count <=255{
@@ -446,7 +487,6 @@ impl State {
                 let value = 1.0/link_flows[0][rtt];
                 
                 let max_bandwidth_element = (value / rtt_reverse_sum) * bandwidth_bps;
-
                 //calculated our bandwidth push to vector
                 max_bandwidth_on_link.push(max_bandwidth_element);
 
@@ -459,7 +499,6 @@ impl State {
                 let mut hungry_usage_sum = our_share;
 
                 for position in 1..link_flows.len(){
-
                     let flow = &link_flows[position];
                     //calculate bandwidth for everyone
                     let value = 1.0/flow[rtt];
@@ -467,7 +506,6 @@ impl State {
                     let max_bandwidth_element = (value / rtt_reverse_sum) * bandwidth_bps;
 
                     max_bandwidth_on_link.push(max_bandwidth_element);
-
                     //check if a flow is hungry (wants more than its allocated share)
                     if flow[bw] > max_bandwidth_on_link[position]{
 
@@ -492,11 +530,9 @@ impl State {
 
                     max_bandwidth_on_link[0] = maximized;
                 }
-
                 //If this link restricts us more than previously try to assume this bandwidth as the max
                 if max_bandwidth_on_link[0] < max_bandwidth{
                     max_bandwidth = max_bandwidth_on_link[0];
-                    path.lock().unwrap().set_max_bandwidth(max_bandwidth_on_link[0]);
                 }
             }
 
@@ -527,7 +563,6 @@ impl State {
 
                 ips_and_bandwidths.push(ip_and_bandwidth);
 
-                //print_message(self.name.clone(),format!("want to change bw to {}",new_bandwidth))    ;
                 self.emulation.lock().unwrap().change_bandwidth(ip,new_bandwidth as u32);
 
             }   
@@ -542,13 +577,15 @@ impl State {
         
     }
 
-    //Add flow received from CM to our state"   
+    //Add flow received from CM to our state  
     pub fn apply_flow_u8(&mut self,key:&String){
         let flow = self.get_flow_u8(key);
 
         let link_indices = flow.lock().unwrap().link_indices.clone();
         let path_used_bandwidth = flow.lock().unwrap().bandwidth.clone();
-
+        if path_used_bandwidth == 0.0
+            {return;}
+        //print_message(self.name.clone(),format!("Used bandwidth by other is {}",path_used_bandwidth).to_string());
         let mut pathrtt = 0.0;
         //calculate RTT
         for index in link_indices.clone(){
@@ -576,7 +613,8 @@ impl State {
 
         let link_indices = flow.lock().unwrap().link_indices.clone();
         let path_used_bandwidth = flow.lock().unwrap().bandwidth.clone();
-
+        if path_used_bandwidth == 0.0
+            {return;}
         let mut pathrtt = 0.0;
         //calculate RTT
         for index in link_indices.clone(){

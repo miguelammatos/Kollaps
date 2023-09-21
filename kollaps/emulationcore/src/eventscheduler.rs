@@ -61,7 +61,6 @@ impl EventScheduler{
     pub fn schedule_leave(&mut self,time:f32){
 
         let event = Event::new(2,time);
-
         self.events.push(event);
     }
     
@@ -90,7 +89,7 @@ impl EventScheduler{
 
         self.state.lock().unwrap().insert_graph();
 
-        let bridge = self.state.lock().unwrap().get_graph().lock().unwrap().bridges_by_name.get(&bridge_name).unwrap().clone();
+        let bridge = self.state.lock().unwrap().get_graph().lock().unwrap().removed_bridges.get(&bridge_name).unwrap().clone();
 
         self.state.lock().unwrap().get_graph().lock().unwrap().bridges_by_name.insert(bridge_name.clone(),bridge.clone());
 
@@ -116,12 +115,13 @@ impl EventScheduler{
 
         //remove from bridges_by_name
         self.state.lock().unwrap().get_graph().lock().unwrap().bridges_by_name.remove(&bridge_name);
-        
+
+        self.recompute_and_store();
+
         let event = Event::new(1,time);
 
         self.events.push(event);
 
-        self.recompute_and_store();
         
     }
 
@@ -291,7 +291,7 @@ impl EventScheduler{
         self.state.lock().unwrap().get_graph().lock().unwrap().calculate_shortest_paths();
 
         self.state.lock().unwrap().get_graph().lock().unwrap().calculate_properties();
-
+        
     }
 
     // pub fn print_events(&mut self){
@@ -331,7 +331,8 @@ impl EventScheduler{
                     stop_experiment(self.pid.clone());
                 }
                 if self.events[count].id == 2{
-                    stop_experiment(self.pid.clone());
+                    //This is not properly implemented since 1.0
+                    //self.state.lock().unwrap().increment_age();
                 }
                 if self.events[count].id == 1{
                     self.state.lock().unwrap().increment_age();
