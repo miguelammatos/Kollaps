@@ -17,12 +17,12 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time;
-use crate::elements::{Service,Link,Path,Flowu8,Flowu16};
+use crate::elements::{Service,Link,Path,Flowu16};
 use trust_dns_resolver::Resolver;
 use trust_dns_resolver::config::*;
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-use crate::aux::{convert_to_int,get_own_ip,Dijkstraentry};
+use crate::aux::{convert_to_int, get_own_ip, print_message, Dijkstraentry};
 use rand::Rng;
 use std::f32::INFINITY;
 // use crate::aux::print_message;
@@ -31,7 +31,6 @@ use std::f32::INFINITY;
 pub struct Graph{
     //Containers
     pub services: HashMap<u32,Arc<Mutex<Service>>>,
-
     //bridges
     pub bridges: HashMap<u32,Arc<Mutex<Service>>>,
     //Links between elements
@@ -43,7 +42,6 @@ pub struct Graph{
     //Aux map that olds the path id to an IP
     pub path_id_to_ip: HashMap<u32,u32>,
     //Holds metadata received from other containers, with metadata specific to this graph
-    pub flow_accumulator_u8: HashMap<String,Arc<Mutex<Flowu8>>>,
     pub flow_accumulator_u16: HashMap<String,Arc<Mutex<Flowu16>>>,
     //Aux vec with IPs of containers
 
@@ -52,7 +50,7 @@ pub struct Graph{
     pub bridges_by_name: HashMap<String,Vec<Arc<Mutex<Service>>>>,
 
     //hold flows sent by others
-    pub flow_accumulator_keys:Vec<String>,
+    pub flow_accumulator_keys:HashMap<String,String>,
 
     //hold all ips in deployment
     pub ips: Vec<u32>,
@@ -71,6 +69,8 @@ pub struct Graph{
     //number of total links
     pub link_count:u32,
 
+    pub name:String
+
 
 
 }
@@ -83,9 +83,8 @@ impl Graph {
             paths: HashMap::new(),
             ip_to_path_id:HashMap::new(),
             path_id_to_ip:HashMap::new(),
-            flow_accumulator_u8:HashMap::new(),
             flow_accumulator_u16:HashMap::new(),
-            flow_accumulator_keys:vec![],
+            flow_accumulator_keys:HashMap::new(),
             ips:vec![],
             services_by_name:HashMap::new(),
             bridges_by_name:HashMap::new(),
@@ -96,6 +95,7 @@ impl Graph {
             removed_bridges:HashMap::new(),
             removed_links:vec![],
             link_count:0,
+            name:"".to_string()
 
         }
     }
@@ -268,7 +268,7 @@ impl Graph {
         }
     } 
 
-    pub fn print_graph(&mut self){
+    pub fn print_graph(&mut self,name:String){
 
     //     for (name, services) in &self.services_by_name {
     //         for service in services{
@@ -283,13 +283,13 @@ impl Graph {
     //             println!("Bridge with name {}",bridge.hostname);
     //         }
     //     }
-        // for (id, link) in &self.links {
-        //       link.lock().unwrap().print();
+        // for (_id, link) in &self.links {
+        //       link.lock().unwrap().print(name.clone());
         // }
 
-        // for (_id, path) in &self.paths {
-        //      path.lock().unwrap().print();
-        // }
+        for (_id, path) in &self.paths {
+             path.lock().unwrap().print(name.clone());
+        }
 
     //     for (ip, id) in &self.ip_to_path_id {
     //          println!("ip is {} and id is {}",ip,id);
@@ -358,49 +358,54 @@ impl Graph {
         self.removed_bridges = old_graph.lock().unwrap().removed_bridges.clone();
 
         for (_id,link) in old_graph.lock().unwrap().links.iter(){
-            
-            let id = link.lock().unwrap().id;
+            let link = link.lock().unwrap();
+            {
+                let id = link.id;
 
-            let latency = link.lock().unwrap().latency;
+                let latency = link.latency;
 
-            let jitter = link.lock().unwrap().jitter;
+                let jitter = link.jitter;
 
-            let drop = link.lock().unwrap().drop;
+                let drop = link.drop;
 
-            let bandwidth = link.lock().unwrap().bandwidth;
+                let bandwidth = link.bandwidth;
 
-            let source = link.lock().unwrap().source.clone();
+                let source = link.source.clone();
 
-            let destination = link.lock().unwrap().destination.clone();
+                let destination = link.destination.clone();
 
 
-            let link = Link::new(id,latency,jitter,drop,bandwidth,source,destination);
-            let link = Arc::new(Mutex::new(link));
+                let link = Link::new(id,latency,jitter,drop,bandwidth,source,destination);
+                let link = Arc::new(Mutex::new(link));
 
-            self.links.insert(id,link);
+                self.links.insert(id,link);
+            }
         }
 
         for link in self.removed_links.iter(){
 
-            let id = link.lock().unwrap().id;
+            let link = link.lock().unwrap();
+            {
+                let id = link.id;
 
-            let latency = link.lock().unwrap().latency;
+                let latency = link.latency;
 
-            let jitter = link.lock().unwrap().jitter;
+                let jitter = link.jitter;
 
-            let drop = link.lock().unwrap().drop;
+                let drop = link.drop;
 
-            let bandwidth = link.lock().unwrap().bandwidth;
+                let bandwidth = link.bandwidth;
 
-            let source = link.lock().unwrap().source.clone();
+                let source = link.source.clone();
 
-            let destination = link.lock().unwrap().destination.clone();
+                let destination = link.destination.clone();
 
 
-            let link = Link::new(id,latency,jitter,drop,bandwidth,source,destination);
-            let link = Arc::new(Mutex::new(link));
+                let link = Link::new(id,latency,jitter,drop,bandwidth,source,destination);
+                let link = Arc::new(Mutex::new(link));
 
-            self.links.insert(id,link);
+                self.links.insert(id,link);
+            }
 
         }
 
@@ -423,6 +428,9 @@ impl Graph {
         match self.paths.get_mut(&id) {
             Some(path) => {
                 let mut path = path.lock().unwrap();
+
+                let start = path.start.clone();
+                let finish = path.finish.clone();
 
                 for link in &path.links.clone(){
                     
@@ -458,6 +466,9 @@ impl Graph {
                 path.rtt = path.latency*2.0;
         
                 path.drop = 1.0 - total_not_drop_probability;
+
+
+                //print_message(self.name.clone(),format!{"In e to e: start is {} finish is {} bw is {} latency is {}",start,finish,path.current_bandwidth,path.latency}.to_string());
                 },
             None => ()
         }
@@ -478,123 +489,37 @@ impl Graph {
             None => return false//error
         };
 
+        let path_max_bandwidth = path.lock().unwrap().max_bandwidth.clone();
 
-        
-        let path_max_bandwidth = path.lock().unwrap().max_bandwidth;
-
-        let path_used_bandwidth = path.lock().unwrap().used_bandwidth;
-
-        //if throughput <= (path_max_bandwidth * errormargin) && throughput != 0.0{
-
-        if throughput == 0.0 && path.lock().unwrap().used_bandwidth == 0.0{
-            return false;
-        }
-        if throughput == 0.0{
-            return true;
-        }
         if throughput <= (path_max_bandwidth * errormargin){
+            path.lock().unwrap().used_bandwidth = throughput;
             return false;
         }
 
-        let percentage_variation;
-
-        //first time seeing a bandwidth for this path
-        if path_used_bandwidth== 0.0{
-            percentage_variation = 100.0;
-        }
-        else{
-            percentage_variation = ((path_used_bandwidth - throughput)*100.0).abs()/path_used_bandwidth;
-        }
-
-        let is_usefull;
-        let mut age = 0;
-        if self.link_count <=255{
-            for (_key,flow) in &self.flow_accumulator_u8{
-                let flow = flow.lock().unwrap();
-                age = age + flow.age;
-            }
-        }else{
-            for (_key,flow) in &self.flow_accumulator_u16{
-                let flow = flow.lock().unwrap();
-                age = age + flow.age;
-            }
-        }
-
-        is_usefull = age != 0;
-
-
-        //if it changed by more than 5% it is relevant
-        if percentage_variation > 5.0 || is_usefull{
-            path.lock().unwrap().used_bandwidth = throughput;
-            return true;
-        }
-        return false;
+        path.lock().unwrap().used_bandwidth = throughput;
+        
+        return true;
 
     }
 
-    //Saves metadata in flow accumulator related to other containers
-    pub fn collect_flow_u8(&mut self,bandwidth:f32,link_count:usize,ids:Vec<u8>){
 
-        let key = format!("{}:{}",ids[0],ids[link_count-1]);
+    pub fn collect_flow_u16(&mut self,bandwidth:f32,link_count:u16,ids:Vec<u16>){
 
-
-        match self.flow_accumulator_u8.get_mut(&key){
-            //If flow already exists we only update if it changed by more than 5%
-            Some(flow) => {
-
-                let flow_bandwidth = flow.lock().unwrap().bandwidth.clone();
-                if flow_bandwidth == 0.0 && bandwidth == 0.0{
-                    return
-                }
-                if flow_bandwidth == 0.0 && bandwidth != 0.0{
-                    flow.lock().unwrap().bandwidth = bandwidth;
-                    flow.lock().unwrap().age = 1;
-                    return
-                }
-                let percentage_variation = ((flow_bandwidth - bandwidth)*100.0).abs()/flow_bandwidth;
-                if percentage_variation > 5.0{
-                    flow.lock().unwrap().bandwidth = bandwidth;
-                    flow.lock().unwrap().age = 1;
-                }
-            },
-            //If it doesn't exist insert
-            None => {
-                let new_flow_u8 = Arc::new(Mutex::new(Flowu8::new(bandwidth,ids.clone())));
-                self.flow_accumulator_u8.insert(key.clone(),new_flow_u8);
-                self.flow_accumulator_keys.push(key.clone());
-            }
-        }
-    }
-
-    pub fn collect_flow_u16(&mut self,bandwidth:f32,link_count:usize,ids:Vec<u16>){
-
-        let key = format!("{}:{}",ids[0],ids[link_count-1]);
+        let link_count_usize = link_count as usize;
+        let key = format!("{}:{}",ids[0],ids[link_count_usize-1]);
 
 
         match self.flow_accumulator_u16.get_mut(&key){
-            //If flow already exists we only update if it changed by more than 5%
             Some(flow) => {
 
-                let flow_bandwidth = flow.lock().unwrap().bandwidth.clone();
-                if flow_bandwidth == 0.0 && bandwidth == 0.0{
-                    return
-                }
-                if flow_bandwidth == 0.0 && bandwidth != 0.0{
-                    flow.lock().unwrap().bandwidth = bandwidth;
-                    flow.lock().unwrap().age = 1;
-                    return
-                }
-                let percentage_variation = ((flow_bandwidth - bandwidth)*100.0).abs()/flow_bandwidth;
-                if percentage_variation > 5.0{
-                    flow.lock().unwrap().bandwidth = bandwidth;
-                    flow.lock().unwrap().age = 1;
-                }
+                flow.lock().unwrap().bandwidth = bandwidth;
+                flow.lock().unwrap().age = 0;
             },
             //If it doesn't exist insert
             None => {
                 let new_flow_u16 = Arc::new(Mutex::new(Flowu16::new(bandwidth,ids.clone())));
                 self.flow_accumulator_u16.insert(key.clone(),new_flow_u16);
-                self.flow_accumulator_keys.push(key.clone());
+                self.flow_accumulator_keys.insert(key.clone(),"".to_string());
             }
         }
     }
@@ -604,7 +529,6 @@ impl Graph {
 
 
         for (name,services) in self.services_by_name.iter_mut(){            
-
             let mut ips:Vec<Ipv4Addr>;
             loop{
 
@@ -635,17 +559,18 @@ impl Graph {
                 let response = resolver.ipv4_lookup(format!("{}-{}",name,uuid.as_ref().unwrap()));
                 match response{
                     Ok(response) =>{
-
                         for address in response.iter(){
+                            println!("Address is {}",address);
                             ips.push(address.clone());
                         }
 
                     },
                     Err(_e) => {
+                        println!("Error: {}",_e);
                         thread::sleep(sleeptime);
                     }
                 };
-                //println!("IPS len is {} and services len is {}",ips.len(),services.len());
+                println!("IPS len is {} and services len is {} for name {}",ips.len(),services.len(),name.clone());
                 if ips.len() == services.len(){
                     break;
                 }
@@ -704,7 +629,9 @@ impl Graph {
     }
 
     pub fn get_name(&mut self) -> String{
-        return self.graph_root.as_ref().unwrap().lock().unwrap().hostname.clone().to_string();
+        let name = self.graph_root.as_ref().unwrap().lock().unwrap().hostname.clone().to_string();
+        self.name = name.clone();
+        return name.clone();
     }
 
     pub fn calculate_shortest_paths(&mut self){
@@ -723,6 +650,12 @@ impl Graph {
 
         for (_name,services) in self.services_by_name.iter_mut(){
             for service in services{
+
+                if service.lock().unwrap().supervisor{
+                    println!("Skipped dashboard in paths");
+                    continue;
+                }
+
                 let mut distance = 0.0;
 
                 let service_ip = service.lock().unwrap().ip;
@@ -807,6 +740,110 @@ impl Graph {
 
         self.set_start_and_finish();
     }
+
+    pub fn calculate_shortest_paths_latency(&mut self){
+
+        if self.graph_root.is_none(){
+            println!("No root");
+        }
+
+        let inf:f32  = INFINITY;
+
+        let mut dist = HashMap::new();
+
+        let mut q = vec![];
+
+        let root_ip = self.graph_root.as_ref().unwrap().lock().unwrap().ip;
+
+        for (_name,services) in self.services_by_name.iter_mut(){
+            for service in services{
+                let mut distance = 0.0;
+
+                let service_ip = service.lock().unwrap().ip;
+
+                if service_ip != root_ip{
+                    distance = inf;
+                }
+                dist.insert(service.clone().lock().unwrap().ip.clone(),distance);
+
+                let entry = Dijkstraentry::new(distance,service.clone());
+
+                q.push(entry);
+
+            }
+        }
+
+        for (_name,bridges) in self.bridges_by_name.iter_mut(){
+
+            dist.insert(bridges[0].lock().unwrap().ip.clone(),inf);
+            let entry = Dijkstraentry::new(inf,bridges[0].clone());
+
+            q.push(entry);
+        }
+
+        self.insert_path(self.path_counter,vec![]);
+
+        self.insert_ip_to_path(root_ip,self.path_counter);
+
+        self.path_counter +=1;
+
+        loop {
+
+            if q.len().clone() == 0{
+                break;
+            }
+            q.sort_by(|a,b| a.distance.partial_cmp(&b.distance).unwrap());
+
+            let node = q.remove(0).node.clone();
+
+            let links = node.lock().unwrap().links.clone();
+
+            let mut alt;
+
+            for link in links.clone(){
+                let node_ip = node.lock().unwrap().ip.clone();
+
+                let link_object = self.links.get_mut(&link);
+
+                let link_object = link_object.unwrap().clone();                
+
+                let latency = link_object.lock().unwrap().latency;
+                
+                alt = dist.get(&node_ip).unwrap() + latency;
+                let destination_ip = link_object.lock().unwrap().destination.lock().unwrap().ip.clone();
+                if !dist.contains_key(&destination_ip){
+                    continue;
+                }
+                if alt < *dist.get(&destination_ip).unwrap(){
+                        dist.insert(destination_ip,alt);
+
+
+                        let path_id = self.ip_to_path_id.get(&node_ip).unwrap();
+
+                        let mut new_links = self.paths.get_mut(&path_id).unwrap().lock().unwrap().links.clone();
+
+                        new_links.push(link);
+                        let new_path_id = self.path_counter.clone();
+
+                        self.insert_path(new_path_id,new_links);
+
+                        self.insert_ip_to_path(destination_ip,new_path_id);
+
+                        self.path_counter+=1;
+
+                    for i in 0..q.len().clone(){
+                        if q[i].node.lock().unwrap().ip == destination_ip{
+                            q[i].distance = alt;
+                        }
+                    }
+                }               
+            }
+           
+        }
+
+        self.set_start_and_finish();
+    }
+
 
     pub fn set_start_and_finish(&mut self){
         for (_id,path) in self.paths.iter_mut(){

@@ -23,10 +23,9 @@ ADD ./setup.py /Kollaps/setup.py
 
 ADD /kube/ /root/.kube
 
-RUN pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netifaces netaddr pyroute2 && \
+RUN pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netifaces netaddr pyroute2 requests==2.31.0 && \
     pip3 --no-cache-dir wheel --no-deps -w /Kollaps /Kollaps && \
     pip3 --no-cache-dir install /Kollaps/kollaps-2.0-py3-none-any.whl && \
     rm -rf /Kollaps && \
     mkdir /result && \
-    pip3 --no-cache-dir uninstall -y setuptools wheel pip && \
-    apt-get remove -y gcc make flex bison 
+    pip3 --no-cache-dir uninstall -y setuptools wheel pip

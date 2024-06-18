@@ -14,6 +14,7 @@
 // limitations under the License.
 
 extern crate libc;
+use std::borrow::BorrowMut;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::fs::File;
@@ -21,6 +22,15 @@ use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 use std::thread;
 use std::ffi::CString;
+
+pub mod messages_capnp {
+    include!(concat!(env!("OUT_DIR"), "/src/messages_capnp.rs"));
+}
+
+use capnp::serialize_packed;
+use capnp::message::{Builder, HeapAllocator};
+use crate::messages_capnp::message;
+use std::io::BufReader;
 
 pub struct FdSet(libc::fd_set);
 
@@ -40,6 +50,7 @@ static mut CONTAINERLIMIT:u32 = 0;
 struct Communication {
     writepipe: Option<File>,
     readpipe: Option<File>,
+    buf_reader: Option<BufReader<File>>
 }
 
 //struct of messages to RM
@@ -52,6 +63,7 @@ struct Message{
 static mut COMMUNICATION:Communication = Communication{
     writepipe: None,
     readpipe: None,
+    buf_reader: None,
 };
 
 //init message (always the same struct all function write to and read from this)
@@ -150,19 +162,6 @@ fn start(_py: Python,id: String,name:String,ip:u32,link_count:u32){
         
     }
 
-    //start message
-    init_content();
-    unsafe{
-        if CONTAINERLIMIT == 8{
-            MESSAGE.content[0] = 0;
-            MESSAGE.index = 1;
-        }
-        else{
-            put_uint16(0,0);
-            MESSAGE.index = 2;
-        }
-    }
-
     //create files
     let pathwrite = "/tmp/pipewrite";
     let pathread = "/tmp/piperead";
@@ -205,7 +204,6 @@ fn start(_py: Python,id: String,name:String,ip:u32,link_count:u32){
 
     print_message("GOT WRITE PIPE".to_string());
 
-
     unsafe{
         COMMUNICATION.readpipe = Some(fileread);
         COMMUNICATION.writepipe = Some(filewrite);
@@ -230,41 +228,42 @@ fn start_polling_u8(){
 
     let _handle = thread::spawn(move || {
     //buffer to hold data
-    let mut receive_buffer = vec![0;512];
+    let mut receive_buffer = vec![0;1024];
     loop{
-        unsafe{
-            COMMUNICATION.readpipe.as_ref().unwrap().read(&mut receive_buffer).map_err(|err| print_message(format!("{:?}", err))).ok();
-        }
 
-        let mut recv_ptr = 0;
+        // unsafe{
+        //     COMMUNICATION.readpipe.as_ref().unwrap().read(&mut receive_buffer).map_err(|err| print_message(format!("{:?}", err))).ok();
+        // }
+
+        // let mut recv_ptr = 0;
 
 
-        let flow_count = receive_buffer[recv_ptr];
-        recv_ptr += 1;
+        // let flow_count = receive_buffer[recv_ptr];
+        // recv_ptr += 1;
 
-        //0 flows means the other node left
-        if flow_count == 0{
+        // //0 flows means the other node left
+        // if flow_count == 0{
 
-        }else{
-            for _f in 0..flow_count {
+        // }else{
+        //     for _f in 0..flow_count {
 
-                let mut ids = Vec::new();
+        //         let mut ids = Vec::new();
     
-                let bandwidth = get_uint32(&receive_buffer,recv_ptr);
-                recv_ptr += 4;
+        //         let bandwidth = get_uint32(&receive_buffer,recv_ptr);
+        //         recv_ptr += 4;
     
-                let link_count = receive_buffer[recv_ptr] as usize;
-                recv_ptr += 1;
+        //         let link_count = receive_buffer[recv_ptr] as usize;
+        //         recv_ptr += 1;
     
-                for _l in 0..link_count {
-                    ids.push(receive_buffer[recv_ptr]);
-                    recv_ptr+=1;
-                }
+        //         for _l in 0..link_count {
+        //             ids.push(receive_buffer[recv_ptr]);
+        //             recv_ptr+=1;
+        //         }
     
-                 callreceive_flow(bandwidth,link_count,ids);
+        //          callreceive_flow(bandwidth,link_count,ids);
     
-            }
-        }
+        //     }
+        // }
 
 
     }
@@ -278,45 +277,44 @@ fn start_polling_u8(){
 fn start_polling_u16(){
 
     let _handle = thread::spawn(move || {
-    //buffer to hold data
-    let mut receive_buffer = vec![0;512];
+        //buffer to hold data
 
-        loop{
-            unsafe{
-                COMMUNICATION.readpipe.as_ref().unwrap().read(&mut receive_buffer).map_err(|err| print_message(format!("{:?}", err))).ok();
-            }
+        unsafe{
 
-            let mut recv_ptr = 0;
+            let mut buf_reader = BufReader::new(COMMUNICATION.readpipe.as_ref().unwrap());
+
+                loop{
+                
+                    let message_reader = serialize_packed::read_message(buf_reader.borrow_mut(),capnp::message::ReaderOptions::new()).unwrap();
+       
+
+                    let message = message_reader.get_root::<message::Reader>().unwrap();
+
+                    let mut flows = message.get_flows().unwrap();
+
+                    for flow in flows{
+
+                        let bandwidth = flow.get_bw();
+
+                        let links = flow.get_links().unwrap();
+
+                        let link_count = links.len() as u16;
+
+                        let mut ids = vec![];
 
 
-            let flow_count = get_uint16(&receive_buffer,recv_ptr);
-            
-            if flow_count == 0{
-    
-            }
-            else{
-                recv_ptr += 2;
-                for _f in 0..flow_count {
+                        for i in (0..link_count){
+                            ids.push(links.get(i as u32).get_id());
+                        } 
 
-                    let mut ids = Vec::new();
-    
-                    let bandwidth = get_uint32(&receive_buffer,recv_ptr);
-                    recv_ptr += 4;
-    
-                    let link_count = get_uint16(&receive_buffer,recv_ptr) as usize;
-                    recv_ptr += 2;
-    
-                    for _l in 0..link_count {
-                        ids.push(get_uint16(&receive_buffer,recv_ptr));
-                        recv_ptr+=2;
-                    }
-    
-                    callreceive_flow_16(bandwidth,link_count,ids);
-    
+
+                        callreceive_flow_16(bandwidth,link_count,ids);
+                    } 
+
+
                 }
-            }
+
         }
-        
     });
 
 }
@@ -333,7 +331,7 @@ fn callreceive_flow(bandwidth:u32,link_count:usize,ids:Vec<u8>){
 }
 
 //call python to give information about flows from other containers
-fn callreceive_flow_16(bandwidth:u32,link_count:usize,ids:Vec<u16>){
+fn callreceive_flow_16(bandwidth:u32,link_count:u16,ids:Vec<u16>){
     let gil = Python::acquire_gil();
     let py = gil.python();
     unsafe{

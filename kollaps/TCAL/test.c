@@ -40,9 +40,9 @@ int main(int argc, char** argv){
     printf("%s\n", argv[1]);
     printf("%ud\n", ip);
 
-    char map_path[64];
-    sprintf(map_path, "/sys/fs/bpf/tc/globals/usage%s","123");
-    bpf_obj_get(map_path);
+    // char map_path[64];
+    // sprintf(map_path, "/sys/fs/bpf/tc/globals/usage%s","123");
+    // bpf_obj_get(map_path);
   
     
     void (*init)(short);

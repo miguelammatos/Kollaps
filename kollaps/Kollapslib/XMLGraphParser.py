@@ -145,8 +145,27 @@ class XMLGraphParser:
             if 'drop' in link.attrib:
                 drop = link.attrib['drop']
 
-            bidirectional = ('download' in link.attrib)
+            bidirectional = True
 
+            has_download = ('download' in link.attrib)
+            has_upload = ('upload' in link.attrib)
+
+            upload = 0
+            download = 0
+
+            if has_upload:
+                upload = link.attrib['upload']
+
+            if has_download:
+                download = link.attrib['download']
+
+            if has_upload and not has_download:
+                download = upload
+
+            if not has_upload and has_download:
+                upload = download
+
+            
             both_shared = (source_nodes[0].shared_link and destination_nodes[0].shared_link)
             if both_shared:
                 src_meta_bridge = self.create_meta_bridge()
@@ -154,57 +173,57 @@ class XMLGraphParser:
                 dst_meta_bridge = self.create_meta_bridge()
                 # create a link between both meta bridges
                 self.graph.new_link(src_meta_bridge, dst_meta_bridge, link.attrib['latency'],
-                                    jitter, drop, link.attrib['upload'], network)
+                                    jitter, drop, upload, network)
                 if bidirectional:
                     self.graph.new_link(dst_meta_bridge, src_meta_bridge, link.attrib['latency'],
-                                    jitter, drop, link.attrib['download'], network)
+                                    jitter, drop, download, network)
                 # connect source to src meta bridge
                 self.graph.new_link(link.attrib['origin'], src_meta_bridge, 0,
-                                    0, 0.0, link.attrib['upload'], network)
+                                    0, 0.0, upload, network)
                 if bidirectional:
                     self.graph.new_link(src_meta_bridge, link.attrib['origin'], 0,
-                                    0, 0.0, link.attrib['download'], network)
+                                    0, 0.0, download, network)
                 # connect destination to dst meta bridge
                 self.graph.new_link(dst_meta_bridge, link.attrib['dest'], 0,
-                                    0, 0.0, link.attrib['upload'], network)
+                                    0, 0.0, upload, network)
                 if bidirectional:
                     self.graph.new_link(link.attrib['dest'], dst_meta_bridge, 0,
-                                    0, 0.0, link.attrib['download'], network)
+                                    0, 0.0, download, network)
             elif source_nodes[0].shared_link:
                 meta_bridge = self.create_meta_bridge()
                 # create a link between meta bridge and destination
                 self.graph.new_link(meta_bridge, link.attrib['dest'], link.attrib['latency'],
-                                    jitter, drop, link.attrib['upload'], network)
+                                    jitter, drop, upload, network)
                 if bidirectional:
                     self.graph.new_link(link.attrib['dest'], meta_bridge, link.attrib['latency'],
-                                    jitter, drop, link.attrib['download'], network)
+                                    jitter, drop, download, network)
                 # connect origin to meta bridge
                 self.graph.new_link(link.attrib['origin'], meta_bridge, 0,
-                                    0, 0.0, link.attrib['upload'], network)
+                                    0, 0.0, upload, network)
                 if bidirectional:
                     self.graph.new_link(meta_bridge, link.attrib['origin'], 0,
-                                    0, 0.0, link.attrib['download'], network)
+                                    0, 0.0, download, network)
             elif destination_nodes[0].shared_link:
                 meta_bridge = self.create_meta_bridge()
                 # create a link between origin and meta_bridge
                 self.graph.new_link(link.attrib['origin'], meta_bridge, link.attrib['latency'],
-                                    jitter, drop, link.attrib['upload'], network)
+                                    jitter, drop, upload, network)
                 if bidirectional:
                     self.graph.new_link(meta_bridge, link.attrib['origin'], link.attrib['latency'],
-                                    jitter, drop, link.attrib['download'], network)
+                                    jitter, drop, download, network)
                 # connect meta bridge to destination
                 self.graph.new_link(meta_bridge, link.attrib['dest'], 0,
-                                    0, 0.0, link.attrib['upload'], network)
+                                    0, 0.0, upload, network)
                 if bidirectional:
                     self.graph.new_link(link.attrib['dest'], meta_bridge, 0,
-                                    0, 0.0, link.attrib['download'], network)
+                                    0, 0.0, download, network)
             else:
                 # Regular case create a link between origin and destination
                 self.graph.new_link(link.attrib['origin'], link.attrib['dest'], link.attrib['latency'],
-                                jitter, drop, link.attrib['upload'], network)
+                                jitter, drop, upload, network)
                 if bidirectional:
                     self.graph.new_link(link.attrib['dest'], link.attrib['origin'], link.attrib['latency'],
-                                jitter, drop, link.attrib['download'], network)
+                                jitter, drop, download, network)
 
     def calulate_required_replicas(self, service, hardcoded_count, root, reuse):
         dynamic = None
@@ -323,6 +342,9 @@ class XMLGraphParser:
         bridges = None
         links = None
         for child in root:
+
+            if child.tag == 'config':
+                continue
             if child.tag == 'services':
                 if services is not None:
                     print_and_fail("Only one <services> block is allowed.")

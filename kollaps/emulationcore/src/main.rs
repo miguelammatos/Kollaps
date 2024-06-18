@@ -25,7 +25,15 @@ mod docker;
 mod emulationcore;
 mod communication;
 use crate::emulationcore::EmulationCore;
+
+
+pub mod messages_capnp {
+    include!(concat!(env!("OUT_DIR"), "/src/messages_capnp.rs"));
+}
+
+
 use tokio::runtime;
+
 
 fn main(){
 

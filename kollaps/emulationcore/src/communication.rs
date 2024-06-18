@@ -13,93 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::borrow::BorrowMut;
 use std::sync::{Arc, Mutex};
 use std::fs::OpenOptions;
-use std::io::prelude::*;
 use std::fs::File;
 use std::ffi::CString;
-use crate::state::{State};
+use crate::state::State;
 use std::thread;
+use crate::aux::print_message;
+use capnp::serialize_packed;
+use capnp::message::{Builder, HeapAllocator};
+use crate::messages_capnp::message;
+use std::io::BufReader;
+use libc::O_WRONLY;
 
-struct Message{
-    //content has first entry number of flows, then the info of each flow[bw,len(link),linkid1,linkid2,...]
-    content: Vec<u8>,
-    index: usize,
-}
-
-impl Message{
-    fn add_flow_count_u8(&mut self){
-        self.content[0] += 1;
-    }
-    
-    fn add_flow_count_u16(&mut self){
-        let current_flow = self.get_uint16(0);
-        let new_flows = current_flow + 1;
-        self.put_uint16(0,new_flows as u16);
-    }
-    fn addindex(&mut self,value:usize){
-        self.index += value;
-    }
-    
-    fn put_uint8(&mut self,index:usize,value:u16){
-    
-        self.content[index] = value as u8;
-    }
-    
-    fn put_uint16(&mut self,index:usize,value:u16){
-    
-        self.content[index] = ((value >> 0) & 0xff) as u8;
-        self.content[index+1] = ((value >> 8) & 0xff) as u8;
-    }
-    
-    
-    fn put_uint32(&mut self,index:usize,value:u32){
-    
-        self.content[index] = ((value >> 0) & 0xff) as u8;
-        self.content[index+1] = ((value >> 8) & 0xff)  as u8;
-        self.content[index+2] = ((value >> 16) & 0xff) as u8;
-        self.content[index+3] = ((value >> 24)& 0xff) as u8;
-}
-    
-    /*fn put_uint32_in_buffer(value:u32) -> [u8;4]{
-    
-        let mut buffer = [0;4];
-        buffer[0] = ((value >> 0) & 0xff) as u8;
-        buffer[1] = ((value >> 8) & 0xff)  as u8;
-        buffer[2] = ((value >> 16) & 0xff) as u8;
-        buffer[3] = ((value >> 24)& 0xff) as u8;
-        return buffer;
-    }*/
-    
-    /*fn get_uint8(buffer:&Vec<u8>,index:usize)-> u32{
-    
-        return ((buffer[index] >> 0) & 0xff) as u32;
-    
-    }*/
-    
-    fn get_uint16(&mut self,index:usize) -> u16{
-        return (u16::from(self.content[index+1]) << 8) | (u16::from(self.content[index])) ;
-    
-    }
-    
-    
-    // fn get_uint32(&mut self,index:usize) -> u32{
-    
-    //     return (u32::from(self.content[index+3]) << 24) | 
-    //             (u32::from(self.content[index+2]) << 16) | 
-    //             (u32::from(self.content[index+1]) << 8)  |
-    //             (u32::from(self.content[index])) ;
-    // }
-
-}
 
 pub struct Communication{
     pub id:String,
     pub ip:u32,
     writepipe:Option<File>,
     readpipe:Arc<Mutex<Option<File>>>,
-    message:Message,
-    containerlimit:u32,
+    pub name: String,
+    pub filewriter:Option<File>,
+    pub filereader:Arc<Mutex<Option<BufReader<File>>>>,
 }
 
 impl Communication{
@@ -109,12 +45,11 @@ impl Communication{
             id:id.clone(),
             ip:0,
             writepipe:None,
-            message:Message{
-                content:vec![],
-                index:0
-            },
-            containerlimit:0,
-            readpipe:Arc::new(Mutex::new(None))
+            readpipe:Arc::new(Mutex::new(None)),
+            name:"".to_string(),
+            filewriter:None,
+            filereader:Arc::new(Mutex::new(None)),
+
             
         }
     }
@@ -130,7 +65,7 @@ impl Communication{
 
         let filename = CString::new(pathread.clone()).unwrap();
             unsafe {
-                libc::mkfifo(filename.as_ptr(), 0o644);
+                libc::mkfifo(filename.as_ptr(), O_WRONLY as u32);
             }
 
         
@@ -139,215 +74,104 @@ impl Communication{
 
         let filename = CString::new(pathwrite.clone()).unwrap();
         unsafe {
-            libc::mkfifo(filename.as_ptr(), 0o644);
+            libc::mkfifo(filename.as_ptr(), O_WRONLY as u32);
         }
 
-        let readpipe = Some(OpenOptions::new().read(true).open(pathread).expect("file not found"));
+        let readpipe = Some(OpenOptions::new().read(true).open(pathread.clone()).expect("file not found"));
 
         self.readpipe = Arc::new(Mutex::new(readpipe));
 
-        self.writepipe = Some(OpenOptions::new().write(true).open(pathwrite).expect("file not found"));
+        self.writepipe = Some(OpenOptions::new().write(true).open(pathwrite.clone()).expect("file not found"));
+
+
 
     }
 
     pub fn start_polling(&mut self,state:Arc<Mutex<State>>,linkcount:u32){
 
-        self.message.content.resize(512,0);
-        if linkcount <= 255{
-            self.containerlimit = 8
-        }
-        else{
-            self.containerlimit = 16
-        }
+        start_polling_u16(state.clone(),self.readpipe.clone());
 
-        if self.containerlimit == 8{
-            self.message.content[0] = 0;
-            self.message.index = 1;
-        }
-        else{
-            self.message.put_uint16(0,0);
-            self.message.index = 2;
-        }
+    }
 
-        //start the thread that will read from CommunicationManager
-        if linkcount <= 255{
-            start_polling_u8(state.clone(),self.readpipe.clone());
-        }else{
-            start_polling_u16(state.clone(),self.readpipe.clone());
+
+    pub fn init_message<'a>(&mut self,mut msg:message::Builder<'a>, round_number:u32,flow_count:u32){
+    
+        msg.set_round(round_number);
+        msg.init_flows(flow_count);
+
+
+    }
+
+
+    pub fn add_flow<'a>(&mut self,msg:message::Builder<'a>, bandwidth:u32,len_links:u32,links_vector:Vec<u16>,flow_number:u32){
+
+        let flows = msg.get_flows().unwrap();
+
+        let mut flow = flows.get(flow_number);
+
+        flow.set_bw(bandwidth);
+
+        let mut links = flow.init_links(len_links);
+
+        for i in 0..links_vector.len(){
+            links.reborrow().get(i as u32).set_id(links_vector[i as usize]);
         }
     }
 
-    //Add a flow to the message
-    pub fn add_flow_u8(&mut self, bandwidth:u32,total_links:u16,list:Vec<u16>){
 
-        //add bandwidth to message
-        self.message.put_uint32(self.message.index,bandwidth);
-        self.message.addindex(4);
-
-        //add number of links
-        self.message.put_uint8(self.message.index,total_links);
-
-        self.message.addindex(1);
-
-        //add the id of each links
-        for id in list {
-            self.message.put_uint8(self.message.index,id);
-            self.message.addindex(1);
-        }
+    pub fn send_message(&mut self,msg:Builder<HeapAllocator>){
         
-        //increment number of flows
-        self.message.add_flow_count_u8();
-    
-       
-    }
-
-    pub fn add_flow_u16(&mut self,bandwidth:u32,total_links:u16,list:Vec<u16>){
-
-        //add bandwidth to message
-        self.message.put_uint32(self.message.index,bandwidth);
-        self.message.addindex(4);
-
-        //add number of links
-        self.message.put_uint16(self.message.index,total_links);
-        self.message.addindex(2);
-
-
-        //add the id of each links
-        for id in list {
-            self.message.put_uint16(self.message.index,id);
-            self.message.addindex(2);
-        }
-
-        //increment number of flows
-        self.message.add_flow_count_u16();
-    
-    
-    }
-
-    //Writes to the pipe
-    pub fn flush(&mut self){
-
-        self.writepipe.as_ref().unwrap().write_all(&self.message.content).map_err(|err| println!("ERROR in EM writing with container id {} {:?}",self.id, err)).ok();
-        
-        //reset message
-        if self.containerlimit == 8{
-            self.message.content[0] = 0;
-            self.message.index = 1;
-        }
-        else{
-            self.message.put_uint16(0,0);
-            self.message.index = 2;
-        }
-
-
+        serialize_packed::write_message(self.writepipe.as_ref().unwrap(), &msg).unwrap();
 
     }
-
 
 
 }
 
-fn start_polling_u8(state:Arc<Mutex<State>>,readpipe:Arc<Mutex<Option<File>>>){
 
-    //buffer to hold data
-    let _handle = thread::spawn(move || {
-    let mut receive_buffer = vec![0;512];
-        loop{
-            readpipe.lock().unwrap().as_ref().unwrap().read(&mut receive_buffer).map_err(|err| println!("{:?}", err)).ok();
-
-            let mut recv_ptr = 0;
-
-
-            let flow_count = receive_buffer[recv_ptr];
-            recv_ptr += 1;
-
-            //0 flows means the other node left, might be useful for later
-            if flow_count == 0{
-
-
-            }else{
-                for _f in 0..flow_count {
-
-                    let mut ids = Vec::new();
-        
-                    let bandwidth = get_uint32(&receive_buffer,recv_ptr);
-                    recv_ptr += 4;
-        
-                    let link_count = receive_buffer[recv_ptr] as usize;
-                    recv_ptr += 1;
-                    
-                    for _l in 0..link_count {
-                        ids.push(receive_buffer[recv_ptr]);
-                        recv_ptr+=1;
-                    }
-        
-                    callreceive_flow_u8(state.clone(),bandwidth,link_count,ids);
-        
-                }
-            }
-
-        }
-    
-    });
-    
-
-}
-
-
-//same as u8 but for u16
+//Pool info from our pipe
 fn start_polling_u16(state:Arc<Mutex<State>>,readpipe:Arc<Mutex<Option<File>>>){
 
     let _handle = thread::spawn(move || {
     //buffer to hold data
-    let mut receive_buffer = vec![0;512];
-
+        let name: String = state.lock().unwrap().name.clone();
+        let readpipe_unlocked = readpipe.lock().unwrap();
+        let mut filereader = BufReader::new(readpipe_unlocked.as_ref().unwrap());  
         loop{
-
-            // if state.lock().unwrap().name.clone() != "server"{
-            //     print_message(state.lock().unwrap().name.clone(),"STARTED READING".to_string());
-            // }
-            readpipe.lock().unwrap().as_ref().unwrap().read(&mut receive_buffer).map_err(|err| println!("{:?}", err)).ok();
-
-            let mut recv_ptr = 0;
-
-
-            let flow_count = get_uint16(&receive_buffer,recv_ptr);
             
-                //0 flows means the other node left, might be useful for later
-            if flow_count == 0{
 
-    
-            }
-            else{
-                recv_ptr += 2;
-                for _f in 0..flow_count {
+            let message_reader = serialize_packed::read_message(filereader.borrow_mut(),capnp::message::ReaderOptions::new()).unwrap();
 
-                    let mut ids = Vec::new();
-    
-                    let bandwidth = get_uint32(&receive_buffer,recv_ptr);
-                    recv_ptr += 4;
-    
-                    let link_count = get_uint16(&receive_buffer,recv_ptr) as usize;
-                    recv_ptr += 2;
-    
-                    for _l in 0..link_count {
-                        ids.push(get_uint16(&receive_buffer,recv_ptr));
-                        recv_ptr+=2;
-                    }
-                    
-                    // if state.lock().unwrap().name.clone() != "server"{
-                    //     print_message(state.lock().unwrap().name.clone(),"STARTED CRF".to_string());
-                    // }
-                    callreceive_flow_16(state.clone(),bandwidth,link_count,ids);
-                    // if state.lock().unwrap().name.clone() != "server"{
-                    //     print_message(state.lock().unwrap().name.clone(),"DONE CRF".to_string());
-                    // }
-    
+            
+            let message: message::Reader<'_> = match message_reader.get_root::<message::Reader>(){
+                Ok(message)=>{
+                    message
+                },
+                Err(e)=>{
+                    print_message(name.clone(),format!("Error in parsing message {} \n Contents: {:?}",e,message_reader.canonicalize()).to_string());
+                    continue;
+
                 }
+            };
+
+            let flows = message.get_flows().unwrap();
+            for flow in flows{
+
+                let bandwidth = flow.get_bw();
+
+                let links = flow.get_links().unwrap();
+
+                let link_count = links.len() as u16;
+
+                let mut ids = vec![];
+
+                for i in 0..link_count{
+                    ids.push(links.get(i as u32).get_id());
+                } 
+
+                callreceive_flow_16(state.clone(),bandwidth,link_count,ids);
+
             }
-            // if state.lock().unwrap().name.clone() != "server"{
-            //     print_message(state.lock().unwrap().name.clone(),"DONE READING".to_string());
-            // }
             
         }
         
@@ -356,27 +180,7 @@ fn start_polling_u16(state:Arc<Mutex<State>>,readpipe:Arc<Mutex<Option<File>>>){
 }
 
 
-fn get_uint16(buffer:&Vec<u8>,index:usize) -> u16{
-    return (u16::from(buffer[index+1]) << 8) | (u16::from(buffer[index])) ;
-
-}
-
-
-fn get_uint32(buffer:&Vec<u8>,index:usize) -> u32{
-
-    return (u32::from(buffer[index+3]) << 24) | 
-            (u32::from(buffer[index+2]) << 16) | 
-            (u32::from(buffer[index+1]) << 8)  |
-            (u32::from(buffer[index])) ;
-}
-
-fn callreceive_flow_u8(state:Arc<Mutex<State>>,bandwidth:u32,link_count:usize,ids:Vec<u8>){
-
-    state.lock().unwrap().get_current_graph().lock().unwrap().collect_flow_u8(bandwidth as f32,link_count,ids.clone());
-
-}
-
-fn callreceive_flow_16(state:Arc<Mutex<State>>,bandwidth:u32,link_count:usize,ids:Vec<u16>){
+fn callreceive_flow_16(state:Arc<Mutex<State>>,bandwidth:u32,link_count:u16,ids:Vec<u16>){
 
     state.lock().unwrap().get_current_graph().lock().unwrap().collect_flow_u16(bandwidth as f32,link_count,ids.clone());
 }

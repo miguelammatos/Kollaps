@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::borrow::BorrowMut;
 use std::fs::OpenOptions;
 use std::io::prelude::*; 
 use std::thread;
@@ -23,7 +24,8 @@ use std::path::Path;
 use std::{time};
 use std::sync::{Arc, Mutex};
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
-
+use capnp::serialize_packed;
+use capnp::message::{Builder, HeapAllocator};
 pub struct Container{
     pipe: File,
     id_container: String,
@@ -33,8 +35,11 @@ pub struct Container{
 
 impl Container{
 
-    pub fn write(&mut self,content:&[u8]){
-        self.pipe.write_all(&content).map_err(|err| print_message(format!("{:?}", err))).ok();
+    pub fn write(&mut self,msg:&Builder<HeapAllocator>){
+        //print_message(format!("Writing to {}",self.id_container.clone())).ok();
+        //self.pipe.write_all(&content).map_err(|err| print_message(format!(" Failed to write {:?}", err))).ok();
+        serialize_packed::write_message(self.pipe.borrow_mut(),msg).unwrap();
+        //self.pipe.sync_all();
     }
 }
 
@@ -194,7 +199,7 @@ pub fn get_containers(local_ids:Vec<String>,pathread:String) -> Vec<Arc<Mutex<Co
 }
 
 //clones the structure containining the pipes to read from
-pub fn clone_pipes(id:String,vector_pipes_write:Vec<Arc<Mutex<Container>>>) -> Vec<Arc<Mutex<Container>>>{
+pub fn clone_pipes(id:String,vector_pipes_write:&Vec<Arc<Mutex<Container>>>) -> Vec<Arc<Mutex<Container>>>{
 
     let mut pipes = vec![];
 

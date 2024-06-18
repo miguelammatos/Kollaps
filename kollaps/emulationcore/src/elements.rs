@@ -15,6 +15,8 @@
 
 use std::sync::{Arc, Mutex};
 
+use crate::aux::print_message;
+
 //Represents a bridge and a container
 pub struct Service{
     pub ip:u32,
@@ -98,15 +100,15 @@ impl Link{
         self.flows.clear();
     }
 
-    // pub fn print(&mut self){
-    //     println!("Link with id {} from {} to {} and parameters: bw {} | latency {:.1} | jitter {:.1} | drop {:.1}",
-    //             self.id,self.source.lock().unwrap().hostname,self.destination.lock().unwrap().hostname,self.bandwidth,self.latency,self.jitter,self.drop);
-    // }
+    pub fn print(&mut self,name:String){
+        println!("Name {}: Link with id {} from {} to {} and parameters: bw {} | latency {:.} | jitter {:.1} | drop {:.1}",name.clone(),
+                self.id,self.source.lock().unwrap().hostname,self.destination.lock().unwrap().hostname,self.bandwidth,self.latency,self.jitter,self.drop);
+    }
 
-    // pub fn print_flows(&mut self){
-    //     println!("Link id: {}",self.id);
+    // pub fn print_flows(&mut self,name:String,ic:u32){
+    //     println!("Name {}: Link id: {}",name,self.id);
     //     for flow in &self.flows{
-    //         println!("Flow with rtt {:.1} and bandwidth {:.1}",flow[0],flow[1])
+    //         println!("Name {} : IC {} Flow with rtt {:.1} and bandwidth {:.1}",name,ic,flow[0],flow[1])
     //     }
     // }
 }   
@@ -123,6 +125,7 @@ pub struct Path{
     pub current_bandwidth:f32,
     pub start:String,
     pub finish:String,
+    pub last_cycle_change:u16
 }
 
 impl Path{
@@ -130,27 +133,25 @@ impl Path{
         Path {
             links: links,
             id: id,
-            latency:0.0,
+            latency:0.0000,
             rtt:0.0,
             drop:0.0,
             max_bandwidth:0.0,
             jitter:0.0,
             used_bandwidth:0.0,
-            current_bandwidth:0.0   ,
+            current_bandwidth:0.0,
             start:"".to_string(),
             finish:"".to_string(),
+            last_cycle_change:0
         }
     }
 
-    // pub fn print(&mut self){
-    //     println!("Path with id {} from {} to {} and parameters: bw {} | latency {:.1} | jitter {:.1} | drop {:.1}",
-    //             self.id,self.start,self.finish, self.max_bandwidth,self.latency,self.jitter,self.drop);
+    pub fn print(&mut self,name:String){
+        print_message(name,format!("Path with id {} from {} to {} and parameters: bw {} | latency {:.} | jitter {:.1} | drop {:.1} | links {:?}",
+                self.id,self.start,self.finish, self.max_bandwidth,self.latency,self.jitter,self.drop,self.links));
 
-    //     println!("And has links:");
-    //      for link in &self.links{
-    //         println!("{}",link);
-    //     }
-    // }
+
+    }
 
 
     pub fn set_used_bandwidth(&mut self,used_bandwidth:f32){
@@ -161,36 +162,8 @@ impl Path{
         self.current_bandwidth = current_bandwidth;
     }
 
-    pub fn set_max_bandwidth(&mut self,max_bandwidth:f32){
-        self.max_bandwidth = max_bandwidth;
-    }
 }
 
-//Metadata circulating in the emulation
-pub struct Flowu8{
-    //bytes that circulated
-    pub bandwidth:f32,
-    //links it went through
-    pub link_indices:Vec<u8>,
-    pub age:u32,
-}
-
-impl Flowu8{
-    pub fn new(bandwidth:f32,link_indices:Vec<u8>) -> Flowu8{
-        Flowu8{
-            bandwidth:bandwidth,
-            link_indices:link_indices,
-            age:1,
-        }
-    }
-
-    // pub fn print(&mut self){
-    //     println!("Flow with key {:?} and bandwidth {:.1} with age {}",
-    //             self.link_indices,self.bandwidth,self.age);
-
-    // }
-
-}
 
 //Metadata circulating in the emulation
 pub struct Flowu16{
@@ -206,7 +179,7 @@ impl Flowu16{
         Flowu16{
             bandwidth:bandwidth,
             link_indices:link_indices,
-            age:1,
+            age:0,
         }
     }
 

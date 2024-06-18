@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+ 
+<head>
+    <title>Kollaps Dashboard</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <script type="text/javascript" src="/static/js/vis.js"></script>
+</head>
+ 
+<body>
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul>
+                    <li class="pull-left" role="presentation"><a href="/">Home</a></li>
+                    <li class="pull-left" role="presentation"><a href="/flows">Active flows</a></li>
+                    <li class="pull-left" role="presentation" id="active"><a href="/graph">Graph</a></li>
+                    <li class="pull-right" role="presentation"><a href="/stop">STOP</a></li>
+                    <li class="pull-right" role="presentation"><a href="/start">START</a></li>
+                    <li class="pull-right" role="presentation"><a href="/interact">INTERACT</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main">
+            <div class="container">
+                <form>
+                    <label for="options">Choose a property:</label>
+        
+                    <select name="Options" id="options">
+                    <option value="download">Download</option>
+                    <option value="upload">Upload</option>
+                    <option value="latency">Latency</option>
+                    <option value="jitter">jitter</option>
+                    <option value="drop">drop</option>
+                    </select>
+                </form> 
+            </div>
+
+            <footer class="footer">
+                <p>Kollaps 2020</p>
+            </footer>
+        </div>
+
+</body>
+ 
+</html>

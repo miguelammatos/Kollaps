@@ -1,0 +1,51 @@
+FROM ubuntu:22.04
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    DEBIAN_FRONTEND=noninteractive \
+    KERNEL_VERSION=6.1.0-1028-oem
+
+RUN apt-get -y update
+
+RUN apt-get -y install \
+       wget \
+       build-essential \
+       software-properties-common \
+       lsb-release \
+       libelf-dev \
+       linux-headers-generic \
+       pkg-config \
+       curl \
+       linux-headers-$(uname -r)
+
+RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 13 && rm -f ./llvm.sh
+# llvm-config-13 --version | grep 13
+
+
+RUN curl https://sh.rustup.rs -sSf > rustup.sh \
+    && sh rustup.sh -y \
+          --default-toolchain stable \
+          --profile minimal \
+          --no-modify-path \
+    && rustup component add rustfmt \
+    && rustup target add x86_64-unknown-linux-musl \
+    && rustup toolchain add nightly --profile minimal \
+    && rustup --version \
+    && cargo --version \
+    && rustc --version \
+    && cargo install bindgen-cli \
+    && rm -f rustup.sh
+
+RUN cargo install cargo-bpf --no-default-features --features=llvm13,command-line
+
+RUN mkdir /monitor
+ADD ./kollaps/emulationcore/monitor /monitor
+
+RUN rustup install 1.56
+RUN rustup default 1.56
+
+WORKDIR /monitor
+
+RUN cargo bpf build
+
+ENTRYPOINT ["/bin/bash"]

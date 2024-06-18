@@ -15,6 +15,7 @@
 
 use crate::state::{State};
 use std::sync::{Arc, Mutex};
+use docker_api::models::Config;
 use roxmltree::{Node};
 use random_string::generate;
 use regex::Regex;
@@ -33,6 +34,9 @@ pub struct XMLGraphParser{
     mode:String,
     pub ips:Vec<String>,
     pub controller_ip:String,
+    pub shortest_path_type:String,
+    pub pool_period:f32,
+    pub max_age:u32
 
 }
 
@@ -42,7 +46,10 @@ impl XMLGraphParser{
             state:state,
             mode:mode,
             ips:vec![],
-            controller_ip:"".to_string()
+            controller_ip:"".to_string(),
+            shortest_path_type:"hop".to_string(),
+            pool_period:0.05,
+            max_age:2
         }
     }
 
@@ -60,6 +67,8 @@ impl XMLGraphParser{
             return;
         }
 
+        let mut config:Option<Node> = None;
+
         let mut services:Option<Node> = None;
 
         let mut bridges:Option<Node> = None;
@@ -71,6 +80,13 @@ impl XMLGraphParser{
         for node in root.children(){
             if !node.is_element(){
                 continue;
+            }
+
+            if node.tag_name().name() =="config"{
+                if !config.is_none(){
+                    continue;
+                }
+                config = Some(node);
             }
             if node.tag_name().name() == "services"{
                 if !services.is_none(){
@@ -100,6 +116,10 @@ impl XMLGraphParser{
             }
         }
 
+        if !config.is_none(){
+            self.parse_config(config.unwrap());
+        }
+
         if services.is_none(){
             print_and_fail("No services declared in topology".to_string());
         }
@@ -116,7 +136,27 @@ impl XMLGraphParser{
 
     }
 
+    pub fn parse_config(&mut self,config:Node){
+        for property in config.children(){
+            if !property.is_element(){
+                continue;
+            }
+            if property.has_attribute("shortest_path"){
+                let shortest_path_type = property.attribute("shortest_path").unwrap();
+                self.shortest_path_type = shortest_path_type.to_string();
+            }
 
+            if property.has_attribute("pool_period"){
+                let pool_period:f32 = property.attribute("pool_period").unwrap().parse().unwrap();
+                self.pool_period = pool_period;
+            }
+
+            if property.has_attribute("max_age"){
+                let max_age:u32 = property.attribute("max_age").unwrap().parse().unwrap();
+                self.max_age = max_age;
+            }
+        }
+    }
     pub fn parse_services(&mut self,services:Node,dynamic:Option<Node>){
         for service in services.children(){
             if !service.is_element() {
@@ -481,7 +521,6 @@ impl XMLGraphParser{
                 drop = link.attribute("drop").unwrap().parse().unwrap();
             }
 
-            let bidirectional = link.has_attribute("download");
 
             let both_shared = source_node_shared_link && destination_node_shared_link;
 
@@ -490,13 +529,36 @@ impl XMLGraphParser{
             if latency == 0.0{
                 println!("Warning: Latency in a path between two containers/machines/VMs can not be 0, make sure one of the links in the path has a latency bigger than 0");
             }
-            let upload = link.attribute("upload").unwrap();
-            let upload = self.parse_bandwidth(upload.to_string());
+
+            //let bidirectional = true;
+            let bidirectional = link.has_attribute("download");
+
+            
+            let has_download = link.has_attribute("download");
+
+            let has_upload = link.has_attribute("upload");
+            
             let mut download = 0.0;
-            if bidirectional{
+            let mut upload = 0.0;
+
+            if has_upload{
+                let upload_str = link.attribute("upload").unwrap();
+                upload = self.parse_bandwidth(upload_str.to_string());
+
+            }
+
+            if has_download{
                 let download_str = link.attribute("download").unwrap();
                 download = self.parse_bandwidth(download_str.to_string());
             }
+
+            // if has_upload && !has_download{
+            //     download = upload;
+            // }
+            // if !has_upload && has_download{
+            //     upload = download;
+            // }
+
 
             if both_shared{
                 let src_meta_bridge = self.create_meta_bridge().clone();
@@ -507,7 +569,7 @@ impl XMLGraphParser{
                self.state.lock().unwrap().get_current_graph().lock().unwrap().insert_link(latency,jitter,drop,upload,src_meta_bridge.clone(),dst_meta_bridge.clone());
 
                if bidirectional{
-                   self.state.lock().unwrap().get_current_graph().lock().unwrap().insert_link(latency,jitter,drop,download,dst_meta_bridge.clone(),src_meta_bridge.clone());
+                    self.state.lock().unwrap().get_current_graph().lock().unwrap().insert_link(latency,jitter,drop,download,dst_meta_bridge.clone(),src_meta_bridge.clone());
 
                }
 
@@ -515,8 +577,7 @@ impl XMLGraphParser{
                self.state.lock().unwrap().get_current_graph().lock().unwrap().insert_link(0.0,0.0,0.0,upload,source.clone(),src_meta_bridge.clone());
 
                if bidirectional{
-                self.state.lock().unwrap().get_current_graph().lock().unwrap().insert_link(0.0,0.0,0.0,download,src_meta_bridge.clone(),source.clone());
-
+                    self.state.lock().unwrap().get_current_graph().lock().unwrap().insert_link(0.0,0.0,0.0,download,src_meta_bridge.clone(),source.clone());
                }
                //connect destination to dst meta bridge
                self.state.lock().unwrap().get_current_graph().lock().unwrap().insert_link(0.0,0.0,0.0,upload,dst_meta_bridge.clone(),destination.clone());
@@ -571,8 +632,6 @@ impl XMLGraphParser{
 
                 }
             }
-
-            
         }
     }
 
@@ -591,17 +650,18 @@ impl XMLGraphParser{
 
         let bandwidth_regex = Regex::new(r"([0-9]+)([KMG])bps").unwrap();
 
+        let multi = 1.00;
         if bandwidth_regex.is_match(&bandwidth){
             let captures = bandwidth_regex.captures(&bandwidth).unwrap();
             let base:f32  = captures.get(1).unwrap().as_str().parse().unwrap();
             let multiplier = captures.get(2).unwrap().as_str();
             if multiplier == "K"{
-                return base*1000.0;
+                return base*1000.0*multi;
             }
             if multiplier == "M"{
-                return base*1000.0*1000.0;
+                return base*1000.0*1000.0*multi;
             }if multiplier == "G"{
-                return base*1000.0*1000.0*1000.0
+                return base*1000.0*1000.0*1000.0*multi;
             }
 
         }else{
@@ -774,7 +834,8 @@ impl XMLGraphParser{
                         if root.lock().unwrap().replica_id == id{
 
                             if event_type == "leave"{
-                                scheduler.schedule_leave(time);
+                                //Temporary fix before we change all wiki
+                                scheduler.schedule_crash(time);
                             }
 
                             if event_type == "crash"{

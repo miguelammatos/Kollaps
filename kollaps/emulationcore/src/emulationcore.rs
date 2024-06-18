@@ -1,16 +1,15 @@
+
 use std::sync::{Arc, Mutex};
-use crate::xmlgraphparser::{XMLGraphParser};
+use crate::xmlgraphparser::XMLGraphParser;
 //use crate::xmlgraphparserelement::{XMLGraphParser};
 use crate::communication::Communication;
 use crate::eventscheduler::EventScheduler;
-use crate::state::{State};
+use crate::state::State;
 use std::time::{Duration, Instant};
 use std::collections::HashMap;
 use redbpf::load::Loader;
-use monitor::usage::{message};
-use std::{
-    ptr,
-};
+use monitor::usage::message as ebpf_message;
+use std::ptr;
 use std::thread;
 use std::net::{TcpStream,TcpListener};
 use std::time;
@@ -29,11 +28,13 @@ use subprocess::Popen;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::io::Read;
-use futures::{StreamExt};
+use futures::StreamExt;
 use std::io;
 use tokio::runtime;
 use tokio::runtime::Handle;
 use roxmltree::Document;
+use capnp::message::{Builder, HeapAllocator};
+use crate::messages_capnp::message;
 
 
 pub struct EmulationCore{
@@ -45,7 +46,6 @@ pub struct EmulationCore{
     comms:Arc<Mutex<Communication>>,
     lasttime:Option<Instant>,
     usages:Arc<Mutex<HashMap<u32,u32>>>,
-    poolperiod:f64,
     link_count:u32,
     orchestrator:String,
     cm_file:String,
@@ -53,7 +53,10 @@ pub struct EmulationCore{
     networkdevice:String,
     shutdown:Arc<Mutex<bool>>,
     start:Arc<Mutex<bool>>,
-    scheduler:Arc<Mutex<EventScheduler>>
+    scheduler:Arc<Mutex<EventScheduler>>,
+    shortest_path_type:String,
+    pool_period:f32,
+    max_age:u32
 }
 
 impl EmulationCore{
@@ -75,7 +78,7 @@ impl EmulationCore{
             comms:Arc::new(Mutex::new(communication)),
             lasttime:None,
             usages:Arc::new(Mutex::new(HashMap::new())),
-            poolperiod:0.05,
+            pool_period:0.05,
             link_count:0,
             orchestrator:orchestrator,
             cm_file:"".to_string(),
@@ -84,6 +87,9 @@ impl EmulationCore{
             shutdown:Arc::new(Mutex::new(false)),
             scheduler:eventscheduler,
             start:Arc::new(Mutex::new(false)),
+            shortest_path_type:"hop".to_string(),
+            max_age:2
+
         }
     }
 
@@ -118,6 +124,14 @@ impl EmulationCore{
         //Parses topology
         parser.fill_graph(root.clone());
 
+        //Collect config properties
+
+        self.shortest_path_type = parser.shortest_path_type.to_string();
+
+        self.pool_period = parser.pool_period;
+
+        self.max_age = parser.max_age;
+
         let service_count = self.state.lock().unwrap().get_current_graph().lock().unwrap().services.keys().len();
 
         //Get own ip with the provided network device
@@ -136,6 +150,9 @@ impl EmulationCore{
         self.calculate_paths();
 
         //Parse dynamic events
+        
+        self.scheduler.lock().unwrap().shortest_path_type = self.shortest_path_type.clone();
+        
         parser.parse_schedule(self.scheduler.clone(),root);
         self.scheduler.lock().unwrap().sort_events();
         self.scheduler.lock().unwrap().pid = self.pid;
@@ -163,6 +180,101 @@ impl EmulationCore{
 
         thread::spawn(move || {accept_loop_baremetal(scheduler,shutdown,Arc::new(Mutex::new(process)))});
 
+    }
+    
+
+    pub fn init(&mut self){
+
+        print_message(self.name.clone(),format!("Started EC with ID {}",self.id));
+
+        //Parse the topology
+        //self.state.lock().unwrap().name = self.name.clone();
+        self.state.lock().unwrap().insert_graph();
+
+        let mut parser = XMLGraphParser::new(self.state.clone(),"container".to_string());
+        
+        let text = std::fs::read_to_string("/topology.xml".to_string()).unwrap();
+
+        let doc = Document::parse(&text).unwrap();
+
+        let root = doc.root().first_child().unwrap();
+
+        parser.fill_graph(root.clone());
+
+        //Collect config properties
+
+        self.shortest_path_type = parser.shortest_path_type.to_string();
+
+        self.pool_period = parser.pool_period;
+
+        self.max_age = parser.max_age;
+
+        let sleeptime = time::Duration::from_millis(2000);
+        thread::sleep(sleeptime);
+
+        //Get ips of all containers
+        print_message(self.name.clone(),"Looking for ips".to_string());
+        if self.orchestrator == "docker"{
+            self.state.lock().unwrap().get_current_graph().lock().unwrap().resolve_hostnames_docker();
+        }else{
+            //Need new runtime because kubernetes library uses block_on
+            let basic_rt = runtime::Builder::new_multi_thread().worker_threads(1).enable_all().build().unwrap();
+            let graph = self.state.lock().unwrap().get_current_graph().clone();
+            basic_rt.block_on(async {resolve_hostnames_kubernetes(graph).await}).map_err(|err| println!("{:?}", err)).ok();
+        }
+        print_message(self.name.clone(),"Got ips".to_string());
+        self.state.lock().unwrap().get_current_graph().lock().unwrap().set_graph_root();
+        self.calculate_paths();
+
+        //Set name for debug
+        self.scheduler.lock().unwrap().name = self.name.clone();
+
+        self.scheduler.lock().unwrap().shortest_path_type = self.shortest_path_type.clone();
+
+        self.state.lock().unwrap().emulation.lock().unwrap().name = self.name.clone();
+
+
+        //Parse dynamic events
+        parser.parse_schedule(self.scheduler.clone(),root.clone());
+        self.scheduler.lock().unwrap().sort_events();
+
+        self.state.lock().unwrap().shrink_maps();
+        self.scheduler.lock().unwrap().pid = self.pid;
+
+        //Get how many links we have in the experiment if >255 use u16 else u8
+        let removed_links_len = self.state.lock().unwrap().get_current_graph().lock().unwrap().removed_links.len();
+        self.link_count = (self.state.lock().unwrap().get_current_graph().lock().unwrap().links.keys().len() + removed_links_len) as u32;
+
+
+        //Start communication
+        self.comms.lock().unwrap().start_polling(self.state.clone(),self.link_count);
+
+        self.state.lock().unwrap().set_link_count(self.link_count);
+
+        let pid = self.pid.clone();
+
+        let scheduler = self.scheduler.clone();
+
+        let start = self.start.clone();
+
+        let shutdown = self.shutdown.clone();
+
+        self.ip = get_own_ip(None);
+
+        //Start TC structures
+        self.state.lock().unwrap().init(self.ip).map_err(|err| println!("{:?}", err)).ok();
+
+        self.comms.lock().unwrap().ip = self.ip.clone();
+        self.comms.lock().unwrap().name = self.name.clone();
+
+        //self.state.lock().unwrap().get_current_graph().lock().unwrap().print_graph(self.name.clone());
+
+        thread::spawn(move || {accept_loop(scheduler,pid,start,shutdown)});
+        
+        print_message(self.name.clone(),format!("Started with defaults values: pool_period={},max_age={},shortest_path={}",self.pool_period,self.max_age,self.shortest_path_type));
+
+
+        print_message(self.name.clone(),format!("EC with ID {} is now ON",self.id));
     }
 
     pub fn start_cm(&mut self,service_count:usize) -> Popen{
@@ -193,94 +305,21 @@ impl EmulationCore{
         print_message(self.name.clone(),"GOT PID".to_string());
         return process;
     }
-    
-
-    pub fn init(&mut self){
-
-        print_message(self.name.clone(),format!("Started EC with ID {}",self.id));
-
-        //Parse the topology
-        //self.state.lock().unwrap().name = self.name.clone();
-        self.state.lock().unwrap().insert_graph();
-
-        let mut parser = XMLGraphParser::new(self.state.clone(),"container".to_string());
-        
-        let text = std::fs::read_to_string("topology.xml".to_string()).unwrap();
-
-        let doc = Document::parse(&text).unwrap();
-
-        let root = doc.root().first_child().unwrap();
-
-        parser.fill_graph(root.clone());
-
-        let sleeptime = time::Duration::from_millis(2000);
-        thread::sleep(sleeptime);
-
-        //Get ips of all containers
-
-        if self.orchestrator == "docker"{
-            self.state.lock().unwrap().get_current_graph().lock().unwrap().resolve_hostnames_docker();
-        }else{
-            //Need new runtime because kubernetes library uses block_on
-            let basic_rt = runtime::Builder::new_multi_thread().worker_threads(1).enable_all().build().unwrap();
-            let graph = self.state.lock().unwrap().get_current_graph().clone();
-            basic_rt.block_on(async {resolve_hostnames_kubernetes(graph).await}).map_err(|err| println!("{:?}", err)).ok();
-        }
-
-        self.state.lock().unwrap().get_current_graph().lock().unwrap().set_graph_root();
-        self.calculate_paths();
-        //Set name for debug
-        self.scheduler.lock().unwrap().name = self.name.clone();
-        self.state.lock().unwrap().emulation.lock().unwrap().name = self.name.clone();
-
-
-        //Parse dynamic events
-        parser.parse_schedule(self.scheduler.clone(),root.clone());
-        self.scheduler.lock().unwrap().sort_events();
-
-        //shrink maps
-
-        self.state.lock().unwrap().shrink_maps();
-        self.scheduler.lock().unwrap().pid = self.pid;
-
-        //Get how many links we have in the experiment if >255 use u16 else u8
-        let removed_links_len = self.state.lock().unwrap().get_current_graph().lock().unwrap().removed_links.len();
-        self.link_count = (self.state.lock().unwrap().get_current_graph().lock().unwrap().links.keys().len() + removed_links_len) as u32;
-
-
-        //Start communication
-        self.comms.lock().unwrap().start_polling(self.state.clone(),self.link_count);
-
-        self.state.lock().unwrap().set_link_count(self.link_count);
-
-
-        let pid = self.pid.clone();
-
-        let scheduler = self.scheduler.clone();
-
-        let start = self.start.clone();
-
-        let shutdown = self.shutdown.clone();
-
-        self.ip = get_own_ip(None);
-
-        //Start TC structures
-        self.state.lock().unwrap().init(self.ip).map_err(|err| println!("{:?}", err)).ok();
-
-        self.comms.lock().unwrap().ip = self.ip.clone();
-
-        self.state.lock().unwrap().get_current_graph().lock().unwrap().print_graph();
-
-        thread::spawn(move || {accept_loop(scheduler,pid,start,shutdown)});
-        
-        print_message(self.name.clone(),format!("EC with ID {} is now ON",self.id));
-    }
 
     pub fn calculate_paths(&mut self){
-        self.state.lock().unwrap().get_current_graph().lock().unwrap().calculate_shortest_paths();
-        self.state.lock().unwrap().get_current_graph().lock().unwrap().calculate_properties();
-        self.name = self.state.lock().unwrap().get_current_graph().lock().unwrap().get_name().clone();
-        self.state.lock().unwrap().name = self.name.clone();
+        let mut state = self.state.lock().unwrap();
+        {
+            if self.shortest_path_type.eq("hop"){
+                state.get_current_graph().lock().unwrap().calculate_shortest_paths();
+            }
+            if self.shortest_path_type.eq("latency"){
+                state.get_current_graph().lock().unwrap().calculate_shortest_paths_latency();
+            }
+
+            state.get_current_graph().lock().unwrap().calculate_properties();
+            self.name = state.get_current_graph().lock().unwrap().get_name().clone();
+            state.name = self.name.clone();
+        }   
     }
 
     pub async fn setup_ebpf(&mut self){
@@ -300,32 +339,31 @@ impl EmulationCore{
         self.check_active_flows();
 
         loop{
-
             //wait for the experiment to start, not relevant if not debugging
             if *self.shutdown.lock().unwrap(){
                 println!("SHUTDOWN");
                 break;
             }
             if !*self.start.lock().unwrap(){
-                let sleeptime = 0.05;
-                thread::sleep(Duration::from_secs_f64(sleeptime));
+                let sleeptime = 0.0001;
+                thread::sleep(Duration::from_secs_f32(sleeptime));
                 continue;
             }
-            let sleeptime = self.poolperiod - (self.lasttime.unwrap().elapsed().as_millis() as f64)/1000.0;
+            let sleeptime = self.pool_period - (self.lasttime.unwrap().elapsed().as_millis() as f32)/1000.0;
 
             if sleeptime > 0.0{
-                //print_message(self.name.clone(),format!("Sleeping for {:.}",sleeptime).to_string());
-                thread::sleep(Duration::from_secs_f64(sleeptime));
+                thread::sleep(Duration::from_secs_f32(sleeptime));
             }
+
             
             self.state.lock().unwrap().clear_paths();
-
 
             self.check_active_flows();
 
             self.broadcast_flows();
 
             self.state.lock().unwrap().calculate_bandwidth();
+
 
 
         }
@@ -338,7 +376,7 @@ impl EmulationCore{
         let iter = usage.iter();
         for (ip,bytes) in iter{
         
-            let last_bytes  = self.state.lock().unwrap().get_current_graph().lock().unwrap().get_lastbytes(&ip);
+            let last_bytes  = self.state.lock().unwrap().get_current_graph().lock().unwrap().get_lastbytes(&ip).clone();
 
             self.state.lock().unwrap().get_current_graph().lock().unwrap().set_lastbytes(&ip,*bytes);
 
@@ -346,8 +384,10 @@ impl EmulationCore{
             if last_bytes > *bytes{
                 delta_bytes = *bytes;
             }else{
-                delta_bytes = bytes - last_bytes;
+                delta_bytes = *bytes - last_bytes;
             }
+
+            //print_message(self.name.clone(),format!("delta bytes is {}",delta_bytes.clone()));
             let delta_time = self.lasttime.unwrap().elapsed().as_millis() as f32;
 
             
@@ -359,6 +399,7 @@ impl EmulationCore{
 
             if useful{ 
                 self.state.lock().unwrap().insert_active_path_id(*ip);
+                //print_message(self.name.clone(),format!("throughput is {}",throughput.clone()));
             }
             
         }
@@ -373,27 +414,41 @@ impl EmulationCore{
         //Retrieve paths the node sent bytes to
         let active_paths = self.state.lock().unwrap().get_active_paths().clone();
 
-        if active_paths.len() > 0{
+        let active_paths_len = active_paths.len().clone();
+        if active_paths_len > 0{
+
+            let mut message: Builder<HeapAllocator> = capnp::message::Builder::new_default();
+            let mut msg: message::Builder<'_> = message.init_root::<message::Builder>();
+
+            self.comms.lock().unwrap().init_message(msg.reborrow(), self.state.lock().unwrap().ec_cycle.clone() as u32, active_paths_len as u32);
+
+
+            let mut flow_number = 0;
+            let mut total_bw = 0;            
             for path in active_paths{
+                
+                let path = path.lock().unwrap();
 
-                let bandwidth = path.lock().unwrap().used_bandwidth.clone() as u32;
-  
-                let len_links = path.lock().unwrap().links.len().clone() as u16;
+                {
+                    //TODO add bw and links
+                    let bandwidth = path.used_bandwidth.clone() as u32;
+                    total_bw= total_bw + bandwidth;
+                    let len_links = path.links.len().clone() as u32;
 
-                let links = path.lock().unwrap().links.clone();
+                    if len_links == 0 || len_links > 254{
+                        print_message(self.name.clone(),"Len links is 0 or bigger than 254\n".to_string())
+                    }
+
+                    let links = path.links.clone();
+
+                    self.comms.lock().unwrap().add_flow(msg.reborrow(), bandwidth, len_links, links,flow_number);
 
 
-                if self.link_count <=255{
-                    self.comms.lock().unwrap().add_flow_u8(bandwidth,len_links,links);
-                }
-                else{
-                    self.comms.lock().unwrap().add_flow_u16(bandwidth,len_links,links);
+                    flow_number+=1;
                 }
 
             }
-
-
-            self.comms.lock().unwrap().flush();
+            self.comms.lock().unwrap().send_message(message);
 
         }
     
@@ -419,7 +474,7 @@ async fn get_local_usage(usages:Arc<Mutex<HashMap<u32,u32>>>){
         match name.as_str() {
             "perf_events" => {
                 for event in events {
-                    let message = unsafe { ptr::read(event.as_ptr() as *const message) }; 
+                    let message = unsafe { ptr::read(event.as_ptr() as *const ebpf_message) }; 
                         usages.lock().unwrap().insert(message.dst,message.bytes);
                         //println!("Read from kernel {} {}",message.dst,message.bytes);
                 }
@@ -466,7 +521,7 @@ fn receive_commands(mut stream:TcpStream,eventscheduler:Arc<Mutex<EventScheduler
                 if buf[0] == shutdown_command{
                     
                     *shutdown.lock().unwrap() = true;
-                    stop_experiment(pid);
+                    stop_experiment(pid,3);
                     
                     break;
                 }

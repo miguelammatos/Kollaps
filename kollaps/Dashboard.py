@@ -70,6 +70,8 @@ class DashboardState:
     topology_file = ""
     kollaps_folder = ""
     interact_button_pressed = 0
+    links = OrderedDict()
+    link_error = OrderedDict()
 
 
 class Host:
@@ -149,8 +151,23 @@ def flows():
             answer = render_template('flows_baremetal.html', flows=DashboardState.flows, graph=DashboardState.graph)
         else:
             answer = render_template('flows.html', flows=DashboardState.flows, graph=DashboardState.graph)
-            #DashboardState.flows.clear()
+            DashboardState.flows.clear()
         return answer
+
+@app.route('/links_state')
+def links_state():
+    with DashboardState.lock:
+        for link in DashboardState.links:
+            bandwidth = sum(DashboardState.links[link].values())
+            maximum_bandwidth = DashboardState.graph.links[link].bandwidth_bps
+            DashboardState.link_error[link] = ((maximum_bandwidth-bandwidth)/maximum_bandwidth)*100
+            print("max_bw: " + str(maximum_bandwidth) + " and " + " bw" + str(bandwidth) + " in link " + str(link))
+        if DashboardState.mode == "container":
+            answer = render_template('links_state.html', link_error=DashboardState.link_error, graph=DashboardState.graph)
+        for link in DashboardState.links:
+            DashboardState.links[link] = {}
+        return answer
+    
 
 @app.route('/graph')
 def graph():
@@ -211,6 +228,20 @@ def initialize():
 
     with DashboardState.lock:
         DashboardState.initialized = True
+
+
+def collect_flow(bandwidth, links):
+    key = str(links[0]) + ":" + str(links[-1])
+    with DashboardState.lock:
+        #print("Received from " + str(DashboardState.graph.links[links[0]].source.name) + " to " + str(DashboardState.graph.links[links[-1]].destination.name),"to",str(bandwidth))
+        DashboardState.flows[key] = (links[0], links[-1], int(bandwidth/1000))
+        for link in links:
+            DashboardState.links[link][key] = bandwidth
+            #print("ADDED BW ",bandwidth," to ", link)
+
+
+    return True
+
 
 def stopExperiment():
     with DashboardState.lock:
@@ -323,6 +354,8 @@ def startExperiment():
 
 
 def resolve_hostnames():
+
+
     experimentUUID = environ.get('KOLLAPS_UUID', '')
     
     orchestrator = getenv('KOLLAPS_ORCHESTRATOR', 'swarm')
@@ -402,7 +435,6 @@ def resolve_hostnames():
                     DashboardState.hosts[host].ip = ips[i]
                     DashboardState.hosts[host].status = 'Pending'
 
-    start_rust()
 
 
 def start_rust():
@@ -413,17 +445,20 @@ def start_rust():
         libcommunicationcore.start(CONTAINER.id,"dashboard",0,link_count)
     
     
-    if link_count <= BYTE_LIMIT:
-        print_message("Started reading with u8")
-        libcommunicationcore.start_polling_u8()
+    # if link_count <= BYTE_LIMIT:
+    #     print_message("Started reading with u8")
+    #     libcommunicationcore.start_polling_u8()
 
-    else:
-        print_message("Started reading with u16")
-        libcommunicationcore.start_polling_u16()
+    # else:
+        # print_message("Started reading with u16")
+        # libcommunicationcore.start_polling_u16()
+        
+    libcommunicationcore.start_polling_u16()
 
     libcommunicationcore.register_communicationmanager(RustComms(collect_flow))
 
 def query_until_ready():
+    start_rust()
     resolve_hostnames()
     print_named("Dashboard", "resolved all hostnames.")
     pending_nodes = []
@@ -434,7 +469,6 @@ def query_until_ready():
         pending_nodes.append(host)
     while pending_nodes:
         host = pending_nodes.pop()
-        sleep(0.05)
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             #s.settimeout(2)
@@ -502,11 +536,6 @@ def controller_ready():
     return
 
 
-def collect_flow(bandwidth, links):
-    key = str(links[0]) + ":" + str(links[-1])
-    with DashboardState.lock:
-        DashboardState.flows[key] = (links[0], links[-1], int(bandwidth/1000))
-    return True
 
 def add_dashboard_id(id):
         file= open("/tmp/topoinfodashboard", "a")
@@ -561,8 +590,11 @@ def container_deployment():
                 if host.supervisor:
                     continue
                 DashboardState.hosts[host] = Host(host.name, host.machinename)
-
+    
     DashboardState.graph = graph
+
+    for link in graph.links:
+        DashboardState.links[link.index] = {}
     
     if getenv('RUNTIME_EMULATION', 'true') != 'false':
         startup_thread = Thread(target=query_until_ready)

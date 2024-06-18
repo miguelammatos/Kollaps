@@ -27,7 +27,6 @@ static mut COMMAND_STRING:Option<String> = None;
 pub async fn start_experiment(id:String){
 
     get_command_string(id.clone()).await;
-
     let docker = docker_api::Docker::unix("/var/run/docker.sock");
 
     let container = docker.containers().get(id);
@@ -51,17 +50,6 @@ pub async fn start_experiment(id:String){
     args.push(&command_string);
     
 
-    // let opts = ExecContainerOpts::builder()
-    //     .cmd(args)
-    //     .attach_stdout(true)
-    //     .attach_stderr(true)
-    //     .build();
-    
-    // let mut stream = container.exec(&opts);
-
-    // //run command
-    // stream.next().await;
-
     // Create Opts with specified command
     let opts = ExecCreateOpts::builder()
         .command(args)
@@ -72,7 +60,7 @@ pub async fn start_experiment(id:String){
     let exec = Exec::create(docker, &container.id(), &opts).await;
 
 
-    let mut stream = exec.as_ref().unwrap().start().next().await;
+    exec.as_ref().unwrap().start().next().await;
 
 
     //println!("{:#?}", exec.as_ref().unwrap().inspect().await);
@@ -141,9 +129,18 @@ pub async fn get_command_string(id:String){
 }
 
 //Kill every process in the namespace of the container
-pub fn stop_experiment(pid:u32){
-    Popen::create(&["nsenter", "-t", &pid.to_string(),"-p","-m","/bin/sh","-c","kill -2 -1"], PopenConfig {
-        stdout: Redirection::Pipe, ..Default::default()
-    }).unwrap();
+pub fn stop_experiment(pid:u32,code:u32){
+    //If it is a kill
+    if code==3{
+        Popen::create(&["nsenter", "-t", &pid.to_string(),"-p","-m","/bin/sh","-c","kill -9 -1"], PopenConfig {
+            stdout: Redirection::Pipe, ..Default::default()
+        }).unwrap();
+    }
+    //If it is a leave
+    if code==2{
+        Popen::create(&["nsenter", "-t", &pid.to_string(),"-p","-m","/bin/sh","-c","kill -2 -1"], PopenConfig {
+            stdout: Redirection::Pipe, ..Default::default()
+        }).unwrap();
+    }
 
 }

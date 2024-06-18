@@ -32,7 +32,8 @@ pub struct EventScheduler{
     pub tokiohandler:Option<Handle>,
     orchestrator:String,
     pub script:String,
-    pub name:String
+    pub name:String,
+    pub shortest_path_type:String
 
 }
 
@@ -46,7 +47,8 @@ impl EventScheduler{
             pid:0,
             tokiohandler:None,
             orchestrator,
-            script:"".to_string()
+            script:"".to_string(),
+            shortest_path_type:"hop".to_string()
         }
     }
 
@@ -89,12 +91,12 @@ impl EventScheduler{
 
         self.state.lock().unwrap().insert_graph();
 
-        let bridge = self.state.lock().unwrap().get_graph().lock().unwrap().removed_bridges.get(&bridge_name).unwrap().clone();
+        let bridge = self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().removed_bridges.get(&bridge_name).unwrap().clone();
 
-        self.state.lock().unwrap().get_graph().lock().unwrap().bridges_by_name.insert(bridge_name.clone(),bridge.clone());
+        self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().bridges_by_name.insert(bridge_name.clone(),bridge.clone());
 
         //if it already existed remove it from removed_bridges
-        self.state.lock().unwrap().get_graph().lock().unwrap().removed_bridges.remove(&bridge_name);
+        self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().removed_bridges.remove(&bridge_name);
         
         self.recompute_and_store();
 
@@ -108,13 +110,13 @@ impl EventScheduler{
 
         self.state.lock().unwrap().insert_graph();
 
-        let bridges = self.state.lock().unwrap().get_graph().lock().unwrap().bridges_by_name.get(&bridge_name).unwrap().clone();
+        let bridges = self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().bridges_by_name.get(&bridge_name).unwrap().clone();
 
         //insert in removed_bridges
-        self.state.lock().unwrap().get_graph().lock().unwrap().removed_bridges.insert(bridge_name.clone(),bridges);
+        self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().removed_bridges.insert(bridge_name.clone(),bridges);
 
         //remove from bridges_by_name
-        self.state.lock().unwrap().get_graph().lock().unwrap().bridges_by_name.remove(&bridge_name);
+        self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().bridges_by_name.remove(&bridge_name);
 
         self.recompute_and_store();
 
@@ -130,7 +132,7 @@ impl EventScheduler{
 
         self.state.lock().unwrap().insert_graph();
 
-        let links = self.state.lock().unwrap().get_graph().lock().unwrap().links.clone();
+        let links = self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().links.clone();
 
         //get id of links with origin and destination
         let mut ids = vec![];
@@ -141,23 +143,23 @@ impl EventScheduler{
 
             if source == origin && dest == destination{
                 ids.push(id);
-                self.state.lock().unwrap().get_graph().lock().unwrap().removed_links.push(link.clone());
+                self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().removed_links.push(link.clone());
             }
 
         }
 
         //remove them from the services and bridges
         for id in ids{
-            self.state.lock().unwrap().get_graph().lock().unwrap().links.remove(id);
+            self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().links.remove(id);
 
-            let services = self.state.lock().unwrap().get_graph().lock().unwrap().services.clone();
+            let services = self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().services.clone();
 
 
             for (_ip,service) in services.iter(){
                 service.lock().unwrap().remove_link(*id);
             }
 
-            let bridges = self.state.lock().unwrap().get_graph().lock().unwrap().bridges.clone();
+            let bridges = self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().bridges.clone();
 
 
             for (_ip,bridge) in bridges.iter(){
@@ -182,7 +184,7 @@ impl EventScheduler{
 
         let mut joining_links = vec![];
 
-        let removed_links = self.state.lock().unwrap().get_graph().lock().unwrap().removed_links.clone();
+        let removed_links = self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().removed_links.clone();
 
         let mut link_existed = false;
 
@@ -195,8 +197,8 @@ impl EventScheduler{
 
             if source == origin && dest == destination{
                 joining_links.push(link.clone());
-                self.state.lock().unwrap().get_graph().lock().unwrap().removed_links.remove(i);
-                self.state.lock().unwrap().get_graph().lock().unwrap().links.insert(link.lock().unwrap().id,link.clone());
+                self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().removed_links.remove(i);
+                self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().links.insert(link.lock().unwrap().id,link.clone());
             }
 
         }
@@ -206,7 +208,7 @@ impl EventScheduler{
 
             link_existed = true;
 
-            let services = self.state.lock().unwrap().get_graph().lock().unwrap().services_by_name.clone();
+            let services = self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().services_by_name.clone();
             let source = link.lock().unwrap().source.lock().unwrap().hostname.clone();
             for (name,services) in services.iter(){
                 if source == *name{
@@ -215,7 +217,7 @@ impl EventScheduler{
                     }
                 }
             }
-            let bridges = self.state.lock().unwrap().get_graph().lock().unwrap().bridges_by_name.clone();
+            let bridges = self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().bridges_by_name.clone();
 
             for (name,bridges) in bridges.iter(){
                 if source == *name{
@@ -241,7 +243,7 @@ impl EventScheduler{
         
         self.state.lock().unwrap().insert_graph();
 
-        self.state.lock().unwrap().get_graph().lock().unwrap().insert_link(latency,jitter,drop,bandwidth,origin,destination);
+        self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().insert_link(latency,jitter,drop,bandwidth,origin,destination);
    
         let event = Event::new(1,time);
 
@@ -254,7 +256,7 @@ impl EventScheduler{
     
         self.state.lock().unwrap().insert_graph();
 
-        for (_id,link) in self.state.lock().unwrap().get_graph().lock().unwrap().links.iter_mut(){
+        for (_id,link) in self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().links.iter_mut(){
             let link_origin = link.lock().unwrap().source.lock().unwrap().hostname.clone();
             let link_dest = link.lock().unwrap().destination.lock().unwrap().hostname.clone();
 
@@ -288,9 +290,15 @@ impl EventScheduler{
 
     pub fn recompute_and_store(&mut self){
 
-        self.state.lock().unwrap().get_graph().lock().unwrap().calculate_shortest_paths();
+        if self.shortest_path_type.eq("hop"){
+            self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().calculate_shortest_paths();
+        }
+        if self.shortest_path_type.eq("latency"){
+            self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().calculate_shortest_paths_latency();
+        }
 
-        self.state.lock().unwrap().get_graph().lock().unwrap().calculate_properties();
+
+        self.state.lock().unwrap().get_graph_most_recent().lock().unwrap().calculate_properties();
         
     }
 
@@ -328,11 +336,10 @@ impl EventScheduler{
                 }
 
                 if self.events[count].id == 3{
-                    stop_experiment(self.pid.clone());
+                    stop_experiment(self.pid.clone(),3);
                 }
                 if self.events[count].id == 2{
-                    //This is not properly implemented since 1.0
-                    //self.state.lock().unwrap().increment_age();
+                    stop_experiment(self.pid.clone(),2);
                 }
                 if self.events[count].id == 1{
                     self.state.lock().unwrap().increment_age();

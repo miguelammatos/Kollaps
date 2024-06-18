@@ -3,10 +3,16 @@ FROM ubuntu:22.04
 WORKDIR /
 
 # Location of netem distribution files on archlinux
-
 ARG openssl_arch=linux-x86_64
+
 ENV DEBIAN_FRONTEND=noninteractive \
-    TC_LIB_DIR=/usr/lib/tc/
+    TC_LIB_DIR=/usr/lib/tc/ \
+    RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    KERNEL_VERSION=6.2.0-37-generic \
+    RUST_BACKTRACE=1 \
+    PIP_ROOT_USER_ACTION=ignore
     #JEMALLOC_SYS_WITH_MALLOC_CONF=background_thread:true,narenas:1,tcache:false,dirty_decay_ms:0,muzzy_decay_ms:0,abort_conf:true
     
 RUN CONFIG_BPF=y \
@@ -38,6 +44,7 @@ RUN apt-get update \
     pkgconf \
     python3 \
     python3-pip \
+    vim \
     && apt-get clean -y
 
 ADD ./pid1 /Kollaps/pid1
@@ -49,7 +56,7 @@ ADD ./setup.py /Kollaps/setup.py
 RUN make -C /Kollaps/pid1 && \
     cp /Kollaps/pid1/pid1 /usr/bin/pid1 && \
     make -C /Kollaps/kollaps/TCAL -j8 && \
-    pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netifaces openssh_wrapper netaddr && \
+    pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netifaces openssh_wrapper netaddr requests==2.31.0 && \
     pip3 --no-cache-dir wheel --no-deps -w /Kollaps /Kollaps && \
     pip3 --no-cache-dir install /Kollaps/kollaps-2.0-py3-none-any.whl && \
     cp /Kollaps/kollaps/TCAL/libTCAL.so /usr/local/bin/libTCAL.so && \
@@ -57,8 +64,7 @@ RUN make -C /Kollaps/pid1 && \
     cp -R /Kollaps/kollaps/rustbinaries/emulationcore /usr/bin/emulationcore  && \
     cp /Kollaps/kollaps/rustbinaries/libcommunicationcore.so /usr/local/bin/libcommunicationcore.so && \   
     rm -rf /Kollaps && \
-    pip3 --no-cache-dir uninstall -y setuptools wheel pip3 && \
-    apt-get remove -y gcc make flex bison
+    pip3 --no-cache-dir uninstall -y setuptools wheel pip3
 
 WORKDIR /
 

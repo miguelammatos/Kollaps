@@ -2,6 +2,13 @@
 name = "emulationcore"
 version = "0.1.0"
 edition = "2021"
+build = "src/build.rs"
+
+# [profile.release]
+# debug = true
+
+#[target.x86_64-unknown-linux-gnu]
+#rustflags = ["-Clink-arg=-fuse-ld=lld", "-Clink-arg=-Wl,--no-rosegment"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -26,3 +33,10 @@ k8s-openapi = { version = "0.14.0", features = ["v1_22"] }
 futures = "0.3.21"
 elementtree = "0.7.0"
 zero = "=0.1.2"
+capnp = "0.18.3"
+capnpc = "0.17.0"
+os_pipe = "1.1.4"
+chrono = "0.4.31"
+
+[build-dependencies]
+capnpc = "0.17.0"

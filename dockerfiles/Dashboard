@@ -34,5 +34,3 @@ RUN pip3 --no-cache-dir install wheel dnspython flask docker kubernetes netiface
 
 WORKDIR /Kollaps/
 ENTRYPOINT ["python3","kollaps/Dashboard.py","baremetal/topology.xml"]
-
-#docker run -d  --network host dashboard:2.0

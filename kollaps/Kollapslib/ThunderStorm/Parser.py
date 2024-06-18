@@ -240,7 +240,7 @@ def p_image_declaration(p):
         p[0] = p[1] + [p[2]]
 
 def p_ip_declaration(p):
-    '''ip_declaration : SERVICE ID IP EQ INTEGER ID ID ID ID
+    '''ip_declaration : SERVICE ID IP EQ INipTEGER ID ID ID ID
                       | ip_declaration'''
     node = BaremetalNodeAuxDeclaration()
     setattr(node,"name",p[2])

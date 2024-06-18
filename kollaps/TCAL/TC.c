@@ -241,7 +241,8 @@ void TC_initDestination(Destination *dest) {
     size = snprintf(NULL, 0, "%0.6fms", dest->latency);
     latency = (char*)malloc(sizeof(char)*(size+1));
     snprintf(latency, size+1, "%0.6fms", dest->latency);
-
+    //printf("Latency in TC is %s \n",latency);
+    //fflush(stdout);
     //Create the netem qdisc for emulating latency and attach it to the previous htb class
     //Warning, if we use new netem features, double check that TC_changePacketLoss() still works (might need changes)
     ADD_DEV

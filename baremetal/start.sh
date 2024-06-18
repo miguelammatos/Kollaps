@@ -14,5 +14,9 @@ sudo rm /ips.txt
 # cargo build --release
 # cd ..
 # cd ..
+
+#CHANGE THIS ACCORDING TO THE NAME OF THE NETWORK DEVICE
+networkdevice="eth0"
+
 sudo cp libTCAL.so /usr/local/bin/libTCAL.so
-sudo ./emulationcore $1 communicationmanager eth0 baremetal
+sudo ./emulationcore $1 communicationmanager $networkdevice baremetal

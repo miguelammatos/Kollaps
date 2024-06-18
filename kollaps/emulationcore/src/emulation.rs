@@ -15,6 +15,7 @@
 
 use libloading::{Library, Symbol};
 use crate::aux::print_and_fail;
+use crate::aux::{print_message};
 //Interacts with TC library
 pub struct Emulation{
     library:Library,
@@ -56,24 +57,37 @@ impl Emulation{
 
     }
 
-    // pub fn disable_path(&mut self, destinationip:u32){
-    //     unsafe{
+    pub fn disable_path(&mut self, destinationip:u32){
+        unsafe{
             
-    //         let initdestination: Symbol< unsafe extern fn(u32,u32,f32,f32,f32)> = self.library.get(b"initDestination").unwrap();
-    //         initdestination(destinationip,10000,1.0,0.0,1.0);
-    //     }
+            let initdestination: Symbol< unsafe extern fn(u32,u32,f32,f32,f32)> = self.library.get(b"initDestination").unwrap();
+            initdestination(destinationip,10000,1.0,0.0,1.0);
+        }
 
-    // }
+    }
 
     pub fn change_bandwidth(&mut self, ip:u32,bandwidth:u32){
 
-        if bandwidth==0{
-            print_and_fail("Tried to change bandwidth to 0".to_string());
+        let bw_in_kbps=bandwidth/1000;
+        //print_message(self.name.clone(),format!("In change bw {} to {}",bandwidth,ip).to_string());
+        if bw_in_kbps==0{
+            //print_and_fail("Tried to change bandwidth to 0".to_string());
+            print_message(self.name.clone(),"Tried changing to 0".to_string());
+            unsafe{
+                let changebw: Symbol< unsafe extern fn(u32,u32)> = self.library.get(b"changeBandwidth").unwrap();
+                changebw(ip,1);
+                //print_message(self.name.clone(),"Changed to 1".to_string());
+            }
         }
-        unsafe{
-            let changebw: Symbol< unsafe extern fn(u32,u32)> = self.library.get(b"changeBandwidth").unwrap();
-            changebw(ip,bandwidth/1000);
+        else{
+            unsafe{
+                let changebw: Symbol< unsafe extern fn(u32,u32)> = self.library.get(b"changeBandwidth").unwrap();
+                //print_message(self.name.clone(),format!("Changing bw to {}",bandwidth/1000).to_string());
+                changebw(ip,bw_in_kbps);
+            }
         }
+        //print_message(self.name.clone(),"Out of of change bw".to_string());
+
     }
 
     pub fn change_loss(&mut self, ip:u32,loss:f32){

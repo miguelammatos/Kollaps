@@ -53,11 +53,6 @@ def main():
                 try:
                     parsed_declarations.append(ndl_parse(line.strip()))
 
-                    # print(ndl_parse(line.strip()).name)
-                    # print(ndl_parse(line.strip()).ip)
-                    # print(ndl_parse(line.strip()).machinename)
-                    # print(ndl_parse(line.strip()).folder)
-
                 except:
                     print("Could not parse line: \"" + line.strip() + "\". Skipping.")
                     continue

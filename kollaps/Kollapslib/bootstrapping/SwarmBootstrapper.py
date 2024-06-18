@@ -172,6 +172,10 @@ class SwarmBootstrapper(Bootstrapper):
                     "-t", str(pid),
                     "-n", "/usr/bin/emulationcore", str(container_id), str(pid),"docker"]
 
+            # cmd = ["cd /Kollaps/kollaps/emulationcore/","&&","nsenter",
+            #         "-t", str(pid),
+            #         "-n", "cargo flamegraph --", str(container_id), str(pid),"docker"]
+            
             emucore_instance = Popen(cmd)
 
             self.instance_count += 1

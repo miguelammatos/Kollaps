@@ -69,6 +69,7 @@ void changeBandwidth(unsigned int ip, int bandwidth){
 void changeLoss(unsigned int ip, float packetLoss){
     Destination* dest;
     HASH_FIND(hh_ip, hosts, &ip, sizeof(int), dest);
+    fflush(stdout);
     dest->packetLossRate = packetLoss;
     TC_changeNetem(dest);
 }

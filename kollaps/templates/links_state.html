@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <title>Kollaps Dashboard</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <meta http-equiv="refresh" content="2"/>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul>
+                    <li class="pull-left" role="presentation"><a href="/">Home</a></li>
+                    <li class="pull-left" role="presentation" id="active"><a href="/flows">Active flows</a></li>
+                    <li class="pull-left" role="presentation"><a href="/links_state">Links state</a></li>
+                    <li class="pull-left" role="presentation"><a href="/graph">Graph</a></li>
+                    <li class="pull-right" role="presentation"><a href="/stop">STOP</a></li>
+                    <li class="pull-right" role="presentation"><a href="/start">START</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main">
+            <div class="container">
+                <table>
+                    <tr>
+                        <th>Origin</th>
+                        <th>Source</th>
+                        <th>Error</th>
+                    </tr>
+                    {% for key, error in link_error.items() %}
+                    <tr>
+                        <td> <!-- LL: ugly hack
+                                  if new links have been added dynamically, the dashboard doesn't know about them
+                                  the clean solution would be to always keep the graph updated -->
+                          {% if graph.links|length > key %}
+                            {{graph.links[key].source.name}}
+                          {% else %}
+                            source
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if graph.links|length > key %}
+                            {{graph.links[key].destination.name}}
+                          {% else %}
+                            destination
+                          {% endif %}
+                        </td>
+                        <td style="text-align:right">{{error}}%</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Kollaps 2020</p>
+        </footer>
+
+    </div>
+</body>
+
+</html>
